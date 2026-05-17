@@ -1,0 +1,27 @@
+{
+  "projectName": "48-coffee-pos",
+  "mode": "file-router",
+  "typescript": true,
+  "tailwind": true,
+  "packageManager": "npm",
+  "git": true,
+  "install": true,
+  "intent": true,
+  "addOnOptions": {
+    "prisma": {
+      "database": "postgres"
+    }
+  },
+  "includeExamples": true,
+  "envVarValues": {},
+  "routerOnly": false,
+  "version": 1,
+  "framework": "react",
+  "chosenAddOns": [
+    "better-auth",
+    "prisma",
+    "neon",
+    "tanstack-query",
+    "table"
+  ]
+}
