@@ -1,28 +1,33 @@
-import { createFormHook, createFormHookContexts } from '@tanstack/react-form'
-
-import { FormInput } from './components/form-input'
-import { FormTextarea } from './components/form-textarea'
-import { FormSelect } from './components/form-select'
-import { FormCheckbox } from './components/form-checkbox'
-import { FormSwitch } from './components/form-switch'
-import { FormRadio } from './components/form-radio'
-import { FormSubmitButton } from './components/form-submit-button'
+import { createFormHook, createFormHookContexts } from "@tanstack/react-form";
+import type { FormDevtoolsPanel } from "@tanstack/react-form-devtools";
+import { FormCheckbox } from "./components/form-checkbox";
+import { FormInput } from "./components/form-input";
+import { FormRadio } from "./components/form-radio";
+import { FormSelect } from "./components/form-select";
+import { FormSubmitButton } from "./components/form-submit-button";
+import { FormSwitch } from "./components/form-switch";
+import { FormTextarea } from "./components/form-textarea";
 
 export const { fieldContext, formContext, useFieldContext, useFormContext } =
-  createFormHookContexts()
+	createFormHookContexts();
 
 export const { useAppForm, withForm } = createFormHook({
-  fieldComponents: {
-    Input: FormInput,
-    Textarea: FormTextarea,
-    Select: FormSelect,
-    Checkbox: FormCheckbox,
-    Switch: FormSwitch,
-    Radio: FormRadio,
-  },
-  formComponents: {
-    SubmitButton: FormSubmitButton,
-  },
-  fieldContext,
-  formContext,
-})
+	fieldComponents: {
+		Input: FormInput,
+		Textarea: FormTextarea,
+		Select: FormSelect,
+		Checkbox: FormCheckbox,
+		Switch: FormSwitch,
+		Radio: FormRadio,
+	},
+	formComponents: {
+		SubmitButton: FormSubmitButton,
+	},
+	fieldContext,
+	formContext,
+});
+
+export const TanstackFormDevtools = {
+	name: "Tanstack Form",
+	render: () => <FormDevtoolsPanel />,
+}

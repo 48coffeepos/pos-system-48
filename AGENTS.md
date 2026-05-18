@@ -23,6 +23,7 @@ npx @tanstack/cli@latest create 48-coffee-pos --framework React --yes --package-
 
 - **Framework**: TanStack Start (React) w/ file-based routing
 - **Styling**: Tailwind CSS v4 w/ `@tailwindcss/vite`, shadcn/ui + Base UI
+- **Icons**: Phosphor Icons (`@phosphor-icons/react`) for UI icons; do not use `lucide-react`
 - **Auth**: Better Auth w/ Prisma adapter (`@better-auth/prisma-adapter`), experimental joins enabled
 - **Database ORM**: Prisma v7 (`@prisma/adapter-neon` for Neon-optimized connection)
 - **Database**: Neon (Postgres)
