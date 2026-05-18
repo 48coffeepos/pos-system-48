@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { AdminHeader } from "@/feature/admin/inventory/components/AdminHeader";
+import { AdminHeader } from "@/feature/admin/components/AdminHeader";
 import { Package } from "@phosphor-icons/react";
 
 export const Route = createFileRoute("/admin/inventory")({
