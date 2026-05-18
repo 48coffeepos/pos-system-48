@@ -963,7 +963,8 @@ export const InventoryScalarFieldEnum = {
   inventory_id: 'inventory_id',
   name: 'name',
   stock: 'stock',
-  yesterday_stock: 'yesterday_stock'
+  yesterday_stock: 'yesterday_stock',
+  type: 'type'
 } as const
 
 export type InventoryScalarFieldEnum = (typeof InventoryScalarFieldEnum)[keyof typeof InventoryScalarFieldEnum]
@@ -1045,6 +1046,20 @@ export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaM
  * Reference to a field of type 'Boolean'
  */
 export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+/**
+ * Reference to a field of type 'Inventory_Type'
+ */
+export type EnumInventory_TypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Inventory_Type'>
+    
+
+
+/**
+ * Reference to a field of type 'Inventory_Type[]'
+ */
+export type ListEnumInventory_TypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Inventory_Type[]'>
     
 
 

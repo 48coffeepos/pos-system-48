@@ -63,7 +63,7 @@ model Account {
 }
 
 model Verification {
-  id         String   @id
+  id         String   @id 
   identifier String
   value      String
   expiresAt  DateTime
@@ -75,7 +75,7 @@ model Verification {
 }
 
 model inventory {
-  inventory_id    String @id @db.Uuid
+  inventory_id    String @id @default(uuid())
   name            String
   stock           Int
   yesterday_stock Int?

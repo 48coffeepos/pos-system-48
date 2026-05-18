@@ -41,6 +41,7 @@ export type InventoryMinAggregateOutputType = {
   name: string | null
   stock: number | null
   yesterday_stock: number | null
+  type: $Enums.Inventory_Type | null
 }
 
 export type InventoryMaxAggregateOutputType = {
@@ -48,6 +49,7 @@ export type InventoryMaxAggregateOutputType = {
   name: string | null
   stock: number | null
   yesterday_stock: number | null
+  type: $Enums.Inventory_Type | null
 }
 
 export type InventoryCountAggregateOutputType = {
@@ -55,6 +57,7 @@ export type InventoryCountAggregateOutputType = {
   name: number
   stock: number
   yesterday_stock: number
+  type: number
   _all: number
 }
 
@@ -74,6 +77,7 @@ export type InventoryMinAggregateInputType = {
   name?: true
   stock?: true
   yesterday_stock?: true
+  type?: true
 }
 
 export type InventoryMaxAggregateInputType = {
@@ -81,6 +85,7 @@ export type InventoryMaxAggregateInputType = {
   name?: true
   stock?: true
   yesterday_stock?: true
+  type?: true
 }
 
 export type InventoryCountAggregateInputType = {
@@ -88,6 +93,7 @@ export type InventoryCountAggregateInputType = {
   name?: true
   stock?: true
   yesterday_stock?: true
+  type?: true
   _all?: true
 }
 
@@ -182,6 +188,7 @@ export type InventoryGroupByOutputType = {
   name: string
   stock: number
   yesterday_stock: number | null
+  type: $Enums.Inventory_Type
   _count: InventoryCountAggregateOutputType | null
   _avg: InventoryAvgAggregateOutputType | null
   _sum: InventorySumAggregateOutputType | null
@@ -208,10 +215,11 @@ export type inventoryWhereInput = {
   AND?: Prisma.inventoryWhereInput | Prisma.inventoryWhereInput[]
   OR?: Prisma.inventoryWhereInput[]
   NOT?: Prisma.inventoryWhereInput | Prisma.inventoryWhereInput[]
-  inventory_id?: Prisma.UuidFilter<"inventory"> | string
+  inventory_id?: Prisma.StringFilter<"inventory"> | string
   name?: Prisma.StringFilter<"inventory"> | string
   stock?: Prisma.IntFilter<"inventory"> | number
   yesterday_stock?: Prisma.IntNullableFilter<"inventory"> | number | null
+  type?: Prisma.EnumInventory_TypeFilter<"inventory"> | $Enums.Inventory_Type
 }
 
 export type inventoryOrderByWithRelationInput = {
@@ -219,6 +227,7 @@ export type inventoryOrderByWithRelationInput = {
   name?: Prisma.SortOrder
   stock?: Prisma.SortOrder
   yesterday_stock?: Prisma.SortOrderInput | Prisma.SortOrder
+  type?: Prisma.SortOrder
 }
 
 export type inventoryWhereUniqueInput = Prisma.AtLeast<{
@@ -229,6 +238,7 @@ export type inventoryWhereUniqueInput = Prisma.AtLeast<{
   name?: Prisma.StringFilter<"inventory"> | string
   stock?: Prisma.IntFilter<"inventory"> | number
   yesterday_stock?: Prisma.IntNullableFilter<"inventory"> | number | null
+  type?: Prisma.EnumInventory_TypeFilter<"inventory"> | $Enums.Inventory_Type
 }, "inventory_id">
 
 export type inventoryOrderByWithAggregationInput = {
@@ -236,6 +246,7 @@ export type inventoryOrderByWithAggregationInput = {
   name?: Prisma.SortOrder
   stock?: Prisma.SortOrder
   yesterday_stock?: Prisma.SortOrderInput | Prisma.SortOrder
+  type?: Prisma.SortOrder
   _count?: Prisma.inventoryCountOrderByAggregateInput
   _avg?: Prisma.inventoryAvgOrderByAggregateInput
   _max?: Prisma.inventoryMaxOrderByAggregateInput
@@ -247,24 +258,27 @@ export type inventoryScalarWhereWithAggregatesInput = {
   AND?: Prisma.inventoryScalarWhereWithAggregatesInput | Prisma.inventoryScalarWhereWithAggregatesInput[]
   OR?: Prisma.inventoryScalarWhereWithAggregatesInput[]
   NOT?: Prisma.inventoryScalarWhereWithAggregatesInput | Prisma.inventoryScalarWhereWithAggregatesInput[]
-  inventory_id?: Prisma.UuidWithAggregatesFilter<"inventory"> | string
+  inventory_id?: Prisma.StringWithAggregatesFilter<"inventory"> | string
   name?: Prisma.StringWithAggregatesFilter<"inventory"> | string
   stock?: Prisma.IntWithAggregatesFilter<"inventory"> | number
   yesterday_stock?: Prisma.IntNullableWithAggregatesFilter<"inventory"> | number | null
+  type?: Prisma.EnumInventory_TypeWithAggregatesFilter<"inventory"> | $Enums.Inventory_Type
 }
 
 export type inventoryCreateInput = {
-  inventory_id: string
+  inventory_id?: string
   name: string
   stock: number
   yesterday_stock?: number | null
+  type: $Enums.Inventory_Type
 }
 
 export type inventoryUncheckedCreateInput = {
-  inventory_id: string
+  inventory_id?: string
   name: string
   stock: number
   yesterday_stock?: number | null
+  type: $Enums.Inventory_Type
 }
 
 export type inventoryUpdateInput = {
@@ -272,6 +286,7 @@ export type inventoryUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   stock?: Prisma.IntFieldUpdateOperationsInput | number
   yesterday_stock?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  type?: Prisma.EnumInventory_TypeFieldUpdateOperationsInput | $Enums.Inventory_Type
 }
 
 export type inventoryUncheckedUpdateInput = {
@@ -279,13 +294,15 @@ export type inventoryUncheckedUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   stock?: Prisma.IntFieldUpdateOperationsInput | number
   yesterday_stock?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  type?: Prisma.EnumInventory_TypeFieldUpdateOperationsInput | $Enums.Inventory_Type
 }
 
 export type inventoryCreateManyInput = {
-  inventory_id: string
+  inventory_id?: string
   name: string
   stock: number
   yesterday_stock?: number | null
+  type: $Enums.Inventory_Type
 }
 
 export type inventoryUpdateManyMutationInput = {
@@ -293,6 +310,7 @@ export type inventoryUpdateManyMutationInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   stock?: Prisma.IntFieldUpdateOperationsInput | number
   yesterday_stock?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  type?: Prisma.EnumInventory_TypeFieldUpdateOperationsInput | $Enums.Inventory_Type
 }
 
 export type inventoryUncheckedUpdateManyInput = {
@@ -300,6 +318,7 @@ export type inventoryUncheckedUpdateManyInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   stock?: Prisma.IntFieldUpdateOperationsInput | number
   yesterday_stock?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  type?: Prisma.EnumInventory_TypeFieldUpdateOperationsInput | $Enums.Inventory_Type
 }
 
 export type inventoryCountOrderByAggregateInput = {
@@ -307,6 +326,7 @@ export type inventoryCountOrderByAggregateInput = {
   name?: Prisma.SortOrder
   stock?: Prisma.SortOrder
   yesterday_stock?: Prisma.SortOrder
+  type?: Prisma.SortOrder
 }
 
 export type inventoryAvgOrderByAggregateInput = {
@@ -319,6 +339,7 @@ export type inventoryMaxOrderByAggregateInput = {
   name?: Prisma.SortOrder
   stock?: Prisma.SortOrder
   yesterday_stock?: Prisma.SortOrder
+  type?: Prisma.SortOrder
 }
 
 export type inventoryMinOrderByAggregateInput = {
@@ -326,6 +347,7 @@ export type inventoryMinOrderByAggregateInput = {
   name?: Prisma.SortOrder
   stock?: Prisma.SortOrder
   yesterday_stock?: Prisma.SortOrder
+  type?: Prisma.SortOrder
 }
 
 export type inventorySumOrderByAggregateInput = {
@@ -341,6 +363,10 @@ export type NullableIntFieldUpdateOperationsInput = {
   divide?: number
 }
 
+export type EnumInventory_TypeFieldUpdateOperationsInput = {
+  set?: $Enums.Inventory_Type
+}
+
 
 
 export type inventorySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -348,6 +374,7 @@ export type inventorySelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   name?: boolean
   stock?: boolean
   yesterday_stock?: boolean
+  type?: boolean
 }, ExtArgs["result"]["inventory"]>
 
 export type inventorySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -355,6 +382,7 @@ export type inventorySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   name?: boolean
   stock?: boolean
   yesterday_stock?: boolean
+  type?: boolean
 }, ExtArgs["result"]["inventory"]>
 
 export type inventorySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -362,6 +390,7 @@ export type inventorySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   name?: boolean
   stock?: boolean
   yesterday_stock?: boolean
+  type?: boolean
 }, ExtArgs["result"]["inventory"]>
 
 export type inventorySelectScalar = {
@@ -369,9 +398,10 @@ export type inventorySelectScalar = {
   name?: boolean
   stock?: boolean
   yesterday_stock?: boolean
+  type?: boolean
 }
 
-export type inventoryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"inventory_id" | "name" | "stock" | "yesterday_stock", ExtArgs["result"]["inventory"]>
+export type inventoryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"inventory_id" | "name" | "stock" | "yesterday_stock" | "type", ExtArgs["result"]["inventory"]>
 
 export type $inventoryPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "inventory"
@@ -381,6 +411,7 @@ export type $inventoryPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     name: string
     stock: number
     yesterday_stock: number | null
+    type: $Enums.Inventory_Type
   }, ExtArgs["result"]["inventory"]>
   composites: {}
 }
@@ -808,6 +839,7 @@ export interface inventoryFieldRefs {
   readonly name: Prisma.FieldRef<"inventory", 'String'>
   readonly stock: Prisma.FieldRef<"inventory", 'Int'>
   readonly yesterday_stock: Prisma.FieldRef<"inventory", 'Int'>
+  readonly type: Prisma.FieldRef<"inventory", 'Inventory_Type'>
 }
     
 
