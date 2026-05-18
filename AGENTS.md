@@ -4,6 +4,7 @@
 
 Before substantial work:
 
+- Before taking any action, read the relevant repo instructions and load any matching skills first to get the best context.
 - Skill check: run `npx @tanstack/intent@latest list`, or use skills already listed in context.
 - Skill guidance: if one local skill clearly matches the task, run `npx @tanstack/intent@latest load <package>#<skill>` and follow the returned `SKILL.md`.
 - Monorepos: when working across packages, run the skill check from the workspace root and prefer the local skill for the package being changed.
@@ -22,6 +23,7 @@ npx @tanstack/cli@latest create 48-coffee-pos --framework React --yes --package-
 
 - **Framework**: TanStack Start (React) w/ file-based routing
 - **Styling**: Tailwind CSS v4 w/ `@tailwindcss/vite`, shadcn/ui + Base UI
+- **Icons**: Phosphor Icons (`@phosphor-icons/react`) for UI icons; do not use `lucide-react`
 - **Auth**: Better Auth w/ Prisma adapter (`@better-auth/prisma-adapter`), experimental joins enabled
 - **Database ORM**: Prisma v7 (`@prisma/adapter-neon` for Neon-optimized connection)
 - **Database**: Neon (Postgres)
@@ -44,7 +46,7 @@ DIRECT_URL=pq://... (direct — for Prisma CLI commands)
 
 ## Key Architecture
 
-- `/src/routes/` — file-based routing via TanStack Router
+- `/src/routes/` — file-based routing via TanStack Router; route files handle route-level wiring and rendering of domain-specific components
 - `/src/integrations/prisma/db.ts` — shared Prisma client w/ `@prisma/adapter-neon` (Neon-optimized)
 - `/src/integrations/better-auth/auth.ts` — Better Auth server config w/ Prisma adapter + experimental joins
 - `/src/integrations/better-auth/auth-client.ts` — Better Auth client config
@@ -55,14 +57,15 @@ DIRECT_URL=pq://... (direct — for Prisma CLI commands)
 - `/src/generated/prisma/` — Generated Prisma client (gitignored)
 - `/src/stores/` — Global client state (Zustand)
 - `/src/components/ui/data-table.tsx` — Generic table primitive (TanStack Table + shadcn)
-- `/src/feature/todos/` — Todos feature entrypoint (`keys.ts`, `queryOptions.ts`, `mutationOptions.ts`, `server/`, `components/`)
+- `/src/features/todos/` — Todos feature entrypoint (`keys.ts`, `queryOptions.ts`, `mutationOptions.ts`, `server/`, `components/`)
 
 ## Repo Conventions
 
 - Organize code by domain/feature first, not by technical layer alone.
 - Each feature should own its own `components/`, `server/`, `schemas/`, `keys.ts`, `queryOptions.ts`, and `mutationOptions.ts` as needed.
-- Keep feature logic colocated inside `src/feature/<domain>/`.
-- Keep route files thin; they should compose feature modules, not contain business logic.
+- Keep feature logic colocated inside `src/features/<domain>/`.
+- Keep `src/routes/` files thin; they should handle route-level concerns like loaders, `beforeLoad`, params/search/url handling, redirects, server fetching, and prefetching, while rendering domain-specific components.
+- Keep client-side components and interaction logic in `src/features/<domain>/` or `src/components/`, not in `src/routes/`.
 - Use `@/` imports for app code under `src/`.
 - Use the shared Prisma client from `@/integrations/prisma/db` as the single database entry point.
 - Keep Prisma access out of route components and UI components.
@@ -73,14 +76,14 @@ DIRECT_URL=pq://... (direct — for Prisma CLI commands)
 ## Zustand Conventions
 
 - Global UI state (theme, sidebar, cart) lives in `src/stores/`.
-- Domain-specific client state lives in `src/feature/<domain>/stores/`.
+- Domain-specific client state lives in `src/features/<domain>/stores/`.
 - Server state stays in TanStack Query. Never mirror server data in Zustand.
 
 ## Server Function Wiring
 
-- `createServerFn` must be wired into `queryOptions()` or `mutationOptions()` inside `*.queries.ts` and `*.mutations.ts`.
+- `createServerFn` must be wired into `queryOptions()` or `mutationOptions()` inside feature-level `queryOptions.ts` and `mutationOptions.ts` files.
 - UI components and route files must import the hook/options, never the raw server function.
-- Only `*.queries.ts` and `*.mutations.ts` files are allowed to import `createServerFn` handlers directly.
+- Only feature-level `queryOptions.ts` and `mutationOptions.ts` files are allowed to import `createServerFn` handlers directly.
 
 ## Error Handling
 
@@ -94,34 +97,129 @@ DIRECT_URL=pq://... (direct — for Prisma CLI commands)
 
 - Server is source of truth; TanStack Query is the client cache.
 - Use `createServerFn` for all Prisma reads and writes.
-- Use `useQuery` for reusable client data.
-- Use `useSuspenseQuery` when the route has prefeteched the data.
+- Define query options in `src/features/<domain>/queryOptions.ts` with `queryOptions()` so the same definition can be reused by route loaders and components.
+- Use `useSuspenseQuery` when a route loader already fetched the query through `queryClient.ensureQueryData(...)`.
+- Use `useQuery` when the component owns loading and there is no route-level prefetch.
 - Use `useMutation` for all writes.
 - Do not query Prisma directly inside route loaders.
+- Route loaders may either warm the cache with `queryClient.ensureQueryData(...)` or return data fetched through `queryClient.ensureQueryData(...)`.
 - Keep query key factories in `keys.ts` and query options in `queryOptions.ts`.
 - Use `queryClient.invalidateQueries()` for React Query-owned data.
-- Use `router.invalidate()` only when route loaders own the data.
+- Use `router.invalidate()` only when the route loader result itself is the source of truth for the rendered screen.
 - Keep query client setup centralized in `src/integrations/tanstack-query/`.
 - Set sane query defaults once in the query client.
-- Keep route files thin; move data logic into `src/feature/<domain>/`.
+- Keep route files thin; move data logic into `src/features/<domain>/`.
 
-## Data Loading
+## Finite Data Fetching Patterns
 
-Define query options in `queryOptions.ts` using `queryOptions()`. Keep the query key and fetcher together so the same definition can be reused in route loaders and components.
+Use one of these three patterns for finite query data. Pattern 1 and Pattern 2 are equally recommended. Pattern 3 is the simplest option when route-level prefetching is unnecessary.
 
-- Use `queryClient.prefetchQuery(...)` in route loaders for SSR-critical or above-the-fold data.
-- Use `useQuery(...)` in components with the same query options when the component should own its loading state.
-- Use `useSuspenseQuery(...)` when the route loader or beforeLoad already prefetched the data.
-- If a screen does not need route-level prefetching, skip the loader and let the component fetch directly.
-- Prefer explicit loading UI for `useQuery(...)`;
-- Keep the component API stable. Prefetching should be an implementation detail, not a component rewrite.
+### Shared Setup
+
+Keep the query key and fetcher together so the same definition can be reused in loaders and components.
+
+```ts
+// src/features/todos/queryOptions.ts
+import { queryOptions } from "@tanstack/react-query";
+import todoKeys from "./keys";
+import getTodos from "./server/getTodos";
+
+export const getAllTodosQueryOptions = queryOptions({
+	queryKey: todoKeys.all,
+	queryFn: getTodos,
+});
+```
+
+### Pattern 1: Cache-First Route Loader
+
+Use this when the route should ensure the query is in the cache and the screen should read from TanStack Query with `useSuspenseQuery(...)`.
+
+```ts
+// src/routes/demo/todos.tsx
+import { createFileRoute } from "@tanstack/react-router";
+import { getAllTodosQueryOptions } from "@/features/todos/queryOptions";
+
+export const Route = createFileRoute("/demo/todos")({
+	loader: async ({ context: { queryClient } }) => {
+		await queryClient.ensureQueryData(getAllTodosQueryOptions);
+	},
+	component: TodosRoute,
+});
+```
+
+```tsx
+// src/routes/demo/todos.tsx
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { getAllTodosQueryOptions } from "@/features/todos/queryOptions";
+
+function TodosRoute() {
+	const { data } = useSuspenseQuery(getAllTodosQueryOptions);
+
+	return <pre>{JSON.stringify(data, null, 2)}</pre>;
+}
+```
+
+### Pattern 2: Loader-Returned Route Data
+
+Use this when the route should fetch through TanStack Query and return the resolved data to the route component, which then passes it into a feature component as props.
+
+```ts
+// src/routes/demo/todos.tsx
+import { createFileRoute } from "@tanstack/react-router";
+import { getAllTodosQueryOptions } from "@/features/todos/queryOptions";
+import { TodosScreen } from "@/features/todos/components/TodosScreen";
+
+export const Route = createFileRoute("/demo/todos")({
+	loader: async ({ context: { queryClient } }) => {
+		return queryClient.ensureQueryData(getAllTodosQueryOptions);
+	},
+	component: TodosRoute,
+});
+
+function TodosRoute() {
+	const todos = Route.useLoaderData();
+
+	return <TodosScreen todos={todos} />;
+}
+```
+
+### Pattern 3: Component-Owned Query
+
+Use this when the screen does not need route-level prefetching and the component should own loading and error states directly.
+
+```tsx
+// src/routes/demo/todos.tsx
+import { createFileRoute } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { getAllTodosQueryOptions } from "@/features/todos/queryOptions";
+
+export const Route = createFileRoute("/demo/todos")({
+	component: TodosRoute,
+});
+
+function TodosRoute() {
+	const { data, isLoading, error } = useQuery(getAllTodosQueryOptions);
+
+	if (isLoading) return <div>Loading...</div>;
+	if (error) return <div>Failed to load todos.</div>;
+
+	return <pre>{JSON.stringify(data, null, 2)}</pre>;
+}
+```
+
+### Choosing a Pattern
+
+- Use Pattern 1 when the route should guarantee the query is cached and the screen should continue to consume TanStack Query directly.
+- Use Pattern 2 when the route should compose the fetched data and pass a screen-ready payload into feature components.
+- Use Pattern 3 when the data is local to the screen, below the fold, or not worth route-level prefetching.
+- Keep the component API stable. Switching between patterns should not force a full feature rewrite.
 
 ## Route Boundaries
 
 Use route boundaries for navigation-level loading and route-level failures, not as a replacement for component query states.
 
 - Use `beforeLoad` for auth, redirects, and guard checks.
-- Use `loader` for route-scoped prefetching only.
+- Use `loader` for route-scoped prefetching or returning route-owned data.
 - Add `pendingComponent` when route transitions or loader work should show a page-level loading state.
 - Use `errorComponent` for loader failures and retry with `router.invalidate()`.
 - Use `notFound()` for missing resources and `notFoundComponent` on the root route for the app-wide 404.
@@ -131,75 +229,30 @@ Use route boundaries for navigation-level loading and route-level failures, not 
 
 ```ts
 // src/routes/orders.tsx
-import { createFileRoute, redirect } from "@tanstack/react-router";
-import { ordersQueryOptions } from "@/features/orders/orders.queries";
+import { createFileRoute } from "@tanstack/react-router";
+import { ordersQueryOptions } from "@/features/orders/queryOptions";
 import {
-  RouteErrorBoundary,
-  RoutePendingBoundary,
+	RouteErrorBoundary,
+	RoutePendingBoundary,
 } from "@/components/route-boundaries";
 
 export const Route = createFileRoute("/orders")({
-  loader: async ({ context: { queryClient } }) => {
-    await queryClient.prefetchQuery(ordersQueryOptions);
-  },
-  pendingComponent: RoutePendingBoundary,
-  errorComponent: RouteErrorBoundary,
-  component: OrdersRoute,
+	loader: async ({ context: { queryClient } }) => {
+		await queryClient.ensureQueryData(ordersQueryOptions);
+	},
+	pendingComponent: RoutePendingBoundary,
+	errorComponent: RouteErrorBoundary,
+	component: OrdersRoute,
 });
 ```
 
-### Example
-
-```ts
-// src/feature/todos/queryOptions.ts
-import { queryOptions } from "@tanstack/react-query";
-import todoKeys from "./keys";
-import getTodos from "./server/getTodos";
-
-export const getAllTodosQueryOptions = queryOptions({
-  queryKey: todoKeys.all,
-  queryFn: getTodos,
-});
-```
-
-```ts
-// src/routes/demo/todos.tsx
-import { createFileRoute } from "@tanstack/react-router";
-import { getAllTodosQueryOptions } from "@/feature/todos/queryOptions";
-
-export const Route = createFileRoute("/demo/todos")({
-  loader: async ({ context }) => {
-    await context.queryClient.prefetchQuery(getAllTodosQueryOptions);
-  },
-  component: TodosRoute,
-});
-```
-
-```tsx
-function TodosRoute() {
-  const { data } = useSuspenseQuery(getAllTodosQueryOptions);
-
-  return <pre>{JSON.stringify(data, null, 2)}</pre>;
-}
-```
-
-```tsx
-function TodosRoute() {
-  const { data, isLoading, error } = useQuery(getAllTodosQueryOptions);
-
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Failed to load todos.</div>;
-
-  return <pre>{JSON.stringify(data, null, 2)}</pre>;
-}
-```
-
-## Infinite Queries
+## Infinite Query Patterns
 
 Use `useInfiniteQuery(...)` for cursor-based or unbounded collections such as feeds, logs, or long lists.
 
 - Keep infinite query definitions in `queryOptions.ts` alongside the base query logic.
 - Use `queryClient.prefetchInfiniteQuery(...)` in route loaders when the initial page must be ready on first render.
+- Keep route-level infinite prefetching separate from finite query patterns. Infinite queries should still use `prefetchInfiniteQuery(...)`, not the finite `ensureQueryData(...)` flow.
 - Use normal `useQuery(...)` for finite lists and single-record detail views.
 - Keep pagination or cursor state in the component or feature store, not in route loaders.
 - Use infinite queries only when the data truly grows over time or needs page-by-page fetching.
@@ -208,65 +261,65 @@ Use `useInfiniteQuery(...)` for cursor-based or unbounded collections such as fe
 
 ```ts
 export const activityKeys = {
-  all: ["activity"] as const,
+	all: ["activity"] as const,
 };
 
 const getActivity = createServerFn({ method: "GET" }).handler(
-  async ({ data }: { data?: { cursor?: string | null } }) => {
-    return {
-      items: [{ id: 1, label: "Opened register" }],
-      nextCursor: null as string | null,
-    };
-  },
+	async ({ data }: { data?: { cursor?: string | null } }) => {
+		return {
+			items: [{ id: 1, label: "Opened register" }],
+			nextCursor: null as string | null,
+		};
+	},
 );
 
 export const activityInfiniteQueryOptions = infiniteQueryOptions({
-  queryKey: activityKeys.all,
-  initialPageParam: null as string | null,
-  queryFn: ({ pageParam }) => getActivity({ data: { cursor: pageParam } }),
-  getNextPageParam: (lastPage) => lastPage.nextCursor,
+	queryKey: activityKeys.all,
+	initialPageParam: null as string | null,
+	queryFn: ({ pageParam }) => getActivity({ data: { cursor: pageParam } }),
+	getNextPageParam: (lastPage) => lastPage.nextCursor,
 });
 ```
 
 ```ts
 // src/routes/activity.tsx
 import { createFileRoute } from "@tanstack/react-router";
-import { activityInfiniteQueryOptions } from "@/features/activity/activity.queries";
+import { activityInfiniteQueryOptions } from "@/features/activity/queryOptions";
 
 export const Route = createFileRoute("/activity")({
-  loader: async ({ context }) => {
-    await context.queryClient.prefetchInfiniteQuery(
-      activityInfiniteQueryOptions,
-    );
-  },
-  component: ActivityRoute,
+	loader: async ({ context }) => {
+		await context.queryClient.prefetchInfiniteQuery(
+			activityInfiniteQueryOptions,
+		);
+	},
+	component: ActivityRoute,
 });
 ```
 
 ```tsx
 // src/routes/activity.tsx
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { activityInfiniteQueryOptions } from "@/features/activity/activity.queries";
+import { activityInfiniteQueryOptions } from "@/features/activity/queryOptions";
 
 function ActivityRoute() {
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useInfiniteQuery(activityInfiniteQueryOptions);
+	const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
+		useInfiniteQuery(activityInfiniteQueryOptions);
 
-  const items = data?.pages.flatMap((page) => page.items) ?? [];
+	const items = data?.pages.flatMap((page) => page.items) ?? [];
 
-  return (
-    <div>
-      {items.map((item) => (
-        <div key={item.id}>{item.label}</div>
-      ))}
-      <button
-        disabled={!hasNextPage || isFetchingNextPage}
-        onClick={() => fetchNextPage()}
-      >
-        Load more
-      </button>
-    </div>
-  );
+	return (
+		<div>
+			{items.map((item) => (
+				<div key={item.id}>{item.label}</div>
+			))}
+			<button
+				disabled={!hasNextPage || isFetchingNextPage}
+				onClick={() => fetchNextPage()}
+			>
+				Load more
+			</button>
+		</div>
+	);
 }
 ```
 
@@ -282,9 +335,9 @@ Define query key factories/constants in `keys.ts`.
 ### Example
 
 ```ts
-// src/feature/todos/keys.ts
+// src/features/todos/keys.ts
 const todoKeys = {
-  all: ["todos"] as const,
+	all: ["todos"] as const,
 };
 
 export default todoKeys;
@@ -296,7 +349,7 @@ Define mutation options in `mutationOptions.ts` using `mutationOptions()`.
 
 - Keep mutation config and server function wiring together in the feature mutation file.
 - Consume the mutation options from hooks with `useMutation(...)`.
-- Use the predefined query keys from `*.queries.ts` for targeted invalidation.
+- Use the predefined query keys from `keys.ts` for targeted invalidation.
 - Keep invalidation local to the affected feature and resource.
 - Prefer returning updated server data when practical instead of broad refetches.
 - Skip optimistic updates unless a feature clearly needs them.
@@ -305,26 +358,27 @@ Define mutation options in `mutationOptions.ts` using `mutationOptions()`.
 ### Example
 
 ```ts
-// src/feature/todos/mutationOptions.ts
+// src/features/todos/mutationOptions.ts
 import { mutationOptions } from "@tanstack/react-query";
 import createTodo from "./server/createTodo";
+import todoKeys from "./keys";
 
 export const createTodoMutationOptions = mutationOptions({
-  mutationFn: async (title: string) => createTodo({ data: { title } }),
-  onSuccess: (data, variables, context) => {
-    // Invalidate the "todos" query to refetch the list after creating a new todo
-    queryClient.invalidateQueries(todoKeys.all);
-  },
+	mutationFn: async (title: string) => createTodo({ data: { title } }),
+	onSuccess: async (_data, _variables, context) => {
+		// Invalidate the "todos" query to refetch the list after creating a new todo
+		await context.client.invalidateQueries({ queryKey: todoKeys.all });
+	},
 });
 ```
 
 ```ts
-// src/feature/todos/components/CreateTodoForm.tsx
+// src/features/todos/components/CreateTodoForm.tsx
 import { useMutation } from "@tanstack/react-query";
 import { createTodoMutationOptions } from "../mutationOptions";
 
 function CreateTodoForm() {
-  const mutation = useMutation(createTodoMutationOptions);
+	const mutation = useMutation(createTodoMutationOptions);
 
 	...rest of the code
 }
@@ -332,13 +386,13 @@ function CreateTodoForm() {
 
 ## File Layout
 
-- `src/feature/<domain>/server/` for Prisma and server-only logic.
-- `src/feature/<domain>/schemas/` for shared Zod schemas.
-- `src/feature/<domain>/keys.ts` for query key factories/constants.
-- `src/feature/<domain>/queryOptions.ts` for `queryOptions()` and query fetchers.
-- `src/feature/<domain>/mutationOptions.ts` for `mutationOptions()` and mutation wiring.
-- `src/feature/<domain>/components/` for feature-specific UI.
-- `src/feature/<domain>/stores/` for domain-specific client state (Zustand).
+- `src/features/<domain>/server/` for Prisma and server-only logic.
+- `src/features/<domain>/schemas/` for shared Zod schemas.
+- `src/features/<domain>/keys.ts` for query key factories/constants.
+- `src/features/<domain>/queryOptions.ts` for `queryOptions()` and query fetchers.
+- `src/features/<domain>/mutationOptions.ts` for `mutationOptions()` and mutation wiring.
+- `src/features/<domain>/components/` for feature-specific UI.
+- `src/features/<domain>/stores/` for domain-specific client state (Zustand).
 - `src/integrations/` for integration-specific setup and shared logic (Prisma client, auth config, query client).
 - `src/components/ui/` for reusable UI primitives (buttons, inputs, tables).
 - `src/stores/` for global client state (Zustand).
@@ -360,41 +414,41 @@ import { useAppForm } from '@/integrations/tanstack-form'
 
 ```tsx
 const form = useAppForm({
-  defaultValues: { name: "" },
-  validators: { onChange: MyZodSchema },
-  onSubmit: async ({ value }) => {
-    // createServerFn call
-  },
+	defaultValues: { name: "" },
+	validators: { onChange: MyZodSchema },
+	onSubmit: async ({ value }) => {
+		// createServerFn call
+	},
 });
 
 return (
-  <form
-    onSubmit={(e) => {
-      e.preventDefault();
-      form.handleSubmit();
-    }}
-  >
-    <form.AppField name="name">
-      {(field) => <field.Input label="Name" placeholder="Enter name" />}
-    </form.AppField>
-    <form.AppField name="role">
-      {(field) => (
-        <field.Select
-          label="Role"
-          options={[
-            { value: "admin", label: "Admin" },
-            { value: "user", label: "User" },
-          ]}
-        />
-      )}
-    </form.AppField>
-    <form.AppField name="notify">
-      {(field) => <field.Checkbox label="Send notifications" />}
-    </form.AppField>
-    <form.AppForm>
-      <form.SubmitButton label="Save" />
-    </form.AppForm>
-  </form>
+	<form
+		onSubmit={(e) => {
+			e.preventDefault();
+			form.handleSubmit();
+		}}
+	>
+		<form.AppField name="name">
+			{(field) => <field.Input label="Name" placeholder="Enter name" />}
+		</form.AppField>
+		<form.AppField name="role">
+			{(field) => (
+				<field.Select
+					label="Role"
+					options={[
+						{ value: "admin", label: "Admin" },
+						{ value: "user", label: "User" },
+					]}
+				/>
+			)}
+		</form.AppField>
+		<form.AppField name="notify">
+			{(field) => <field.Checkbox label="Send notifications" />}
+		</form.AppField>
+		<form.AppForm>
+			<form.SubmitButton label="Save" />
+		</form.AppForm>
+	</form>
 );
 ```
 
