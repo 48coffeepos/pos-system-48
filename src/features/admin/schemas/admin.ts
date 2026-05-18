@@ -1,12 +1,35 @@
 import { z } from "zod";
 import { ROLES } from "@/features/auth/schemas/auth";
 
-export const CreateCashierSchema = z.object({
+
+const nameSchema = z.string().trim().min(1, "Name is required");
+const usernameSchema = z.string().trim().min(1, "Username is required");
+const passwordSchema = z.string().min(8, "Password must be at least 8 characters");
+
+export const CreateAccountSchema = z.object({
 	email: z.email(),
-	password: z.string().min(6, "Password must be at least 6 characters"),
-	name: z.string().min(1, "Name is required"),
-	username: z.string().min(1, "Username is required"),
-	role: ROLES.enum.cashier,
+	password: passwordSchema,
+	name: nameSchema,
+	username: usernameSchema,
+	role: ROLES,
 });
 
-export type CreateCashierInput = z.input<typeof CreateCashierSchema>;
+export const UpdateAccountSchema = z.object({
+	userId: z.string().min(1, "User ID is required"),
+	name: nameSchema,
+	password: passwordSchema.optional(),
+});
+
+export const AccountFormSchema = CreateAccountSchema;
+
+export const EditAccountFormSchema = z.object({
+	name: nameSchema,
+	password: z.union([
+		z.literal(""),
+		passwordSchema,
+	]),
+});
+
+export type CreateAccountInput = z.input<typeof CreateAccountSchema>;
+export type UpdateAccountInput = z.input<typeof UpdateAccountSchema>;
+export type AccountFormInput = z.input<typeof AccountFormSchema>;

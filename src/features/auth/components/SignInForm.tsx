@@ -1,4 +1,3 @@
-import { FieldError } from "@/components/ui/field";
 import { useSignIn } from "../hooks/useSignIn";
 
 export function SignInForm() {
@@ -26,7 +25,6 @@ export function SignInForm() {
 						<field.Password label="Password" placeholder="Enter password" />
 					)}
 				</form.AppField>
-				<FieldError errors={form.state.errors} />
 
 				{/* Submit Button */}
 				<form.AppForm>

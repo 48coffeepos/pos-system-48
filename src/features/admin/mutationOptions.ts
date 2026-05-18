@@ -1,29 +1,27 @@
 import { mutationOptions } from "@tanstack/react-query";
-import type { RoleName } from "@/features/auth/roles";
-import { authClient } from "@/integrations/better-auth/auth-client";
 import adminUsersKeys from "./keys";
-import type { CreateCashierInput } from "./schemas/admin";
-import { createCashier } from "./server/createCashier";
+import type { CreateAccountInput, UpdateAccountInput } from "./schemas/admin";
+import { createAccount } from "./server/createAccount";
+import { removeAccount } from "./server/removeAccount";
+import { updateAccount } from "./server/updateAccount";
 
-export const setRoleMutationOptions = mutationOptions({
-	mutationFn: async ({ userId, role }: { userId: string; role: RoleName }) => {
-		const { data, error } = await authClient.admin.setRole({ userId, role });
-		if (error) throw new Error(error.message || "Failed to update role");
-		return data;
-	},
-	onSuccess: async (_, __, ___, context) => {
-		await context.client.invalidateQueries({ queryKey: adminUsersKeys.all });
+export const createAccountMutationOptions = mutationOptions({
+	mutationFn: async (data: CreateAccountInput) => createAccount({ data }),
+	onSuccess: async (_data, _variables, _onMutateResult, context) => {
+		await context.client.invalidateQueries({ queryKey: adminUsersKeys.accounts() });
 	},
 });
 
-export const createCashierMutationOptions = mutationOptions({
-	mutationFn: async (data: CreateCashierInput) => createCashier({ data }),
+export const updateAccountMutationOptions = mutationOptions({
+	mutationFn: async (data: UpdateAccountInput) => updateAccount({ data }),
+	onSuccess: async (_data, _variables, _onMutateResult, context) => {
+		await context.client.invalidateQueries({ queryKey: adminUsersKeys.accounts() });
+	},
 });
 
-export const removeUserMutationOptions = mutationOptions({
-	mutationFn: async (userId: string) => {
-		const { data, error } = await authClient.admin.removeUser({ userId });
-		if (error) throw new Error(error.message || "Failed to remove user");
-		return data;
+export const removeAccountMutationOptions = mutationOptions({
+	mutationFn: async (userId: string) => removeAccount({ data: { userId } }),
+	onSuccess: async (_data, _variables, _onMutateResult, context) => {
+		await context.client.invalidateQueries({ queryKey: adminUsersKeys.accounts() });
 	},
 });
