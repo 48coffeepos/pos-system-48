@@ -129,72 +129,72 @@ Use route boundaries for navigation-level loading and route-level failures, not 
 
 ```ts
 // src/routes/orders.tsx
-import { createFileRoute, redirect } from '@tanstack/react-router'
-import { ordersQueryOptions } from '@/features/orders/orders.queries'
+import { createFileRoute, redirect } from "@tanstack/react-router";
+import { ordersQueryOptions } from "@/features/orders/orders.queries";
 import {
   RouteErrorBoundary,
   RoutePendingBoundary,
-} from '@/components/route-boundaries'
+} from "@/components/route-boundaries";
 
-export const Route = createFileRoute('/orders')({
+export const Route = createFileRoute("/orders")({
   beforeLoad: ({ context }) => {
-    if (!context.queryClient) throw redirect({ to: '/login' })
+    if (!context.queryClient) throw redirect({ to: "/login" });
   },
   loader: async ({ context: { queryClient } }) => {
-    await queryClient.prefetchQuery(ordersQueryOptions)
+    await queryClient.prefetchQuery(ordersQueryOptions);
   },
   pendingComponent: RoutePendingBoundary,
   errorComponent: RouteErrorBoundary,
   component: OrdersRoute,
-})
+});
 ```
 
 ### Example
 
 ```ts
 // src/features/todos/todos.queries.ts
-import { queryOptions } from '@tanstack/react-query'
-import { createServerFn } from '@tanstack/react-start'
+import { queryOptions } from "@tanstack/react-query";
+import { createServerFn } from "@tanstack/react-start";
 
 export const todosKeys = {
-  all: ['todos'] as const,
-}
+  all: ["todos"] as const,
+};
 
-const getTodos = createServerFn({ method: 'GET' }).handler(async () => {
-  return [{ id: 1, title: 'Latte' }]
-})
+const getTodos = createServerFn({ method: "GET" }).handler(async () => {
+  return [{ id: 1, title: "Latte" }];
+});
 
 export const todosQueryOptions = queryOptions({
   queryKey: todosKeys.all,
   queryFn: () => getTodos(),
-})
+});
 ```
 
 ```ts
 // src/routes/demo/todos.tsx
-import { createFileRoute } from '@tanstack/react-router'
-import { todosQueryOptions } from '@/features/todos/todos.queries'
+import { createFileRoute } from "@tanstack/react-router";
+import { todosQueryOptions } from "@/features/todos/todos.queries";
 
-export const Route = createFileRoute('/demo/todos')({
+export const Route = createFileRoute("/demo/todos")({
   loader: async ({ context }) => {
-    await context.queryClient.prefetchQuery(todosQueryOptions)
+    await context.queryClient.prefetchQuery(todosQueryOptions);
   },
   component: TodosRoute,
-})
+});
 ```
 
 ```tsx
 // src/routes/demo/todos.tsx
-import { useQuery } from '@tanstack/react-query'
-import { todosQueryOptions } from '@/features/todos/todos.queries'
+import { useQuery } from "@tanstack/react-query";
+import { todosQueryOptions } from "@/features/todos/todos.queries";
 
 function TodosRoute() {
-  const { data, isLoading, error } = useQuery(todosQueryOptions)
+  const { data, isLoading, error } = useQuery(todosQueryOptions);
 
-  if (isLoading) return <div>Loading...</div>
-  if (error) return <div>Failed to load todos.</div>
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Failed to load todos.</div>;
 
-  return <pre>{JSON.stringify(data, null, 2)}</pre>
+  return <pre>{JSON.stringify(data, null, 2)}</pre>;
 }
 ```
 
@@ -212,55 +212,55 @@ Use `useInfiniteQuery(...)` for cursor-based or unbounded collections such as fe
 
 ```ts
 // src/features/activity/activity.queries.ts
-import { infiniteQueryOptions } from '@tanstack/react-query'
-import { createServerFn } from '@tanstack/react-start'
+import { infiniteQueryOptions } from "@tanstack/react-query";
+import { createServerFn } from "@tanstack/react-start";
 
 export const activityKeys = {
-  all: ['activity'] as const,
-}
+  all: ["activity"] as const,
+};
 
-const getActivity = createServerFn({ method: 'GET' }).handler(async ({
-  data,
-}: {
-  data?: { cursor?: string | null }
-}) => {
-  return {
-    items: [{ id: 1, label: 'Opened register' }],
-    nextCursor: null as string | null,
-  }
-})
+const getActivity = createServerFn({ method: "GET" }).handler(
+  async ({ data }: { data?: { cursor?: string | null } }) => {
+    return {
+      items: [{ id: 1, label: "Opened register" }],
+      nextCursor: null as string | null,
+    };
+  },
+);
 
 export const activityInfiniteQueryOptions = infiniteQueryOptions({
   queryKey: activityKeys.all,
   initialPageParam: null as string | null,
   queryFn: ({ pageParam }) => getActivity({ data: { cursor: pageParam } }),
   getNextPageParam: (lastPage) => lastPage.nextCursor,
-})
+});
 ```
 
 ```ts
 // src/routes/activity.tsx
-import { createFileRoute } from '@tanstack/react-router'
-import { activityInfiniteQueryOptions } from '@/features/activity/activity.queries'
+import { createFileRoute } from "@tanstack/react-router";
+import { activityInfiniteQueryOptions } from "@/features/activity/activity.queries";
 
-export const Route = createFileRoute('/activity')({
+export const Route = createFileRoute("/activity")({
   loader: async ({ context }) => {
-    await context.queryClient.prefetchInfiniteQuery(activityInfiniteQueryOptions)
+    await context.queryClient.prefetchInfiniteQuery(
+      activityInfiniteQueryOptions,
+    );
   },
   component: ActivityRoute,
-})
+});
 ```
 
 ```tsx
 // src/routes/activity.tsx
-import { useInfiniteQuery } from '@tanstack/react-query'
-import { activityInfiniteQueryOptions } from '@/features/activity/activity.queries'
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { activityInfiniteQueryOptions } from "@/features/activity/activity.queries";
 
 function ActivityRoute() {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useInfiniteQuery(activityInfiniteQueryOptions)
+    useInfiniteQuery(activityInfiniteQueryOptions);
 
-  const items = data?.pages.flatMap((page) => page.items) ?? []
+  const items = data?.pages.flatMap((page) => page.items) ?? [];
 
   return (
     <div>
@@ -274,7 +274,7 @@ function ActivityRoute() {
         Load more
       </button>
     </div>
-  )
+  );
 }
 ```
 
@@ -292,20 +292,20 @@ Define query key factories/constants at the top of each `*.queries.ts`.
 ```ts
 // src/features/auth/auth.queries.ts
 export const authKeys = {
-  all: ['auth'] as const,
-  session: () => [...authKeys.all, 'session'] as const,
-  user: () => [...authKeys.all, 'user'] as const,
-}
+  all: ["auth"] as const,
+  session: () => [...authKeys.all, "session"] as const,
+  user: () => [...authKeys.all, "user"] as const,
+};
 
 export const authSessionQueryOptions = queryOptions({
   queryKey: authKeys.session(),
   queryFn: () => getSession(),
-})
+});
 ```
 
 ```ts
 // src/features/auth/auth.mutations.ts
-queryClient.invalidateQueries({ queryKey: authKeys.all })
+queryClient.invalidateQueries({ queryKey: authKeys.all });
 ```
 
 ## Mutation Conventions
@@ -323,30 +323,30 @@ Define mutation options in `*.mutations.ts` using `mutationOptions()`.
 
 ```ts
 // src/features/todos/todos.mutations.ts
-import { mutationOptions } from '@tanstack/react-query'
-import { createServerFn } from '@tanstack/react-start'
-import { queryClient } from '@/integrations/tanstack-query/root-provider'
-import { todosKeys } from './todos.queries'
+import { mutationOptions } from "@tanstack/react-query";
+import { createServerFn } from "@tanstack/react-start";
+import { queryClient } from "@/integrations/tanstack-query/root-provider";
+import { todosKeys } from "./todos.queries";
 
-const createTodo = createServerFn({ method: 'POST' })
+const createTodo = createServerFn({ method: "POST" })
   .inputValidator((data: { title: string }) => data)
-  .handler(async ({ data }) => data)
+  .handler(async ({ data }) => data);
 
 export const createTodoMutationOptions = mutationOptions({
   mutationFn: createTodo,
   onSuccess: () => {
-    queryClient.invalidateQueries({ queryKey: todosKeys.all })
+    queryClient.invalidateQueries({ queryKey: todosKeys.all });
   },
-})
+});
 ```
 
 ```ts
 // src/features/todos/use-create-todo.ts
-import { useMutation } from '@tanstack/react-query'
-import { createTodoMutationOptions } from './todos.mutations'
+import { useMutation } from "@tanstack/react-query";
+import { createTodoMutationOptions } from "./todos.mutations";
 
 export function useCreateTodo() {
-  return useMutation(createTodoMutationOptions)
+  return useMutation(createTodoMutationOptions);
 }
 ```
 
