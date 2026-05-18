@@ -1,6 +1,7 @@
 import { z } from "zod";
+import { ROLE_VALUES } from "../roles";
 
-export const ROLES = z.enum(["admin", "cashier"]);
+export const ROLES = z.enum(ROLE_VALUES as [string, ...string[]]);
 
 export type ROLES = z.infer<typeof ROLES>;
 export const SignInSchema = z.discriminatedUnion("method", [

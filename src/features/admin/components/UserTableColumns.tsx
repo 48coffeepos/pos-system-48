@@ -1,4 +1,5 @@
 import type { ColumnDef } from "@tanstack/react-table";
+import { ROLES } from "@/features/auth/roles";
 import type { User } from "@/generated/prisma/browser";
 export function getUserTableColumns({
 	onToggleRole,
@@ -40,7 +41,7 @@ export function getUserTableColumns({
 						className="rounded-md border px-3 py-1 text-sm transition hover:bg-muted"
 						onClick={() => onToggleRole(user)}
 					>
-						{user.role === "admin" ? "Demote to Cashier" : "Promote to Admin"}
+						{user.role === ROLES.admin ? "Demote to Cashier" : "Promote to Admin"}
 					</button>
 				);
 			},

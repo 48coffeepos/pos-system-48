@@ -1,16 +1,19 @@
 import { mutationOptions } from "@tanstack/react-query";
-import { auth } from "@/integrations/better-auth/auth";
+import type { RoleName } from "@/features/auth/roles";
 import { authClient } from "@/integrations/better-auth/auth-client";
-import type { ROLES } from "../auth/schemas/auth";
+import adminUsersKeys from "./keys";
 import type { CreateCashierInput } from "./schemas/admin";
 import { createCashier } from "./server/createCashier";
 
 export const setRoleMutationOptions = mutationOptions({
-	// mutationFn: async ({ userId, role }: { userId: string; role: ROLES }) => {
-	// const { data, error } = await auth.api.setRole({ body: { userId, role } });
-	// if (error) throw new Error(error.message || "Failed to update role");
-	// return data;
-	// },
+	mutationFn: async ({ userId, role }: { userId: string; role: RoleName }) => {
+		const { data, error } = await authClient.admin.setRole({ userId, role });
+		if (error) throw new Error(error.message || "Failed to update role");
+		return data;
+	},
+	onSuccess: async (_, __, ___, context) => {
+		await context.client.invalidateQueries({ queryKey: adminUsersKeys.all });
+	},
 });
 
 export const createCashierMutationOptions = mutationOptions({
