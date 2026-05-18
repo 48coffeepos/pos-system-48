@@ -37,7 +37,7 @@ async function main() {
 	await prisma.todo.deleteMany();
 
 	const existingAdmin = await prisma.user.findFirst({
-		where: { email },
+		where: { email: email },
 	});
 
 	if (!existingAdmin) {

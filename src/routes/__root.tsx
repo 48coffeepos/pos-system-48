@@ -7,6 +7,7 @@ import {
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { authClient } from "@/integrations/better-auth/auth-client";
+import { TanstackFormDevtools } from "@/integrations/tanstack-form";
 import {
 	RouteErrorBoundary,
 	RouteNotFoundBoundary,
@@ -23,15 +24,13 @@ interface MyRouterContext {
 	session: Session | null;
 }
 
-const THEME_INIT_SCRIPT = `(function(){try{var stored=window.localStorage.getItem('theme');var mode=(stored==='light'||stored==='dark'||stored==='auto')?stored:'auto';var prefersDark=window.matchMedia('(prefers-color-scheme: dark)').matches;var resolved=mode==='auto'?(prefersDark?'dark':'light'):mode;var root=document.documentElement;root.classList.remove('light','dark');root.classList.add(resolved);if(mode==='auto'){root.removeAttribute('data-theme')}else{root.setAttribute('data-theme',mode)}root.style.colorScheme=resolved;}catch(e){}})();`;
-
 export const Route = createRootRouteWithContext<MyRouterContext>()({
 	beforeLoad: async () => {
 		try {
-			const { data } = await authClient.getSession()
-			return { session: data ?? null }
+			const { data } = await authClient.getSession();
+			return { session: data ?? null };
 		} catch {
-			return { session: null }
+			return { session: null };
 		}
 	},
 	errorComponent: RouteErrorBoundary,
@@ -63,8 +62,6 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 	return (
 		<html lang="en" suppressHydrationWarning>
 			<head>
-				{/** biome-ignore lint/security/noDangerouslySetInnerHtml: Used for theme */}
-				<script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
 				<HeadContent />
 			</head>
 			<body className="font-sans antialiased wrap-anywhere selection:bg-[rgba(79,184,178,0.24)]">
@@ -79,6 +76,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 							render: <TanStackRouterDevtoolsPanel />,
 						},
 						TanStackQueryDevtools,
+						TanstackFormDevtools,
 					]}
 				/>
 				<Scripts />
