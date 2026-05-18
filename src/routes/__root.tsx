@@ -6,7 +6,7 @@ import {
 	Scripts,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
-import { authClient } from "@/integrations/better-auth/auth-client";
+import { Toaster } from "@/components/ui/sonner";
 import { TanstackFormDevtools } from "@/integrations/tanstack-form";
 import {
 	RouteErrorBoundary,
@@ -17,22 +17,11 @@ import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
 import { createSeo } from "../lib/seo";
 import appCss from "../styles.css?url";
 
-type Session = typeof authClient.$Infer.Session;
-
 interface MyRouterContext {
 	queryClient: QueryClient;
-	session: Session | null;
 }
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
-	beforeLoad: async () => {
-		try {
-			const { data } = await authClient.getSession();
-			return { session: data ?? null };
-		} catch {
-			return { session: null };
-		}
-	},
 	errorComponent: RouteErrorBoundary,
 	notFoundComponent: RouteNotFoundBoundary,
 	pendingComponent: RoutePendingBoundary,
@@ -66,6 +55,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 			</head>
 			<body className="font-sans antialiased wrap-anywhere selection:bg-[rgba(79,184,178,0.24)]">
 				{children}
+				<Toaster position="top-right" />
 				<TanStackDevtools
 					config={{
 						position: "bottom-right",

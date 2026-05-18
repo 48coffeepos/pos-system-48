@@ -16,9 +16,9 @@ function UserTable({ users }: UserTableProps) {
 	const roleMutation = useMutation(setRoleMutationOptions);
 
 	const handleToggleRole = async (user: User) => {
-		const newRole = user.role === "admin" ? "user" : "admin";
-		await roleMutation.mutateAsync({ userId: user.id, role: newRole });
-		queryClient.invalidateQueries({ queryKey: adminUsersKeys.list() });
+		const newRole = user.role === "admin" ? "cashier" : "admin";
+		await roleMutation.mutateAsync();
+		queryClient.invalidateQueries({ queryKey: adminUsersKeys.all });
 	};
 
 	const columns = getUserTableColumns({ onToggleRole: handleToggleRole });

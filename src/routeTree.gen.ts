@@ -9,27 +9,15 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as PosRouteImport } from './routes/pos'
-import { Route as AdminRouteImport } from './routes/admin'
-import { Route as AboutRouteImport } from './routes/about'
+import { Route as AuthedRouteRouteImport } from './routes/_authed/route'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AdminIndexRouteImport } from './routes/admin/index'
-import { Route as AdminUsersRouteImport } from './routes/admin/users'
+import { Route as AuthedCashierRouteRouteImport } from './routes/_authed/cashier/route'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as AuthedCashierPosRouteImport } from './routes/_authed/cashier/pos'
+import { Route as AuthedAdminAccountsRouteImport } from './routes/_authed/admin/accounts'
 
-const PosRoute = PosRouteImport.update({
-  id: '/pos',
-  path: '/pos',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminRoute = AdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AboutRoute = AboutRouteImport.update({
-  id: '/about',
-  path: '/about',
+const AuthedRouteRoute = AuthedRouteRouteImport.update({
+  id: '/_authed',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -37,101 +25,83 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminIndexRoute = AdminIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminUsersRoute = AdminUsersRouteImport.update({
-  id: '/users',
-  path: '/users',
-  getParentRoute: () => AdminRoute,
+const AuthedCashierRouteRoute = AuthedCashierRouteRouteImport.update({
+  id: '/cashier',
+  path: '/cashier',
+  getParentRoute: () => AuthedRouteRoute,
 } as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthedCashierPosRoute = AuthedCashierPosRouteImport.update({
+  id: '/pos',
+  path: '/pos',
+  getParentRoute: () => AuthedCashierRouteRoute,
+} as any)
+const AuthedAdminAccountsRoute = AuthedAdminAccountsRouteImport.update({
+  id: '/admin/accounts',
+  path: '/admin/accounts',
+  getParentRoute: () => AuthedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
-  '/admin': typeof AdminRouteWithChildren
-  '/pos': typeof PosRoute
-  '/admin/users': typeof AdminUsersRoute
-  '/admin/': typeof AdminIndexRoute
+  '/cashier': typeof AuthedCashierRouteRouteWithChildren
+  '/admin/accounts': typeof AuthedAdminAccountsRoute
+  '/cashier/pos': typeof AuthedCashierPosRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
-  '/pos': typeof PosRoute
-  '/admin/users': typeof AdminUsersRoute
-  '/admin': typeof AdminIndexRoute
+  '/cashier': typeof AuthedCashierRouteRouteWithChildren
+  '/admin/accounts': typeof AuthedAdminAccountsRoute
+  '/cashier/pos': typeof AuthedCashierPosRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
-  '/admin': typeof AdminRouteWithChildren
-  '/pos': typeof PosRoute
-  '/admin/users': typeof AdminUsersRoute
-  '/admin/': typeof AdminIndexRoute
+  '/_authed': typeof AuthedRouteRouteWithChildren
+  '/_authed/cashier': typeof AuthedCashierRouteRouteWithChildren
+  '/_authed/admin/accounts': typeof AuthedAdminAccountsRoute
+  '/_authed/cashier/pos': typeof AuthedCashierPosRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/about'
-    | '/admin'
-    | '/pos'
-    | '/admin/users'
-    | '/admin/'
+    | '/cashier'
+    | '/admin/accounts'
+    | '/cashier/pos'
     | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/pos' | '/admin/users' | '/admin' | '/api/auth/$'
+  to: '/' | '/cashier' | '/admin/accounts' | '/cashier/pos' | '/api/auth/$'
   id:
     | '__root__'
     | '/'
-    | '/about'
-    | '/admin'
-    | '/pos'
-    | '/admin/users'
-    | '/admin/'
+    | '/_authed'
+    | '/_authed/cashier'
+    | '/_authed/admin/accounts'
+    | '/_authed/cashier/pos'
     | '/api/auth/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AboutRoute: typeof AboutRoute
-  AdminRoute: typeof AdminRouteWithChildren
-  PosRoute: typeof PosRoute
+  AuthedRouteRoute: typeof AuthedRouteRouteWithChildren
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/pos': {
-      id: '/pos'
-      path: '/pos'
-      fullPath: '/pos'
-      preLoaderRoute: typeof PosRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin': {
-      id: '/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/about': {
-      id: '/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AboutRouteImport
+    '/_authed': {
+      id: '/_authed'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -141,19 +111,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin/': {
-      id: '/admin/'
-      path: '/'
-      fullPath: '/admin/'
-      preLoaderRoute: typeof AdminIndexRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/users': {
-      id: '/admin/users'
-      path: '/users'
-      fullPath: '/admin/users'
-      preLoaderRoute: typeof AdminUsersRouteImport
-      parentRoute: typeof AdminRoute
+    '/_authed/cashier': {
+      id: '/_authed/cashier'
+      path: '/cashier'
+      fullPath: '/cashier'
+      preLoaderRoute: typeof AuthedCashierRouteRouteImport
+      parentRoute: typeof AuthedRouteRoute
     }
     '/api/auth/$': {
       id: '/api/auth/$'
@@ -162,26 +125,51 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authed/cashier/pos': {
+      id: '/_authed/cashier/pos'
+      path: '/pos'
+      fullPath: '/cashier/pos'
+      preLoaderRoute: typeof AuthedCashierPosRouteImport
+      parentRoute: typeof AuthedCashierRouteRoute
+    }
+    '/_authed/admin/accounts': {
+      id: '/_authed/admin/accounts'
+      path: '/admin/accounts'
+      fullPath: '/admin/accounts'
+      preLoaderRoute: typeof AuthedAdminAccountsRouteImport
+      parentRoute: typeof AuthedRouteRoute
+    }
   }
 }
 
-interface AdminRouteChildren {
-  AdminUsersRoute: typeof AdminUsersRoute
-  AdminIndexRoute: typeof AdminIndexRoute
+interface AuthedCashierRouteRouteChildren {
+  AuthedCashierPosRoute: typeof AuthedCashierPosRoute
 }
 
-const AdminRouteChildren: AdminRouteChildren = {
-  AdminUsersRoute: AdminUsersRoute,
-  AdminIndexRoute: AdminIndexRoute,
+const AuthedCashierRouteRouteChildren: AuthedCashierRouteRouteChildren = {
+  AuthedCashierPosRoute: AuthedCashierPosRoute,
 }
 
-const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+const AuthedCashierRouteRouteWithChildren =
+  AuthedCashierRouteRoute._addFileChildren(AuthedCashierRouteRouteChildren)
+
+interface AuthedRouteRouteChildren {
+  AuthedCashierRouteRoute: typeof AuthedCashierRouteRouteWithChildren
+  AuthedAdminAccountsRoute: typeof AuthedAdminAccountsRoute
+}
+
+const AuthedRouteRouteChildren: AuthedRouteRouteChildren = {
+  AuthedCashierRouteRoute: AuthedCashierRouteRouteWithChildren,
+  AuthedAdminAccountsRoute: AuthedAdminAccountsRoute,
+}
+
+const AuthedRouteRouteWithChildren = AuthedRouteRoute._addFileChildren(
+  AuthedRouteRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AboutRoute: AboutRoute,
-  AdminRoute: AdminRouteWithChildren,
-  PosRoute: PosRoute,
+  AuthedRouteRoute: AuthedRouteRouteWithChildren,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport

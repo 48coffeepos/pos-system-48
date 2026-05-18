@@ -1,6 +1,6 @@
 const adminUsersKeys = {
-  all: ['admin', 'users'] as const,
-  list: () => [...adminUsersKeys.all, 'list'] as const,
-}
+	all: ["admin", "users"] as const,
+	accounts: () => [...adminUsersKeys.all, "accounts"] as const,
+};
 
-export default adminUsersKeys
+export default adminUsersKeys;

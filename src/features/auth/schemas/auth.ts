@@ -1,9 +1,9 @@
 import { z } from "zod";
 
-export const ROLES = z.enum(["admin", "user"]);
+export const ROLES = z.enum(["admin", "cashier"]);
 
 export type ROLES = z.infer<typeof ROLES>;
-export const signInSchema = z.discriminatedUnion("method", [
+export const SignInSchema = z.discriminatedUnion("method", [
 	z.object({
 		method: z.literal("email"),
 		email: z.email(),
@@ -16,7 +16,7 @@ export const signInSchema = z.discriminatedUnion("method", [
 	}),
 ]);
 
-export type SignInInput = z.infer<typeof signInSchema>;
+export type SignInInput = z.infer<typeof SignInSchema>;
 
 export const signInFormSchema = z.object({
 	identifier: z.string().min(1, "Email or username is required"),

@@ -35,18 +35,24 @@ async function main() {
 	console.log("🌱 Seeding database...");
 
 	await prisma.todo.deleteMany();
+	await prisma.user.deleteMany();
 
 	const existingAdmin = await prisma.user.findFirst({
 		where: { email: email },
 	});
 
 	if (!existingAdmin) {
-		const result = await auth.api.signUpEmail({
+		const result = await auth.api.createUser({
 			body: {
 				email,
 				password,
 				name: "Admin",
-				username: "admin",
+				role: "admin",
+				data: {
+					username: "admin",
+					displayUsername: "admin",
+					emailVerified: true,
+				},
 			},
 		});
 

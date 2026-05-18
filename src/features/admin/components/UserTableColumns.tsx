@@ -40,7 +40,7 @@ export function getUserTableColumns({
 						className="rounded-md border px-3 py-1 text-sm transition hover:bg-muted"
 						onClick={() => onToggleRole(user)}
 					>
-						{user.role === "admin" ? "Demote to User" : "Promote to Admin"}
+						{user.role === "admin" ? "Demote to Cashier" : "Promote to Admin"}
 					</button>
 				);
 			},

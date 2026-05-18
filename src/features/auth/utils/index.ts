@@ -1,0 +1,1 @@
+export { getAuthRedirectPath } from "./redirectPath"

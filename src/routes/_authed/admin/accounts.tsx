@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { UserTable } from "@/features/admin/components/UserTable";
 import { adminUsersQueryOptions } from "@/features/admin/queryOptions";
 
-export const Route = createFileRoute("/admin/users")({
+export const Route = createFileRoute("/_authed/admin/accounts")({
 	loader: async ({ context }) => {
 		await context.queryClient.prefetchQuery(adminUsersQueryOptions);
 	},

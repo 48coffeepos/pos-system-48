@@ -1,8 +1,8 @@
 import { queryOptions } from "@tanstack/react-query";
 import adminUsersKeys from "./keys";
-import getUsers from "./server/getUsers";
+import getAccounts from "./server/getAccounts";
 
 export const adminUsersQueryOptions = queryOptions({
-	queryKey: adminUsersKeys.list(),
-	queryFn: getUsers,
+	queryKey: adminUsersKeys.accounts(),
+	queryFn: getAccounts,
 });

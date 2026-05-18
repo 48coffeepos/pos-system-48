@@ -1,22 +1,14 @@
-import { queryOptions } from '@tanstack/react-query'
-import { authClient } from '@/integrations/better-auth/auth-client'
-import authKeys from './keys'
+import { queryOptions } from "@tanstack/react-query";
+import authKeys from "./keys";
+import { getSession } from "./server/getSession";
+import { getUser } from "./server/getUser";
 
 export const sessionQueryOptions = queryOptions({
-  queryKey: authKeys.session(),
-  queryFn: async () => {
-    const { data, error } = await authClient.getSession()
-    if (error) return null
-    return data
-  },
-  staleTime: 1000 * 60 * 5,
-})
+	queryKey: authKeys.session(),
+	queryFn: getSession,
+});
 
 export const currentUserQueryOptions = queryOptions({
-  queryKey: authKeys.currentUser(),
-  queryFn: async () => {
-    const { data } = await authClient.getSession()
-    return data?.user ?? null
-  },
-  staleTime: 1000 * 60 * 5,
-})
+	queryKey: authKeys.currentUser(),
+	queryFn: getUser,
+});
