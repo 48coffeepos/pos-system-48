@@ -4,6 +4,7 @@
 
 Before substantial work:
 
+- Before taking any action, read the relevant repo instructions and load any matching skills first to get the best context.
 - Skill check: run `npx @tanstack/intent@latest list`, or use skills already listed in context.
 - Skill guidance: if one local skill clearly matches the task, run `npx @tanstack/intent@latest load <package>#<skill>` and follow the returned `SKILL.md`.
 - Monorepos: when working across packages, run the skill check from the workspace root and prefer the local skill for the package being changed.
@@ -44,7 +45,7 @@ DIRECT_URL=pq://... (direct — for Prisma CLI commands)
 
 ## Key Architecture
 
-- `/src/routes/` — file-based routing via TanStack Router
+- `/src/routes/` — file-based routing via TanStack Router; route files handle route-level wiring and rendering of domain-specific components
 - `/src/integrations/prisma/db.ts` — shared Prisma client w/ `@prisma/adapter-neon` (Neon-optimized)
 - `/src/integrations/better-auth/auth.ts` — Better Auth server config w/ Prisma adapter + experimental joins
 - `/src/integrations/better-auth/auth-client.ts` — Better Auth client config
@@ -62,7 +63,8 @@ DIRECT_URL=pq://... (direct — for Prisma CLI commands)
 - Organize code by domain/feature first, not by technical layer alone.
 - Each feature should own its own `components/`, `server/`, `schemas/`, `keys.ts`, `queryOptions.ts`, and `mutationOptions.ts` as needed.
 - Keep feature logic colocated inside `src/feature/<domain>/`.
-- Keep route files thin; they should compose feature modules, not contain business logic.
+- Keep `src/routes/` files thin; they should handle route-level concerns like loaders, `beforeLoad`, params/search/url handling, redirects, server fetching, and prefetching, while rendering domain-specific components.
+- Keep client-side components and interaction logic in `src/feature/<domain>/` or `src/components/`, not in `src/routes/`.
 - Use `@/` imports for app code under `src/`.
 - Use the shared Prisma client from `@/integrations/prisma/db` as the single database entry point.
 - Keep Prisma access out of route components and UI components.

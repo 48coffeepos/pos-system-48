@@ -6,22 +6,34 @@ import {
 	Scripts,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
-import { createSeo } from "../lib/seo";
+import { authClient } from "@/integrations/better-auth/auth-client";
 import {
 	RouteErrorBoundary,
 	RouteNotFoundBoundary,
 	RoutePendingBoundary,
 } from "../components/route-boundaries";
 import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
+import { createSeo } from "../lib/seo";
 import appCss from "../styles.css?url";
+
+type Session = typeof authClient.$Infer.Session;
 
 interface MyRouterContext {
 	queryClient: QueryClient;
+	session: Session | null;
 }
 
 const THEME_INIT_SCRIPT = `(function(){try{var stored=window.localStorage.getItem('theme');var mode=(stored==='light'||stored==='dark'||stored==='auto')?stored:'auto';var prefersDark=window.matchMedia('(prefers-color-scheme: dark)').matches;var resolved=mode==='auto'?(prefersDark?'dark':'light'):mode;var root=document.documentElement;root.classList.remove('light','dark');root.classList.add(resolved);if(mode==='auto'){root.removeAttribute('data-theme')}else{root.setAttribute('data-theme',mode)}root.style.colorScheme=resolved;}catch(e){}})();`;
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
+	beforeLoad: async () => {
+		try {
+			const { data } = await authClient.getSession()
+			return { session: data ?? null }
+		} catch {
+			return { session: null }
+		}
+	},
 	errorComponent: RouteErrorBoundary,
 	notFoundComponent: RouteNotFoundBoundary,
 	pendingComponent: RoutePendingBoundary,
@@ -32,7 +44,10 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 				name: "viewport",
 				content: "width=device-width, initial-scale=1",
 			},
-			...createSeo().meta,
+			...createSeo({
+				title: "48 Coffee POS",
+				description: "POS for 48 Coffee - Ledesma",
+			}).meta,
 		],
 		links: [
 			{
