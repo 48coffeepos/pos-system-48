@@ -1,5 +1,5 @@
 import { createFormHook, createFormHookContexts } from "@tanstack/react-form";
-import type { FormDevtoolsPanel } from "@tanstack/react-form-devtools";
+import { FormDevtoolsPanel } from "@tanstack/react-form-devtools";
 import { FormCheckbox } from "./components/form-checkbox";
 import { FormInput } from "./components/form-input";
 import { FormRadio } from "./components/form-radio";
@@ -30,4 +30,4 @@ export const { useAppForm, withForm } = createFormHook({
 export const TanstackFormDevtools = {
 	name: "Tanstack Form",
 	render: () => <FormDevtoolsPanel />,
-}
+};
