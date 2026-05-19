@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { Receipt, Calendar, CreditCard, User, Tag } from "@phosphor-icons/react";
+import { Receipt, CreditCard, User, Tag } from "@phosphor-icons/react";
 import { formatPeso } from "@/lib/format-currency";
 import { PosReceiptDialog } from "@/features/staff/pos/components/PosReceiptDialog";
 import type { PosOrder } from "@/features/staff/pos/types";
@@ -138,11 +138,8 @@ export function OrdersList({ orders = [] }: OrdersListProps) {
                     {/* Date and Time */}
                     <td className="p-4 text-xs font-medium text-(--near-black)">
                       <div className="flex flex-col gap-0.5">
-                        <span className="flex items-center gap-1">
-                          <Calendar className="size-3 text-(--medium-gray)" />
-                          {formattedDate}
-                        </span>
-                        <span className="text-(--medium-gray) ml-4">{formattedTime}</span>
+                        <span>{formattedDate}</span>
+                        <span className="text-(--medium-gray)">{formattedTime}</span>
                       </div>
                     </td>
 

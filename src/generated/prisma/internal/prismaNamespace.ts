@@ -391,7 +391,6 @@ export const ModelName = {
   OrderItem: 'OrderItem',
   Addon: 'Addon',
   AddonItem: 'AddonItem',
-  Expenses: 'Expenses',
   inventory: 'inventory'
 } as const
 
@@ -408,7 +407,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "role" | "account" | "menu" | "order" | "orderItem" | "addon" | "addonItem" | "expenses" | "inventory"
+    modelProps: "role" | "account" | "menu" | "order" | "orderItem" | "addon" | "addonItem" | "inventory"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -930,80 +929,6 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
-    Expenses: {
-      payload: Prisma.$ExpensesPayload<ExtArgs>
-      fields: Prisma.ExpensesFieldRefs
-      operations: {
-        findUnique: {
-          args: Prisma.ExpensesFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExpensesPayload> | null
-        }
-        findUniqueOrThrow: {
-          args: Prisma.ExpensesFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExpensesPayload>
-        }
-        findFirst: {
-          args: Prisma.ExpensesFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExpensesPayload> | null
-        }
-        findFirstOrThrow: {
-          args: Prisma.ExpensesFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExpensesPayload>
-        }
-        findMany: {
-          args: Prisma.ExpensesFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExpensesPayload>[]
-        }
-        create: {
-          args: Prisma.ExpensesCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExpensesPayload>
-        }
-        createMany: {
-          args: Prisma.ExpensesCreateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        createManyAndReturn: {
-          args: Prisma.ExpensesCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExpensesPayload>[]
-        }
-        delete: {
-          args: Prisma.ExpensesDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExpensesPayload>
-        }
-        update: {
-          args: Prisma.ExpensesUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExpensesPayload>
-        }
-        deleteMany: {
-          args: Prisma.ExpensesDeleteManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateMany: {
-          args: Prisma.ExpensesUpdateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateManyAndReturn: {
-          args: Prisma.ExpensesUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExpensesPayload>[]
-        }
-        upsert: {
-          args: Prisma.ExpensesUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExpensesPayload>
-        }
-        aggregate: {
-          args: Prisma.ExpensesAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateExpenses>
-        }
-        groupBy: {
-          args: Prisma.ExpensesGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.ExpensesGroupByOutputType>[]
-        }
-        count: {
-          args: Prisma.ExpensesCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.ExpensesCountAggregateOutputType> | number
-        }
-      }
-    }
     inventory: {
       payload: Prisma.$inventoryPayload<ExtArgs>
       fields: Prisma.inventoryFieldRefs
@@ -1205,17 +1130,6 @@ export const AddonItemScalarFieldEnum = {
 } as const
 
 export type AddonItemScalarFieldEnum = (typeof AddonItemScalarFieldEnum)[keyof typeof AddonItemScalarFieldEnum]
-
-
-export const ExpensesScalarFieldEnum = {
-  id: 'id',
-  description: 'description',
-  amount: 'amount',
-  type: 'type',
-  date: 'date'
-} as const
-
-export type ExpensesScalarFieldEnum = (typeof ExpensesScalarFieldEnum)[keyof typeof ExpensesScalarFieldEnum]
 
 
 export const InventoryScalarFieldEnum = {
@@ -1452,7 +1366,6 @@ export type GlobalOmitConfig = {
   orderItem?: Prisma.OrderItemOmit
   addon?: Prisma.AddonOmit
   addonItem?: Prisma.AddonItemOmit
-  expenses?: Prisma.ExpensesOmit
   inventory?: Prisma.inventoryOmit
 }
 

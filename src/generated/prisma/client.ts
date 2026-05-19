@@ -77,11 +77,6 @@ export type Addon = Prisma.AddonModel
  */
 export type AddonItem = Prisma.AddonItemModel
 /**
- * Model Expenses
- * 
- */
-export type Expenses = Prisma.ExpensesModel
-/**
  * Model inventory
  * 
  */

@@ -11,9 +11,11 @@ export interface InventoryItem {
 
 interface InventoryListProps {
   items?: InventoryItem[];
+  title?: string;
+  description?: string;
 }
 
-function InventoryList({ items = [] }: InventoryListProps) {
+function InventoryList({ items = [], title, description }: InventoryListProps) {
   const [timeframe, setTimeframe] = useState<"today" | "yesterday">("today");
   const hasItems = items.length > 0;
 
@@ -22,7 +24,19 @@ function InventoryList({ items = [] }: InventoryListProps) {
       {hasItems ? (
         <div className="rounded-2xl border border-(--light-gray) bg-(--pure-white) p-6 shadow-sm">
           {/* Header Controls */}
-          <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-end">
+          <div className={`mb-6 flex flex-col gap-4 sm:flex-row sm:items-center ${title ? "sm:justify-between" : "sm:justify-end"}`}>
+            {title && (
+              <div>
+                <h2 className="text-lg font-bold text-(--deep-forest)">
+                  {title}
+                </h2>
+                {description && (
+                  <p className="mt-0.5 text-xs text-(--medium-gray)">
+                    {description}
+                  </p>
+                )}
+              </div>
+            )}
             {/* Timeframe Pill Switcher */}
             <div className="flex self-start gap-1.5 rounded-full bg-(--light-gray)/30 p-1">
               <button

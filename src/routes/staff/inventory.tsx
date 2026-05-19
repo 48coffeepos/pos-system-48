@@ -20,20 +20,6 @@ function StaffInventory() {
 		<div className="min-h-screen" style={{ background: "var(--warm-beige)" }}>
 			<StaffHeader />
 			<main className="mx-auto max-w-screen-2xl px-4 py-8 sm:px-6 lg:px-8 animate-fade-in-up">
-				<div className="mb-8 flex items-center gap-3">
-					<div className="flex size-10 items-center justify-center rounded-xl bg-(--deep-forest)">
-						<Package weight="fill" className="size-5 text-(--pale-yellow)" />
-					</div>
-					<div>
-						<h1 className="text-2xl font-bold text-(--deep-forest)">
-							Inventory Tracking
-						</h1>
-						<p className="mt-0.5 text-sm text-(--medium-gray)">
-							Monitor stock levels and cup supplies in real-time.
-						</p>
-					</div>
-				</div>
-
 				{isLoading ? (
 					<div className="flex h-64 items-center justify-center rounded-2xl border border-(--light-gray) bg-(--pure-white)">
 						<div className="flex flex-col items-center gap-3">
@@ -54,7 +40,11 @@ function StaffInventory() {
 						</p>
 					</div>
 				) : (
-					<InventoryList items={inventory as any} />
+					<InventoryList
+						items={inventory as any}
+						title="Inventory items"
+						description="Track item quantity and category"
+					/>
 				)}
 			</main>
 		</div>

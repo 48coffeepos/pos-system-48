@@ -19,7 +19,6 @@ async function main() {
 	await prisma.menu.deleteMany()
 	await prisma.account.deleteMany()
 	await prisma.role.deleteMany()
-	await prisma.expenses.deleteMany()
 	await prisma.inventory.deleteMany()
 
 	// ── Roles ──
@@ -177,7 +176,7 @@ async function main() {
 		],
 	})
 
-	console.log('✅ Seeded roles, accounts, menu, addons, expenses, inventory')
+	console.log('✅ Seeded roles, accounts, menu, addons, inventory')
 }
 
 main()
