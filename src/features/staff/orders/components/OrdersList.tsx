@@ -105,14 +105,14 @@ export function OrdersList({ orders = [] }: OrdersListProps) {
         </div>
 
         <div className="w-full overflow-x-auto rounded-xl border border-(--light-gray)/40">
-          <table className="w-full border-collapse text-left">
+          <table className="w-full border-collapse text-left table-fixed">
             <thead>
               <tr className="border-b border-(--light-gray)/40 bg-(--off-white) text-xs font-bold uppercase tracking-wider text-(--medium-gray)">
-                <th className="p-4 pl-6">Order No</th>
-                <th className="p-4">Date & Time</th>
-                <th className="p-4">Payment</th>
-                <th className="p-4 pr-6 text-right">Total</th>
-                <th className="p-4 pr-6 text-center no-print">Receipt</th>
+                <th className="p-4 pl-6 w-[20%]">Order No</th>
+                <th className="p-4 w-[20%]">Date & Time</th>
+                <th className="p-4 w-[20%]">Payment</th>
+                <th className="p-4 w-[20%]">Total</th>
+                <th className="p-4 pr-6 no-print w-[20%]">Receipt</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-(--light-gray)/40">
@@ -166,12 +166,12 @@ export function OrdersList({ orders = [] }: OrdersListProps) {
                     </td>
 
                     {/* Total Price */}
-                    <td className="p-4 pr-6 text-right font-black text-sm text-(--near-black)">
+                    <td className="p-4 font-black text-sm text-(--near-black)">
                       {formatPeso(order.total)}
                     </td>
 
                     {/* Action Button */}
-                    <td className="p-4 pr-6 text-center no-print">
+                    <td className="p-4 pr-6 no-print">
                       <button
                         onClick={() => viewReceipt(order)}
                         className="inline-flex items-center gap-1.5 rounded-lg border border-(--light-gray) bg-white px-3 py-1.5 text-xs font-bold text-(--near-black) transition-all hover:bg-gray-50 active:scale-95 shadow-sm"

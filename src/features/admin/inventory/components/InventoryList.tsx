@@ -22,37 +22,26 @@ function InventoryList({ items = [] }: InventoryListProps) {
       {hasItems ? (
         <div className="rounded-2xl border border-(--light-gray) bg-(--pure-white) p-6 shadow-sm">
           {/* Header Controls */}
-          <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h2 className="text-xl font-bold text-(--deep-forest)">
-                Inventory Items
-              </h2>
-              <p className="text-xs text-(--medium-gray) mt-0.5">
-                Track item quantity and category
-              </p>
-            </div>
-
+          <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-end">
             {/* Timeframe Pill Switcher */}
             <div className="flex self-start gap-1.5 rounded-full bg-(--light-gray)/30 p-1">
               <button
                 type="button"
                 onClick={() => setTimeframe("today")}
-                className={`rounded-full px-4 py-1.5 text-xs font-semibold transition-all duration-200 ${
-                  timeframe === "today"
+                className={`rounded-full px-4 py-1.5 text-xs font-semibold transition-all duration-200 ${timeframe === "today"
                     ? "bg-(--deep-forest) text-white shadow-sm"
                     : "text-(--medium-gray) hover:bg-(--light-gray)/50"
-                }`}
+                  }`}
               >
                 Today
               </button>
               <button
                 type="button"
                 onClick={() => setTimeframe("yesterday")}
-                className={`rounded-full px-4 py-1.5 text-xs font-semibold transition-all duration-200 ${
-                  timeframe === "yesterday"
+                className={`rounded-full px-4 py-1.5 text-xs font-semibold transition-all duration-200 ${timeframe === "yesterday"
                     ? "bg-(--deep-forest) text-white shadow-sm"
                     : "text-(--medium-gray) hover:bg-(--light-gray)/50"
-                }`}
+                  }`}
               >
                 Yesterday
               </button>
@@ -88,8 +77,8 @@ function InventoryList({ items = [] }: InventoryListProps) {
                     {/* Column 2: Selected Timeframe Quantity Counter */}
                     <td className="p-4 pr-6 text-right font-bold text-sm text-(--near-black)">
                       {timeframe === "today"
-                        ? `${item.stock} units`
-                        : `${item.yesterday_stock ?? 0} units`}
+                        ? item.stock
+                        : item.yesterday_stock ?? 0}
                     </td>
                   </tr>
                 ))}
