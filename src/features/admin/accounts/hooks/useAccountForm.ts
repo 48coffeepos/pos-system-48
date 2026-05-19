@@ -1,15 +1,15 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import adminUsersKeys from "@/features/admin/keys";
+import adminUsersKeys from "@/features/admin/accounts/keys";
 import {
 	createAccountMutationOptions,
 	updateAccountMutationOptions,
-} from "@/features/admin/mutationOptions";
+} from "@/features/admin/accounts/mutationOptions";
 import {
 	type AccountFormInput,
 	AccountFormSchema,
-} from "@/features/admin/schemas/admin";
-import type { AdminAccount } from "@/features/admin/types";
+} from "@/features/admin/accounts/schemas/admin";
+import type { AdminAccount } from "@/features/admin/accounts/types";
 import { ROLES } from "@/features/auth/roles";
 import { useAppForm } from "@/integrations/tanstack-form";
 
@@ -18,7 +18,9 @@ interface UseAccountFormOptions {
 	onCompleted: () => void;
 }
 
-function getDefaultValues(editingAccount: AdminAccount | null): AccountFormInput {
+function getDefaultValues(
+	editingAccount: AdminAccount | null,
+): AccountFormInput {
 	if (editingAccount !== null) {
 		return {
 			mode: "edit" as const,

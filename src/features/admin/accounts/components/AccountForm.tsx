@@ -14,8 +14,8 @@ import {
 	InputGroupText,
 } from "@/components/ui/input-group";
 import { Separator } from "@/components/ui/separator";
-import { useAccountForm } from "@/features/admin/hooks/useAccountForm";
-import type { AdminAccount } from "@/features/admin/types";
+import { useAccountForm } from "@/features/admin/accounts/hooks/useAccountForm";
+import type { AdminAccount } from "@/features/admin/accounts/types";
 import { ROLES } from "@/features/auth/roles";
 
 interface AccountFormProps {

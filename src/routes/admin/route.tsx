@@ -1,5 +1,5 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
-import { AdminHeader } from "@/feature/admin/components/AdminHeader";
+import { AdminHeader } from "@/features/admin/components/AdminHeader";
 import { sessionQueryOptions } from "@/features/auth/queryOptions";
 
 export const Route = createFileRoute("/admin")({

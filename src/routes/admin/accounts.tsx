@@ -1,7 +1,7 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { AccountsManager } from "@/features/admin/components/accounts/AccountsManager";
-import { adminAccountsQueryOptions } from "@/features/admin/queryOptions";
+import { AccountsManager } from "@/features/admin/accounts/components/AccountsManager";
+import { adminAccountsQueryOptions } from "@/features/admin/accounts/queryOptions";
 
 export const Route = createFileRoute("/admin/accounts")({
 	loader: async ({ context }) => {

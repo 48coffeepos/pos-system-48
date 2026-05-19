@@ -1,13 +1,13 @@
-import type { ColumnDef } from "@tanstack/react-table";
 import {
-	Circle,
-	Envelope,
-	PencilSimple,
-	ShieldCheck,
-	Trash,
+	CircleIcon,
+	EnvelopeIcon,
+	PencilSimpleIcon,
+	ShieldCheckIcon,
+	TrashIcon,
 } from "@phosphor-icons/react";
+import type { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import type { AdminAccount } from "@/features/admin/types";
+import type { AdminAccount } from "@/features/admin/accounts/types";
 import { ROLES } from "@/features/auth/roles";
 
 interface AccountsTableColumnsOptions {
@@ -55,7 +55,7 @@ export function getAccountsTableColumns({
 						<div className="flex min-w-0 flex-col gap-1">
 							<div className="truncate font-medium">{account.name}</div>
 							<div className="flex items-center gap-1 text-xs text-muted-foreground">
-								<Envelope />
+								<EnvelopeIcon />
 								<span className="truncate">{account.email}</span>
 							</div>
 							<div className="text-xs text-muted-foreground">
@@ -71,7 +71,7 @@ export function getAccountsTableColumns({
 			header: "Role",
 			cell: ({ row }) => (
 				<div className="inline-flex items-center gap-2 rounded-md border px-2.5 py-1 text-xs font-medium text-muted-foreground">
-					<ShieldCheck />
+					<ShieldCheckIcon />
 					<span>{getRoleLabel(row.original.role)}</span>
 				</div>
 			),
@@ -85,10 +85,12 @@ export function getAccountsTableColumns({
 				return (
 					<div className="flex flex-col gap-1">
 						<div className="flex items-center gap-2 text-sm font-medium">
-							<Circle
+							<CircleIcon
 								weight="fill"
 								className={
-									account.isOnline ? "text-emerald-500" : "text-muted-foreground"
+									account.isOnline
+										? "text-emerald-500"
+										: "text-muted-foreground"
 								}
 							/>
 							<span>{account.isOnline ? "Online" : "Offline"}</span>
@@ -116,7 +118,7 @@ export function getAccountsTableColumns({
 							onClick={() => onEdit(account)}
 							aria-label={`Edit ${account.name}`}
 						>
-							<PencilSimple />
+							<PencilSimpleIcon />
 						</Button>
 						<Button
 							type="button"
@@ -126,7 +128,7 @@ export function getAccountsTableColumns({
 							disabled={isSelf || isRemovingUser}
 							aria-label={`Delete ${account.name}`}
 						>
-							<Trash />
+							<TrashIcon />
 						</Button>
 					</div>
 				);

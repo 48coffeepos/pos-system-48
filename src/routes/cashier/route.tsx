@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { sessionQueryOptions } from "@/features/auth/queryOptions";
-import { CashierHeader } from "./CashierHeader";
+import { CashierHeader } from "../../components/CashierHeader";
 
 export const Route = createFileRoute("/cashier")({
 	component: RouteComponent,

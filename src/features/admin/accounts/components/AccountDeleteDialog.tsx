@@ -10,7 +10,7 @@ import {
 	AlertDialogMedia,
 	AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import type { AdminAccount } from "@/features/admin/types";
+import type { AdminAccount } from "@/features/admin/accounts/types";
 
 interface AccountDeleteDialogProps {
 	account: AdminAccount | null;

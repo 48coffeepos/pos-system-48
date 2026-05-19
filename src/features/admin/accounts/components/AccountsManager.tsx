@@ -1,8 +1,8 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
-import { removeAccountMutationOptions } from "@/features/admin/mutationOptions";
-import type { AdminAccount } from "@/features/admin/types";
+import { removeAccountMutationOptions } from "@/features/admin/accounts/mutationOptions";
+import type { AdminAccount } from "@/features/admin/accounts/types";
 import { sessionQueryOptions } from "@/features/auth/queryOptions";
 import { AccountDeleteDialog } from "./AccountDeleteDialog";
 import { AccountForm } from "./AccountForm";

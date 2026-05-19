@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { adminAuthMiddleware } from "@/features/auth/middlewares";
-import type { AdminAccount } from "@/features/admin/types";
+import type { AdminAccount } from "@/features/admin/accounts/types";
 import { prisma } from "@/integrations/prisma/db";
 
 const getAccounts = createServerFn()

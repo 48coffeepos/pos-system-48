@@ -1,6 +1,6 @@
-import { Users } from "@phosphor-icons/react";
+import { UsersIcon } from "@phosphor-icons/react";
 import { DataTable } from "@/components/ui/data-table";
-import type { AdminAccount } from "@/features/admin/types";
+import type { AdminAccount } from "@/features/admin/accounts/types";
 import { getAccountsTableColumns } from "./AccountsTableColumns";
 
 interface AccountsTableProps {
@@ -36,7 +36,7 @@ export function AccountsTable({
 						</p>
 					</div>
 					<div className="inline-flex items-center gap-2 rounded-md border bg-muted px-3 py-2 text-sm font-medium text-muted-foreground">
-						<Users />
+						<UsersIcon />
 						<span>{accounts.length} total</span>
 					</div>
 				</div>

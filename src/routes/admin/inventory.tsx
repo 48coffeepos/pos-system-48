@@ -2,10 +2,10 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 
-import type { InventoryItem } from "@/feature/admin/inventory/components/AddInventoryItem";
-import { AddInventoryItem } from "@/feature/admin/inventory/components/AddInventoryItem";
-import { InventoryList } from "@/feature/admin/inventory/components/InventoryList";
-import { getAllInventoryQueryOptions } from "@/feature/admin/inventory/queryOptions";
+import type { InventoryItem } from "@/features/admin/inventory/components/AddInventoryItem";
+import { AddInventoryItem } from "@/features/admin/inventory/components/AddInventoryItem";
+import { InventoryList } from "@/features/admin/inventory/components/InventoryList";
+import { getAllInventoryQueryOptions } from "@/features/admin/inventory/queryOptions";
 
 export const Route = createFileRoute("/admin/inventory")({
 	loader: async ({ context: { queryClient } }) => {
