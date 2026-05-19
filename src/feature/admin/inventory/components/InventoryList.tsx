@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Package, NotePencilIcon, Trash } from "@phosphor-icons/react";
+import { PackageIcon, NotePencilIcon, TrashIcon } from "@phosphor-icons/react";
 import type { InventoryItem } from "./AddInventoryItem";
 
 // Ensure your shared type includes yesterday_stock from the query context
@@ -8,7 +8,7 @@ interface ExtendedInventoryItem extends InventoryItem {
   yesterdayStock?: number;
 }
 
-function InventoryList({ items = [] }: { items?: ExtendedInventoryItem[] }) {
+function InventoryList({ items = [], onEdit }: { items?: ExtendedInventoryItem[]; onEdit?: (item: ExtendedInventoryItem) => void }) {
   const [timeframe, setTimeframe] = useState<"today" | "yesterday">("today");
   const hasItems = items.length > 0;
 
@@ -93,8 +93,9 @@ function InventoryList({ items = [] }: { items?: ExtendedInventoryItem[] }) {
                       <div className="flex items-center justify-end gap-3 text-(--medium-gray)">
                         <button 
                           type="button" 
+                          onClick={() => onEdit?.(item)}
                           className="p-1 hover:text-(--deep-forest) transition-colors"
-                          aria-label="View user records"
+                          aria-label="Edit item"
                         >
                           <NotePencilIcon size={18} />
                         </button>
@@ -103,7 +104,7 @@ function InventoryList({ items = [] }: { items?: ExtendedInventoryItem[] }) {
                           className="p-1 hover:text-red-600 transition-colors"
                           aria-label="Delete item record"
                         >
-                          <Trash size={18} />
+                          <TrashIcon size={18} />
                         </button>
                       </div>
                     </td>
@@ -116,7 +117,7 @@ function InventoryList({ items = [] }: { items?: ExtendedInventoryItem[] }) {
       ) : (
         /* Empty State Fallback Dropzone */
         <div className="rounded-2xl border border-(--light-gray) bg-(--pure-white) p-8 text-center">
-          <Package className="mx-auto size-12 text-(--medium-gray)/40" />
+          <PackageIcon className="mx-auto size-12 text-(--medium-gray)/40" />
           <h2 className="mt-4 text-lg font-semibold text-(--deep-forest)">
             No inventory items yet
           </h2>
