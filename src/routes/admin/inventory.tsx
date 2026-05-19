@@ -2,7 +2,6 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 
-import { AdminHeader } from "@/feature/admin/components/AdminHeader";
 import type { InventoryItem } from "@/feature/admin/inventory/components/AddInventoryItem";
 import { AddInventoryItem } from "@/feature/admin/inventory/components/AddInventoryItem";
 import { InventoryList } from "@/feature/admin/inventory/components/InventoryList";

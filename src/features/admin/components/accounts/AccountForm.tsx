@@ -6,17 +6,17 @@ import {
 	FieldGroup,
 	FieldLabel,
 } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 import {
 	InputGroup,
 	InputGroupAddon,
 	InputGroupInput,
 	InputGroupText,
 } from "@/components/ui/input-group";
-import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { ROLES } from "@/features/auth/roles";
 import { useAccountForm } from "@/features/admin/hooks/useAccountForm";
 import type { AdminAccount } from "@/features/admin/types";
+import { ROLES } from "@/features/auth/roles";
 
 interface AccountFormProps {
 	editingAccount: AdminAccount | null;
@@ -161,11 +161,20 @@ export function AccountForm({
 
 					<Separator />
 
-					<form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
+					<form.Subscribe
+						selector={(state) => [state.canSubmit, state.isSubmitting]}
+					>
 						{([canSubmit, isSubmitting]) => (
 							<div className="flex flex-col gap-2">
-								<Button type="submit" disabled={!canSubmit || isSubmitting || isPending}>
-									{isEditing ? <Check data-icon="inline-start" /> : <Plus data-icon="inline-start" />}
+								<Button
+									type="submit"
+									disabled={!canSubmit || isSubmitting || isPending}
+								>
+									{isEditing ? (
+										<Check data-icon="inline-start" />
+									) : (
+										<Plus data-icon="inline-start" />
+									)}
 									{isSubmitting || isPending
 										? isEditing
 											? "Saving..."
@@ -186,14 +195,14 @@ export function AccountForm({
 				</form>
 			</div>
 
-			<div className="flex flex-col gap-3 rounded-2xl border bg-background p-5 shadow-xs">
+			{/*<div className="flex flex-col gap-3 rounded-2xl border bg-background p-5 shadow-xs">
 				<h4 className="text-sm font-semibold">Security Tips</h4>
 				<ul className="flex flex-col gap-2 text-sm text-muted-foreground">
 					<li>Admin accounts can manage all other staff accounts.</li>
 					<li>Use unique passwords for each staff member.</li>
 					<li>Reset passwords here whenever access changes hands.</li>
 				</ul>
-			</div>
+			</div>*/}
 		</section>
 	);
 }

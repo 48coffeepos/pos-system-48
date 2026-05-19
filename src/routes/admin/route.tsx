@@ -1,5 +1,4 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
-import { toast } from "sonner";
 import { AdminHeader } from "@/feature/admin/components/AdminHeader";
 import { sessionQueryOptions } from "@/features/auth/queryOptions";
 
@@ -14,7 +13,6 @@ export const Route = createFileRoute("/admin")({
 		}
 
 		if (session.user.role !== "admin") {
-			toast.error("You are not authorized to access this page.");
 			throw redirect({
 				to: "/cashier/pos",
 			});

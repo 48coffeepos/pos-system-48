@@ -15,7 +15,9 @@ interface AccountsManagerProps {
 export function AccountsManager({ users }: AccountsManagerProps) {
 	const { data: session } = useQuery(sessionQueryOptions);
 	const currentUserId = session?.user?.id;
-	const [editingAccount, setEditingAccount] = useState<AdminAccount | null>(null);
+	const [editingAccount, setEditingAccount] = useState<AdminAccount | null>(
+		null,
+	);
 	const [accountPendingDelete, setAccountPendingDelete] =
 		useState<AdminAccount | null>(null);
 	const removeMutation = useMutation(removeAccountMutationOptions);
@@ -40,7 +42,7 @@ export function AccountsManager({ users }: AccountsManagerProps) {
 	};
 
 	return (
-		<div className="p-6">
+		<div>
 			<div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
 				<AccountsTable
 					accounts={users}

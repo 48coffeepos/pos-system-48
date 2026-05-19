@@ -1,12 +1,13 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
-import { SignOutButton } from "@/features/auth/components/SignOutButton";
 import { sessionQueryOptions } from "@/features/auth/queryOptions";
+import { CashierHeader } from "./CashierHeader";
 
 export const Route = createFileRoute("/cashier")({
 	component: RouteComponent,
 	loader: async ({ context }) => {
-		const session = await context.queryClient.fetchQuery(sessionQueryOptions);
-		if (!session?.user) {
+		const currentUser =
+			await context.queryClient.ensureQueryData(sessionQueryOptions);
+		if (!currentUser) {
 			throw redirect({
 				to: "/",
 			});
@@ -16,8 +17,8 @@ export const Route = createFileRoute("/cashier")({
 
 function RouteComponent() {
 	return (
-		<main>
-			<SignOutButton />
+		<main className="min-h-screen">
+			<CashierHeader />
 			<Outlet />
 		</main>
 	);

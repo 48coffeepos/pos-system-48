@@ -9,12 +9,14 @@ import {
 	UsersIcon,
 	XIcon,
 } from "@phosphor-icons/react";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import Fuse from "fuse.js";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
+import { sessionQueryOptions } from "@/features/auth/queryOptions";
 import { authClient } from "@/integrations/better-auth/auth-client";
 import { cn } from "@/lib/utils";
 
@@ -52,8 +54,7 @@ function AdminHeader({
 }: AdminHeaderProps) {
 	const location = useLocation();
 	const navigate = useNavigate();
-	const { data: session, isPending: sessionLoading } = authClient.useSession();
-
+	const { data } = useSuspenseQuery(sessionQueryOptions);
 	const [searchQuery, setSearchQuery] = useState("");
 	const [showResults, setShowResults] = useState(false);
 	const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -112,10 +113,11 @@ function AdminHeader({
 		return location.pathname.startsWith(path);
 	};
 
+	const currentRole = data?.user.role ?? "Admin";
+
 	return (
 		<header className="sticky top-0 z-50 w-full border-b border-(--light-gray) bg-(--pure-white)/95 backdrop-blur-sm">
 			<div className="mx-auto flex h-16 max-w-screen-2xl items-center gap-4 px-4 sm:px-6 lg:px-8">
-				{/* Logo */}
 				<Link
 					to={adminTo("/admin")}
 					className="flex shrink-0 items-center gap-2 no-underline"
@@ -128,7 +130,6 @@ function AdminHeader({
 					</span>
 				</Link>
 
-				{/* Search */}
 				<div
 					ref={searchRef}
 					className="relative hidden flex-1 sm:block max-w-md"
@@ -148,6 +149,7 @@ function AdminHeader({
 						/>
 						{searchQuery && (
 							<button
+								type="button"
 								onClick={() => {
 									setSearchQuery("");
 									setShowResults(false);
@@ -160,7 +162,6 @@ function AdminHeader({
 						)}
 					</div>
 
-					{/* Search Results Dropdown */}
 					{showResults && searchQuery.trim() && (
 						<div className="absolute top-full mt-1.5 w-full rounded-xl border border-(--light-gray) bg-(--pure-white) p-1.5 shadow-lg animate-fade-in-up">
 							{results.length > 0 ? (
@@ -168,6 +169,7 @@ function AdminHeader({
 									{results.map((item) => (
 										<li key={`${item.path}-${item.label}`}>
 											<button
+												type="button"
 												onClick={() => handleSearchSelect(item.path)}
 												className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-(--pale-yellow)"
 											>
@@ -197,7 +199,6 @@ function AdminHeader({
 					)}
 				</div>
 
-				{/* Desktop Navigation */}
 				<nav className="hidden items-center gap-1 lg:flex">
 					{navLinks.map((link) => {
 						const Icon = link.icon;
@@ -221,9 +222,8 @@ function AdminHeader({
 
 				<div className="hidden flex-1 lg:block" />
 
-				{/* User Info + Logout (Desktop) */}
 				<div className="hidden items-center gap-3 lg:flex">
-					{!sessionLoading && session?.user ? (
+					{data?.user ? (
 						<>
 							<div className="flex items-center gap-2.5">
 								<div className="flex size-8 items-center justify-center rounded-full bg-(--deep-forest)">
@@ -234,12 +234,10 @@ function AdminHeader({
 								</div>
 								<div className="flex flex-col leading-tight">
 									<span className="text-sm font-semibold text-(--deep-forest)">
-										{session.user.name ?? "User"}
+										{data.user.name ?? "User"}
 									</span>
 									<span className="text-xs text-(--medium-gray)">
-										{"role" in session.user
-											? (session.user as { role?: string }).role
-											: "Admin"}
+										{currentRole}
 									</span>
 								</div>
 							</div>
@@ -268,8 +266,8 @@ function AdminHeader({
 					)}
 				</div>
 
-				{/* Mobile Menu Toggle */}
 				<button
+					type="button"
 					onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
 					className="ml-auto flex size-9 items-center justify-center rounded-xl text-(--medium-gray) hover:bg-(--pale-yellow) hover:text-(--deep-forest) lg:hidden"
 					aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
@@ -282,10 +280,8 @@ function AdminHeader({
 				</button>
 			</div>
 
-			{/* Mobile Menu */}
 			{mobileMenuOpen && (
 				<div className="border-t border-(--light-gray) bg-(--pure-white) px-4 pb-4 pt-2 lg:hidden animate-fade-in-up">
-					{/* Mobile Search */}
 					<div className="relative mb-3">
 						<MagnifyingGlassIcon className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-(--medium-gray)" />
 						<Input
@@ -301,12 +297,12 @@ function AdminHeader({
 						/>
 					</div>
 
-					{/* Mobile Results */}
 					{showResults && searchQuery.trim() && results.length > 0 && (
 						<div className="mb-3 rounded-xl border border-(--light-gray) bg-(--off-white)/50 p-1">
 							{results.map((item) => (
 								<button
 									key={`${item.path}-${item.label}`}
+									type="button"
 									onClick={() => handleSearchSelect(item.path)}
 									className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-(--pale-yellow)"
 								>
@@ -321,7 +317,6 @@ function AdminHeader({
 						</div>
 					)}
 
-					{/* Mobile Nav */}
 					<nav className="flex flex-col gap-1">
 						{navLinks.map((link) => {
 							const Icon = link.icon;
@@ -345,8 +340,7 @@ function AdminHeader({
 
 					<Separator className="my-3 bg-(--light-gray)" />
 
-					{/* Mobile User Info */}
-					{!sessionLoading && session?.user ? (
+					{data ? (
 						<div className="flex items-center justify-between">
 							<div className="flex items-center gap-2.5">
 								<div className="flex size-9 items-center justify-center rounded-full bg-(--deep-forest)">
@@ -357,16 +351,15 @@ function AdminHeader({
 								</div>
 								<div className="flex flex-col leading-tight">
 									<span className="text-sm font-semibold text-(--deep-forest)">
-										{session.user.name ?? "User"}
+										{data?.user.name ?? "User"}
 									</span>
 									<span className="text-xs text-(--medium-gray)">
-										{"role" in session.user
-											? (session.user as { role?: string }).role
-											: "Admin"}
+										{currentRole}
 									</span>
 								</div>
 							</div>
 							<button
+								type="button"
 								onClick={handleLogout}
 								className="flex size-9 items-center justify-center rounded-xl text-(--medium-gray) hover:bg-(--soft-peach)/30 hover:text-(--coral)"
 								aria-label="Log out"
