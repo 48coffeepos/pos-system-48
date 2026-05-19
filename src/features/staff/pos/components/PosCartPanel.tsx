@@ -1,4 +1,3 @@
-import { motion, AnimatePresence } from "motion/react";
 import {
 	ArrowRight,
 	Coffee,
@@ -81,21 +80,15 @@ export function PosCartPanel({
 					) : null}
 				</div>
 
-				{/* Cart Items */}
 				<div className="-mr-1 flex-1 overflow-y-auto pr-1">
-					<AnimatePresence>
-						{cart.map((item) => {
-							const cupLine = formatCupLine(item.cup_type, item.cup_size);
-							return (
-								<motion.div
-									key={item.lineKey}
-									layout
-									initial={{ opacity: 0, x: 20 }}
-									animate={{ opacity: 1, x: 0 }}
-									exit={{ opacity: 0, x: -20 }}
-									className="mb-2 flex items-center gap-3 rounded-xl p-3"
-									style={{ background: "var(--off-white)" }}
-								>
+					{cart.map((item) => {
+						const cupLine = formatCupLine(item.cup_type, item.cup_size);
+						return (
+							<div
+								key={item.lineKey}
+								className="mb-2 flex items-center gap-3 rounded-xl p-3"
+								style={{ background: "var(--off-white)" }}
+							>
 									<div
 										className="flex size-12 shrink-0 items-center justify-center rounded-lg"
 										style={{ background: "var(--light-gray)" }}
@@ -176,10 +169,9 @@ export function PosCartPanel({
 											<Plus className="size-3 text-white" />
 										</button>
 									</div>
-								</motion.div>
-							);
-						})}
-					</AnimatePresence>
+							</div>
+						);
+					})}
 
 					{cart.length === 0 ? (
 						<div className="flex h-32 flex-col items-center justify-center">
@@ -286,9 +278,7 @@ export function PosCartPanel({
 							!isGrab &&
 							amountPaid &&
 							paidNum >= cartTotal ? (
-								<motion.div
-									initial={{ opacity: 0, y: -10 }}
-									animate={{ opacity: 1, y: 0 }}
+								<div
 									className="flex items-center justify-between rounded-xl p-3"
 									style={{ background: "var(--deep-forest)", color: "white" }}
 								>
@@ -298,14 +288,11 @@ export function PosCartPanel({
 									<span className="text-lg font-black">
 										{formatPeso(paidNum - cartTotal)}
 									</span>
-								</motion.div>
+								</div>
 							) : null}
 
 							{paymentMethod === "GCASH" || paymentMethod === "GRAB" ? (
-								<motion.div
-									initial={{ opacity: 0, y: -10 }}
-									animate={{ opacity: 1, y: 0 }}
-								>
+								<div>
 									<label
 										className="mb-1.5 block text-xs font-medium"
 										style={{ color: "var(--medium-gray)" }}
@@ -328,7 +315,7 @@ export function PosCartPanel({
 											}}
 										/>
 									</div>
-								</motion.div>
+								</div>
 							) : null}
 						</div>
 					</div>

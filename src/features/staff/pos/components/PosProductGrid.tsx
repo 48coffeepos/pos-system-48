@@ -1,5 +1,4 @@
 import { MagnifyingGlass, Coffee } from "@phosphor-icons/react";
-import { AnimatePresence } from "motion/react";
 import { PosCategoryTabs } from "./ui/PosCategoryTabs";
 import { PosProductCard } from "./ui/PosProductCard";
 import type { MenuItem } from "../types";
@@ -74,16 +73,14 @@ export function PosProductGrid({
 					</div>
 				) : (
 					<div className="grid grid-cols-4 gap-4">
-						<AnimatePresence mode="popLayout">
-							{menuItems.map((item) => (
-								<PosProductCard
-									key={item.id}
-									name={item.name}
-									price={item.temperatures?.length ? null : item.price}
-									onSelect={() => onProductClick(item)}
-								/>
-							))}
-						</AnimatePresence>
+						{menuItems.map((item) => (
+							<PosProductCard
+								key={item.id}
+								name={item.name}
+								price={item.temperatures?.length ? null : item.price}
+								onSelect={() => onProductClick(item)}
+							/>
+						))}
 					</div>
 				)}
 

@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { motion } from "motion/react";
 import { Minus, Plus } from "@phosphor-icons/react";
 import { toast } from "sonner";
 import { formatPeso } from "@/lib/format-currency";
@@ -315,11 +314,7 @@ export function PosCupPickerDialog({
 					</button>
 				</div>
 				{showAddons ? (
-					<motion.div
-						initial={{ opacity: 0, height: 0 }}
-						animate={{ opacity: 1, height: "auto" }}
-						className="space-y-2"
-					>
+					<div className="space-y-2">
 						{addOns.map((addon) => {
 							const qty = selectedAddons[addon.id]?.quantity ?? 0;
 							return (
@@ -378,7 +373,7 @@ export function PosCupPickerDialog({
 								</div>
 							);
 						})}
-					</motion.div>
+					</div>
 				) : null}
 			</div>
 
@@ -414,11 +409,7 @@ export function PosCupPickerDialog({
 				</div>
 
 				{itemDiscountType !== "none" ? (
-					<motion.div
-						initial={{ opacity: 0, height: 0 }}
-						animate={{ opacity: 1, height: "auto" }}
-						className="mb-3 space-y-2"
-					>
+					<div className="mb-3 space-y-2">
 						<input
 							type="text"
 							value={itemDiscountName}
@@ -435,7 +426,7 @@ export function PosCupPickerDialog({
 							className="h-9 w-full rounded-lg border px-3 text-xs outline-none"
 							style={{ borderColor: "var(--light-gray)" }}
 						/>
-					</motion.div>
+					</div>
 				) : null}
 
 				{pickCupSize === "12OZ" ? (
@@ -459,10 +450,9 @@ export function PosCupPickerDialog({
 									: "var(--light-gray)",
 							}}
 						>
-							<motion.div
-								className="absolute top-0.5 h-5 w-5 rounded-full bg-white shadow"
-								animate={{ left: isFreeDrink ? 22 : 2 }}
-								transition={{ type: "spring", stiffness: 500, damping: 30 }}
+							<div
+								className="absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all duration-200"
+								style={{ left: isFreeDrink ? 22 : 2 }}
 							/>
 						</button>
 					</div>
