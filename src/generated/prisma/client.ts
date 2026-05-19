@@ -31,8 +31,8 @@ export * from "./enums.ts"
  * const prisma = new PrismaClient({
  *   adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL })
  * })
- * // Fetch zero or more Todos
- * const todos = await prisma.todo.findMany()
+ * // Fetch zero or more Roles
+ * const roles = await prisma.role.findMany()
  * ```
  * 
  * Read more in our [docs](https://pris.ly/d/client).
@@ -42,30 +42,45 @@ export type PrismaClient<LogOpts extends Prisma.LogLevel = never, OmitOpts exten
 export { Prisma }
 
 /**
- * Model Todo
+ * Model Role
  * 
  */
-export type Todo = Prisma.TodoModel
-/**
- * Model User
- * 
- */
-export type User = Prisma.UserModel
-/**
- * Model Session
- * 
- */
-export type Session = Prisma.SessionModel
+export type Role = Prisma.RoleModel
 /**
  * Model Account
  * 
  */
 export type Account = Prisma.AccountModel
 /**
- * Model Verification
+ * Model Menu
  * 
  */
-export type Verification = Prisma.VerificationModel
+export type Menu = Prisma.MenuModel
+/**
+ * Model Order
+ * 
+ */
+export type Order = Prisma.OrderModel
+/**
+ * Model OrderItem
+ * 
+ */
+export type OrderItem = Prisma.OrderItemModel
+/**
+ * Model Addon
+ * 
+ */
+export type Addon = Prisma.AddonModel
+/**
+ * Model AddonItem
+ * 
+ */
+export type AddonItem = Prisma.AddonItemModel
+/**
+ * Model Expenses
+ * 
+ */
+export type Expenses = Prisma.ExpensesModel
 /**
  * Model inventory
  * 

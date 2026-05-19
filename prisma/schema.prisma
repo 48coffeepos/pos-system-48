@@ -7,71 +7,91 @@ datasource db {
   provider = "postgresql"
 }
 
-model Todo {
-  id        Int      @id @default(autoincrement())
-  title     String
-  createdAt DateTime @default(now())
-}
-
-model User {
-  id            String    @id
-  name          String
-  email         String    @unique
-  emailVerified Boolean   @default(false)
-  image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  accounts      Account[]
-  sessions      Session[]
-
-  @@map("user")
-}
-
-model Session {
-  id        String   @id
-  expiresAt DateTime
-  token     String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  ipAddress String?
-  userAgent String?
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@map("session")
+model Role {
+  id       Int       @id @default(autoincrement())
+  name     String
+  accounts Account[]
 }
 
 model Account {
-  id                    String    @id
-  accountId             String
-  providerId            String
-  userId                String
-  accessToken           String?
-  refreshToken          String?
-  idToken               String?
-  accessTokenExpiresAt  DateTime?
-  refreshTokenExpiresAt DateTime?
-  scope                 String?
-  password              String?
-  createdAt             DateTime  @default(now())
-  updatedAt             DateTime  @updatedAt
-  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@map("account")
+  id         Int      @id @default(autoincrement())
+  role_id    Int
+  role       Role     @relation(fields: [role_id], references: [id])
+  username   String   @unique
+  password   String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 }
 
-model Verification {
-  id         String   @id 
-  identifier String
-  value      String
-  expiresAt  DateTime
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+model Menu {
+  id             Int         @id @default(autoincrement())
+  name           String
+  price          Float
+  category       String
+  temperatures   String[]
+  hot_cup_sizes  Int[]
+  iced_cup_sizes Int[]
+  hot_12oz_price   Float       @default(0)
+  hot_16oz_price   Float       @default(0)
+  iced_12oz_price  Float       @default(0)
+  iced_16oz_price  Float       @default(0)
+  order_items    OrderItem[]
+}
 
-  @@index([identifier])
-  @@map("verification")
+model Order {
+  order_id         String      @id
+  method           String
+  reference_number String?
+  paid             Float?
+  change           Float?
+  total            Float
+  created_at       DateTime    @default(now())
+  order_items      OrderItem[]
+}
+
+model OrderItem {
+  id            Int         @id @default(autoincrement())
+  order_id      String
+  order         Order       @relation(fields: [order_id], references: [order_id])
+  menu_id       Int
+  menu          Menu        @relation(fields: [menu_id], references: [id])
+  name          String
+  discount      String?
+  quantity      Int
+  loyalty       Boolean?
+  discount_name String?
+  discount_id   String?
+  subtotal      Float
+  total         Float
+  change        Float?
+  note          String?
+  cup_type      String?
+  cup_size      String?
+  addon_items   AddonItem[]
+}
+
+model Addon {
+  id          Int         @id @default(autoincrement())
+  name        String
+  price       Float
+  addon_items AddonItem[]
+}
+
+model AddonItem {
+  id            Int      @id @default(autoincrement())
+  addon_id      Int
+  addon         Addon    @relation(fields: [addon_id], references: [id])
+  order_item_id Int
+  order_item    OrderItem @relation(fields: [order_item_id], references: [id])
+  quantity      Int
+}
+
+model Expenses {
+  id          Int      @id @default(autoincrement())
+  description String
+  amount      Float
+  type        String
+  date        DateTime
 }
 
 model inventory {
@@ -86,3 +106,4 @@ enum Inventory_Type {
   CUP
   STANDALONE
 }
+
