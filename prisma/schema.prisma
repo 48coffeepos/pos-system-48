@@ -32,7 +32,6 @@ model Menu {
   hot_cup_sizes  Int[]
   iced_cup_sizes Int[]
   hot_12oz_price   Float       @default(0)
-  hot_16oz_price   Float       @default(0)
   iced_12oz_price  Float       @default(0)
   iced_16oz_price  Float       @default(0)
   order_items    OrderItem[]

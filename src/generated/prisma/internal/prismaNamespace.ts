@@ -1071,7 +1071,6 @@ export const MenuScalarFieldEnum = {
   hot_cup_sizes: 'hot_cup_sizes',
   iced_cup_sizes: 'iced_cup_sizes',
   hot_12oz_price: 'hot_12oz_price',
-  hot_16oz_price: 'hot_16oz_price',
   iced_12oz_price: 'iced_12oz_price',
   iced_16oz_price: 'iced_16oz_price'
 } as const

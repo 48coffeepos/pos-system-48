@@ -32,7 +32,6 @@ export type MenuAvgAggregateOutputType = {
   hot_cup_sizes: number | null
   iced_cup_sizes: number | null
   hot_12oz_price: number | null
-  hot_16oz_price: number | null
   iced_12oz_price: number | null
   iced_16oz_price: number | null
 }
@@ -43,7 +42,6 @@ export type MenuSumAggregateOutputType = {
   hot_cup_sizes: number[]
   iced_cup_sizes: number[]
   hot_12oz_price: number | null
-  hot_16oz_price: number | null
   iced_12oz_price: number | null
   iced_16oz_price: number | null
 }
@@ -54,7 +52,6 @@ export type MenuMinAggregateOutputType = {
   price: number | null
   category: string | null
   hot_12oz_price: number | null
-  hot_16oz_price: number | null
   iced_12oz_price: number | null
   iced_16oz_price: number | null
 }
@@ -65,7 +62,6 @@ export type MenuMaxAggregateOutputType = {
   price: number | null
   category: string | null
   hot_12oz_price: number | null
-  hot_16oz_price: number | null
   iced_12oz_price: number | null
   iced_16oz_price: number | null
 }
@@ -79,7 +75,6 @@ export type MenuCountAggregateOutputType = {
   hot_cup_sizes: number
   iced_cup_sizes: number
   hot_12oz_price: number
-  hot_16oz_price: number
   iced_12oz_price: number
   iced_16oz_price: number
   _all: number
@@ -92,7 +87,6 @@ export type MenuAvgAggregateInputType = {
   hot_cup_sizes?: true
   iced_cup_sizes?: true
   hot_12oz_price?: true
-  hot_16oz_price?: true
   iced_12oz_price?: true
   iced_16oz_price?: true
 }
@@ -103,7 +97,6 @@ export type MenuSumAggregateInputType = {
   hot_cup_sizes?: true
   iced_cup_sizes?: true
   hot_12oz_price?: true
-  hot_16oz_price?: true
   iced_12oz_price?: true
   iced_16oz_price?: true
 }
@@ -114,7 +107,6 @@ export type MenuMinAggregateInputType = {
   price?: true
   category?: true
   hot_12oz_price?: true
-  hot_16oz_price?: true
   iced_12oz_price?: true
   iced_16oz_price?: true
 }
@@ -125,7 +117,6 @@ export type MenuMaxAggregateInputType = {
   price?: true
   category?: true
   hot_12oz_price?: true
-  hot_16oz_price?: true
   iced_12oz_price?: true
   iced_16oz_price?: true
 }
@@ -139,7 +130,6 @@ export type MenuCountAggregateInputType = {
   hot_cup_sizes?: true
   iced_cup_sizes?: true
   hot_12oz_price?: true
-  hot_16oz_price?: true
   iced_12oz_price?: true
   iced_16oz_price?: true
   _all?: true
@@ -240,7 +230,6 @@ export type MenuGroupByOutputType = {
   hot_cup_sizes: number[]
   iced_cup_sizes: number[]
   hot_12oz_price: number
-  hot_16oz_price: number
   iced_12oz_price: number
   iced_16oz_price: number
   _count: MenuCountAggregateOutputType | null
@@ -277,7 +266,6 @@ export type MenuWhereInput = {
   hot_cup_sizes?: Prisma.IntNullableListFilter<"Menu">
   iced_cup_sizes?: Prisma.IntNullableListFilter<"Menu">
   hot_12oz_price?: Prisma.FloatFilter<"Menu"> | number
-  hot_16oz_price?: Prisma.FloatFilter<"Menu"> | number
   iced_12oz_price?: Prisma.FloatFilter<"Menu"> | number
   iced_16oz_price?: Prisma.FloatFilter<"Menu"> | number
   order_items?: Prisma.OrderItemListRelationFilter
@@ -292,7 +280,6 @@ export type MenuOrderByWithRelationInput = {
   hot_cup_sizes?: Prisma.SortOrder
   iced_cup_sizes?: Prisma.SortOrder
   hot_12oz_price?: Prisma.SortOrder
-  hot_16oz_price?: Prisma.SortOrder
   iced_12oz_price?: Prisma.SortOrder
   iced_16oz_price?: Prisma.SortOrder
   order_items?: Prisma.OrderItemOrderByRelationAggregateInput
@@ -310,7 +297,6 @@ export type MenuWhereUniqueInput = Prisma.AtLeast<{
   hot_cup_sizes?: Prisma.IntNullableListFilter<"Menu">
   iced_cup_sizes?: Prisma.IntNullableListFilter<"Menu">
   hot_12oz_price?: Prisma.FloatFilter<"Menu"> | number
-  hot_16oz_price?: Prisma.FloatFilter<"Menu"> | number
   iced_12oz_price?: Prisma.FloatFilter<"Menu"> | number
   iced_16oz_price?: Prisma.FloatFilter<"Menu"> | number
   order_items?: Prisma.OrderItemListRelationFilter
@@ -325,7 +311,6 @@ export type MenuOrderByWithAggregationInput = {
   hot_cup_sizes?: Prisma.SortOrder
   iced_cup_sizes?: Prisma.SortOrder
   hot_12oz_price?: Prisma.SortOrder
-  hot_16oz_price?: Prisma.SortOrder
   iced_12oz_price?: Prisma.SortOrder
   iced_16oz_price?: Prisma.SortOrder
   _count?: Prisma.MenuCountOrderByAggregateInput
@@ -347,7 +332,6 @@ export type MenuScalarWhereWithAggregatesInput = {
   hot_cup_sizes?: Prisma.IntNullableListFilter<"Menu">
   iced_cup_sizes?: Prisma.IntNullableListFilter<"Menu">
   hot_12oz_price?: Prisma.FloatWithAggregatesFilter<"Menu"> | number
-  hot_16oz_price?: Prisma.FloatWithAggregatesFilter<"Menu"> | number
   iced_12oz_price?: Prisma.FloatWithAggregatesFilter<"Menu"> | number
   iced_16oz_price?: Prisma.FloatWithAggregatesFilter<"Menu"> | number
 }
@@ -360,7 +344,6 @@ export type MenuCreateInput = {
   hot_cup_sizes?: Prisma.MenuCreatehot_cup_sizesInput | number[]
   iced_cup_sizes?: Prisma.MenuCreateiced_cup_sizesInput | number[]
   hot_12oz_price?: number
-  hot_16oz_price?: number
   iced_12oz_price?: number
   iced_16oz_price?: number
   order_items?: Prisma.OrderItemCreateNestedManyWithoutMenuInput
@@ -375,7 +358,6 @@ export type MenuUncheckedCreateInput = {
   hot_cup_sizes?: Prisma.MenuCreatehot_cup_sizesInput | number[]
   iced_cup_sizes?: Prisma.MenuCreateiced_cup_sizesInput | number[]
   hot_12oz_price?: number
-  hot_16oz_price?: number
   iced_12oz_price?: number
   iced_16oz_price?: number
   order_items?: Prisma.OrderItemUncheckedCreateNestedManyWithoutMenuInput
@@ -389,7 +371,6 @@ export type MenuUpdateInput = {
   hot_cup_sizes?: Prisma.MenuUpdatehot_cup_sizesInput | number[]
   iced_cup_sizes?: Prisma.MenuUpdateiced_cup_sizesInput | number[]
   hot_12oz_price?: Prisma.FloatFieldUpdateOperationsInput | number
-  hot_16oz_price?: Prisma.FloatFieldUpdateOperationsInput | number
   iced_12oz_price?: Prisma.FloatFieldUpdateOperationsInput | number
   iced_16oz_price?: Prisma.FloatFieldUpdateOperationsInput | number
   order_items?: Prisma.OrderItemUpdateManyWithoutMenuNestedInput
@@ -404,7 +385,6 @@ export type MenuUncheckedUpdateInput = {
   hot_cup_sizes?: Prisma.MenuUpdatehot_cup_sizesInput | number[]
   iced_cup_sizes?: Prisma.MenuUpdateiced_cup_sizesInput | number[]
   hot_12oz_price?: Prisma.FloatFieldUpdateOperationsInput | number
-  hot_16oz_price?: Prisma.FloatFieldUpdateOperationsInput | number
   iced_12oz_price?: Prisma.FloatFieldUpdateOperationsInput | number
   iced_16oz_price?: Prisma.FloatFieldUpdateOperationsInput | number
   order_items?: Prisma.OrderItemUncheckedUpdateManyWithoutMenuNestedInput
@@ -419,7 +399,6 @@ export type MenuCreateManyInput = {
   hot_cup_sizes?: Prisma.MenuCreatehot_cup_sizesInput | number[]
   iced_cup_sizes?: Prisma.MenuCreateiced_cup_sizesInput | number[]
   hot_12oz_price?: number
-  hot_16oz_price?: number
   iced_12oz_price?: number
   iced_16oz_price?: number
 }
@@ -432,7 +411,6 @@ export type MenuUpdateManyMutationInput = {
   hot_cup_sizes?: Prisma.MenuUpdatehot_cup_sizesInput | number[]
   iced_cup_sizes?: Prisma.MenuUpdateiced_cup_sizesInput | number[]
   hot_12oz_price?: Prisma.FloatFieldUpdateOperationsInput | number
-  hot_16oz_price?: Prisma.FloatFieldUpdateOperationsInput | number
   iced_12oz_price?: Prisma.FloatFieldUpdateOperationsInput | number
   iced_16oz_price?: Prisma.FloatFieldUpdateOperationsInput | number
 }
@@ -446,7 +424,6 @@ export type MenuUncheckedUpdateManyInput = {
   hot_cup_sizes?: Prisma.MenuUpdatehot_cup_sizesInput | number[]
   iced_cup_sizes?: Prisma.MenuUpdateiced_cup_sizesInput | number[]
   hot_12oz_price?: Prisma.FloatFieldUpdateOperationsInput | number
-  hot_16oz_price?: Prisma.FloatFieldUpdateOperationsInput | number
   iced_12oz_price?: Prisma.FloatFieldUpdateOperationsInput | number
   iced_16oz_price?: Prisma.FloatFieldUpdateOperationsInput | number
 }
@@ -476,7 +453,6 @@ export type MenuCountOrderByAggregateInput = {
   hot_cup_sizes?: Prisma.SortOrder
   iced_cup_sizes?: Prisma.SortOrder
   hot_12oz_price?: Prisma.SortOrder
-  hot_16oz_price?: Prisma.SortOrder
   iced_12oz_price?: Prisma.SortOrder
   iced_16oz_price?: Prisma.SortOrder
 }
@@ -487,7 +463,6 @@ export type MenuAvgOrderByAggregateInput = {
   hot_cup_sizes?: Prisma.SortOrder
   iced_cup_sizes?: Prisma.SortOrder
   hot_12oz_price?: Prisma.SortOrder
-  hot_16oz_price?: Prisma.SortOrder
   iced_12oz_price?: Prisma.SortOrder
   iced_16oz_price?: Prisma.SortOrder
 }
@@ -498,7 +473,6 @@ export type MenuMaxOrderByAggregateInput = {
   price?: Prisma.SortOrder
   category?: Prisma.SortOrder
   hot_12oz_price?: Prisma.SortOrder
-  hot_16oz_price?: Prisma.SortOrder
   iced_12oz_price?: Prisma.SortOrder
   iced_16oz_price?: Prisma.SortOrder
 }
@@ -509,7 +483,6 @@ export type MenuMinOrderByAggregateInput = {
   price?: Prisma.SortOrder
   category?: Prisma.SortOrder
   hot_12oz_price?: Prisma.SortOrder
-  hot_16oz_price?: Prisma.SortOrder
   iced_12oz_price?: Prisma.SortOrder
   iced_16oz_price?: Prisma.SortOrder
 }
@@ -520,7 +493,6 @@ export type MenuSumOrderByAggregateInput = {
   hot_cup_sizes?: Prisma.SortOrder
   iced_cup_sizes?: Prisma.SortOrder
   hot_12oz_price?: Prisma.SortOrder
-  hot_16oz_price?: Prisma.SortOrder
   iced_12oz_price?: Prisma.SortOrder
   iced_16oz_price?: Prisma.SortOrder
 }
@@ -587,7 +559,6 @@ export type MenuCreateWithoutOrder_itemsInput = {
   hot_cup_sizes?: Prisma.MenuCreatehot_cup_sizesInput | number[]
   iced_cup_sizes?: Prisma.MenuCreateiced_cup_sizesInput | number[]
   hot_12oz_price?: number
-  hot_16oz_price?: number
   iced_12oz_price?: number
   iced_16oz_price?: number
 }
@@ -601,7 +572,6 @@ export type MenuUncheckedCreateWithoutOrder_itemsInput = {
   hot_cup_sizes?: Prisma.MenuCreatehot_cup_sizesInput | number[]
   iced_cup_sizes?: Prisma.MenuCreateiced_cup_sizesInput | number[]
   hot_12oz_price?: number
-  hot_16oz_price?: number
   iced_12oz_price?: number
   iced_16oz_price?: number
 }
@@ -630,7 +600,6 @@ export type MenuUpdateWithoutOrder_itemsInput = {
   hot_cup_sizes?: Prisma.MenuUpdatehot_cup_sizesInput | number[]
   iced_cup_sizes?: Prisma.MenuUpdateiced_cup_sizesInput | number[]
   hot_12oz_price?: Prisma.FloatFieldUpdateOperationsInput | number
-  hot_16oz_price?: Prisma.FloatFieldUpdateOperationsInput | number
   iced_12oz_price?: Prisma.FloatFieldUpdateOperationsInput | number
   iced_16oz_price?: Prisma.FloatFieldUpdateOperationsInput | number
 }
@@ -644,7 +613,6 @@ export type MenuUncheckedUpdateWithoutOrder_itemsInput = {
   hot_cup_sizes?: Prisma.MenuUpdatehot_cup_sizesInput | number[]
   iced_cup_sizes?: Prisma.MenuUpdateiced_cup_sizesInput | number[]
   hot_12oz_price?: Prisma.FloatFieldUpdateOperationsInput | number
-  hot_16oz_price?: Prisma.FloatFieldUpdateOperationsInput | number
   iced_12oz_price?: Prisma.FloatFieldUpdateOperationsInput | number
   iced_16oz_price?: Prisma.FloatFieldUpdateOperationsInput | number
 }
@@ -689,7 +657,6 @@ export type MenuSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   hot_cup_sizes?: boolean
   iced_cup_sizes?: boolean
   hot_12oz_price?: boolean
-  hot_16oz_price?: boolean
   iced_12oz_price?: boolean
   iced_16oz_price?: boolean
   order_items?: boolean | Prisma.Menu$order_itemsArgs<ExtArgs>
@@ -705,7 +672,6 @@ export type MenuSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   hot_cup_sizes?: boolean
   iced_cup_sizes?: boolean
   hot_12oz_price?: boolean
-  hot_16oz_price?: boolean
   iced_12oz_price?: boolean
   iced_16oz_price?: boolean
 }, ExtArgs["result"]["menu"]>
@@ -719,7 +685,6 @@ export type MenuSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   hot_cup_sizes?: boolean
   iced_cup_sizes?: boolean
   hot_12oz_price?: boolean
-  hot_16oz_price?: boolean
   iced_12oz_price?: boolean
   iced_16oz_price?: boolean
 }, ExtArgs["result"]["menu"]>
@@ -733,12 +698,11 @@ export type MenuSelectScalar = {
   hot_cup_sizes?: boolean
   iced_cup_sizes?: boolean
   hot_12oz_price?: boolean
-  hot_16oz_price?: boolean
   iced_12oz_price?: boolean
   iced_16oz_price?: boolean
 }
 
-export type MenuOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "price" | "category" | "temperatures" | "hot_cup_sizes" | "iced_cup_sizes" | "hot_12oz_price" | "hot_16oz_price" | "iced_12oz_price" | "iced_16oz_price", ExtArgs["result"]["menu"]>
+export type MenuOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "price" | "category" | "temperatures" | "hot_cup_sizes" | "iced_cup_sizes" | "hot_12oz_price" | "iced_12oz_price" | "iced_16oz_price", ExtArgs["result"]["menu"]>
 export type MenuInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   order_items?: boolean | Prisma.Menu$order_itemsArgs<ExtArgs>
   _count?: boolean | Prisma.MenuCountOutputTypeDefaultArgs<ExtArgs>
@@ -760,7 +724,6 @@ export type $MenuPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     hot_cup_sizes: number[]
     iced_cup_sizes: number[]
     hot_12oz_price: number
-    hot_16oz_price: number
     iced_12oz_price: number
     iced_16oz_price: number
   }, ExtArgs["result"]["menu"]>
@@ -1195,7 +1158,6 @@ export interface MenuFieldRefs {
   readonly hot_cup_sizes: Prisma.FieldRef<"Menu", 'Int[]'>
   readonly iced_cup_sizes: Prisma.FieldRef<"Menu", 'Int[]'>
   readonly hot_12oz_price: Prisma.FieldRef<"Menu", 'Float'>
-  readonly hot_16oz_price: Prisma.FieldRef<"Menu", 'Float'>
   readonly iced_12oz_price: Prisma.FieldRef<"Menu", 'Float'>
   readonly iced_16oz_price: Prisma.FieldRef<"Menu", 'Float'>
 }

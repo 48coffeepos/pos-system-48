@@ -145,9 +145,7 @@ export function PosCupPickerDialog({
 
 		const comboPrice =
 			pickCupType === "HOT"
-				? pickCupSize === "12OZ"
-					? item.hot_12oz_price
-					: item.hot_16oz_price
+				? item.hot_12oz_price
 				: pickCupSize === "12OZ"
 					? item.iced_12oz_price
 					: item.iced_16oz_price;
@@ -205,13 +203,13 @@ export function PosCupPickerDialog({
 
 	const adjForTemp = (temp: string) =>
 		(temp === "HOT"
-			? pickCupSize === "12OZ" ? item.hot_12oz_price : item.hot_16oz_price
+			? item.hot_12oz_price
 			: pickCupSize === "12OZ" ? item.iced_12oz_price : item.iced_16oz_price) ?? 0;
 
 	const adjForSize = (sizeKey: string) => {
 		if (isFreeDrink && sizeKey === "12OZ") return 0;
 		return (pickCupType === "HOT"
-			? sizeKey === "12OZ" ? item.hot_12oz_price : item.hot_16oz_price
+			? item.hot_12oz_price
 			: sizeKey === "12OZ" ? item.iced_12oz_price : item.iced_16oz_price) ?? 0;
 	};
 
@@ -224,7 +222,7 @@ export function PosCupPickerDialog({
 		isFreeDrink && pickCupSize === "12OZ"
 			? 0
 			: pickCupType === "HOT"
-				? pickCupSize === "12OZ" ? item.hot_12oz_price : item.hot_16oz_price
+				? item.hot_12oz_price
 				: pickCupSize === "12OZ" ? item.iced_12oz_price : item.iced_16oz_price;
 
 	return (

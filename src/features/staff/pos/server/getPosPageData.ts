@@ -12,7 +12,6 @@ export interface PosPageData {
     hot_cup_sizes: number[];
     iced_cup_sizes: number[];
     hot_12oz_price: number;
-    hot_16oz_price: number;
     iced_12oz_price: number;
     iced_16oz_price: number;
   }>;
@@ -53,7 +52,6 @@ export const getPosPageData = createServerFn({ method: "GET" }).handler(
       hot_cup_sizes: item.hot_cup_sizes,
       iced_cup_sizes: item.iced_cup_sizes,
       hot_12oz_price: item.hot_12oz_price,
-      hot_16oz_price: item.hot_16oz_price,
       iced_12oz_price: item.iced_12oz_price,
       iced_16oz_price: item.iced_16oz_price,
     }));

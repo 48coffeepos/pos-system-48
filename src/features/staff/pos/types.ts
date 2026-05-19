@@ -7,7 +7,6 @@ export interface MenuItem {
 	hot_cup_sizes: number[];
 	iced_cup_sizes: number[];
 	hot_12oz_price: number;
-	hot_16oz_price: number;
 	iced_12oz_price: number;
 	iced_16oz_price: number;
 }
