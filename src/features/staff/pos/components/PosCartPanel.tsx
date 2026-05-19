@@ -27,7 +27,7 @@ export function PosCartPanel({
 	onRemoveFromCart,
 	onUpdateQuantity,
 	onClearCart,
-	onPlaceOrderClick,
+	
 }: PosCartPanelProps) {
 	const lineSubtotal = cart.reduce((s, c) => s + c.total_price, 0);
 	const cartTotal = lineSubtotal;
@@ -35,7 +35,6 @@ export function PosCartPanel({
 	const values = form.state.values;
 	const paymentMethod = values.paymentMethod;
 	const amountPaid = values.amountPaid;
-	const referenceNumber = values.referenceNumber;
 
 	const paidNum = parseFloat(amountPaid) || 0;
 	const isGrab = paymentMethod === "GRAB";

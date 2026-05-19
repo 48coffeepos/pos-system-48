@@ -28,7 +28,7 @@ model Menu {
   name            String
   price           Float?
   category        String
-  type            Inventory_Type
+  type            Inventory_Type?
   inventory_items MenuInventory[]
   order_items     OrderItem[]
 }

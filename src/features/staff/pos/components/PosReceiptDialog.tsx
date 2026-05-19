@@ -1,4 +1,4 @@
-import { Printer, X } from "@phosphor-icons/react";
+import { Printer } from "@phosphor-icons/react";
 import type { PosOrder } from "../types";
 import { PosModal } from "./ui/PosModal";
 
