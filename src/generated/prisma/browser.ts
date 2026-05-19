@@ -42,3 +42,8 @@ export type Account = Prisma.AccountModel
  * 
  */
 export type Verification = Prisma.VerificationModel
+/**
+ * Model inventory
+ * 
+ */
+export type inventory = Prisma.inventoryModel
