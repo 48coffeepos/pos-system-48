@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from "react";
+import { useMemo, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Toaster, toast } from "sonner";
 import { z } from "zod";
@@ -12,6 +12,7 @@ import { PosOrderConfirmDialog } from "./PosOrderConfirmDialog";
 import { PosReceiptDialog } from "./PosReceiptDialog";
 import { posPageDataQueryOptions } from "../queryOptions";
 import { createOrderMutationOptions } from "../mutationOptions";
+import { usePosStore } from "../stores/usePosStore";
 import type { MenuItem, CartItem, PosOrder } from "../types";
 
 const posFormSchema = z.object({
@@ -22,14 +23,25 @@ const posFormSchema = z.object({
 });
 
 export function PosScreen() {
-	const [activeCategory, setActiveCategory] = useState("all");
-	const [search, setSearch] = useState("");
-	const [showReceipt, setShowReceipt] = useState(false);
-	const [showPlaceOrderConfirm, setShowPlaceOrderConfirm] = useState(false);
-	const [lastOrder, setLastOrder] = useState<PosOrder | null>(null);
-	const [customizeItem, setCustomizeItem] = useState<MenuItem | null>(null);
-
-	const [cart, setCart] = useState<CartItem[]>([]);
+	const {
+		activeCategory,
+		setActiveCategory,
+		search,
+		setSearch,
+		showReceipt,
+		setShowReceipt,
+		showPlaceOrderConfirm,
+		setShowPlaceOrderConfirm,
+		lastOrder,
+		setLastOrder,
+		customizeItem,
+		setCustomizeItem,
+		cart,
+		addToCart,
+		removeFromCart,
+		updateQuantity,
+		clearCart,
+	} = usePosStore();
 
 	const queryClient = useQueryClient();
 	const { data, isLoading, error } = useQuery(posPageDataQueryOptions);
@@ -108,24 +120,10 @@ export function PosScreen() {
 			is_free_drink?: boolean;
 			addon_items?: Array<{ addon_id: number; name: string; price: number; quantity: number }>;
 		}) => {
-			setCart((prev) => {
-				const existing = prev.find((c) => c.lineKey === params.lineKey);
-				if (existing) {
-					return prev.map((c) =>
-						c.lineKey === params.lineKey
-							? {
-									...c,
-									quantity: c.quantity + 1,
-									total_price: (c.quantity + 1) * c.unit_price,
-								}
-							: c,
-					);
-				}
-				return [...prev, { ...params, quantity: 1 } as CartItem];
-			});
+			addToCart({ ...params, quantity: 1 } as CartItem);
 			toast.success(`${params.menu_name} added to cart`);
 		},
-		[],
+		[addToCart],
 	);
 
 	const handleProductClick = useCallback((item: MenuItem) => {
@@ -143,30 +141,17 @@ export function PosScreen() {
 		} else {
 			setCustomizeItem(item);
 		}
-	}, [handleCustomizeConfirm]);
+	}, [handleCustomizeConfirm, setCustomizeItem]);
 
-	const removeFromCart = useCallback((lineKey: string) => {
-		setCart((prev) => prev.filter((c) => c.lineKey !== lineKey));
-	}, []);
-
-	const updateQuantity = useCallback(
+	const handleUpdateQuantity = useCallback(
 		(lineKey: string, delta: number) => {
-			setCart((prev) =>
-				prev.map((c) => {
-					if (c.lineKey !== lineKey) return c;
-					const currentQty = c.quantity || 0;
-					const newQty = currentQty + delta;
-					if (newQty <= 0) return c;
-					return { ...c, quantity: newQty, total_price: newQty * (c.unit_price || 0) };
-				}),
-			);
+			const existing = cart.find((c) => c.lineKey === lineKey);
+			if (existing) {
+				updateQuantity(lineKey, existing.quantity + delta);
+			}
 		},
-		[],
+		[cart, updateQuantity],
 	);
-
-	const clearCart = useCallback(() => {
-		setCart([]);
-	}, []);
 
 	const handlePlaceOrder = useCallback(async () => {
 		const values = form.state.values;
@@ -234,7 +219,7 @@ export function PosScreen() {
 			console.error("Order placement failed:", err);
 			toast.error("Failed to place order: " + (err.message || "Unknown error"));
 		}
-	}, [cart, cartTotal, clearCart, createOrderMutation, form]);
+	}, [cart, cartTotal, clearCart, createOrderMutation, form, setLastOrder, setShowReceipt, setShowPlaceOrderConfirm]);
 
 	const handlePrint = useCallback(() => {
 		window.print();
@@ -269,7 +254,7 @@ export function PosScreen() {
 					cart={cart}
 					form={form}
 					onRemoveFromCart={removeFromCart}
-					onUpdateQuantity={updateQuantity}
+					onUpdateQuantity={handleUpdateQuantity}
 					onClearCart={clearCart}
 					onPlaceOrderClick={() => {
 						form.handleSubmit();
