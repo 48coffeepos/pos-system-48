@@ -1,6 +1,19 @@
 import { useState } from "react";
-import { PackageIcon, NotePencilIcon, TrashIcon } from "@phosphor-icons/react";
+import { useMutation } from "@tanstack/react-query";
+import { PackageIcon, NotePencilIcon, TrashIcon, WarningCircleIcon } from "@phosphor-icons/react";
 import type { InventoryItem } from "./AddInventoryItem";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogMedia,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogAction,
+  AlertDialogCancel,
+} from "@/components/ui/alert-dialog";
+import { deleteInventoryItemMutationOptions } from "../mutationOptions";
 
 // Ensure your shared type includes yesterday_stock from the query context
 // If it doesn't, you can safely extend it here:
@@ -10,7 +23,15 @@ interface ExtendedInventoryItem extends InventoryItem {
 
 function InventoryList({ items = [], onEdit }: { items?: ExtendedInventoryItem[]; onEdit?: (item: ExtendedInventoryItem) => void }) {
   const [timeframe, setTimeframe] = useState<"today" | "yesterday">("today");
+  const [deletingItem, setDeletingItem] = useState<ExtendedInventoryItem | null>(null);
   const hasItems = items.length > 0;
+
+  const deleteMutation = useMutation({
+    ...deleteInventoryItemMutationOptions,
+    onSettled: () => {
+      setDeletingItem(null);
+    },
+  });
 
   return (
     <div>
@@ -101,6 +122,7 @@ function InventoryList({ items = [], onEdit }: { items?: ExtendedInventoryItem[]
                         </button>
                         <button 
                           type="button" 
+                          onClick={() => setDeletingItem(item)}
                           className="p-1 hover:text-red-600 transition-colors"
                           aria-label="Delete item record"
                         >
@@ -123,6 +145,35 @@ function InventoryList({ items = [], onEdit }: { items?: ExtendedInventoryItem[]
           </h2>
         </div>
       )}
+
+      {/* Delete Confirmation Modal */}
+      <AlertDialog open={!!deletingItem} onOpenChange={(open) => { if (!open) setDeletingItem(null); }}>
+        <AlertDialogContent size="sm">
+          <AlertDialogHeader>
+            <AlertDialogMedia>
+              <WarningCircleIcon weight="fill" className="size-8 text-red-500" />
+            </AlertDialogMedia>
+            <AlertDialogTitle>Delete item?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently remove <strong>{deletingItem?.name}</strong> from inventory. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              variant="destructive"
+              disabled={deleteMutation.isPending}
+              onClick={() => {
+                if (deletingItem) {
+                  deleteMutation.mutate({ id: deletingItem.id });
+                }
+              }}
+            >
+              {deleteMutation.isPending ? "Deleting..." : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

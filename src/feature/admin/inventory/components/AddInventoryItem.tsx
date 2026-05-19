@@ -2,8 +2,7 @@
 
 import { useState, useRef, useEffect, useMemo } from "react";
 import { createPortal } from "react-dom";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
+import { useMutation } from "@tanstack/react-query";
 import { PlusIcon, MagnifyingGlassIcon, CaretDownIcon, NotePencilIcon } from "@phosphor-icons/react";
 
 import { cn } from "@/lib/utils";
@@ -13,7 +12,6 @@ import {
   addStockMutationOptions,
   updateInventoryItemMutationOptions,
 } from "../mutationOptions";
-import inventoryKeys from "../keys";
 
 export interface InventoryItem {
   id: string;
@@ -44,7 +42,6 @@ const itemTypeOptions = [
 type SelectionState = "idle" | "new" | "existing" | "editing";
 
 function AddInventoryItem({ items, editingItem, onCancelEdit }: AddInventoryItemProps) {
-  const queryClient = useQueryClient();
   const inventoryItems = items ?? [];
 
   const [isOpen, setIsOpen] = useState(false);
@@ -63,27 +60,21 @@ function AddInventoryItem({ items, editingItem, onCancelEdit }: AddInventoryItem
 
   const createMutation = useMutation({
     ...createInventoryItemMutationOptions,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: inventoryKeys.inventory });
-      toast.success("Item created", { description: `${itemName} has been added to inventory.` });
+    onSettled: () => {
       handleClear();
     },
   });
 
   const addStockMutation = useMutation({
     ...addStockMutationOptions,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: inventoryKeys.inventory });
-      toast.success("Stock updated", { description: `Added ${quantity} to ${selectedItem?.name}.` });
+    onSettled: () => {
       handleClear();
     },
   });
 
   const updateMutation = useMutation({
     ...updateInventoryItemMutationOptions,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: inventoryKeys.inventory });
-      toast.success("Item updated", { description: `${itemName} has been saved.` });
+    onSettled: () => {
       handleClear();
     },
   });
