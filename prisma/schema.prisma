@@ -86,14 +86,6 @@ model AddonItem {
   quantity      Int
 }
 
-model Expenses {
-  id          Int      @id @default(autoincrement())
-  description String
-  amount      Float
-  type        String
-  date        DateTime
-}
-
 model inventory {
   inventory_id    String @id @default(uuid())
   name            String

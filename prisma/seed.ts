@@ -164,26 +164,7 @@ async function main() {
 			{ name: 'Pearls', price: 20 },
 		],
 	})
-
-	// ── Expenses Sample ──
-
-	await prisma.expenses.createMany({
-		data: [
-			{
-				description: 'Electric bill',
-				amount: 2500,
-				type: 'utility',
-				date: new Date(),
-			},
-			{
-				description: 'Coffee beans delivery',
-				amount: 4500,
-				type: 'supply',
-				date: new Date(),
-			},
-		],
-	})
-
+	
 	// ── Inventory ──
 
 	await prisma.inventory.createMany({
