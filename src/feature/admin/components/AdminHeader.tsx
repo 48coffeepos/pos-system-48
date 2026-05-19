@@ -8,15 +8,15 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 
 import {
-  Coffee,
-  MagnifyingGlass,
-  SquaresFour,
-  List,
-  Package,
-  Users,
-  SignOut,
-  UserCircle,
-  X,
+  CoffeeIcon,
+  MagnifyingGlassIcon,
+  SquaresFourIcon,
+  ListIcon,
+  PackageIcon,
+  UsersIcon,
+  SignOutIcon,
+  UserCircleIcon,
+  XIcon,
 } from "@phosphor-icons/react";
 
 interface SearchItem {
@@ -39,10 +39,10 @@ const defaultSearchItems: SearchItem[] = [
 ];
 
 const navLinks = [
-  { label: "Dashboard", path: "/admin", icon: SquaresFour },
-  { label: "Menu", path: "/admin/menu", icon: List },
-  { label: "Inventory", path: "/admin/inventory", icon: Package },
-  { label: "Accounts", path: "/admin/accounts", icon: Users },
+  { label: "Dashboard", path: "/admin", icon: SquaresFourIcon },
+  { label: "Menu", path: "/admin/menu", icon: ListIcon },
+  { label: "Inventory", path: "/admin/inventory", icon: PackageIcon },
+  { label: "Accounts", path: "/admin/accounts", icon: UsersIcon },
 ];
 
 const adminTo = (path: string) => path as never;
@@ -122,7 +122,7 @@ function AdminHeader({
           className="flex shrink-0 items-center gap-2 no-underline"
         >
           <div className="flex size-9 items-center justify-center rounded-xl bg-(--deep-forest)">
-            <Coffee weight="fill" className="size-5 text-(--pale-yellow)" />
+            <CoffeeIcon weight="fill" className="size-5 text-(--pale-yellow)" />
           </div>
           <span className="hidden text-lg font-bold tracking-tight text-(--deep-forest) sm:inline">
             48° Coffee
@@ -140,7 +140,7 @@ function AdminHeader({
           className="relative hidden flex-1 sm:block max-w-md"
         >
           <div className="relative">
-            <MagnifyingGlass className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2" />
+            <MagnifyingGlassIcon className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2" />
             <Input
               ref={inputRef}
               value={searchQuery}
@@ -161,7 +161,7 @@ function AdminHeader({
                 }}
                 className="absolute right-2 top-1/2 -translate-y-1/2 text-[var(--medium-gray)] hover:text-[var(--deep-forest)]"
               >
-                <X className="size-4" />
+                <XIcon className="size-4" />
               </button>
             )}
           </div>
@@ -233,7 +233,7 @@ function AdminHeader({
             <>
               <div className="flex items-center gap-2.5">
                 <div className="flex size-8 items-center justify-center rounded-full bg-[var(--deep-forest)]">
-                  <UserCircle
+                  <UserCircleIcon
                     weight="fill"
                     className="size-6 text-[var(--pale-yellow)]"
                   />
@@ -260,7 +260,7 @@ function AdminHeader({
                 className="text-[var(--medium-gray)] hover:text-[var(--coral)] hover:bg-[var(--soft-peach)]/30"
                 title="Log out"
               >
-                <SignOut className="size-4" />
+                <SignOutIcon className="size-4" />
               </Button>
             </>
           ) : (
@@ -281,9 +281,9 @@ function AdminHeader({
           aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
         >
           {mobileMenuOpen ? (
-            <X className="size-5" />
+            <XIcon className="size-5" />
           ) : (
-            <List className="size-5" />
+            <ListIcon className="size-5" />
           )}
         </button>
       </div>
@@ -293,7 +293,7 @@ function AdminHeader({
         <div className="border-t border-[var(--light-gray)] bg-[var(--pure-white)] px-4 pb-4 pt-2 lg:hidden animate-fade-in-up">
           {/* Mobile Search */}
           <div className="relative mb-3">
-            <MagnifyingGlass className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[var(--medium-gray)]" />
+            <MagnifyingGlassIcon className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[var(--medium-gray)]" />
             <Input
               value={searchQuery}
               onChange={(e) => {
@@ -358,7 +358,7 @@ function AdminHeader({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5">
                 <div className="flex size-9 items-center justify-center rounded-full bg-[var(--deep-forest)]">
-                  <UserCircle
+                  <UserCircleIcon
                     weight="fill"
                     className="size-6 text-[var(--pale-yellow)]"
                   />
@@ -379,7 +379,7 @@ function AdminHeader({
                 className="flex size-9 items-center justify-center rounded-xl text-[var(--medium-gray)] hover:bg-[var(--soft-peach)]/30 hover:text-[var(--coral)]"
                 aria-label="Log out"
               >
-                <SignOut className="size-5" />
+                <SignOutIcon className="size-5" />
               </button>
             </div>
           ) : (
