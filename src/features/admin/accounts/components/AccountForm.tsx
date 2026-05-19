@@ -25,7 +25,7 @@ interface AccountFormProps {
 }
 
 function getRoleLabel(role: string | null) {
-	return role === ROLES.admin ? "Administrator" : "Cashier";
+	return role === ROLES.admin ? "Administrator" : "Staff";
 }
 
 export function AccountForm({
@@ -52,7 +52,7 @@ export function AccountForm({
 						<p className="text-sm text-muted-foreground">
 							{isEditing
 								? "Update the account name or set a new password."
-								: "Add a cashier or administrator account for the POS."}
+								: "Add a staff or administrator account for the POS."}
 						</p>
 					</div>
 				</div>
@@ -96,7 +96,7 @@ export function AccountForm({
 											placeholder="Select a role"
 											description="Choose the role when creating the account."
 											options={[
-												{ value: ROLES.cashier, label: "Cashier" },
+												{ value: ROLES.staff, label: "Staff" },
 												{ value: ROLES.admin, label: "Administrator" },
 											]}
 										/>

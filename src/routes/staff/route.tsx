@@ -1,8 +1,8 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { sessionQueryOptions } from "@/features/auth/queryOptions";
-import { CashierHeader } from "../../components/CashierHeader";
+import { StaffHeader } from "../../components/StaffHeader";
 
-export const Route = createFileRoute("/cashier")({
+export const Route = createFileRoute("/staff")({
 	component: RouteComponent,
 	loader: async ({ context }) => {
 		const currentUser =
@@ -18,7 +18,7 @@ export const Route = createFileRoute("/cashier")({
 function RouteComponent() {
 	return (
 		<main className="min-h-screen">
-			<CashierHeader />
+			<StaffHeader />
 			<Outlet />
 		</main>
 	);

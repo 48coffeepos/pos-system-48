@@ -35,7 +35,7 @@ function getDefaultValues(
 		name: "",
 		email: "",
 		username: "",
-		role: ROLES.cashier,
+		role: ROLES.staff,
 		password: "",
 	};
 }

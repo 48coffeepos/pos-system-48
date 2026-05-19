@@ -11,7 +11,7 @@ const statements = { ...defaultStatements } as const;
 
 export const ac = createAccessControl(statements);
 
-export const cashier = ac.newRole({
+export const staff = ac.newRole({
 	...userAc.statements,
 });
 
@@ -22,8 +22,8 @@ export const adminRole = ac.newRole({
 export const adminPluginConfig = {
 	ac,
 	roles: {
-		[ROLES.cashier]: cashier,
+		[ROLES.staff]: staff,
 		[ROLES.admin]: adminRole,
 	},
-	defaultRole: ROLES.cashier,
+	defaultRole: ROLES.staff,
 } as const;

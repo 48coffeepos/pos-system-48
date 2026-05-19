@@ -31,7 +31,7 @@ function formatLastSeen(lastSeenAt: Date | null) {
 }
 
 function getRoleLabel(role: string | null) {
-	return role === ROLES.admin ? "Administrator" : "Cashier";
+	return role === ROLES.admin ? "Administrator" : "Staff";
 }
 
 export function getAccountsTableColumns({

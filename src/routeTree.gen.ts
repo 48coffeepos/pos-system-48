@@ -9,19 +9,19 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as CashierRouteRouteImport } from './routes/cashier/route'
+import { Route as StaffRouteRouteImport } from './routes/staff/route'
 import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
-import { Route as CashierPosRouteImport } from './routes/cashier/pos'
+import { Route as StaffPosRouteImport } from './routes/staff/pos'
 import { Route as AdminMenuRouteImport } from './routes/admin/menu'
 import { Route as AdminInventoryRouteImport } from './routes/admin/inventory'
 import { Route as AdminAccountsRouteImport } from './routes/admin/accounts'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
-const CashierRouteRoute = CashierRouteRouteImport.update({
-  id: '/cashier',
-  path: '/cashier',
+const StaffRouteRoute = StaffRouteRouteImport.update({
+  id: '/staff',
+  path: '/staff',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRouteRoute = AdminRouteRouteImport.update({
@@ -39,10 +39,10 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRouteRoute,
 } as any)
-const CashierPosRoute = CashierPosRouteImport.update({
+const StaffPosRoute = StaffPosRouteImport.update({
   id: '/pos',
   path: '/pos',
-  getParentRoute: () => CashierRouteRoute,
+  getParentRoute: () => StaffRouteRoute,
 } as any)
 const AdminMenuRoute = AdminMenuRouteImport.update({
   id: '/menu',
@@ -68,21 +68,21 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
-  '/cashier': typeof CashierRouteRouteWithChildren
+  '/staff': typeof StaffRouteRouteWithChildren
   '/admin/accounts': typeof AdminAccountsRoute
   '/admin/inventory': typeof AdminInventoryRoute
   '/admin/menu': typeof AdminMenuRoute
-  '/cashier/pos': typeof CashierPosRoute
+  '/staff/pos': typeof StaffPosRoute
   '/admin/': typeof AdminIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/cashier': typeof CashierRouteRouteWithChildren
+  '/staff': typeof StaffRouteRouteWithChildren
   '/admin/accounts': typeof AdminAccountsRoute
   '/admin/inventory': typeof AdminInventoryRoute
   '/admin/menu': typeof AdminMenuRoute
-  '/cashier/pos': typeof CashierPosRoute
+  '/staff/pos': typeof StaffPosRoute
   '/admin': typeof AdminIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
@@ -90,11 +90,11 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
-  '/cashier': typeof CashierRouteRouteWithChildren
+  '/staff': typeof StaffRouteRouteWithChildren
   '/admin/accounts': typeof AdminAccountsRoute
   '/admin/inventory': typeof AdminInventoryRoute
   '/admin/menu': typeof AdminMenuRoute
-  '/cashier/pos': typeof CashierPosRoute
+  '/staff/pos': typeof StaffPosRoute
   '/admin/': typeof AdminIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
@@ -103,32 +103,32 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
-    | '/cashier'
+    | '/staff'
     | '/admin/accounts'
     | '/admin/inventory'
     | '/admin/menu'
-    | '/cashier/pos'
+    | '/staff/pos'
     | '/admin/'
     | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/cashier'
+    | '/staff'
     | '/admin/accounts'
     | '/admin/inventory'
     | '/admin/menu'
-    | '/cashier/pos'
+    | '/staff/pos'
     | '/admin'
     | '/api/auth/$'
   id:
     | '__root__'
     | '/'
     | '/admin'
-    | '/cashier'
+    | '/staff'
     | '/admin/accounts'
     | '/admin/inventory'
     | '/admin/menu'
-    | '/cashier/pos'
+    | '/staff/pos'
     | '/admin/'
     | '/api/auth/$'
   fileRoutesById: FileRoutesById
@@ -136,17 +136,17 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRouteRoute: typeof AdminRouteRouteWithChildren
-  CashierRouteRoute: typeof CashierRouteRouteWithChildren
+  StaffRouteRoute: typeof StaffRouteRouteWithChildren
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/cashier': {
-      id: '/cashier'
-      path: '/cashier'
-      fullPath: '/cashier'
-      preLoaderRoute: typeof CashierRouteRouteImport
+    '/staff': {
+      id: '/staff'
+      path: '/staff'
+      fullPath: '/staff'
+      preLoaderRoute: typeof StaffRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -170,12 +170,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRouteRoute
     }
-    '/cashier/pos': {
-      id: '/cashier/pos'
+    '/staff/pos': {
+      id: '/staff/pos'
       path: '/pos'
-      fullPath: '/cashier/pos'
-      preLoaderRoute: typeof CashierPosRouteImport
-      parentRoute: typeof CashierRouteRoute
+      fullPath: '/staff/pos'
+      preLoaderRoute: typeof StaffPosRouteImport
+      parentRoute: typeof StaffRouteRoute
     }
     '/admin/menu': {
       id: '/admin/menu'
@@ -226,22 +226,22 @@ const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
   AdminRouteRouteChildren,
 )
 
-interface CashierRouteRouteChildren {
-  CashierPosRoute: typeof CashierPosRoute
+interface StaffRouteRouteChildren {
+  StaffPosRoute: typeof StaffPosRoute
 }
 
-const CashierRouteRouteChildren: CashierRouteRouteChildren = {
-  CashierPosRoute: CashierPosRoute,
+const StaffRouteRouteChildren: StaffRouteRouteChildren = {
+  StaffPosRoute: StaffPosRoute,
 }
 
-const CashierRouteRouteWithChildren = CashierRouteRoute._addFileChildren(
-  CashierRouteRouteChildren,
+const StaffRouteRouteWithChildren = StaffRouteRoute._addFileChildren(
+  StaffRouteRouteChildren,
 )
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRouteRoute: AdminRouteRouteWithChildren,
-  CashierRouteRoute: CashierRouteRouteWithChildren,
+  StaffRouteRoute: StaffRouteRouteWithChildren,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport
