@@ -16,6 +16,7 @@ async function main() {
 	await prisma.orderItem.deleteMany()
 	await prisma.order.deleteMany()
 	await prisma.addon.deleteMany()
+	await prisma.menuInventory.deleteMany()
 	await prisma.menu.deleteMany()
 	await prisma.account.deleteMany()
 	await prisma.role.deleteMany()
@@ -44,6 +45,14 @@ async function main() {
 		},
 	})
 
+	// ── Inventory ──
+
+	const cup12Hot = await prisma.inventory.create({ data: { name: '12oz Hot', stock: 200, type: 'CUP' } })
+	const cup12Iced = await prisma.inventory.create({ data: { name: '12oz Iced', stock: 200, type: 'CUP' } })
+	const cup16Hot = await prisma.inventory.create({ data: { name: '16oz Hot', stock: 200, type: 'CUP' } })
+	const cup16Iced = await prisma.inventory.create({ data: { name: '16oz Iced', stock: 200, type: 'CUP' } })
+	const beans = await prisma.inventory.create({ data: { name: 'Coffee Beans', stock: 50, type: 'STANDALONE' } })
+
 	// ── Menu Items ──
 
 	const americano = await prisma.menu.create({
@@ -51,12 +60,14 @@ async function main() {
 			name: 'Americano',
 			price: 130,
 			category: 'coffee',
-			temperatures: ['HOT', 'ICED'],
-			hot_cup_sizes: [12],
-			iced_cup_sizes: [12, 16],
-			hot_12oz_price: 130,
-			iced_12oz_price: 130,
-			iced_16oz_price: 140,
+			type: 'CUP',
+			inventory_items: {
+				create: [
+					{ inventory_id: cup12Hot.inventory_id, price: 130 },
+					{ inventory_id: cup12Iced.inventory_id, price: 130 },
+					{ inventory_id: cup16Iced.inventory_id, price: 140 },
+				],
+			},
 		},
 	})
 
@@ -65,12 +76,14 @@ async function main() {
 			name: 'Latte',
 			price: 150,
 			category: 'coffee',
-			temperatures: ['HOT', 'ICED'],
-			hot_cup_sizes: [12],
-			iced_cup_sizes: [12, 16],
-			hot_12oz_price: 150,
-			iced_12oz_price: 150,
-			iced_16oz_price: 160,
+			type: 'CUP',
+			inventory_items: {
+				create: [
+					{ inventory_id: cup12Hot.inventory_id, price: 150 },
+					{ inventory_id: cup12Iced.inventory_id, price: 150 },
+					{ inventory_id: cup16Iced.inventory_id, price: 160 },
+				],
+			},
 		},
 	})
 
@@ -79,12 +92,14 @@ async function main() {
 			name: 'Matcha Latte',
 			price: 160,
 			category: 'non_coffee',
-			temperatures: ['HOT', 'ICED'],
-			hot_cup_sizes: [12],
-			iced_cup_sizes: [12, 16],
-			hot_12oz_price: 160,
-			iced_12oz_price: 160,
-			iced_16oz_price: 170,
+			type: 'CUP',
+			inventory_items: {
+				create: [
+					{ inventory_id: cup12Hot.inventory_id, price: 160 },
+					{ inventory_id: cup12Iced.inventory_id, price: 160 },
+					{ inventory_id: cup16Iced.inventory_id, price: 170 },
+				],
+			},
 		},
 	})
 
@@ -93,12 +108,12 @@ async function main() {
 			name: 'Hot Chocolate',
 			price: 140,
 			category: 'hot',
-			temperatures: ['HOT'],
-			hot_cup_sizes: [12],
-			iced_cup_sizes: [],
-			hot_12oz_price: 140,
-			iced_12oz_price: 0,
-			iced_16oz_price: 0,
+			type: 'CUP',
+			inventory_items: {
+				create: [
+					{ inventory_id: cup12Hot.inventory_id, price: 140 },
+				],
+			},
 		},
 	})
 
@@ -107,12 +122,13 @@ async function main() {
 			name: 'Coconut Latte',
 			price: 150,
 			category: 'coconut_milk',
-			temperatures: ['ICED'],
-			hot_cup_sizes: [],
-			iced_cup_sizes: [12, 16],
-			hot_12oz_price: 0,
-			iced_12oz_price: 150,
-			iced_16oz_price: 160,
+			type: 'CUP',
+			inventory_items: {
+				create: [
+					{ inventory_id: cup12Iced.inventory_id, price: 150 },
+					{ inventory_id: cup16Iced.inventory_id, price: 160 },
+				],
+			},
 		},
 	})
 
@@ -121,12 +137,13 @@ async function main() {
 			name: 'Milktea Coffee',
 			price: 160,
 			category: 'milktea_x_coffee',
-			temperatures: ['ICED'],
-			hot_cup_sizes: [],
-			iced_cup_sizes: [12, 16],
-			hot_12oz_price: 0,
-			iced_12oz_price: 160,
-			iced_16oz_price: 170,
+			type: 'CUP',
+			inventory_items: {
+				create: [
+					{ inventory_id: cup12Iced.inventory_id, price: 160 },
+					{ inventory_id: cup16Iced.inventory_id, price: 170 },
+				],
+			},
 		},
 	})
 
@@ -135,15 +152,14 @@ async function main() {
 			name: 'Chocolate Chip Cookie',
 			price: 75,
 			category: 'extra',
-			temperatures: [],
-			hot_cup_sizes: [],
-			iced_cup_sizes: [],
-			hot_12oz_price: 0,
-			iced_12oz_price: 0,
-			iced_16oz_price: 0,
+			type: 'STANDALONE',
+			inventory_items: {
+				create: [
+					{ inventory_id: beans.inventory_id, price: 75 },
+				],
+			},
 		},
 	})
-
 
 	// ── Addons ──
 
@@ -154,18 +170,6 @@ async function main() {
 			{ name: 'Caramel Sauce', price: 20 },
 			{ name: 'Whipped Cream', price: 25 },
 			{ name: 'Pearls', price: 20 },
-		],
-	})
-	
-	// ── Inventory ──
-
-	await prisma.inventory.createMany({
-		data: [
-			{ name: '12oz Hot', stock: 200, type: 'CUP' },
-			{ name: '12oz Iced', stock: 200, type: 'CUP' },
-			{ name: '16oz Hot', stock: 200, type: 'CUP' },
-			{ name: '16oz Iced', stock: 200, type: 'CUP' },
-			{ name: 'Coffee Beans', stock: 50, type: 'STANDALONE' },
 		],
 	})
 

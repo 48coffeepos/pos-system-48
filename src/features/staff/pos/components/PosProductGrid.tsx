@@ -77,7 +77,7 @@ export function PosProductGrid({
 							<PosProductCard
 								key={item.id}
 								name={item.name}
-								price={item.temperatures?.length ? null : item.price}
+								price={item.price}
 								onSelect={() => onProductClick(item)}
 							/>
 						))}

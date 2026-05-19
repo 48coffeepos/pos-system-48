@@ -55,12 +55,28 @@ export function PosCupPickerDialog({
 	useEffect(() => {
 		if (!item) return;
 
-		const temps = item.temperatures ?? [];
+		const inventoryItems = item.inventory_items ?? [];
+		const temps: Array<"HOT" | "ICED"> = [];
+		if (inventoryItems.some(ii => ii.inventory.name.toLowerCase().includes("hot"))) {
+			temps.push("HOT");
+		}
+		if (inventoryItems.some(ii => ii.inventory.name.toLowerCase().includes("iced"))) {
+			temps.push("ICED");
+		}
 		const defaultTemp = temps.includes("HOT") ? "HOT" : temps[0] ?? "HOT";
 
-		const sizes = getCupSizes(
-			defaultTemp === "HOT" ? item.hot_cup_sizes : item.iced_cup_sizes,
-		);
+		// Get sizes list
+		const searchStr = defaultTemp.toLowerCase();
+		const sizesList: number[] = [];
+		inventoryItems.forEach(ii => {
+			const name = ii.inventory.name.toLowerCase();
+			if (name.includes(searchStr)) {
+				if (name.includes("12oz")) sizesList.push(12);
+				if (name.includes("16oz")) sizesList.push(16);
+			}
+		});
+		const rawSizes = sizesList.filter(s => defaultTemp !== "HOT" || s !== 16);
+		const sizes = getCupSizes(rawSizes.sort((a, b) => a - b));
 		const defaultSize = sizes.length > 0 ? sizes[0].key : "12OZ";
 
 		setPickCupType(defaultTemp);
@@ -76,9 +92,18 @@ export function PosCupPickerDialog({
 	useEffect(() => {
 		if (!item) return;
 
-		const sizes = getCupSizes(
-			pickCupType === "HOT" ? item.hot_cup_sizes : item.iced_cup_sizes,
-		);
+		const inventoryItems = item.inventory_items ?? [];
+		const searchStr = pickCupType.toLowerCase();
+		const sizesList: number[] = [];
+		inventoryItems.forEach(ii => {
+			const name = ii.inventory.name.toLowerCase();
+			if (name.includes(searchStr)) {
+				if (name.includes("12oz")) sizesList.push(12);
+				if (name.includes("16oz")) sizesList.push(16);
+			}
+		});
+		const rawSizes = sizesList.filter(s => pickCupType !== "HOT" || s !== 16);
+		const sizes = getCupSizes(rawSizes.sort((a, b) => a - b));
 		const stillExists = sizes.some((s) => s.key === pickCupSize);
 		if (!stillExists && sizes.length > 0) {
 			setPickCupSize(sizes[0].key);
@@ -86,6 +111,16 @@ export function PosCupPickerDialog({
 	}, [pickCupType, item, pickCupSize]);
 
 	if (!item) return null;
+
+	const getSelectedCupPrice = (type: string, size: string) => {
+		const searchTemp = type.toLowerCase();
+		const searchSize = size.toLowerCase();
+		const match = item.inventory_items?.find((ii) => {
+			const name = ii.inventory.name.toLowerCase();
+			return name.includes(searchTemp) && name.includes(searchSize);
+		});
+		return match ? match.price : (item.price ?? 0);
+	};
 
 	const incrementAddon = (addon: AddOnItem) => {
 		setSelectedAddons((prev) => {
@@ -143,13 +178,7 @@ export function PosCupPickerDialog({
 			0,
 		);
 
-		const comboPrice =
-			pickCupType === "HOT"
-				? item.hot_12oz_price
-				: pickCupSize === "12OZ"
-					? item.iced_12oz_price
-					: item.iced_16oz_price;
-
+		const comboPrice = item.type === "CUP" ? getSelectedCupPrice(pickCupType, pickCupSize) : (item.price ?? 0);
 		let finalUnitPrice = comboPrice + addonsTotal;
 
 		if (isFreeDrink) {
@@ -188,29 +217,37 @@ export function PosCupPickerDialog({
 		onClose();
 	};
 
-	const temperatures = (item.temperatures ?? []).filter(
-		(t) => t === "HOT" || t === "ICED",
-	);
+	const inventoryItems = item.inventory_items ?? [];
+	const temperatures: Array<"HOT" | "ICED"> = [];
+	if (inventoryItems.some(ii => ii.inventory.name.toLowerCase().includes("hot"))) {
+		temperatures.push("HOT");
+	}
+	if (inventoryItems.some(ii => ii.inventory.name.toLowerCase().includes("iced"))) {
+		temperatures.push("ICED");
+	}
 	const hasTemps = temperatures.length > 0;
 	const displayTemps = hasTemps ? temperatures : (["HOT", "ICED"] as const);
 
-	const rawSizes = pickCupType === "HOT" ? item.hot_cup_sizes : item.iced_cup_sizes;
-	const availableSizes = getCupSizes(rawSizes);
+	const searchStr = pickCupType.toLowerCase();
+	const sizesList: number[] = [];
+	inventoryItems.forEach(ii => {
+		const name = ii.inventory.name.toLowerCase();
+		if (name.includes(searchStr)) {
+			if (name.includes("12oz")) sizesList.push(12);
+			if (name.includes("16oz")) sizesList.push(16);
+		}
+	});
+
+	const rawSizes = sizesList.filter(s => pickCupType !== "HOT" || s !== 16);
+	const availableSizes = getCupSizes(rawSizes.sort((a, b) => a - b));
 	const hasSizes = availableSizes.length > 0;
 	const displaySizes = hasSizes
 		? availableSizes
-		: getCupSizes(pickCupType === "HOT" ? [12, 16] : [12, 16]);
-
-	const adjForTemp = (temp: string) =>
-		(temp === "HOT"
-			? item.hot_12oz_price
-			: pickCupSize === "12OZ" ? item.iced_12oz_price : item.iced_16oz_price) ?? 0;
+		: getCupSizes(pickCupType === "HOT" ? [12] : [12, 16]);
 
 	const adjForSize = (sizeKey: string) => {
 		if (isFreeDrink && sizeKey === "12OZ") return 0;
-		return (pickCupType === "HOT"
-			? item.hot_12oz_price
-			: sizeKey === "12OZ" ? item.iced_12oz_price : item.iced_16oz_price) ?? 0;
+		return item.type === "CUP" ? getSelectedCupPrice(pickCupType, sizeKey) : (item.price ?? 0);
 	};
 
 	const liveAddonsTotal = Object.values(selectedAddons).reduce(
@@ -221,9 +258,7 @@ export function PosCupPickerDialog({
 	const liveComboPrice =
 		isFreeDrink && pickCupSize === "12OZ"
 			? 0
-			: pickCupType === "HOT"
-				? item.hot_12oz_price
-				: pickCupSize === "12OZ" ? item.iced_12oz_price : item.iced_16oz_price;
+			: (item.type === "CUP" ? getSelectedCupPrice(pickCupType, pickCupSize) : (item.price ?? 0));
 
 	return (
 		<PosModal open={Boolean(item)} onClose={onClose}>

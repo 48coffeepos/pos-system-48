@@ -387,6 +387,7 @@ export const ModelName = {
   Role: 'Role',
   Account: 'Account',
   Menu: 'Menu',
+  MenuInventory: 'MenuInventory',
   Order: 'Order',
   OrderItem: 'OrderItem',
   Addon: 'Addon',
@@ -407,7 +408,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "role" | "account" | "menu" | "order" | "orderItem" | "addon" | "addonItem" | "inventory"
+    modelProps: "role" | "account" | "menu" | "menuInventory" | "order" | "orderItem" | "addon" | "addonItem" | "inventory"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -630,6 +631,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.MenuCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.MenuCountAggregateOutputType> | number
+        }
+      }
+    }
+    MenuInventory: {
+      payload: Prisma.$MenuInventoryPayload<ExtArgs>
+      fields: Prisma.MenuInventoryFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.MenuInventoryFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MenuInventoryPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.MenuInventoryFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MenuInventoryPayload>
+        }
+        findFirst: {
+          args: Prisma.MenuInventoryFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MenuInventoryPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.MenuInventoryFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MenuInventoryPayload>
+        }
+        findMany: {
+          args: Prisma.MenuInventoryFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MenuInventoryPayload>[]
+        }
+        create: {
+          args: Prisma.MenuInventoryCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MenuInventoryPayload>
+        }
+        createMany: {
+          args: Prisma.MenuInventoryCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.MenuInventoryCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MenuInventoryPayload>[]
+        }
+        delete: {
+          args: Prisma.MenuInventoryDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MenuInventoryPayload>
+        }
+        update: {
+          args: Prisma.MenuInventoryUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MenuInventoryPayload>
+        }
+        deleteMany: {
+          args: Prisma.MenuInventoryDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.MenuInventoryUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.MenuInventoryUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MenuInventoryPayload>[]
+        }
+        upsert: {
+          args: Prisma.MenuInventoryUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MenuInventoryPayload>
+        }
+        aggregate: {
+          args: Prisma.MenuInventoryAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateMenuInventory>
+        }
+        groupBy: {
+          args: Prisma.MenuInventoryGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MenuInventoryGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.MenuInventoryCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MenuInventoryCountAggregateOutputType> | number
         }
       }
     }
@@ -1067,15 +1142,20 @@ export const MenuScalarFieldEnum = {
   name: 'name',
   price: 'price',
   category: 'category',
-  temperatures: 'temperatures',
-  hot_cup_sizes: 'hot_cup_sizes',
-  iced_cup_sizes: 'iced_cup_sizes',
-  hot_12oz_price: 'hot_12oz_price',
-  iced_12oz_price: 'iced_12oz_price',
-  iced_16oz_price: 'iced_16oz_price'
+  type: 'type'
 } as const
 
 export type MenuScalarFieldEnum = (typeof MenuScalarFieldEnum)[keyof typeof MenuScalarFieldEnum]
+
+
+export const MenuInventoryScalarFieldEnum = {
+  id: 'id',
+  menu_id: 'menu_id',
+  inventory_id: 'inventory_id',
+  price: 'price'
+} as const
+
+export type MenuInventoryScalarFieldEnum = (typeof MenuInventoryScalarFieldEnum)[keyof typeof MenuInventoryScalarFieldEnum]
 
 
 export const OrderScalarFieldEnum = {
@@ -1229,13 +1309,6 @@ export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaMode
 
 
 /**
- * Reference to a field of type 'Boolean'
- */
-export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
-    
-
-
-/**
  * Reference to a field of type 'Inventory_Type'
  */
 export type EnumInventory_TypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Inventory_Type'>
@@ -1246,6 +1319,13 @@ export type EnumInventory_TypeFieldRefInput<$PrismaModel> = FieldRefInputType<$P
  * Reference to a field of type 'Inventory_Type[]'
  */
 export type ListEnumInventory_TypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Inventory_Type[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Boolean'
+ */
+export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
     
 
 /**
@@ -1361,6 +1441,7 @@ export type GlobalOmitConfig = {
   role?: Prisma.RoleOmit
   account?: Prisma.AccountOmit
   menu?: Prisma.MenuOmit
+  menuInventory?: Prisma.MenuInventoryOmit
   order?: Prisma.OrderOmit
   orderItem?: Prisma.OrderItemOmit
   addon?: Prisma.AddonOmit

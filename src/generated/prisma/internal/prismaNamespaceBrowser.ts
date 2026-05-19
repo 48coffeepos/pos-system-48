@@ -54,6 +54,7 @@ export const ModelName = {
   Role: 'Role',
   Account: 'Account',
   Menu: 'Menu',
+  MenuInventory: 'MenuInventory',
   Order: 'Order',
   OrderItem: 'OrderItem',
   Addon: 'Addon',
@@ -102,15 +103,20 @@ export const MenuScalarFieldEnum = {
   name: 'name',
   price: 'price',
   category: 'category',
-  temperatures: 'temperatures',
-  hot_cup_sizes: 'hot_cup_sizes',
-  iced_cup_sizes: 'iced_cup_sizes',
-  hot_12oz_price: 'hot_12oz_price',
-  iced_12oz_price: 'iced_12oz_price',
-  iced_16oz_price: 'iced_16oz_price'
+  type: 'type'
 } as const
 
 export type MenuScalarFieldEnum = (typeof MenuScalarFieldEnum)[keyof typeof MenuScalarFieldEnum]
+
+
+export const MenuInventoryScalarFieldEnum = {
+  id: 'id',
+  menu_id: 'menu_id',
+  inventory_id: 'inventory_id',
+  price: 'price'
+} as const
+
+export type MenuInventoryScalarFieldEnum = (typeof MenuInventoryScalarFieldEnum)[keyof typeof MenuInventoryScalarFieldEnum]
 
 
 export const OrderScalarFieldEnum = {

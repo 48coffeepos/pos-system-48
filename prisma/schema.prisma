@@ -24,17 +24,22 @@ model Account {
 }
 
 model Menu {
-  id             Int         @id @default(autoincrement())
-  name           String
-  price          Float
-  category       String
-  temperatures   String[]
-  hot_cup_sizes  Int[]
-  iced_cup_sizes Int[]
-  hot_12oz_price   Float       @default(0)
-  iced_12oz_price  Float       @default(0)
-  iced_16oz_price  Float       @default(0)
-  order_items    OrderItem[]
+  id              Int             @id @default(autoincrement())
+  name            String
+  price           Float?
+  category        String
+  type            Inventory_Type
+  inventory_items MenuInventory[]
+  order_items     OrderItem[]
+}
+
+model MenuInventory {
+  id           Int       @id @default(autoincrement())
+  menu_id      Int
+  menu         Menu      @relation(fields: [menu_id], references: [id])
+  inventory_id String
+  inventory    inventory @relation(fields: [inventory_id], references: [inventory_id])
+  price        Float
 }
 
 model Order {
@@ -86,11 +91,12 @@ model AddonItem {
 }
 
 model inventory {
-  inventory_id    String @id @default(uuid())
+  inventory_id    String          @id @default(uuid())
   name            String
   stock           Int
   yesterday_stock Int?
   type            Inventory_Type
+  menu_items      MenuInventory[]
 }
 
 enum Inventory_Type {

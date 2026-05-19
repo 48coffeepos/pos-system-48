@@ -14,37 +14,29 @@ import { formatCupLine } from "../utils";
 
 interface PosCartPanelProps {
 	cart: CartItem[];
-	paymentMethod: string;
-	note: string;
-	amountPaid: string;
-	referenceNumber: string;
+	form: any;
 	onRemoveFromCart: (lineKey: string) => void;
 	onUpdateQuantity: (lineKey: string, delta: number) => void;
 	onClearCart: () => void;
-	onPaymentMethodChange: (method: string) => void;
-	onNoteChange: (value: string) => void;
-	onAmountPaidChange: (value: string) => void;
-	onReferenceNumberChange: (value: string) => void;
 	onPlaceOrderClick: () => void;
 }
 
 export function PosCartPanel({
 	cart,
-	paymentMethod,
-	note,
-	amountPaid,
-	referenceNumber,
+	form,
 	onRemoveFromCart,
 	onUpdateQuantity,
 	onClearCart,
-	onPaymentMethodChange,
-	onNoteChange,
-	onAmountPaidChange,
-	onReferenceNumberChange,
 	onPlaceOrderClick,
 }: PosCartPanelProps) {
 	const lineSubtotal = cart.reduce((s, c) => s + c.total_price, 0);
 	const cartTotal = lineSubtotal;
+
+	const values = form.state.values;
+	const paymentMethod = values.paymentMethod;
+	const amountPaid = values.amountPaid;
+	const referenceNumber = values.referenceNumber;
+
 	const paidNum = parseFloat(amountPaid) || 0;
 	const isGrab = paymentMethod === "GRAB";
 
@@ -53,7 +45,14 @@ export function PosCartPanel({
 			className="flex w-96 shrink-0 flex-col"
 			style={{ background: "white", borderLeft: "1px solid var(--light-gray)" }}
 		>
-			<div className="flex flex-1 flex-col overflow-hidden p-5">
+			<form
+				onSubmit={(e) => {
+					e.preventDefault();
+					e.stopPropagation();
+					form.handleSubmit();
+				}}
+				className="flex flex-1 flex-col overflow-hidden p-5"
+			>
 				<div className="mb-4 flex items-center justify-between">
 					<div>
 						<h2
@@ -188,90 +187,111 @@ export function PosCartPanel({
 
 				{/* Note */}
 				{cart.length > 0 ? (
-					<div className="mb-3">
-						<input
-							type="text"
-							value={note}
-							onChange={(e) => onNoteChange(e.target.value)}
-							placeholder="Add a note..."
-							className="h-9 w-full rounded-lg border px-3 text-xs outline-none"
-							style={{
-								background: "var(--off-white)",
-								borderColor: "var(--light-gray)",
-							}}
-						/>
-					</div>
+					<form.Field name="note">
+						{(field: any) => (
+							<div className="mb-3">
+								<input
+									type="text"
+									value={field.state.value}
+									onChange={(e) => field.handleChange(e.target.value)}
+									placeholder="Add a note..."
+									className="h-9 w-full rounded-lg border px-3 text-xs outline-none"
+									style={{
+										background: "var(--off-white)",
+										borderColor: "var(--light-gray)",
+									}}
+								/>
+							</div>
+						)}
+					</form.Field>
 				) : null}
 
 				{/* Payment */}
 				{cart.length > 0 ? (
 					<div className="mb-4 space-y-4">
-						<div>
-							<label
-								className="mb-1.5 block text-xs font-medium"
-								style={{ color: "var(--medium-gray)" }}
-							>
-								Payment Method
-							</label>
-							<div className="flex gap-2">
-								{(
-									[
-										{ key: "CASH" as const, label: "Cash" },
-										{ key: "GCASH" as const, label: "GCash" },
-										{ key: "GRAB" as const, label: "Grab" },
-									] as const
-								).map((p) => (
-									<button
-										key={p.key}
-										type="button"
-										onClick={() => {
-											onPaymentMethodChange(p.key);
-											onAmountPaidChange("");
-											onReferenceNumberChange("");
-										}}
-										className="flex-1 rounded-xl py-2 text-xs font-semibold transition-all"
-										style={{
-											background:
-												paymentMethod === p.key
-													? "var(--deep-forest)"
-													: "var(--off-white)",
-											color:
-												paymentMethod === p.key
-													? "white"
-													: "var(--dark-gray)",
-										}}
-									>
-										{p.label}
-									</button>
-								))}
-							</div>
-						</div>
-
-						<div className="space-y-3">
-							{paymentMethod !== "GRAB" ? (
+						<form.Field name="paymentMethod">
+							{(field: any) => (
 								<div>
 									<label
 										className="mb-1.5 block text-xs font-medium"
 										style={{ color: "var(--medium-gray)" }}
 									>
-										Amount Paid
+										Payment Method
 									</label>
-									<div className="relative">
-										<CurrencyDollar className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-gray-400" />
-										<input
-											type="number"
-											value={amountPaid}
-											onChange={(e) => onAmountPaidChange(e.target.value)}
-											placeholder="0.00"
-											className="h-10 w-full rounded-xl border pr-3 pl-9 text-sm font-bold outline-none"
-											style={{
-												background: "var(--off-white)",
-												borderColor: "var(--light-gray)",
-												color: "var(--deep-forest)",
-											}}
-										/>
+									<div className="flex gap-2">
+										{(
+											[
+												{ key: "CASH" as const, label: "Cash" },
+												{ key: "GCASH" as const, label: "GCash" },
+												{ key: "GRAB" as const, label: "Grab" },
+											] as const
+										).map((p) => (
+											<button
+												key={p.key}
+												type="button"
+												onClick={() => {
+													field.handleChange(p.key);
+													form.setFieldValue("amountPaid", "");
+													form.setFieldValue("referenceNumber", "");
+												}}
+												className="flex-1 rounded-xl py-2 text-xs font-semibold transition-all"
+												style={{
+													background:
+														field.state.value === p.key
+															? "var(--deep-forest)"
+															: "var(--off-white)",
+													color:
+														field.state.value === p.key
+															? "white"
+															: "var(--dark-gray)",
+												}}
+											>
+												{p.label}
+											</button>
+										))}
 									</div>
 								</div>
+							)}
+						</form.Field>
+
+						<div className="space-y-3">
+							{paymentMethod !== "GRAB" ? (
+								<form.Field name="amountPaid">
+									{(field: any) => {
+										const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+										return (
+											<div>
+												<label
+													className="mb-1.5 block text-xs font-medium"
+													style={{ color: "var(--medium-gray)" }}
+												>
+													Amount Paid
+												</label>
+												<div className="relative">
+													<CurrencyDollar className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-gray-400" />
+													<input
+														type="number"
+														step="0.01"
+														value={field.state.value}
+														onChange={(e) => field.handleChange(e.target.value)}
+														placeholder="0.00"
+														className={`h-10 w-full rounded-xl border pr-3 pl-9 text-sm font-bold outline-none`}
+														style={{
+															background: "var(--off-white)",
+															borderColor: isInvalid ? "red" : "var(--light-gray)",
+															color: "var(--deep-forest)",
+														}}
+													/>
+												</div>
+												{isInvalid && (
+													<p className="mt-1 text-[10px] text-red-500 font-medium">
+														{field.state.meta.errors?.[0]?.message || field.state.meta.errors?.[0]}
+													</p>
+												)}
+											</div>
+										);
+									}}
+								</form.Field>
 							) : null}
 
 							{paymentMethod === "CASH" &&
@@ -292,30 +312,40 @@ export function PosCartPanel({
 							) : null}
 
 							{paymentMethod === "GCASH" || paymentMethod === "GRAB" ? (
-								<div>
-									<label
-										className="mb-1.5 block text-xs font-medium"
-										style={{ color: "var(--medium-gray)" }}
-									>
-										Reference Number
-									</label>
-									<div className="relative">
-										<Hash className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-gray-400" />
-										<input
-											type="text"
-											value={referenceNumber}
-											onChange={(e) =>
-												onReferenceNumberChange(e.target.value)
-											}
-											placeholder="Ref #"
-											className="h-10 w-full rounded-xl border pr-3 pl-9 text-sm font-bold outline-none"
-											style={{
-												background: "var(--off-white)",
-												borderColor: "var(--light-gray)",
-											}}
-										/>
-									</div>
-								</div>
+								<form.Field name="referenceNumber">
+									{(field: any) => {
+										const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+										return (
+											<div>
+												<label
+													className="mb-1.5 block text-xs font-medium"
+													style={{ color: "var(--medium-gray)" }}
+												>
+													Reference Number
+												</label>
+												<div className="relative">
+													<Hash className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-gray-400" />
+													<input
+														type="text"
+														value={field.state.value}
+														onChange={(e) => field.handleChange(e.target.value)}
+														placeholder="Ref #"
+														className={`h-10 w-full rounded-xl border pr-3 pl-9 text-sm font-bold outline-none`}
+														style={{
+															background: "var(--off-white)",
+															borderColor: isInvalid ? "red" : "var(--light-gray)",
+														}}
+													/>
+												</div>
+												{isInvalid && (
+													<p className="mt-1 text-[10px] text-red-500 font-medium">
+														{field.state.meta.errors?.[0]?.message || field.state.meta.errors?.[0]}
+													</p>
+												)}
+											</div>
+										);
+									}}
+								</form.Field>
 							) : null}
 						</div>
 					</div>
@@ -345,15 +375,14 @@ export function PosCartPanel({
 				) : null}
 
 				<button
-					type="button"
-					onClick={onPlaceOrderClick}
+					type="submit"
 					disabled={cart.length === 0}
 					className="btn-primary flex w-full items-center justify-center gap-2"
 					style={{ opacity: cart.length === 0 ? 0.5 : 1 }}
 				>
 					Place Order <ArrowRight className="size-4" />
 				</button>
-			</div>
+			</form>
 		</div>
 	);
 }

@@ -1,6 +1,8 @@
 import { useState, useMemo, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Toaster, toast } from "sonner";
+import { z } from "zod";
+import { useAppForm } from "@/integrations/tanstack-form";
 import { formatPeso } from "@/lib/format-currency";
 import { StaffHeader } from "@/features/staff/components/StaffHeader";
 import { PosProductGrid } from "./PosProductGrid";
@@ -12,6 +14,13 @@ import { posPageDataQueryOptions } from "../queryOptions";
 import { createOrderMutationOptions } from "../mutationOptions";
 import type { MenuItem, CartItem, PosOrder } from "../types";
 
+const posFormSchema = z.object({
+	note: z.string(),
+	paymentMethod: z.enum(["CASH", "GCASH", "GRAB"]),
+	amountPaid: z.string(),
+	referenceNumber: z.string(),
+});
+
 export function PosScreen() {
 	const [activeCategory, setActiveCategory] = useState("all");
 	const [search, setSearch] = useState("");
@@ -19,16 +28,42 @@ export function PosScreen() {
 	const [showPlaceOrderConfirm, setShowPlaceOrderConfirm] = useState(false);
 	const [lastOrder, setLastOrder] = useState<PosOrder | null>(null);
 	const [customizeItem, setCustomizeItem] = useState<MenuItem | null>(null);
-	const [amountPaid, setAmountPaid] = useState("");
-	const [referenceNumber, setReferenceNumber] = useState("");
 
 	const [cart, setCart] = useState<CartItem[]>([]);
-	const [paymentMethod, setPaymentMethod] = useState("CASH");
-	const [note, setNote] = useState("");
 
 	const queryClient = useQueryClient();
 	const { data, isLoading, error } = useQuery(posPageDataQueryOptions);
 	const createOrderMutation = useMutation(createOrderMutationOptions(queryClient));
+
+	const cartTotal = cart.reduce((s, c) => s + c.total_price, 0);
+
+	const form = useAppForm({
+		defaultValues: {
+			note: "",
+			paymentMethod: "CASH" as "CASH" | "GCASH" | "GRAB",
+			amountPaid: "",
+			referenceNumber: "",
+		},
+		validators: {
+			onChange: posFormSchema,
+		},
+		onSubmit: async ({ value }) => {
+			if (cart.length === 0) {
+				toast.error("Cart is empty");
+				return;
+			}
+			const paidNum = parseFloat(value.amountPaid) || 0;
+			if (value.paymentMethod !== "GRAB" && paidNum < cartTotal) {
+				toast.error(`Insufficient amount. Total is ${formatPeso(cartTotal)}`);
+				return;
+			}
+			if ((value.paymentMethod === "GCASH" || value.paymentMethod === "GRAB") && !value.referenceNumber.trim()) {
+				toast.error("Please enter reference number");
+				return;
+			}
+			setShowPlaceOrderConfirm(true);
+		},
+	});
 
 	if (error) {
 		console.error("POS page data query failed:", error);
@@ -56,8 +91,6 @@ export function PosScreen() {
 			}),
 		[allMenuItems, activeCategory, search],
 	);
-
-	const cartTotal = cart.reduce((s, c) => s + c.total_price, 0);
 
 	const handleCustomizeConfirm = useCallback(
 		(params: {
@@ -96,8 +129,7 @@ export function PosScreen() {
 	);
 
 	const handleProductClick = useCallback((item: MenuItem) => {
-		const temps = item.temperatures ?? [];
-		if (temps.length === 0) {
+		if (item.type === "STANDALONE") {
 			handleCustomizeConfirm({
 				lineKey: `${item.id}-NONE-NONE`,
 				menu_item_id: item.id,
@@ -112,7 +144,6 @@ export function PosScreen() {
 			setCustomizeItem(item);
 		}
 	}, [handleCustomizeConfirm]);
-
 
 	const removeFromCart = useCallback((lineKey: string) => {
 		setCart((prev) => prev.filter((c) => c.lineKey !== lineKey));
@@ -137,38 +168,17 @@ export function PosScreen() {
 		setCart([]);
 	}, []);
 
-	const validateOrder = useCallback(() => {
-		if (cart.length === 0) {
-			toast.error("Cart is empty");
-			return false;
-		}
-		const paidNum = parseFloat(amountPaid) || 0;
-		if (paymentMethod !== "GRAB" && paidNum < cartTotal) {
-			toast.error(`Insufficient amount. Total is ${formatPeso(cartTotal)}`);
-			return false;
-		}
-		if (
-			(paymentMethod === "GCASH" || paymentMethod === "GRAB") &&
-			!referenceNumber.trim()
-		) {
-			toast.error("Please enter reference number");
-			return false;
-		}
-		return true;
-	}, [cart, amountPaid, cartTotal, paymentMethod, referenceNumber]);
-
 	const handlePlaceOrder = useCallback(async () => {
-		if (!validateOrder()) return;
-
-		const paidNum = parseFloat(amountPaid) || 0;
+		const values = form.state.values;
+		const paidNum = parseFloat(values.amountPaid) || 0;
 		const changeAmt = paidNum - cartTotal;
 
 		try {
 			const placedOrder = await createOrderMutation.mutateAsync({
-				method: paymentMethod,
-				reference_number: referenceNumber || undefined,
-				paid: paymentMethod === "GRAB" ? undefined : paidNum,
-				change: paymentMethod === "GRAB" ? undefined : changeAmt,
+				method: values.paymentMethod,
+				reference_number: values.referenceNumber || undefined,
+				paid: values.paymentMethod === "GRAB" ? undefined : paidNum,
+				change: values.paymentMethod === "GRAB" ? undefined : changeAmt,
 				total: cartTotal,
 				items: cart.map((c) => ({
 					menu_item_id: c.menu_item_id,
@@ -180,7 +190,7 @@ export function PosScreen() {
 					discount_id: c.discount_id,
 					subtotal: c.unit_price * c.quantity,
 					total: c.total_price,
-					note: note || undefined,
+					note: values.note || undefined,
 					cup_type: c.cup_type,
 					cup_size: c.cup_size,
 					addon_items: c.addon_items?.map((a) => ({
@@ -207,7 +217,7 @@ export function PosScreen() {
 					discount_id: c.discount_id,
 					subtotal: c.unit_price * c.quantity,
 					total: c.total_price,
-					note,
+					note: values.note,
 					cup_type: c.cup_type,
 					cup_size: c.cup_size,
 					addon_items: c.addon_items,
@@ -217,15 +227,14 @@ export function PosScreen() {
 			setLastOrder(order);
 			setShowReceipt(true);
 			clearCart();
-			setAmountPaid("");
-			setReferenceNumber("");
+			form.reset();
 			setShowPlaceOrderConfirm(false);
 			toast.success(`Order #${order.order_number} placed successfully!`);
 		} catch (err: any) {
 			console.error("Order placement failed:", err);
 			toast.error("Failed to place order: " + (err.message || "Unknown error"));
 		}
-	}, [cart, amountPaid, cartTotal, paymentMethod, referenceNumber, note, validateOrder, clearCart, createOrderMutation]);
+	}, [cart, cartTotal, clearCart, createOrderMutation, form]);
 
 	const handlePrint = useCallback(() => {
 		window.print();
@@ -258,19 +267,12 @@ export function PosScreen() {
 				/>
 				<PosCartPanel
 					cart={cart}
-					paymentMethod={paymentMethod}
-					note={note}
-					amountPaid={amountPaid}
-					referenceNumber={referenceNumber}
+					form={form}
 					onRemoveFromCart={removeFromCart}
 					onUpdateQuantity={updateQuantity}
 					onClearCart={clearCart}
-					onPaymentMethodChange={setPaymentMethod}
-					onNoteChange={setNote}
-					onAmountPaidChange={setAmountPaid}
-					onReferenceNumberChange={setReferenceNumber}
 					onPlaceOrderClick={() => {
-						if (validateOrder()) setShowPlaceOrderConfirm(true);
+						form.handleSubmit();
 					}}
 				/>
 			</div>

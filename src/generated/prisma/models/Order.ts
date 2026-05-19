@@ -421,14 +421,6 @@ export type NullableStringFieldUpdateOperationsInput = {
   set?: string | null
 }
 
-export type NullableFloatFieldUpdateOperationsInput = {
-  set?: number | null
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
-}
-
 export type OrderCreateNestedOneWithoutOrder_itemsInput = {
   create?: Prisma.XOR<Prisma.OrderCreateWithoutOrder_itemsInput, Prisma.OrderUncheckedCreateWithoutOrder_itemsInput>
   connectOrCreate?: Prisma.OrderCreateOrConnectWithoutOrder_itemsInput

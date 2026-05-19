@@ -1,14 +1,20 @@
+import { Inventory_Type } from "@/generated/prisma/enums.js";
+
 export interface MenuItem {
 	id: number;
 	name: string;
 	price: number;
 	category: string;
-	temperatures: string[];
-	hot_cup_sizes: number[];
-	iced_cup_sizes: number[];
-	hot_12oz_price: number;
-	iced_12oz_price: number;
-	iced_16oz_price: number;
+	type: Inventory_Type;
+	inventory_items: Array<{
+		price: number;
+		inventory: {
+			inventory_id: string;
+			name: string;
+			stock: number;
+			type: Inventory_Type;
+		};
+	}>;
 }
 
 export interface CartItem {

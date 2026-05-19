@@ -33,6 +33,11 @@ export type Account = Prisma.AccountModel
  */
 export type Menu = Prisma.MenuModel
 /**
+ * Model MenuInventory
+ * 
+ */
+export type MenuInventory = Prisma.MenuInventoryModel
+/**
  * Model Order
  * 
  */

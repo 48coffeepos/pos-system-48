@@ -11,6 +11,7 @@
 export type * from './models/Role.ts'
 export type * from './models/Account.ts'
 export type * from './models/Menu.ts'
+export type * from './models/MenuInventory.ts'
 export type * from './models/Order.ts'
 export type * from './models/OrderItem.ts'
 export type * from './models/Addon.ts'

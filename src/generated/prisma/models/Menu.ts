@@ -29,21 +29,11 @@ export type AggregateMenu = {
 export type MenuAvgAggregateOutputType = {
   id: number | null
   price: number | null
-  hot_cup_sizes: number | null
-  iced_cup_sizes: number | null
-  hot_12oz_price: number | null
-  iced_12oz_price: number | null
-  iced_16oz_price: number | null
 }
 
 export type MenuSumAggregateOutputType = {
   id: number | null
   price: number | null
-  hot_cup_sizes: number[]
-  iced_cup_sizes: number[]
-  hot_12oz_price: number | null
-  iced_12oz_price: number | null
-  iced_16oz_price: number | null
 }
 
 export type MenuMinAggregateOutputType = {
@@ -51,9 +41,7 @@ export type MenuMinAggregateOutputType = {
   name: string | null
   price: number | null
   category: string | null
-  hot_12oz_price: number | null
-  iced_12oz_price: number | null
-  iced_16oz_price: number | null
+  type: $Enums.Inventory_Type | null
 }
 
 export type MenuMaxAggregateOutputType = {
@@ -61,9 +49,7 @@ export type MenuMaxAggregateOutputType = {
   name: string | null
   price: number | null
   category: string | null
-  hot_12oz_price: number | null
-  iced_12oz_price: number | null
-  iced_16oz_price: number | null
+  type: $Enums.Inventory_Type | null
 }
 
 export type MenuCountAggregateOutputType = {
@@ -71,12 +57,7 @@ export type MenuCountAggregateOutputType = {
   name: number
   price: number
   category: number
-  temperatures: number
-  hot_cup_sizes: number
-  iced_cup_sizes: number
-  hot_12oz_price: number
-  iced_12oz_price: number
-  iced_16oz_price: number
+  type: number
   _all: number
 }
 
@@ -84,21 +65,11 @@ export type MenuCountAggregateOutputType = {
 export type MenuAvgAggregateInputType = {
   id?: true
   price?: true
-  hot_cup_sizes?: true
-  iced_cup_sizes?: true
-  hot_12oz_price?: true
-  iced_12oz_price?: true
-  iced_16oz_price?: true
 }
 
 export type MenuSumAggregateInputType = {
   id?: true
   price?: true
-  hot_cup_sizes?: true
-  iced_cup_sizes?: true
-  hot_12oz_price?: true
-  iced_12oz_price?: true
-  iced_16oz_price?: true
 }
 
 export type MenuMinAggregateInputType = {
@@ -106,9 +77,7 @@ export type MenuMinAggregateInputType = {
   name?: true
   price?: true
   category?: true
-  hot_12oz_price?: true
-  iced_12oz_price?: true
-  iced_16oz_price?: true
+  type?: true
 }
 
 export type MenuMaxAggregateInputType = {
@@ -116,9 +85,7 @@ export type MenuMaxAggregateInputType = {
   name?: true
   price?: true
   category?: true
-  hot_12oz_price?: true
-  iced_12oz_price?: true
-  iced_16oz_price?: true
+  type?: true
 }
 
 export type MenuCountAggregateInputType = {
@@ -126,12 +93,7 @@ export type MenuCountAggregateInputType = {
   name?: true
   price?: true
   category?: true
-  temperatures?: true
-  hot_cup_sizes?: true
-  iced_cup_sizes?: true
-  hot_12oz_price?: true
-  iced_12oz_price?: true
-  iced_16oz_price?: true
+  type?: true
   _all?: true
 }
 
@@ -224,14 +186,9 @@ export type MenuGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
 export type MenuGroupByOutputType = {
   id: number
   name: string
-  price: number
+  price: number | null
   category: string
-  temperatures: string[]
-  hot_cup_sizes: number[]
-  iced_cup_sizes: number[]
-  hot_12oz_price: number
-  iced_12oz_price: number
-  iced_16oz_price: number
+  type: $Enums.Inventory_Type
   _count: MenuCountAggregateOutputType | null
   _avg: MenuAvgAggregateOutputType | null
   _sum: MenuSumAggregateOutputType | null
@@ -260,28 +217,20 @@ export type MenuWhereInput = {
   NOT?: Prisma.MenuWhereInput | Prisma.MenuWhereInput[]
   id?: Prisma.IntFilter<"Menu"> | number
   name?: Prisma.StringFilter<"Menu"> | string
-  price?: Prisma.FloatFilter<"Menu"> | number
+  price?: Prisma.FloatNullableFilter<"Menu"> | number | null
   category?: Prisma.StringFilter<"Menu"> | string
-  temperatures?: Prisma.StringNullableListFilter<"Menu">
-  hot_cup_sizes?: Prisma.IntNullableListFilter<"Menu">
-  iced_cup_sizes?: Prisma.IntNullableListFilter<"Menu">
-  hot_12oz_price?: Prisma.FloatFilter<"Menu"> | number
-  iced_12oz_price?: Prisma.FloatFilter<"Menu"> | number
-  iced_16oz_price?: Prisma.FloatFilter<"Menu"> | number
+  type?: Prisma.EnumInventory_TypeFilter<"Menu"> | $Enums.Inventory_Type
+  inventory_items?: Prisma.MenuInventoryListRelationFilter
   order_items?: Prisma.OrderItemListRelationFilter
 }
 
 export type MenuOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  price?: Prisma.SortOrder
+  price?: Prisma.SortOrderInput | Prisma.SortOrder
   category?: Prisma.SortOrder
-  temperatures?: Prisma.SortOrder
-  hot_cup_sizes?: Prisma.SortOrder
-  iced_cup_sizes?: Prisma.SortOrder
-  hot_12oz_price?: Prisma.SortOrder
-  iced_12oz_price?: Prisma.SortOrder
-  iced_16oz_price?: Prisma.SortOrder
+  type?: Prisma.SortOrder
+  inventory_items?: Prisma.MenuInventoryOrderByRelationAggregateInput
   order_items?: Prisma.OrderItemOrderByRelationAggregateInput
 }
 
@@ -291,28 +240,19 @@ export type MenuWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.MenuWhereInput[]
   NOT?: Prisma.MenuWhereInput | Prisma.MenuWhereInput[]
   name?: Prisma.StringFilter<"Menu"> | string
-  price?: Prisma.FloatFilter<"Menu"> | number
+  price?: Prisma.FloatNullableFilter<"Menu"> | number | null
   category?: Prisma.StringFilter<"Menu"> | string
-  temperatures?: Prisma.StringNullableListFilter<"Menu">
-  hot_cup_sizes?: Prisma.IntNullableListFilter<"Menu">
-  iced_cup_sizes?: Prisma.IntNullableListFilter<"Menu">
-  hot_12oz_price?: Prisma.FloatFilter<"Menu"> | number
-  iced_12oz_price?: Prisma.FloatFilter<"Menu"> | number
-  iced_16oz_price?: Prisma.FloatFilter<"Menu"> | number
+  type?: Prisma.EnumInventory_TypeFilter<"Menu"> | $Enums.Inventory_Type
+  inventory_items?: Prisma.MenuInventoryListRelationFilter
   order_items?: Prisma.OrderItemListRelationFilter
 }, "id">
 
 export type MenuOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  price?: Prisma.SortOrder
+  price?: Prisma.SortOrderInput | Prisma.SortOrder
   category?: Prisma.SortOrder
-  temperatures?: Prisma.SortOrder
-  hot_cup_sizes?: Prisma.SortOrder
-  iced_cup_sizes?: Prisma.SortOrder
-  hot_12oz_price?: Prisma.SortOrder
-  iced_12oz_price?: Prisma.SortOrder
-  iced_16oz_price?: Prisma.SortOrder
+  type?: Prisma.SortOrder
   _count?: Prisma.MenuCountOrderByAggregateInput
   _avg?: Prisma.MenuAvgOrderByAggregateInput
   _max?: Prisma.MenuMaxOrderByAggregateInput
@@ -326,122 +266,70 @@ export type MenuScalarWhereWithAggregatesInput = {
   NOT?: Prisma.MenuScalarWhereWithAggregatesInput | Prisma.MenuScalarWhereWithAggregatesInput[]
   id?: Prisma.IntWithAggregatesFilter<"Menu"> | number
   name?: Prisma.StringWithAggregatesFilter<"Menu"> | string
-  price?: Prisma.FloatWithAggregatesFilter<"Menu"> | number
+  price?: Prisma.FloatNullableWithAggregatesFilter<"Menu"> | number | null
   category?: Prisma.StringWithAggregatesFilter<"Menu"> | string
-  temperatures?: Prisma.StringNullableListFilter<"Menu">
-  hot_cup_sizes?: Prisma.IntNullableListFilter<"Menu">
-  iced_cup_sizes?: Prisma.IntNullableListFilter<"Menu">
-  hot_12oz_price?: Prisma.FloatWithAggregatesFilter<"Menu"> | number
-  iced_12oz_price?: Prisma.FloatWithAggregatesFilter<"Menu"> | number
-  iced_16oz_price?: Prisma.FloatWithAggregatesFilter<"Menu"> | number
+  type?: Prisma.EnumInventory_TypeWithAggregatesFilter<"Menu"> | $Enums.Inventory_Type
 }
 
 export type MenuCreateInput = {
   name: string
-  price: number
+  price?: number | null
   category: string
-  temperatures?: Prisma.MenuCreatetemperaturesInput | string[]
-  hot_cup_sizes?: Prisma.MenuCreatehot_cup_sizesInput | number[]
-  iced_cup_sizes?: Prisma.MenuCreateiced_cup_sizesInput | number[]
-  hot_12oz_price?: number
-  iced_12oz_price?: number
-  iced_16oz_price?: number
+  type: $Enums.Inventory_Type
+  inventory_items?: Prisma.MenuInventoryCreateNestedManyWithoutMenuInput
   order_items?: Prisma.OrderItemCreateNestedManyWithoutMenuInput
 }
 
 export type MenuUncheckedCreateInput = {
   id?: number
   name: string
-  price: number
+  price?: number | null
   category: string
-  temperatures?: Prisma.MenuCreatetemperaturesInput | string[]
-  hot_cup_sizes?: Prisma.MenuCreatehot_cup_sizesInput | number[]
-  iced_cup_sizes?: Prisma.MenuCreateiced_cup_sizesInput | number[]
-  hot_12oz_price?: number
-  iced_12oz_price?: number
-  iced_16oz_price?: number
+  type: $Enums.Inventory_Type
+  inventory_items?: Prisma.MenuInventoryUncheckedCreateNestedManyWithoutMenuInput
   order_items?: Prisma.OrderItemUncheckedCreateNestedManyWithoutMenuInput
 }
 
 export type MenuUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
+  price?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   category?: Prisma.StringFieldUpdateOperationsInput | string
-  temperatures?: Prisma.MenuUpdatetemperaturesInput | string[]
-  hot_cup_sizes?: Prisma.MenuUpdatehot_cup_sizesInput | number[]
-  iced_cup_sizes?: Prisma.MenuUpdateiced_cup_sizesInput | number[]
-  hot_12oz_price?: Prisma.FloatFieldUpdateOperationsInput | number
-  iced_12oz_price?: Prisma.FloatFieldUpdateOperationsInput | number
-  iced_16oz_price?: Prisma.FloatFieldUpdateOperationsInput | number
+  type?: Prisma.EnumInventory_TypeFieldUpdateOperationsInput | $Enums.Inventory_Type
+  inventory_items?: Prisma.MenuInventoryUpdateManyWithoutMenuNestedInput
   order_items?: Prisma.OrderItemUpdateManyWithoutMenuNestedInput
 }
 
 export type MenuUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
+  price?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   category?: Prisma.StringFieldUpdateOperationsInput | string
-  temperatures?: Prisma.MenuUpdatetemperaturesInput | string[]
-  hot_cup_sizes?: Prisma.MenuUpdatehot_cup_sizesInput | number[]
-  iced_cup_sizes?: Prisma.MenuUpdateiced_cup_sizesInput | number[]
-  hot_12oz_price?: Prisma.FloatFieldUpdateOperationsInput | number
-  iced_12oz_price?: Prisma.FloatFieldUpdateOperationsInput | number
-  iced_16oz_price?: Prisma.FloatFieldUpdateOperationsInput | number
+  type?: Prisma.EnumInventory_TypeFieldUpdateOperationsInput | $Enums.Inventory_Type
+  inventory_items?: Prisma.MenuInventoryUncheckedUpdateManyWithoutMenuNestedInput
   order_items?: Prisma.OrderItemUncheckedUpdateManyWithoutMenuNestedInput
 }
 
 export type MenuCreateManyInput = {
   id?: number
   name: string
-  price: number
+  price?: number | null
   category: string
-  temperatures?: Prisma.MenuCreatetemperaturesInput | string[]
-  hot_cup_sizes?: Prisma.MenuCreatehot_cup_sizesInput | number[]
-  iced_cup_sizes?: Prisma.MenuCreateiced_cup_sizesInput | number[]
-  hot_12oz_price?: number
-  iced_12oz_price?: number
-  iced_16oz_price?: number
+  type: $Enums.Inventory_Type
 }
 
 export type MenuUpdateManyMutationInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
+  price?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   category?: Prisma.StringFieldUpdateOperationsInput | string
-  temperatures?: Prisma.MenuUpdatetemperaturesInput | string[]
-  hot_cup_sizes?: Prisma.MenuUpdatehot_cup_sizesInput | number[]
-  iced_cup_sizes?: Prisma.MenuUpdateiced_cup_sizesInput | number[]
-  hot_12oz_price?: Prisma.FloatFieldUpdateOperationsInput | number
-  iced_12oz_price?: Prisma.FloatFieldUpdateOperationsInput | number
-  iced_16oz_price?: Prisma.FloatFieldUpdateOperationsInput | number
+  type?: Prisma.EnumInventory_TypeFieldUpdateOperationsInput | $Enums.Inventory_Type
 }
 
 export type MenuUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
+  price?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   category?: Prisma.StringFieldUpdateOperationsInput | string
-  temperatures?: Prisma.MenuUpdatetemperaturesInput | string[]
-  hot_cup_sizes?: Prisma.MenuUpdatehot_cup_sizesInput | number[]
-  iced_cup_sizes?: Prisma.MenuUpdateiced_cup_sizesInput | number[]
-  hot_12oz_price?: Prisma.FloatFieldUpdateOperationsInput | number
-  iced_12oz_price?: Prisma.FloatFieldUpdateOperationsInput | number
-  iced_16oz_price?: Prisma.FloatFieldUpdateOperationsInput | number
-}
-
-export type StringNullableListFilter<$PrismaModel = never> = {
-  equals?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel> | null
-  has?: string | Prisma.StringFieldRefInput<$PrismaModel> | null
-  hasEvery?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
-  hasSome?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
-  isEmpty?: boolean
-}
-
-export type IntNullableListFilter<$PrismaModel = never> = {
-  equals?: number[] | Prisma.ListIntFieldRefInput<$PrismaModel> | null
-  has?: number | Prisma.IntFieldRefInput<$PrismaModel> | null
-  hasEvery?: number[] | Prisma.ListIntFieldRefInput<$PrismaModel>
-  hasSome?: number[] | Prisma.ListIntFieldRefInput<$PrismaModel>
-  isEmpty?: boolean
+  type?: Prisma.EnumInventory_TypeFieldUpdateOperationsInput | $Enums.Inventory_Type
 }
 
 export type MenuCountOrderByAggregateInput = {
@@ -449,22 +337,12 @@ export type MenuCountOrderByAggregateInput = {
   name?: Prisma.SortOrder
   price?: Prisma.SortOrder
   category?: Prisma.SortOrder
-  temperatures?: Prisma.SortOrder
-  hot_cup_sizes?: Prisma.SortOrder
-  iced_cup_sizes?: Prisma.SortOrder
-  hot_12oz_price?: Prisma.SortOrder
-  iced_12oz_price?: Prisma.SortOrder
-  iced_16oz_price?: Prisma.SortOrder
+  type?: Prisma.SortOrder
 }
 
 export type MenuAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
   price?: Prisma.SortOrder
-  hot_cup_sizes?: Prisma.SortOrder
-  iced_cup_sizes?: Prisma.SortOrder
-  hot_12oz_price?: Prisma.SortOrder
-  iced_12oz_price?: Prisma.SortOrder
-  iced_16oz_price?: Prisma.SortOrder
 }
 
 export type MenuMaxOrderByAggregateInput = {
@@ -472,9 +350,7 @@ export type MenuMaxOrderByAggregateInput = {
   name?: Prisma.SortOrder
   price?: Prisma.SortOrder
   category?: Prisma.SortOrder
-  hot_12oz_price?: Prisma.SortOrder
-  iced_12oz_price?: Prisma.SortOrder
-  iced_16oz_price?: Prisma.SortOrder
+  type?: Prisma.SortOrder
 }
 
 export type MenuMinOrderByAggregateInput = {
@@ -482,19 +358,12 @@ export type MenuMinOrderByAggregateInput = {
   name?: Prisma.SortOrder
   price?: Prisma.SortOrder
   category?: Prisma.SortOrder
-  hot_12oz_price?: Prisma.SortOrder
-  iced_12oz_price?: Prisma.SortOrder
-  iced_16oz_price?: Prisma.SortOrder
+  type?: Prisma.SortOrder
 }
 
 export type MenuSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
   price?: Prisma.SortOrder
-  hot_cup_sizes?: Prisma.SortOrder
-  iced_cup_sizes?: Prisma.SortOrder
-  hot_12oz_price?: Prisma.SortOrder
-  iced_12oz_price?: Prisma.SortOrder
-  iced_16oz_price?: Prisma.SortOrder
 }
 
 export type MenuScalarRelationFilter = {
@@ -502,39 +371,30 @@ export type MenuScalarRelationFilter = {
   isNot?: Prisma.MenuWhereInput
 }
 
-export type MenuCreatetemperaturesInput = {
-  set: string[]
-}
-
-export type MenuCreatehot_cup_sizesInput = {
-  set: number[]
-}
-
-export type MenuCreateiced_cup_sizesInput = {
-  set: number[]
-}
-
-export type FloatFieldUpdateOperationsInput = {
-  set?: number
+export type NullableFloatFieldUpdateOperationsInput = {
+  set?: number | null
   increment?: number
   decrement?: number
   multiply?: number
   divide?: number
 }
 
-export type MenuUpdatetemperaturesInput = {
-  set?: string[]
-  push?: string | string[]
+export type EnumInventory_TypeFieldUpdateOperationsInput = {
+  set?: $Enums.Inventory_Type
 }
 
-export type MenuUpdatehot_cup_sizesInput = {
-  set?: number[]
-  push?: number | number[]
+export type MenuCreateNestedOneWithoutInventory_itemsInput = {
+  create?: Prisma.XOR<Prisma.MenuCreateWithoutInventory_itemsInput, Prisma.MenuUncheckedCreateWithoutInventory_itemsInput>
+  connectOrCreate?: Prisma.MenuCreateOrConnectWithoutInventory_itemsInput
+  connect?: Prisma.MenuWhereUniqueInput
 }
 
-export type MenuUpdateiced_cup_sizesInput = {
-  set?: number[]
-  push?: number | number[]
+export type MenuUpdateOneRequiredWithoutInventory_itemsNestedInput = {
+  create?: Prisma.XOR<Prisma.MenuCreateWithoutInventory_itemsInput, Prisma.MenuUncheckedCreateWithoutInventory_itemsInput>
+  connectOrCreate?: Prisma.MenuCreateOrConnectWithoutInventory_itemsInput
+  upsert?: Prisma.MenuUpsertWithoutInventory_itemsInput
+  connect?: Prisma.MenuWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.MenuUpdateToOneWithWhereWithoutInventory_itemsInput, Prisma.MenuUpdateWithoutInventory_itemsInput>, Prisma.MenuUncheckedUpdateWithoutInventory_itemsInput>
 }
 
 export type MenuCreateNestedOneWithoutOrder_itemsInput = {
@@ -551,29 +411,71 @@ export type MenuUpdateOneRequiredWithoutOrder_itemsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.MenuUpdateToOneWithWhereWithoutOrder_itemsInput, Prisma.MenuUpdateWithoutOrder_itemsInput>, Prisma.MenuUncheckedUpdateWithoutOrder_itemsInput>
 }
 
+export type MenuCreateWithoutInventory_itemsInput = {
+  name: string
+  price?: number | null
+  category: string
+  type: $Enums.Inventory_Type
+  order_items?: Prisma.OrderItemCreateNestedManyWithoutMenuInput
+}
+
+export type MenuUncheckedCreateWithoutInventory_itemsInput = {
+  id?: number
+  name: string
+  price?: number | null
+  category: string
+  type: $Enums.Inventory_Type
+  order_items?: Prisma.OrderItemUncheckedCreateNestedManyWithoutMenuInput
+}
+
+export type MenuCreateOrConnectWithoutInventory_itemsInput = {
+  where: Prisma.MenuWhereUniqueInput
+  create: Prisma.XOR<Prisma.MenuCreateWithoutInventory_itemsInput, Prisma.MenuUncheckedCreateWithoutInventory_itemsInput>
+}
+
+export type MenuUpsertWithoutInventory_itemsInput = {
+  update: Prisma.XOR<Prisma.MenuUpdateWithoutInventory_itemsInput, Prisma.MenuUncheckedUpdateWithoutInventory_itemsInput>
+  create: Prisma.XOR<Prisma.MenuCreateWithoutInventory_itemsInput, Prisma.MenuUncheckedCreateWithoutInventory_itemsInput>
+  where?: Prisma.MenuWhereInput
+}
+
+export type MenuUpdateToOneWithWhereWithoutInventory_itemsInput = {
+  where?: Prisma.MenuWhereInput
+  data: Prisma.XOR<Prisma.MenuUpdateWithoutInventory_itemsInput, Prisma.MenuUncheckedUpdateWithoutInventory_itemsInput>
+}
+
+export type MenuUpdateWithoutInventory_itemsInput = {
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  price?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  category?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumInventory_TypeFieldUpdateOperationsInput | $Enums.Inventory_Type
+  order_items?: Prisma.OrderItemUpdateManyWithoutMenuNestedInput
+}
+
+export type MenuUncheckedUpdateWithoutInventory_itemsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  price?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  category?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumInventory_TypeFieldUpdateOperationsInput | $Enums.Inventory_Type
+  order_items?: Prisma.OrderItemUncheckedUpdateManyWithoutMenuNestedInput
+}
+
 export type MenuCreateWithoutOrder_itemsInput = {
   name: string
-  price: number
+  price?: number | null
   category: string
-  temperatures?: Prisma.MenuCreatetemperaturesInput | string[]
-  hot_cup_sizes?: Prisma.MenuCreatehot_cup_sizesInput | number[]
-  iced_cup_sizes?: Prisma.MenuCreateiced_cup_sizesInput | number[]
-  hot_12oz_price?: number
-  iced_12oz_price?: number
-  iced_16oz_price?: number
+  type: $Enums.Inventory_Type
+  inventory_items?: Prisma.MenuInventoryCreateNestedManyWithoutMenuInput
 }
 
 export type MenuUncheckedCreateWithoutOrder_itemsInput = {
   id?: number
   name: string
-  price: number
+  price?: number | null
   category: string
-  temperatures?: Prisma.MenuCreatetemperaturesInput | string[]
-  hot_cup_sizes?: Prisma.MenuCreatehot_cup_sizesInput | number[]
-  iced_cup_sizes?: Prisma.MenuCreateiced_cup_sizesInput | number[]
-  hot_12oz_price?: number
-  iced_12oz_price?: number
-  iced_16oz_price?: number
+  type: $Enums.Inventory_Type
+  inventory_items?: Prisma.MenuInventoryUncheckedCreateNestedManyWithoutMenuInput
 }
 
 export type MenuCreateOrConnectWithoutOrder_itemsInput = {
@@ -594,27 +496,19 @@ export type MenuUpdateToOneWithWhereWithoutOrder_itemsInput = {
 
 export type MenuUpdateWithoutOrder_itemsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
+  price?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   category?: Prisma.StringFieldUpdateOperationsInput | string
-  temperatures?: Prisma.MenuUpdatetemperaturesInput | string[]
-  hot_cup_sizes?: Prisma.MenuUpdatehot_cup_sizesInput | number[]
-  iced_cup_sizes?: Prisma.MenuUpdateiced_cup_sizesInput | number[]
-  hot_12oz_price?: Prisma.FloatFieldUpdateOperationsInput | number
-  iced_12oz_price?: Prisma.FloatFieldUpdateOperationsInput | number
-  iced_16oz_price?: Prisma.FloatFieldUpdateOperationsInput | number
+  type?: Prisma.EnumInventory_TypeFieldUpdateOperationsInput | $Enums.Inventory_Type
+  inventory_items?: Prisma.MenuInventoryUpdateManyWithoutMenuNestedInput
 }
 
 export type MenuUncheckedUpdateWithoutOrder_itemsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
+  price?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   category?: Prisma.StringFieldUpdateOperationsInput | string
-  temperatures?: Prisma.MenuUpdatetemperaturesInput | string[]
-  hot_cup_sizes?: Prisma.MenuUpdatehot_cup_sizesInput | number[]
-  iced_cup_sizes?: Prisma.MenuUpdateiced_cup_sizesInput | number[]
-  hot_12oz_price?: Prisma.FloatFieldUpdateOperationsInput | number
-  iced_12oz_price?: Prisma.FloatFieldUpdateOperationsInput | number
-  iced_16oz_price?: Prisma.FloatFieldUpdateOperationsInput | number
+  type?: Prisma.EnumInventory_TypeFieldUpdateOperationsInput | $Enums.Inventory_Type
+  inventory_items?: Prisma.MenuInventoryUncheckedUpdateManyWithoutMenuNestedInput
 }
 
 
@@ -623,10 +517,12 @@ export type MenuUncheckedUpdateWithoutOrder_itemsInput = {
  */
 
 export type MenuCountOutputType = {
+  inventory_items: number
   order_items: number
 }
 
 export type MenuCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  inventory_items?: boolean | MenuCountOutputTypeCountInventory_itemsArgs
   order_items?: boolean | MenuCountOutputTypeCountOrder_itemsArgs
 }
 
@@ -643,6 +539,13 @@ export type MenuCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensi
 /**
  * MenuCountOutputType without action
  */
+export type MenuCountOutputTypeCountInventory_itemsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.MenuInventoryWhereInput
+}
+
+/**
+ * MenuCountOutputType without action
+ */
 export type MenuCountOutputTypeCountOrder_itemsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.OrderItemWhereInput
 }
@@ -653,12 +556,8 @@ export type MenuSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   name?: boolean
   price?: boolean
   category?: boolean
-  temperatures?: boolean
-  hot_cup_sizes?: boolean
-  iced_cup_sizes?: boolean
-  hot_12oz_price?: boolean
-  iced_12oz_price?: boolean
-  iced_16oz_price?: boolean
+  type?: boolean
+  inventory_items?: boolean | Prisma.Menu$inventory_itemsArgs<ExtArgs>
   order_items?: boolean | Prisma.Menu$order_itemsArgs<ExtArgs>
   _count?: boolean | Prisma.MenuCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["menu"]>
@@ -668,12 +567,7 @@ export type MenuSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   name?: boolean
   price?: boolean
   category?: boolean
-  temperatures?: boolean
-  hot_cup_sizes?: boolean
-  iced_cup_sizes?: boolean
-  hot_12oz_price?: boolean
-  iced_12oz_price?: boolean
-  iced_16oz_price?: boolean
+  type?: boolean
 }, ExtArgs["result"]["menu"]>
 
 export type MenuSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -681,12 +575,7 @@ export type MenuSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   name?: boolean
   price?: boolean
   category?: boolean
-  temperatures?: boolean
-  hot_cup_sizes?: boolean
-  iced_cup_sizes?: boolean
-  hot_12oz_price?: boolean
-  iced_12oz_price?: boolean
-  iced_16oz_price?: boolean
+  type?: boolean
 }, ExtArgs["result"]["menu"]>
 
 export type MenuSelectScalar = {
@@ -694,16 +583,12 @@ export type MenuSelectScalar = {
   name?: boolean
   price?: boolean
   category?: boolean
-  temperatures?: boolean
-  hot_cup_sizes?: boolean
-  iced_cup_sizes?: boolean
-  hot_12oz_price?: boolean
-  iced_12oz_price?: boolean
-  iced_16oz_price?: boolean
+  type?: boolean
 }
 
-export type MenuOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "price" | "category" | "temperatures" | "hot_cup_sizes" | "iced_cup_sizes" | "hot_12oz_price" | "iced_12oz_price" | "iced_16oz_price", ExtArgs["result"]["menu"]>
+export type MenuOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "price" | "category" | "type", ExtArgs["result"]["menu"]>
 export type MenuInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  inventory_items?: boolean | Prisma.Menu$inventory_itemsArgs<ExtArgs>
   order_items?: boolean | Prisma.Menu$order_itemsArgs<ExtArgs>
   _count?: boolean | Prisma.MenuCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -713,19 +598,15 @@ export type MenuIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
 export type $MenuPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Menu"
   objects: {
+    inventory_items: Prisma.$MenuInventoryPayload<ExtArgs>[]
     order_items: Prisma.$OrderItemPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
     name: string
-    price: number
+    price: number | null
     category: string
-    temperatures: string[]
-    hot_cup_sizes: number[]
-    iced_cup_sizes: number[]
-    hot_12oz_price: number
-    iced_12oz_price: number
-    iced_16oz_price: number
+    type: $Enums.Inventory_Type
   }, ExtArgs["result"]["menu"]>
   composites: {}
 }
@@ -1120,6 +1001,7 @@ readonly fields: MenuFieldRefs;
  */
 export interface Prisma__MenuClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  inventory_items<T extends Prisma.Menu$inventory_itemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Menu$inventory_itemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MenuInventoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   order_items<T extends Prisma.Menu$order_itemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Menu$order_itemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OrderItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1154,12 +1036,7 @@ export interface MenuFieldRefs {
   readonly name: Prisma.FieldRef<"Menu", 'String'>
   readonly price: Prisma.FieldRef<"Menu", 'Float'>
   readonly category: Prisma.FieldRef<"Menu", 'String'>
-  readonly temperatures: Prisma.FieldRef<"Menu", 'String[]'>
-  readonly hot_cup_sizes: Prisma.FieldRef<"Menu", 'Int[]'>
-  readonly iced_cup_sizes: Prisma.FieldRef<"Menu", 'Int[]'>
-  readonly hot_12oz_price: Prisma.FieldRef<"Menu", 'Float'>
-  readonly iced_12oz_price: Prisma.FieldRef<"Menu", 'Float'>
-  readonly iced_16oz_price: Prisma.FieldRef<"Menu", 'Float'>
+  readonly type: Prisma.FieldRef<"Menu", 'Inventory_Type'>
 }
     
 
@@ -1550,6 +1427,30 @@ export type MenuDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Limit how many Menus to delete.
    */
   limit?: number
+}
+
+/**
+ * Menu.inventory_items
+ */
+export type Menu$inventory_itemsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the MenuInventory
+   */
+  select?: Prisma.MenuInventorySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the MenuInventory
+   */
+  omit?: Prisma.MenuInventoryOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.MenuInventoryInclude<ExtArgs> | null
+  where?: Prisma.MenuInventoryWhereInput
+  orderBy?: Prisma.MenuInventoryOrderByWithRelationInput | Prisma.MenuInventoryOrderByWithRelationInput[]
+  cursor?: Prisma.MenuInventoryWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.MenuInventoryScalarFieldEnum | Prisma.MenuInventoryScalarFieldEnum[]
 }
 
 /**

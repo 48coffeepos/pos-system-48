@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { prisma } from "@/integrations/prisma/db";
+import { Inventory_Type } from "@/generated/prisma/enums.js";
 
 export interface PosPageData {
   categories: string[];
@@ -8,12 +9,15 @@ export interface PosPageData {
     name: string;
     price: number;
     category: string;
-    temperatures: string[];
-    hot_cup_sizes: number[];
-    iced_cup_sizes: number[];
-    hot_12oz_price: number;
-    iced_12oz_price: number;
-    iced_16oz_price: number;
+    type: Inventory_Type;
+    inventory_items: Array<{
+      inventory: {
+        inventory_id: string;
+        name: string;
+        stock: number;
+        type: Inventory_Type;
+      };
+    }>;
   }>;
   addOns: Array<{
     id: number;
@@ -25,7 +29,16 @@ export interface PosPageData {
 export const getPosPageData = createServerFn({ method: "GET" }).handler(
   async (): Promise<PosPageData> => {
     const [dbMenuItems, dbAddOns] = await Promise.all([
-      prisma.menu.findMany({ orderBy: { id: "asc" } }),
+      prisma.menu.findMany({
+        orderBy: { id: "asc" },
+        include: {
+          inventory_items: {
+            include: {
+              inventory: true,
+            },
+          },
+        },
+      }),
       prisma.addon.findMany({ orderBy: { id: "asc" } }),
     ]);
 
@@ -48,12 +61,16 @@ export const getPosPageData = createServerFn({ method: "GET" }).handler(
       name: item.name,
       price: item.price,
       category: item.category,
-      temperatures: item.temperatures,
-      hot_cup_sizes: item.hot_cup_sizes,
-      iced_cup_sizes: item.iced_cup_sizes,
-      hot_12oz_price: item.hot_12oz_price,
-      iced_12oz_price: item.iced_12oz_price,
-      iced_16oz_price: item.iced_16oz_price,
+      type: item.type,
+      inventory_items: item.inventory_items.map((ii) => ({
+        price: ii.price,
+        inventory: {
+          inventory_id: ii.inventory.inventory_id,
+          name: ii.inventory.name,
+          stock: ii.inventory.stock,
+          type: ii.inventory.type,
+        },
+      })),
     }));
 
     const addOns = dbAddOns.map((a) => ({
