@@ -1,37 +1,36 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useSuspenseQuery } from "@tanstack/react-query";
+
 import { AdminHeader } from "@/feature/admin/components/AdminHeader";
-import { Package } from "@phosphor-icons/react";
+import { AddInventoryItem } from "@/feature/admin/inventory/components/AddInventoryItem";
+import {InventoryList} from "@/feature/admin/inventory/components/InventoryList"
+import { getAllInventoryQueryOptions } from "@/feature/admin/inventory/queryOptions";
 
 export const Route = createFileRoute("/admin/inventory")({
+  loader: async ({ context: { queryClient } }) => {
+    await queryClient.ensureQueryData(getAllInventoryQueryOptions);
+  },
   component: AdminInventory,
 });
 
 function AdminInventory() {
+  const { data: inventoryItems } = useSuspenseQuery(getAllInventoryQueryOptions);
+
   return (
     <div className="min-h-screen">
       <AdminHeader />
       <main className="mx-auto max-w-screen-2xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="mb-8 flex items-center gap-3">
-          <div className="flex size-10 items-center justify-center rounded-xl bg-(--deep-forest)">
-            <Package weight="fill" className="size-5 text-(--pale-yellow)" />
-          </div>
+        {/* Content Grid */}
+        <div className="grid gap-8 lg:grid-cols-[1fr_400px]"> 
+          {/* Inventory List Area */}
           <div>
-            <h1 className="text-2xl font-bold text-(--deep-forest)">
-              Inventory
-            </h1>
-            <p className="mt-0.5 text-sm text-(--medium-gray)">
-              Manage your stock and supplies.
-            </p>
+            <InventoryList items={inventoryItems} />
           </div>
-        </div>
-        <div className="rounded-2xl border border-(--light-gray) bg-(--pure-white) p-8 text-center">
-          <Package className="mx-auto size-12 text-(--medium-gray)/40" />
-          <h2 className="mt-4 text-lg font-semibold text-(--deep-forest)">
-            No inventory items yet
-          </h2>
-          <p className="mt-1 text-sm text-(--medium-gray)">
-            Start adding your coffee beans, milk, syrups, and other supplies.
-          </p>
+
+          {/* Add Inventory Card */}
+          <div className="lg:sticky lg:top-24 lg:self-start">
+            <AddInventoryItem items={inventoryItems} />
+          </div>
         </div>
       </main>
     </div>
