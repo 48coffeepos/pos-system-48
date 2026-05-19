@@ -15,39 +15,38 @@ model Todo {
 }
 
 model User {
-  id            String    @id
-  name          String
-  email         String    @unique
-  emailVerified Boolean   @default(false)
-  image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  accounts      Account[]
-  sessions      Session[]
-
-  role            String?
-  banned          Boolean?  @default(false)
+  id              String    @id
+  name            String
+  email           String    @unique
+  emailVerified   Boolean   @default(false)
+  image           String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
   banReason       String?
-  banExpires      DateTime?
-  username        String?
+  banned          Boolean?  @default(false)
   displayUsername String?
+  role            String?
+  username        String?
+  accounts        Account[]
+  sessions        Session[]
 
-  @@map("user")
+  banExpires DateTime?
+
   @@unique([username])
+  @@map("user")
 }
 
 model Session {
-  id        String   @id
-  expiresAt DateTime
-  token     String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  ipAddress String?
-  userAgent String?
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
+  id             String   @id
+  expiresAt      DateTime
+  token          String   @unique
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  ipAddress      String?
+  userAgent      String?
+  userId         String
   impersonatedBy String?
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@map("session")
@@ -86,7 +85,7 @@ model Verification {
 }
 
 model inventory {
-  inventory_id    String         @id
+  inventory_id    String         @id @default(uuid())
   name            String
   stock           Int
   yesterday_stock Int?

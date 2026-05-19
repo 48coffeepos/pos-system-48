@@ -266,7 +266,7 @@ export type inventoryScalarWhereWithAggregatesInput = {
 }
 
 export type inventoryCreateInput = {
-  inventory_id: string
+  inventory_id?: string
   name: string
   stock: number
   yesterday_stock?: number | null
@@ -274,7 +274,7 @@ export type inventoryCreateInput = {
 }
 
 export type inventoryUncheckedCreateInput = {
-  inventory_id: string
+  inventory_id?: string
   name: string
   stock: number
   yesterday_stock?: number | null
@@ -298,7 +298,7 @@ export type inventoryUncheckedUpdateInput = {
 }
 
 export type inventoryCreateManyInput = {
-  inventory_id: string
+  inventory_id?: string
   name: string
   stock: number
   yesterday_stock?: number | null

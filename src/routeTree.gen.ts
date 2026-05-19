@@ -9,9 +9,11 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as AuthedRouteRouteImport } from './routes/_authed/route'
+import { Route as AboutRouteImport } from './routes/about'
+import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AuthedCashierRouteRouteImport } from './routes/_authed/cashier/route'
+import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as AdminInventoryRouteImport } from './routes/admin/inventory'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as AuthedCashierPosRouteImport } from './routes/_authed/cashier/pos'
 import { Route as AuthedAdminAccountsRouteImport } from './routes/_authed/admin/accounts'
@@ -20,15 +22,25 @@ const AuthedRouteRoute = AuthedRouteRouteImport.update({
   id: '/_authed',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRouteRoute = AdminRouteRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthedCashierRouteRoute = AuthedCashierRouteRouteImport.update({
-  id: '/cashier',
-  path: '/cashier',
-  getParentRoute: () => AuthedRouteRoute,
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminInventoryRoute = AdminInventoryRouteImport.update({
+  id: '/inventory',
+  path: '/inventory',
+  getParentRoute: () => AdminRouteRoute,
 } as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
@@ -48,50 +60,53 @@ const AuthedAdminAccountsRoute = AuthedAdminAccountsRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/cashier': typeof AuthedCashierRouteRouteWithChildren
-  '/admin/accounts': typeof AuthedAdminAccountsRoute
-  '/cashier/pos': typeof AuthedCashierPosRoute
+  '/admin': typeof AdminRouteRouteWithChildren
+  '/about': typeof AboutRoute
+  '/admin/inventory': typeof AdminInventoryRoute
+  '/admin/': typeof AdminIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/cashier': typeof AuthedCashierRouteRouteWithChildren
-  '/admin/accounts': typeof AuthedAdminAccountsRoute
-  '/cashier/pos': typeof AuthedCashierPosRoute
+  '/about': typeof AboutRoute
+  '/admin/inventory': typeof AdminInventoryRoute
+  '/admin': typeof AdminIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/_authed': typeof AuthedRouteRouteWithChildren
-  '/_authed/cashier': typeof AuthedCashierRouteRouteWithChildren
-  '/_authed/admin/accounts': typeof AuthedAdminAccountsRoute
-  '/_authed/cashier/pos': typeof AuthedCashierPosRoute
+  '/admin': typeof AdminRouteRouteWithChildren
+  '/about': typeof AboutRoute
+  '/admin/inventory': typeof AdminInventoryRoute
+  '/admin/': typeof AdminIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/cashier'
-    | '/admin/accounts'
-    | '/cashier/pos'
+    | '/admin'
+    | '/about'
+    | '/admin/inventory'
+    | '/admin/'
     | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/cashier' | '/admin/accounts' | '/cashier/pos' | '/api/auth/$'
+  to: '/' | '/about' | '/admin/inventory' | '/admin' | '/api/auth/$'
   id:
     | '__root__'
     | '/'
-    | '/_authed'
-    | '/_authed/cashier'
-    | '/_authed/admin/accounts'
-    | '/_authed/cashier/pos'
+    | '/admin'
+    | '/about'
+    | '/admin/inventory'
+    | '/admin/'
     | '/api/auth/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AuthedRouteRoute: typeof AuthedRouteRouteWithChildren
+  AdminRouteRoute: typeof AdminRouteRouteWithChildren
+  AboutRoute: typeof AboutRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
@@ -104,6 +119,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -111,12 +133,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authed/cashier': {
-      id: '/_authed/cashier'
-      path: '/cashier'
-      fullPath: '/cashier'
-      preLoaderRoute: typeof AuthedCashierRouteRouteImport
-      parentRoute: typeof AuthedRouteRoute
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/inventory': {
+      id: '/admin/inventory'
+      path: '/inventory'
+      fullPath: '/admin/inventory'
+      preLoaderRoute: typeof AdminInventoryRouteImport
+      parentRoute: typeof AdminRouteRoute
     }
     '/api/auth/$': {
       id: '/api/auth/$'
@@ -142,34 +171,24 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface AuthedCashierRouteRouteChildren {
-  AuthedCashierPosRoute: typeof AuthedCashierPosRoute
+interface AdminRouteRouteChildren {
+  AdminInventoryRoute: typeof AdminInventoryRoute
+  AdminIndexRoute: typeof AdminIndexRoute
 }
 
-const AuthedCashierRouteRouteChildren: AuthedCashierRouteRouteChildren = {
-  AuthedCashierPosRoute: AuthedCashierPosRoute,
+const AdminRouteRouteChildren: AdminRouteRouteChildren = {
+  AdminInventoryRoute: AdminInventoryRoute,
+  AdminIndexRoute: AdminIndexRoute,
 }
 
-const AuthedCashierRouteRouteWithChildren =
-  AuthedCashierRouteRoute._addFileChildren(AuthedCashierRouteRouteChildren)
-
-interface AuthedRouteRouteChildren {
-  AuthedCashierRouteRoute: typeof AuthedCashierRouteRouteWithChildren
-  AuthedAdminAccountsRoute: typeof AuthedAdminAccountsRoute
-}
-
-const AuthedRouteRouteChildren: AuthedRouteRouteChildren = {
-  AuthedCashierRouteRoute: AuthedCashierRouteRouteWithChildren,
-  AuthedAdminAccountsRoute: AuthedAdminAccountsRoute,
-}
-
-const AuthedRouteRouteWithChildren = AuthedRouteRoute._addFileChildren(
-  AuthedRouteRouteChildren,
+const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
+  AdminRouteRouteChildren,
 )
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AuthedRouteRoute: AuthedRouteRouteWithChildren,
+  AdminRouteRoute: AdminRouteRouteWithChildren,
+  AboutRoute: AboutRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport
