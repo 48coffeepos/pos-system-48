@@ -1,31 +1,39 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useAppForm } from "@/integrations/tanstack-form";
+import { toast } from "sonner";
 import adminUsersKeys from "@/features/admin/keys";
 import {
 	createAccountMutationOptions,
 	updateAccountMutationOptions,
 } from "@/features/admin/mutationOptions";
 import {
+	type AccountFormInput,
 	AccountFormSchema,
-	CreateAccountSchema,
-	EditAccountFormSchema,
 } from "@/features/admin/schemas/admin";
 import type { AdminAccount } from "@/features/admin/types";
 import { ROLES } from "@/features/auth/roles";
-import { toast } from "sonner";
+import { useAppForm } from "@/integrations/tanstack-form";
 
 interface UseAccountFormOptions {
 	editingAccount: AdminAccount | null;
 	onCompleted: () => void;
 }
 
-function getDefaultValues(editingAccount: AdminAccount | null) {
+function getDefaultValues(editingAccount: AdminAccount | null): AccountFormInput {
+	if (editingAccount !== null) {
+		return {
+			mode: "edit" as const,
+			userId: editingAccount.id,
+			name: editingAccount.name,
+			password: "",
+		};
+	}
+
 	return {
-		name: editingAccount?.name ?? "",
-		email: editingAccount?.email ?? "",
-		username: editingAccount?.username ?? "",
-		role:
-			editingAccount?.role === ROLES.admin ? ROLES.admin : ROLES.cashier,
+		mode: "create" as const,
+		name: "",
+		email: "",
+		username: "",
+		role: ROLES.cashier,
 		password: "",
 	};
 }
@@ -41,28 +49,23 @@ export function useAccountForm({
 	const form = useAppForm({
 		defaultValues: getDefaultValues(editingAccount),
 		validators: {
-			onSubmit: editingAccount ? EditAccountFormSchema : AccountFormSchema,
+			onSubmit: AccountFormSchema,
 		},
 		onSubmit: async ({ value }) => {
 			try {
-				if (editingAccount) {
-					const parsed = EditAccountFormSchema.parse({
-						name: value.name,
-						password: value.password,
-					});
-
+				if (value.mode === "edit") {
 					await updateAccountMutation.mutateAsync({
-						userId: editingAccount.id,
-						name: parsed.name,
-						password: parsed.password || undefined,
+						userId: value.userId,
+						name: value.name,
+						password: value.password || undefined,
 					});
 
-					toast.success(`Updated ${editingAccount.name}`);
+					toast.success(`Updated ${value.name}`);
 				} else {
-					const parsed = CreateAccountSchema.parse(value);
+					const { mode, ...createInput } = value;
 
-					await createAccountMutation.mutateAsync(parsed);
-					toast.success(`Created ${parsed.name}'s account`);
+					await createAccountMutation.mutateAsync(createInput);
+					toast.success(`Created ${createInput.name}'s account`);
 				}
 
 				await queryClient.invalidateQueries({
@@ -72,9 +75,7 @@ export function useAccountForm({
 				onCompleted();
 			} catch (error) {
 				toast.error(
-					error instanceof Error
-						? error.message
-						: "Failed to save account",
+					error instanceof Error ? error.message : "Failed to save account",
 				);
 			}
 		},

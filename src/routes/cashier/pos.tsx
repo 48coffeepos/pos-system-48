@@ -1,9 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/_authed/cashier")({
+export const Route = createFileRoute("/cashier/pos")({
 	component: RouteComponent,
 });
 
 function RouteComponent() {
-	return <div>Hello "/cashier"!</div>;
+	return <div>Hello "/cashier/pos"!</div>;
 }

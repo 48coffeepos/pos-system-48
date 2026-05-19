@@ -1,13 +1,34 @@
-import { createFileRoute, Outlet } from "@tanstack/react-router"
+import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import { toast } from "sonner";
+import { AdminHeader } from "@/feature/admin/components/AdminHeader";
+import { sessionQueryOptions } from "@/features/auth/queryOptions";
 
 export const Route = createFileRoute("/admin")({
-  component: AdminLayout,
-})
+	component: AdminLayout,
+	loader: async ({ context }) => {
+		const session = await context.queryClient.fetchQuery(sessionQueryOptions);
+		if (!session?.user) {
+			throw redirect({
+				to: "/",
+			});
+		}
+
+		if (session.user.role !== "admin") {
+			toast.error("You are not authorized to access this page.");
+			throw redirect({
+				to: "/cashier/pos",
+			});
+		}
+	},
+});
 
 function AdminLayout() {
-  return (
-    <div className="min-h-screen">
-      <Outlet />
-    </div>
-  )
+	return (
+		<div className="min-h-screen">
+			<AdminHeader />
+			<div className="mx-auto max-w-screen-2xl px-4 py-8 sm:px-6 lg:px-8">
+				<Outlet />
+			</div>
+		</div>
+	);
 }

@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { AccountsManager } from "@/features/admin/components/accounts/AccountsManager";
 import { adminAccountsQueryOptions } from "@/features/admin/queryOptions";
 
-export const Route = createFileRoute("/_authed/admin/accounts")({
+export const Route = createFileRoute("/admin/accounts")({
 	loader: async ({ context }) => {
 		await context.queryClient.ensureQueryData(adminAccountsQueryOptions);
 	},
