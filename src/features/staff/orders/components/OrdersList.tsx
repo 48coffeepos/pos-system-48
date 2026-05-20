@@ -206,7 +206,7 @@ export function OrdersList({ orders = [] }: OrdersListProps) {
                             <CreditCard className="size-3" />
                             {order.method}
                           </span>
-                          {order.reference_number && (
+                          {order.reference_number && order.method !== "GCASH" && (
                             <span className="text-[10px] font-mono text-(--medium-gray)">
                               Ref: {order.reference_number}
                             </span>

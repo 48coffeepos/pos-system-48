@@ -144,33 +144,35 @@ export function PosReceiptDialog({
 					</div>
 				) : null}
 
-				{!isGrab ? (
-					<div className="mt-4 space-y-2 border-t border-dotted border-black pt-2 text-[11px] font-bold">
-						<div className="flex justify-between">
-							<span>Amount PAID :</span>
-							<span>{(order.paid || 0).toFixed(2)}</span>
-						</div>
-						<div className="flex justify-between text-sm font-black">
-							<span>CHANGE :</span>
-							<span>{(order.change || 0).toFixed(2)}</span>
-						</div>
-					</div>
-				) : null}
-
-				{isGrab ? (
-					<div className="mt-4 space-y-2 border-t border-dotted border-black pt-2 text-[11px] font-bold">
-						<div className="flex justify-between">
-							<span>Payment Method :</span>
-							<span>GRAB</span>
-						</div>
-						{order.reference_number ? (
+				<div className="mt-4 space-y-2 border-t border-dotted border-black pt-2 text-[11px] font-bold">
+					{order.method !== "CASH" ? (
+						<>
 							<div className="flex justify-between">
-								<span>Reference No :</span>
-								<span>{order.reference_number}</span>
+								<span>Payment Method :</span>
+								<span>{order.method}</span>
 							</div>
-						) : null}
-					</div>
-				) : null}
+							{order.reference_number ? (
+								<div className="flex justify-between">
+									<span>Reference No :</span>
+									<span>{order.reference_number}</span>
+								</div>
+							) : null}
+						</>
+					) : null}
+
+					{order.method === "CASH" ? (
+						<>
+							<div className="flex justify-between">
+								<span>Amount PAID :</span>
+								<span>{(order.paid || 0).toFixed(2)}</span>
+							</div>
+							<div className="flex justify-between text-sm font-black">
+								<span>CHANGE :</span>
+								<span>{(order.change || 0).toFixed(2)}</span>
+							</div>
+						</>
+					) : null}
+				</div>
 
 				{hasDiscount ? (
 					<div className="mt-6 flex items-center gap-2 text-[10px] font-bold">
