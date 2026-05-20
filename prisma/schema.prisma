@@ -19,15 +19,13 @@ model User {
   banned          Boolean?  @default(false)
   displayUsername String?
   role            String?
-  username        String?
+  username        String?   @unique
+  banExpires      DateTime?
   accounts        Account[]
   expenses        Expense[]
   orders          Order[]
   sessions        Session[]
 
-  banExpires DateTime?
-
-  @@unique([username])
   @@map("user")
 }
 
@@ -94,8 +92,8 @@ model Menu {
   menu_id         String          @id @default(uuid())
   name            String          @unique
   price           Decimal?        @db.Decimal(10, 2)
-  menuInventories MenuInventory[]
   type            Inventory_Type?
+  menuInventories MenuInventory[]
   orderItems      OrderItem[]
 
   @@map("menu")
