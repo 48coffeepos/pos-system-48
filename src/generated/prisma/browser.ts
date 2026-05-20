@@ -18,11 +18,6 @@ export { Prisma }
 export * as $Enums from './enums.ts'
 export * from './enums.ts';
 /**
- * Model Todo
- * 
- */
-export type Todo = Prisma.TodoModel
-/**
  * Model User
  * 
  */
@@ -47,3 +42,33 @@ export type Verification = Prisma.VerificationModel
  * 
  */
 export type inventory = Prisma.inventoryModel
+/**
+ * Model Menu
+ * 
+ */
+export type Menu = Prisma.MenuModel
+/**
+ * Model MenuInventory
+ * 
+ */
+export type MenuInventory = Prisma.MenuInventoryModel
+/**
+ * Model Order
+ * 
+ */
+export type Order = Prisma.OrderModel
+/**
+ * Model OrderItem
+ * 
+ */
+export type OrderItem = Prisma.OrderItemModel
+/**
+ * Model Addon
+ * 
+ */
+export type Addon = Prisma.AddonModel
+/**
+ * Model AddonItem
+ * 
+ */
+export type AddonItem = Prisma.AddonItemModel

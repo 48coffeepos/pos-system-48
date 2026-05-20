@@ -220,6 +220,7 @@ export type inventoryWhereInput = {
   stock?: Prisma.IntFilter<"inventory"> | number
   yesterday_stock?: Prisma.IntNullableFilter<"inventory"> | number | null
   type?: Prisma.EnumInventory_TypeFilter<"inventory"> | $Enums.Inventory_Type
+  menu_items?: Prisma.MenuInventoryListRelationFilter
 }
 
 export type inventoryOrderByWithRelationInput = {
@@ -228,6 +229,7 @@ export type inventoryOrderByWithRelationInput = {
   stock?: Prisma.SortOrder
   yesterday_stock?: Prisma.SortOrderInput | Prisma.SortOrder
   type?: Prisma.SortOrder
+  menu_items?: Prisma.MenuInventoryOrderByRelationAggregateInput
 }
 
 export type inventoryWhereUniqueInput = Prisma.AtLeast<{
@@ -239,6 +241,7 @@ export type inventoryWhereUniqueInput = Prisma.AtLeast<{
   stock?: Prisma.IntFilter<"inventory"> | number
   yesterday_stock?: Prisma.IntNullableFilter<"inventory"> | number | null
   type?: Prisma.EnumInventory_TypeFilter<"inventory"> | $Enums.Inventory_Type
+  menu_items?: Prisma.MenuInventoryListRelationFilter
 }, "inventory_id">
 
 export type inventoryOrderByWithAggregationInput = {
@@ -271,6 +274,7 @@ export type inventoryCreateInput = {
   stock: number
   yesterday_stock?: number | null
   type: $Enums.Inventory_Type
+  menu_items?: Prisma.MenuInventoryCreateNestedManyWithoutInventoryInput
 }
 
 export type inventoryUncheckedCreateInput = {
@@ -279,6 +283,7 @@ export type inventoryUncheckedCreateInput = {
   stock: number
   yesterday_stock?: number | null
   type: $Enums.Inventory_Type
+  menu_items?: Prisma.MenuInventoryUncheckedCreateNestedManyWithoutInventoryInput
 }
 
 export type inventoryUpdateInput = {
@@ -287,6 +292,7 @@ export type inventoryUpdateInput = {
   stock?: Prisma.IntFieldUpdateOperationsInput | number
   yesterday_stock?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   type?: Prisma.EnumInventory_TypeFieldUpdateOperationsInput | $Enums.Inventory_Type
+  menu_items?: Prisma.MenuInventoryUpdateManyWithoutInventoryNestedInput
 }
 
 export type inventoryUncheckedUpdateInput = {
@@ -295,6 +301,7 @@ export type inventoryUncheckedUpdateInput = {
   stock?: Prisma.IntFieldUpdateOperationsInput | number
   yesterday_stock?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   type?: Prisma.EnumInventory_TypeFieldUpdateOperationsInput | $Enums.Inventory_Type
+  menu_items?: Prisma.MenuInventoryUncheckedUpdateManyWithoutInventoryNestedInput
 }
 
 export type inventoryCreateManyInput = {
@@ -355,6 +362,19 @@ export type inventorySumOrderByAggregateInput = {
   yesterday_stock?: Prisma.SortOrder
 }
 
+export type InventoryScalarRelationFilter = {
+  is?: Prisma.inventoryWhereInput
+  isNot?: Prisma.inventoryWhereInput
+}
+
+export type IntFieldUpdateOperationsInput = {
+  set?: number
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
 export type NullableIntFieldUpdateOperationsInput = {
   set?: number | null
   increment?: number
@@ -367,6 +387,97 @@ export type EnumInventory_TypeFieldUpdateOperationsInput = {
   set?: $Enums.Inventory_Type
 }
 
+export type inventoryCreateNestedOneWithoutMenu_itemsInput = {
+  create?: Prisma.XOR<Prisma.inventoryCreateWithoutMenu_itemsInput, Prisma.inventoryUncheckedCreateWithoutMenu_itemsInput>
+  connectOrCreate?: Prisma.inventoryCreateOrConnectWithoutMenu_itemsInput
+  connect?: Prisma.inventoryWhereUniqueInput
+}
+
+export type inventoryUpdateOneRequiredWithoutMenu_itemsNestedInput = {
+  create?: Prisma.XOR<Prisma.inventoryCreateWithoutMenu_itemsInput, Prisma.inventoryUncheckedCreateWithoutMenu_itemsInput>
+  connectOrCreate?: Prisma.inventoryCreateOrConnectWithoutMenu_itemsInput
+  upsert?: Prisma.inventoryUpsertWithoutMenu_itemsInput
+  connect?: Prisma.inventoryWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.inventoryUpdateToOneWithWhereWithoutMenu_itemsInput, Prisma.inventoryUpdateWithoutMenu_itemsInput>, Prisma.inventoryUncheckedUpdateWithoutMenu_itemsInput>
+}
+
+export type inventoryCreateWithoutMenu_itemsInput = {
+  inventory_id?: string
+  name: string
+  stock: number
+  yesterday_stock?: number | null
+  type: $Enums.Inventory_Type
+}
+
+export type inventoryUncheckedCreateWithoutMenu_itemsInput = {
+  inventory_id?: string
+  name: string
+  stock: number
+  yesterday_stock?: number | null
+  type: $Enums.Inventory_Type
+}
+
+export type inventoryCreateOrConnectWithoutMenu_itemsInput = {
+  where: Prisma.inventoryWhereUniqueInput
+  create: Prisma.XOR<Prisma.inventoryCreateWithoutMenu_itemsInput, Prisma.inventoryUncheckedCreateWithoutMenu_itemsInput>
+}
+
+export type inventoryUpsertWithoutMenu_itemsInput = {
+  update: Prisma.XOR<Prisma.inventoryUpdateWithoutMenu_itemsInput, Prisma.inventoryUncheckedUpdateWithoutMenu_itemsInput>
+  create: Prisma.XOR<Prisma.inventoryCreateWithoutMenu_itemsInput, Prisma.inventoryUncheckedCreateWithoutMenu_itemsInput>
+  where?: Prisma.inventoryWhereInput
+}
+
+export type inventoryUpdateToOneWithWhereWithoutMenu_itemsInput = {
+  where?: Prisma.inventoryWhereInput
+  data: Prisma.XOR<Prisma.inventoryUpdateWithoutMenu_itemsInput, Prisma.inventoryUncheckedUpdateWithoutMenu_itemsInput>
+}
+
+export type inventoryUpdateWithoutMenu_itemsInput = {
+  inventory_id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  stock?: Prisma.IntFieldUpdateOperationsInput | number
+  yesterday_stock?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  type?: Prisma.EnumInventory_TypeFieldUpdateOperationsInput | $Enums.Inventory_Type
+}
+
+export type inventoryUncheckedUpdateWithoutMenu_itemsInput = {
+  inventory_id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  stock?: Prisma.IntFieldUpdateOperationsInput | number
+  yesterday_stock?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  type?: Prisma.EnumInventory_TypeFieldUpdateOperationsInput | $Enums.Inventory_Type
+}
+
+
+/**
+ * Count Type InventoryCountOutputType
+ */
+
+export type InventoryCountOutputType = {
+  menu_items: number
+}
+
+export type InventoryCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  menu_items?: boolean | InventoryCountOutputTypeCountMenu_itemsArgs
+}
+
+/**
+ * InventoryCountOutputType without action
+ */
+export type InventoryCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the InventoryCountOutputType
+   */
+  select?: Prisma.InventoryCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * InventoryCountOutputType without action
+ */
+export type InventoryCountOutputTypeCountMenu_itemsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.MenuInventoryWhereInput
+}
 
 
 export type inventorySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -375,6 +486,8 @@ export type inventorySelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   stock?: boolean
   yesterday_stock?: boolean
   type?: boolean
+  menu_items?: boolean | Prisma.inventory$menu_itemsArgs<ExtArgs>
+  _count?: boolean | Prisma.InventoryCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["inventory"]>
 
 export type inventorySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -402,10 +515,18 @@ export type inventorySelectScalar = {
 }
 
 export type inventoryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"inventory_id" | "name" | "stock" | "yesterday_stock" | "type", ExtArgs["result"]["inventory"]>
+export type inventoryInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  menu_items?: boolean | Prisma.inventory$menu_itemsArgs<ExtArgs>
+  _count?: boolean | Prisma.InventoryCountOutputTypeDefaultArgs<ExtArgs>
+}
+export type inventoryIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type inventoryIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
 
 export type $inventoryPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "inventory"
-  objects: {}
+  objects: {
+    menu_items: Prisma.$MenuInventoryPayload<ExtArgs>[]
+  }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     inventory_id: string
     name: string
@@ -806,6 +927,7 @@ readonly fields: inventoryFieldRefs;
  */
 export interface Prisma__inventoryClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  menu_items<T extends Prisma.inventory$menu_itemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.inventory$menu_itemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MenuInventoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -857,6 +979,10 @@ export type inventoryFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.Int
    */
   omit?: Prisma.inventoryOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.inventoryInclude<ExtArgs> | null
+  /**
    * Filter, which inventory to fetch.
    */
   where: Prisma.inventoryWhereUniqueInput
@@ -875,6 +1001,10 @@ export type inventoryFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extensi
    */
   omit?: Prisma.inventoryOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.inventoryInclude<ExtArgs> | null
+  /**
    * Filter, which inventory to fetch.
    */
   where: Prisma.inventoryWhereUniqueInput
@@ -892,6 +1022,10 @@ export type inventoryFindFirstArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * Omit specific fields from the inventory
    */
   omit?: Prisma.inventoryOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.inventoryInclude<ExtArgs> | null
   /**
    * Filter, which inventory to fetch.
    */
@@ -941,6 +1075,10 @@ export type inventoryFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensio
    */
   omit?: Prisma.inventoryOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.inventoryInclude<ExtArgs> | null
+  /**
    * Filter, which inventory to fetch.
    */
   where?: Prisma.inventoryWhereInput
@@ -988,6 +1126,10 @@ export type inventoryFindManyArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Omit specific fields from the inventory
    */
   omit?: Prisma.inventoryOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.inventoryInclude<ExtArgs> | null
   /**
    * Filter, which inventories to fetch.
    */
@@ -1037,6 +1179,10 @@ export type inventoryCreateArgs<ExtArgs extends runtime.Types.Extensions.Interna
    */
   omit?: Prisma.inventoryOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.inventoryInclude<ExtArgs> | null
+  /**
    * The data needed to create a inventory.
    */
   data: Prisma.XOR<Prisma.inventoryCreateInput, Prisma.inventoryUncheckedCreateInput>
@@ -1084,6 +1230,10 @@ export type inventoryUpdateArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * Omit specific fields from the inventory
    */
   omit?: Prisma.inventoryOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.inventoryInclude<ExtArgs> | null
   /**
    * The data needed to update a inventory.
    */
@@ -1151,6 +1301,10 @@ export type inventoryUpsertArgs<ExtArgs extends runtime.Types.Extensions.Interna
    */
   omit?: Prisma.inventoryOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.inventoryInclude<ExtArgs> | null
+  /**
    * The filter to search for the inventory to update in case it exists.
    */
   where: Prisma.inventoryWhereUniqueInput
@@ -1177,6 +1331,10 @@ export type inventoryDeleteArgs<ExtArgs extends runtime.Types.Extensions.Interna
    */
   omit?: Prisma.inventoryOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.inventoryInclude<ExtArgs> | null
+  /**
    * Filter which inventory to delete.
    */
   where: Prisma.inventoryWhereUniqueInput
@@ -1197,6 +1355,30 @@ export type inventoryDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Int
 }
 
 /**
+ * inventory.menu_items
+ */
+export type inventory$menu_itemsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the MenuInventory
+   */
+  select?: Prisma.MenuInventorySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the MenuInventory
+   */
+  omit?: Prisma.MenuInventoryOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.MenuInventoryInclude<ExtArgs> | null
+  where?: Prisma.MenuInventoryWhereInput
+  orderBy?: Prisma.MenuInventoryOrderByWithRelationInput | Prisma.MenuInventoryOrderByWithRelationInput[]
+  cursor?: Prisma.MenuInventoryWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.MenuInventoryScalarFieldEnum | Prisma.MenuInventoryScalarFieldEnum[]
+}
+
+/**
  * inventory without action
  */
 export type inventoryDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1208,4 +1390,8 @@ export type inventoryDefaultArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Omit specific fields from the inventory
    */
   omit?: Prisma.inventoryOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.inventoryInclude<ExtArgs> | null
 }
