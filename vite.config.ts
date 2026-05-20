@@ -1,9 +1,8 @@
+import babel from "@rolldown/plugin-babel";
 import tailwindcss from "@tailwindcss/vite";
 import { devtools } from "@tanstack/devtools-vite";
-
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
-
-import viteReact from "@vitejs/plugin-react";
+import viteReact, { reactCompilerPreset } from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 
 const config = defineConfig({
@@ -27,7 +26,6 @@ const config = defineConfig({
 			injectSource: {
 				enabled: true,
 				ignore: {
-					// files to ignore source injection ford
 					files: ["node_modules", /.*\.test\.(js|ts|jsx|tsx)$/],
 				},
 			},
@@ -35,6 +33,7 @@ const config = defineConfig({
 		tailwindcss(),
 		tanstackStart(),
 		viteReact(),
+		babel({ presets: [reactCompilerPreset()] }),
 	],
 });
 

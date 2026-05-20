@@ -27,29 +27,27 @@ export type AggregateAddon = {
 }
 
 export type AddonAvgAggregateOutputType = {
-  id: number | null
-  price: number | null
+  price: runtime.Decimal | null
 }
 
 export type AddonSumAggregateOutputType = {
-  id: number | null
-  price: number | null
+  price: runtime.Decimal | null
 }
 
 export type AddonMinAggregateOutputType = {
-  id: number | null
+  addon_id: string | null
   name: string | null
-  price: number | null
+  price: runtime.Decimal | null
 }
 
 export type AddonMaxAggregateOutputType = {
-  id: number | null
+  addon_id: string | null
   name: string | null
-  price: number | null
+  price: runtime.Decimal | null
 }
 
 export type AddonCountAggregateOutputType = {
-  id: number
+  addon_id: number
   name: number
   price: number
   _all: number
@@ -57,29 +55,27 @@ export type AddonCountAggregateOutputType = {
 
 
 export type AddonAvgAggregateInputType = {
-  id?: true
   price?: true
 }
 
 export type AddonSumAggregateInputType = {
-  id?: true
   price?: true
 }
 
 export type AddonMinAggregateInputType = {
-  id?: true
+  addon_id?: true
   name?: true
   price?: true
 }
 
 export type AddonMaxAggregateInputType = {
-  id?: true
+  addon_id?: true
   name?: true
   price?: true
 }
 
 export type AddonCountAggregateInputType = {
-  id?: true
+  addon_id?: true
   name?: true
   price?: true
   _all?: true
@@ -172,9 +168,9 @@ export type AddonGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
 }
 
 export type AddonGroupByOutputType = {
-  id: number
+  addon_id: string
   name: string
-  price: number
+  price: runtime.Decimal
   _count: AddonCountAggregateOutputType | null
   _avg: AddonAvgAggregateOutputType | null
   _sum: AddonSumAggregateOutputType | null
@@ -201,31 +197,31 @@ export type AddonWhereInput = {
   AND?: Prisma.AddonWhereInput | Prisma.AddonWhereInput[]
   OR?: Prisma.AddonWhereInput[]
   NOT?: Prisma.AddonWhereInput | Prisma.AddonWhereInput[]
-  id?: Prisma.IntFilter<"Addon"> | number
+  addon_id?: Prisma.StringFilter<"Addon"> | string
   name?: Prisma.StringFilter<"Addon"> | string
-  price?: Prisma.FloatFilter<"Addon"> | number
-  addon_items?: Prisma.AddonItemListRelationFilter
+  price?: Prisma.DecimalFilter<"Addon"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  orderItemAddons?: Prisma.OrderItemAddonListRelationFilter
 }
 
 export type AddonOrderByWithRelationInput = {
-  id?: Prisma.SortOrder
+  addon_id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   price?: Prisma.SortOrder
-  addon_items?: Prisma.AddonItemOrderByRelationAggregateInput
+  orderItemAddons?: Prisma.OrderItemAddonOrderByRelationAggregateInput
 }
 
 export type AddonWhereUniqueInput = Prisma.AtLeast<{
-  id?: number
+  addon_id?: string
+  name?: string
   AND?: Prisma.AddonWhereInput | Prisma.AddonWhereInput[]
   OR?: Prisma.AddonWhereInput[]
   NOT?: Prisma.AddonWhereInput | Prisma.AddonWhereInput[]
-  name?: Prisma.StringFilter<"Addon"> | string
-  price?: Prisma.FloatFilter<"Addon"> | number
-  addon_items?: Prisma.AddonItemListRelationFilter
-}, "id">
+  price?: Prisma.DecimalFilter<"Addon"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  orderItemAddons?: Prisma.OrderItemAddonListRelationFilter
+}, "addon_id" | "name">
 
 export type AddonOrderByWithAggregationInput = {
-  id?: Prisma.SortOrder
+  addon_id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   price?: Prisma.SortOrder
   _count?: Prisma.AddonCountOrderByAggregateInput
@@ -239,79 +235,80 @@ export type AddonScalarWhereWithAggregatesInput = {
   AND?: Prisma.AddonScalarWhereWithAggregatesInput | Prisma.AddonScalarWhereWithAggregatesInput[]
   OR?: Prisma.AddonScalarWhereWithAggregatesInput[]
   NOT?: Prisma.AddonScalarWhereWithAggregatesInput | Prisma.AddonScalarWhereWithAggregatesInput[]
-  id?: Prisma.IntWithAggregatesFilter<"Addon"> | number
+  addon_id?: Prisma.StringWithAggregatesFilter<"Addon"> | string
   name?: Prisma.StringWithAggregatesFilter<"Addon"> | string
-  price?: Prisma.FloatWithAggregatesFilter<"Addon"> | number
+  price?: Prisma.DecimalWithAggregatesFilter<"Addon"> | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type AddonCreateInput = {
+  addon_id?: string
   name: string
-  price: number
-  addon_items?: Prisma.AddonItemCreateNestedManyWithoutAddonInput
+  price: runtime.Decimal | runtime.DecimalJsLike | number | string
+  orderItemAddons?: Prisma.OrderItemAddonCreateNestedManyWithoutAddonInput
 }
 
 export type AddonUncheckedCreateInput = {
-  id?: number
+  addon_id?: string
   name: string
-  price: number
-  addon_items?: Prisma.AddonItemUncheckedCreateNestedManyWithoutAddonInput
+  price: runtime.Decimal | runtime.DecimalJsLike | number | string
+  orderItemAddons?: Prisma.OrderItemAddonUncheckedCreateNestedManyWithoutAddonInput
 }
 
 export type AddonUpdateInput = {
+  addon_id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
-  addon_items?: Prisma.AddonItemUpdateManyWithoutAddonNestedInput
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  orderItemAddons?: Prisma.OrderItemAddonUpdateManyWithoutAddonNestedInput
 }
 
 export type AddonUncheckedUpdateInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number
+  addon_id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
-  addon_items?: Prisma.AddonItemUncheckedUpdateManyWithoutAddonNestedInput
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  orderItemAddons?: Prisma.OrderItemAddonUncheckedUpdateManyWithoutAddonNestedInput
 }
 
 export type AddonCreateManyInput = {
-  id?: number
+  addon_id?: string
   name: string
-  price: number
+  price: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type AddonUpdateManyMutationInput = {
+  addon_id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type AddonUncheckedUpdateManyInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number
+  addon_id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type AddonCountOrderByAggregateInput = {
-  id?: Prisma.SortOrder
+  addon_id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   price?: Prisma.SortOrder
 }
 
 export type AddonAvgOrderByAggregateInput = {
-  id?: Prisma.SortOrder
   price?: Prisma.SortOrder
 }
 
 export type AddonMaxOrderByAggregateInput = {
-  id?: Prisma.SortOrder
+  addon_id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   price?: Prisma.SortOrder
 }
 
 export type AddonMinOrderByAggregateInput = {
-  id?: Prisma.SortOrder
+  addon_id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   price?: Prisma.SortOrder
 }
 
 export type AddonSumOrderByAggregateInput = {
-  id?: Prisma.SortOrder
   price?: Prisma.SortOrder
 }
 
@@ -320,56 +317,58 @@ export type AddonScalarRelationFilter = {
   isNot?: Prisma.AddonWhereInput
 }
 
-export type AddonCreateNestedOneWithoutAddon_itemsInput = {
-  create?: Prisma.XOR<Prisma.AddonCreateWithoutAddon_itemsInput, Prisma.AddonUncheckedCreateWithoutAddon_itemsInput>
-  connectOrCreate?: Prisma.AddonCreateOrConnectWithoutAddon_itemsInput
+export type AddonCreateNestedOneWithoutOrderItemAddonsInput = {
+  create?: Prisma.XOR<Prisma.AddonCreateWithoutOrderItemAddonsInput, Prisma.AddonUncheckedCreateWithoutOrderItemAddonsInput>
+  connectOrCreate?: Prisma.AddonCreateOrConnectWithoutOrderItemAddonsInput
   connect?: Prisma.AddonWhereUniqueInput
 }
 
-export type AddonUpdateOneRequiredWithoutAddon_itemsNestedInput = {
-  create?: Prisma.XOR<Prisma.AddonCreateWithoutAddon_itemsInput, Prisma.AddonUncheckedCreateWithoutAddon_itemsInput>
-  connectOrCreate?: Prisma.AddonCreateOrConnectWithoutAddon_itemsInput
-  upsert?: Prisma.AddonUpsertWithoutAddon_itemsInput
+export type AddonUpdateOneRequiredWithoutOrderItemAddonsNestedInput = {
+  create?: Prisma.XOR<Prisma.AddonCreateWithoutOrderItemAddonsInput, Prisma.AddonUncheckedCreateWithoutOrderItemAddonsInput>
+  connectOrCreate?: Prisma.AddonCreateOrConnectWithoutOrderItemAddonsInput
+  upsert?: Prisma.AddonUpsertWithoutOrderItemAddonsInput
   connect?: Prisma.AddonWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.AddonUpdateToOneWithWhereWithoutAddon_itemsInput, Prisma.AddonUpdateWithoutAddon_itemsInput>, Prisma.AddonUncheckedUpdateWithoutAddon_itemsInput>
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AddonUpdateToOneWithWhereWithoutOrderItemAddonsInput, Prisma.AddonUpdateWithoutOrderItemAddonsInput>, Prisma.AddonUncheckedUpdateWithoutOrderItemAddonsInput>
 }
 
-export type AddonCreateWithoutAddon_itemsInput = {
+export type AddonCreateWithoutOrderItemAddonsInput = {
+  addon_id?: string
   name: string
-  price: number
+  price: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
-export type AddonUncheckedCreateWithoutAddon_itemsInput = {
-  id?: number
+export type AddonUncheckedCreateWithoutOrderItemAddonsInput = {
+  addon_id?: string
   name: string
-  price: number
+  price: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
-export type AddonCreateOrConnectWithoutAddon_itemsInput = {
+export type AddonCreateOrConnectWithoutOrderItemAddonsInput = {
   where: Prisma.AddonWhereUniqueInput
-  create: Prisma.XOR<Prisma.AddonCreateWithoutAddon_itemsInput, Prisma.AddonUncheckedCreateWithoutAddon_itemsInput>
+  create: Prisma.XOR<Prisma.AddonCreateWithoutOrderItemAddonsInput, Prisma.AddonUncheckedCreateWithoutOrderItemAddonsInput>
 }
 
-export type AddonUpsertWithoutAddon_itemsInput = {
-  update: Prisma.XOR<Prisma.AddonUpdateWithoutAddon_itemsInput, Prisma.AddonUncheckedUpdateWithoutAddon_itemsInput>
-  create: Prisma.XOR<Prisma.AddonCreateWithoutAddon_itemsInput, Prisma.AddonUncheckedCreateWithoutAddon_itemsInput>
+export type AddonUpsertWithoutOrderItemAddonsInput = {
+  update: Prisma.XOR<Prisma.AddonUpdateWithoutOrderItemAddonsInput, Prisma.AddonUncheckedUpdateWithoutOrderItemAddonsInput>
+  create: Prisma.XOR<Prisma.AddonCreateWithoutOrderItemAddonsInput, Prisma.AddonUncheckedCreateWithoutOrderItemAddonsInput>
   where?: Prisma.AddonWhereInput
 }
 
-export type AddonUpdateToOneWithWhereWithoutAddon_itemsInput = {
+export type AddonUpdateToOneWithWhereWithoutOrderItemAddonsInput = {
   where?: Prisma.AddonWhereInput
-  data: Prisma.XOR<Prisma.AddonUpdateWithoutAddon_itemsInput, Prisma.AddonUncheckedUpdateWithoutAddon_itemsInput>
+  data: Prisma.XOR<Prisma.AddonUpdateWithoutOrderItemAddonsInput, Prisma.AddonUncheckedUpdateWithoutOrderItemAddonsInput>
 }
 
-export type AddonUpdateWithoutAddon_itemsInput = {
+export type AddonUpdateWithoutOrderItemAddonsInput = {
+  addon_id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
-export type AddonUncheckedUpdateWithoutAddon_itemsInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number
+export type AddonUncheckedUpdateWithoutOrderItemAddonsInput = {
+  addon_id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 
@@ -378,11 +377,11 @@ export type AddonUncheckedUpdateWithoutAddon_itemsInput = {
  */
 
 export type AddonCountOutputType = {
-  addon_items: number
+  orderItemAddons: number
 }
 
 export type AddonCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  addon_items?: boolean | AddonCountOutputTypeCountAddon_itemsArgs
+  orderItemAddons?: boolean | AddonCountOutputTypeCountOrderItemAddonsArgs
 }
 
 /**
@@ -398,40 +397,40 @@ export type AddonCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extens
 /**
  * AddonCountOutputType without action
  */
-export type AddonCountOutputTypeCountAddon_itemsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.AddonItemWhereInput
+export type AddonCountOutputTypeCountOrderItemAddonsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.OrderItemAddonWhereInput
 }
 
 
 export type AddonSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean
+  addon_id?: boolean
   name?: boolean
   price?: boolean
-  addon_items?: boolean | Prisma.Addon$addon_itemsArgs<ExtArgs>
+  orderItemAddons?: boolean | Prisma.Addon$orderItemAddonsArgs<ExtArgs>
   _count?: boolean | Prisma.AddonCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["addon"]>
 
 export type AddonSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean
+  addon_id?: boolean
   name?: boolean
   price?: boolean
 }, ExtArgs["result"]["addon"]>
 
 export type AddonSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean
+  addon_id?: boolean
   name?: boolean
   price?: boolean
 }, ExtArgs["result"]["addon"]>
 
 export type AddonSelectScalar = {
-  id?: boolean
+  addon_id?: boolean
   name?: boolean
   price?: boolean
 }
 
-export type AddonOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "price", ExtArgs["result"]["addon"]>
+export type AddonOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"addon_id" | "name" | "price", ExtArgs["result"]["addon"]>
 export type AddonInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  addon_items?: boolean | Prisma.Addon$addon_itemsArgs<ExtArgs>
+  orderItemAddons?: boolean | Prisma.Addon$orderItemAddonsArgs<ExtArgs>
   _count?: boolean | Prisma.AddonCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type AddonIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -440,12 +439,12 @@ export type AddonIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
 export type $AddonPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Addon"
   objects: {
-    addon_items: Prisma.$AddonItemPayload<ExtArgs>[]
+    orderItemAddons: Prisma.$OrderItemAddonPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
-    id: number
+    addon_id: string
     name: string
-    price: number
+    price: runtime.Decimal
   }, ExtArgs["result"]["addon"]>
   composites: {}
 }
@@ -529,8 +528,8 @@ export interface AddonDelegate<ExtArgs extends runtime.Types.Extensions.Internal
    * // Get first 10 Addons
    * const addons = await prisma.addon.findMany({ take: 10 })
    * 
-   * // Only select the `id`
-   * const addonWithIdOnly = await prisma.addon.findMany({ select: { id: true } })
+   * // Only select the `addon_id`
+   * const addonWithAddon_idOnly = await prisma.addon.findMany({ select: { addon_id: true } })
    * 
    */
   findMany<T extends AddonFindManyArgs>(args?: Prisma.SelectSubset<T, AddonFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AddonPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
@@ -574,9 +573,9 @@ export interface AddonDelegate<ExtArgs extends runtime.Types.Extensions.Internal
    *   ]
    * })
    * 
-   * // Create many Addons and only return the `id`
-   * const addonWithIdOnly = await prisma.addon.createManyAndReturn({
-   *   select: { id: true },
+   * // Create many Addons and only return the `addon_id`
+   * const addonWithAddon_idOnly = await prisma.addon.createManyAndReturn({
+   *   select: { addon_id: true },
    *   data: [
    *     // ... provide data here
    *   ]
@@ -665,9 +664,9 @@ export interface AddonDelegate<ExtArgs extends runtime.Types.Extensions.Internal
    *   ]
    * })
    * 
-   * // Update zero or more Addons and only return the `id`
-   * const addonWithIdOnly = await prisma.addon.updateManyAndReturn({
-   *   select: { id: true },
+   * // Update zero or more Addons and only return the `addon_id`
+   * const addonWithAddon_idOnly = await prisma.addon.updateManyAndReturn({
+   *   select: { addon_id: true },
    *   where: {
    *     // ... provide filter here
    *   },
@@ -840,7 +839,7 @@ readonly fields: AddonFieldRefs;
  */
 export interface Prisma__AddonClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  addon_items<T extends Prisma.Addon$addon_itemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Addon$addon_itemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AddonItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  orderItemAddons<T extends Prisma.Addon$orderItemAddonsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Addon$orderItemAddonsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OrderItemAddonPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -870,9 +869,9 @@ export interface Prisma__AddonClient<T, Null = never, ExtArgs extends runtime.Ty
  * Fields of the Addon model
  */
 export interface AddonFieldRefs {
-  readonly id: Prisma.FieldRef<"Addon", 'Int'>
+  readonly addon_id: Prisma.FieldRef<"Addon", 'String'>
   readonly name: Prisma.FieldRef<"Addon", 'String'>
-  readonly price: Prisma.FieldRef<"Addon", 'Float'>
+  readonly price: Prisma.FieldRef<"Addon", 'Decimal'>
 }
     
 
@@ -1266,27 +1265,27 @@ export type AddonDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Interna
 }
 
 /**
- * Addon.addon_items
+ * Addon.orderItemAddons
  */
-export type Addon$addon_itemsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type Addon$orderItemAddonsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the AddonItem
+   * Select specific fields to fetch from the OrderItemAddon
    */
-  select?: Prisma.AddonItemSelect<ExtArgs> | null
+  select?: Prisma.OrderItemAddonSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the AddonItem
+   * Omit specific fields from the OrderItemAddon
    */
-  omit?: Prisma.AddonItemOmit<ExtArgs> | null
+  omit?: Prisma.OrderItemAddonOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.AddonItemInclude<ExtArgs> | null
-  where?: Prisma.AddonItemWhereInput
-  orderBy?: Prisma.AddonItemOrderByWithRelationInput | Prisma.AddonItemOrderByWithRelationInput[]
-  cursor?: Prisma.AddonItemWhereUniqueInput
+  include?: Prisma.OrderItemAddonInclude<ExtArgs> | null
+  where?: Prisma.OrderItemAddonWhereInput
+  orderBy?: Prisma.OrderItemAddonOrderByWithRelationInput | Prisma.OrderItemAddonOrderByWithRelationInput[]
+  cursor?: Prisma.OrderItemAddonWhereUniqueInput
   take?: number
   skip?: number
-  distinct?: Prisma.AddonItemScalarFieldEnum | Prisma.AddonItemScalarFieldEnum[]
+  distinct?: Prisma.OrderItemAddonScalarFieldEnum | Prisma.OrderItemAddonScalarFieldEnum[]
 }
 
 /**
