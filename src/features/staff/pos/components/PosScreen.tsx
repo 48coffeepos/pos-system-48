@@ -266,6 +266,7 @@ export function PosScreen() {
 			<PosOrderConfirmDialog
 				open={showPlaceOrderConfirm}
 				total={cartTotal}
+				isLoading={createOrderMutation.isPending}
 				onClose={() => setShowPlaceOrderConfirm(false)}
 				onConfirm={handlePlaceOrder}
 			/>

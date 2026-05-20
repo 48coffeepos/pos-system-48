@@ -12,6 +12,7 @@ interface DBOrder {
   change_amount: number | null;
   grand_total: number;
   created_at: string | Date;
+  note: string | null;
   order_items: Array<{
     order_item_id: string;
     menu_id: string;
@@ -77,6 +78,7 @@ export function OrdersList({ orders = [] }: OrdersListProps) {
       amount_tendered: order.amount_tendered !== null ? order.amount_tendered : undefined,
       change_amount: order.change_amount !== null ? order.change_amount : undefined,
       grand_total: order.grand_total,
+      note: order.note || undefined,
       items: order.order_items.map((item) => ({
         snapshot_menu_name: item.snapshot_menu_name,
         quantity: item.quantity,

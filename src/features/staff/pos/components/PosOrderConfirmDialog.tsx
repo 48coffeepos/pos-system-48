@@ -4,6 +4,7 @@ import { PosModal } from "./ui/PosModal";
 interface PosOrderConfirmDialogProps {
 	open: boolean;
 	total: number;
+	isLoading?: boolean;
 	onClose: () => void;
 	onConfirm: () => void;
 }
@@ -11,6 +12,7 @@ interface PosOrderConfirmDialogProps {
 export function PosOrderConfirmDialog({
 	open,
 	total,
+	isLoading = false,
 	onClose,
 	onConfirm,
 }: PosOrderConfirmDialogProps) {
@@ -29,7 +31,8 @@ export function PosOrderConfirmDialog({
 				<button
 					type="button"
 					onClick={onClose}
-					className="h-11 flex-1 rounded-xl text-sm font-semibold transition-all"
+					disabled={isLoading}
+					className="h-11 flex-1 rounded-xl text-sm font-semibold transition-all disabled:opacity-50"
 					style={{
 						background: "var(--off-white)",
 						color: "var(--dark-gray)",
@@ -40,10 +43,11 @@ export function PosOrderConfirmDialog({
 				<button
 					type="button"
 					onClick={onConfirm}
-					className="h-11 flex-1 rounded-xl text-sm font-semibold text-white transition-all"
+					disabled={isLoading}
+					className="h-11 flex-1 rounded-xl text-sm font-semibold text-white transition-all disabled:opacity-50"
 					style={{ background: "var(--deep-forest)" }}
 				>
-					Confirm
+					{isLoading ? "Confirming..." : "Confirm"}
 				</button>
 			</div>
 		</PosModal>
