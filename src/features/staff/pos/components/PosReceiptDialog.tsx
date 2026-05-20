@@ -23,6 +23,7 @@ export function PosReceiptDialog({
 		(i) => i.discount && i.discount !== "none",
 	);
 	const isGrab = order.method === "GRAB";
+	const orderNote = order.items?.find((i) => i.note)?.note;
 
 	return (
 		<PosModal
@@ -119,20 +120,27 @@ export function PosReceiptDialog({
 					</div>
 				</div>
 
-				{hasDiscount ? (
-					<div className="mt-2 space-y-0.5 border-t border-dotted border-black pt-2 text-[9px] font-bold">
-						{order.items
-							?.filter((i) => i.discount && i.discount !== "none")
-							.map((item, idx) => (
-								<div key={idx}>
-									<div className="flex justify-between uppercase">
-										<span>NAME: {item.discount_name}</span>
-									</div>
-									<div className="flex justify-between uppercase">
-										<span>ID NO: {item.discount_id}</span>
-									</div>
-								</div>
-							))}
+				{hasDiscount || orderNote ? (
+					<div className="mt-2 space-y-1 border-t border-dotted border-black pt-2 text-[9px] font-bold">
+						{hasDiscount
+							? order.items
+									?.filter((i) => i.discount && i.discount !== "none")
+									.map((item, idx) => (
+										<div key={idx} className="space-y-0.5">
+											<div className="flex justify-between uppercase">
+												<span>NAME: {item.discount_name}</span>
+											</div>
+											<div className="flex justify-between uppercase">
+												<span>ID NO: {item.discount_id}</span>
+											</div>
+										</div>
+									))
+							: null}
+						{orderNote ? (
+							<div className="flex justify-between uppercase pt-1">
+								<span>NOTE: {orderNote}</span>
+							</div>
+						) : null}
 					</div>
 				) : null}
 
