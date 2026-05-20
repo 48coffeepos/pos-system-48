@@ -85,11 +85,11 @@ export function PosReceiptDialog({
 									{(item.total || 0).toFixed(2)}
 								</span>
 							</div>
-							{item.cup_size || item.cup_type ? (
+							{(item.cup_size && item.cup_size !== "NONE") || (item.cup_type && item.cup_type !== "NONE") ? (
 								<div className="mt-0.5 grid grid-cols-[40px_1fr_60px] text-[9px] font-bold opacity-75">
 									<span />
 									<span className="uppercase">
-										{item.cup_type ? `${item.cup_type} ` : ""}{item.cup_size}
+										{item.cup_type && item.cup_type !== "NONE" ? `${item.cup_type} ` : ""}{item.cup_size && item.cup_size !== "NONE" ? item.cup_size : ""}
 									</span>
 									<span />
 								</div>

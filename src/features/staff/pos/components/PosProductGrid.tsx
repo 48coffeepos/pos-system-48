@@ -41,11 +41,6 @@ export function PosProductGrid({
 				/>
 			</div>
 
-			<PosCategoryTabs
-				activeCategory={activeCategory}
-				onCategoryChange={onCategoryChange}
-				categories={categories}
-			/>
 
 			<div className="flex-1 overflow-y-auto pr-2">
 				{loading ? (
