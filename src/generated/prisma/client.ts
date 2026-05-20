@@ -31,8 +31,8 @@ export * from "./enums.ts"
  * const prisma = new PrismaClient({
  *   adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL })
  * })
- * // Fetch zero or more Roles
- * const roles = await prisma.role.findMany()
+ * // Fetch zero or more Accounts
+ * const accounts = await prisma.account.findMany()
  * ```
  * 
  * Read more in our [docs](https://pris.ly/d/client).
@@ -42,15 +42,25 @@ export type PrismaClient<LogOpts extends Prisma.LogLevel = never, OmitOpts exten
 export { Prisma }
 
 /**
- * Model Role
- * 
- */
-export type Role = Prisma.RoleModel
-/**
  * Model Account
  * 
  */
 export type Account = Prisma.AccountModel
+/**
+ * Model Addon
+ * 
+ */
+export type Addon = Prisma.AddonModel
+/**
+ * Model Expense
+ * 
+ */
+export type Expense = Prisma.ExpenseModel
+/**
+ * Model Inventory
+ * 
+ */
+export type Inventory = Prisma.InventoryModel
 /**
  * Model Menu
  * 
@@ -62,27 +72,32 @@ export type Menu = Prisma.MenuModel
  */
 export type MenuInventory = Prisma.MenuInventoryModel
 /**
- * Model Order
+ * Model OrderItemAddon
  * 
  */
-export type Order = Prisma.OrderModel
+export type OrderItemAddon = Prisma.OrderItemAddonModel
 /**
  * Model OrderItem
  * 
  */
 export type OrderItem = Prisma.OrderItemModel
 /**
- * Model Addon
+ * Model Order
  * 
  */
-export type Addon = Prisma.AddonModel
+export type Order = Prisma.OrderModel
 /**
- * Model AddonItem
+ * Model Session
  * 
  */
-export type AddonItem = Prisma.AddonItemModel
+export type Session = Prisma.SessionModel
 /**
- * Model inventory
+ * Model User
  * 
  */
-export type inventory = Prisma.inventoryModel
+export type User = Prisma.UserModel
+/**
+ * Model Verification
+ * 
+ */
+export type Verification = Prisma.VerificationModel

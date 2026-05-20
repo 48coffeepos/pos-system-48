@@ -8,29 +8,31 @@ interface DBOrder {
   order_id: string;
   method: string;
   reference_number: string | null;
-  paid: number | null;
-  change: number | null;
-  total: number;
+  amount_tendered: number | null;
+  change_amount: number | null;
+  grand_total: number;
   created_at: string | Date;
   order_items: Array<{
-    id: number;
-    menu_id: number;
-    name: string;
-    discount: string | null;
+    order_item_id: string;
+    menu_id: string;
+    snapshot_menu_name: string;
+    discount_amount: number | null;
     quantity: number;
-    discount_name: string | null;
-    discount_id: string | null;
-    subtotal: number;
-    total: number;
+    discount_type: string | null;
+    discount_contact: string | null;
+    discount_id_number: string | null;
+    line_total: number;
+    unit_price: number;
     note: string | null;
-    cup_type: string | null;
-    cup_size: string | null;
+    snapshot_inventory: string;
     addon_items: Array<{
-      id: number;
-      addon_id: number;
+      order_item_addon_id: string;
+      addon_id: string;
       quantity: number;
+      addon_name_snapshot: string;
+      addon_price_snapshot: number;
       addon: {
-        id: number;
+        addon_id: string;
         name: string;
         price: number;
       };
@@ -68,29 +70,27 @@ export function OrdersList({ orders = [] }: OrdersListProps) {
 
   const viewReceipt = (order: DBOrder) => {
     const mapped: PosOrder = {
-      order_number: order.order_id,
+      order_id: order.order_id,
       created_at: new Date(order.created_at).toISOString(),
       method: order.method,
       reference_number: order.reference_number || undefined,
-      paid: order.paid !== null ? order.paid : undefined,
-      change: order.change !== null ? order.change : undefined,
-      total: order.total,
+      amount_tendered: order.amount_tendered !== null ? order.amount_tendered : undefined,
+      change_amount: order.change_amount !== null ? order.change_amount : undefined,
+      grand_total: order.grand_total,
       items: order.order_items.map((item) => ({
-        name: item.name,
+        snapshot_menu_name: item.snapshot_menu_name,
         quantity: item.quantity,
-        unit_price: item.subtotal / (item.quantity || 1),
-        discount: item.discount || undefined,
-        discount_name: item.discount_name || undefined,
-        discount_id: item.discount_id || undefined,
-        subtotal: item.subtotal,
-        total: item.total,
+        unit_price: item.unit_price,
+        discount_type: item.discount_type || undefined,
+        discount_contact: item.discount_contact || undefined,
+        discount_id_number: item.discount_id_number || undefined,
+        line_total: item.line_total,
         note: item.note || undefined,
-        cup_type: item.cup_type || undefined,
-        cup_size: item.cup_size || undefined,
+        snapshot_inventory: item.snapshot_inventory,
         addon_items: item.addon_items.map((ai) => ({
           addon_id: ai.addon_id,
-          name: ai.addon.name,
-          price: ai.addon.price,
+          addon_name_snapshot: ai.addon_name_snapshot,
+          addon_price_snapshot: ai.addon_price_snapshot,
           quantity: ai.quantity,
         })),
       })),
@@ -216,7 +216,7 @@ export function OrdersList({ orders = [] }: OrdersListProps) {
 
                       {/* Total Price */}
                       <td className="p-4 font-black text-sm text-(--near-black)">
-                        {formatPeso(order.total)}
+                        {formatPeso(order.grand_total)}
                       </td>
 
                       {/* Action Button */}

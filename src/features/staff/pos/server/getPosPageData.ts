@@ -1,14 +1,12 @@
 import { createServerFn } from "@tanstack/react-start";
 import { prisma } from "@/integrations/prisma/db";
-import { Inventory_Type } from "@/generated/prisma/enums.js";
+import type { Inventory_Type } from "@/generated/prisma/enums.js";
 
 export interface PosPageData {
-  categories: string[];
   menuItems: Array<{
-    id: number;
+    menu_id: string;
     name: string;
     price: number | null;
-    category: string;
     type: Inventory_Type | null;
     inventory_items: Array<{
       price: number;
@@ -21,7 +19,7 @@ export interface PosPageData {
     }>;
   }>;
   addOns: Array<{
-    id: number;
+    addon_id: string;
     name: string;
     price: number;
   }>;
@@ -31,7 +29,7 @@ export const getPosPageData = createServerFn({ method: "GET" }).handler(
   async (): Promise<PosPageData> => {
     const [dbMenuItems, dbAddOns] = await Promise.all([
       prisma.menu.findMany({
-        orderBy: { id: "asc" },
+        orderBy: { name: "asc" },
         include: {
           inventory_items: {
             include: {
@@ -40,31 +38,16 @@ export const getPosPageData = createServerFn({ method: "GET" }).handler(
           },
         },
       }),
-      prisma.addon.findMany({ orderBy: { id: "asc" } }),
+      prisma.addon.findMany({ orderBy: { name: "asc" } }),
     ]);
 
-    const categoryRows = await prisma.menu.findMany({
-      distinct: ["category"],
-      select: { category: true },
-      orderBy: { category: "asc" },
-    });
-
-    const categories = categoryRows
-      .map((r) => r.category)
-      .sort((a, b) => {
-        if (a === "extra") return 1;
-        if (b === "extra") return -1;
-        return a.localeCompare(b);
-      });
-
     const menuItems = dbMenuItems.map((item) => ({
-      id: item.id,
+      menu_id: item.menu_id,
       name: item.name,
-      price: item.price,
-      category: item.category,
+      price: item.price ? Number(item.price) : null,
       type: item.type,
       inventory_items: item.inventory_items.map((ii) => ({
-        price: ii.price,
+        price: Number(ii.price),
         inventory: {
           inventory_id: ii.inventory.inventory_id,
           name: ii.inventory.name,
@@ -75,11 +58,11 @@ export const getPosPageData = createServerFn({ method: "GET" }).handler(
     }));
 
     const addOns = dbAddOns.map((a) => ({
-      id: a.id,
+      addon_id: a.addon_id,
       name: a.name,
-      price: a.price,
+      price: Number(a.price),
     }));
 
-    return { categories, menuItems, addOns };
+    return { menuItems, addOns };
   },
 );

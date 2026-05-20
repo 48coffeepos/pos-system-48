@@ -1,10 +1,9 @@
-import { Inventory_Type } from "@/generated/prisma/enums.js";
+import type { Inventory_Type } from "@/generated/prisma/enums.js";
 
 export interface MenuItem {
-	id: number;
+	menu_id: string;
 	name: string;
 	price: number | null;
-	category: string;
 	type: Inventory_Type | null;
 	inventory_items: Array<{
 		price: number;
@@ -19,13 +18,12 @@ export interface MenuItem {
 
 export interface CartItem {
 	lineKey: string;
-	menu_item_id: number;
+	menu_id: string;
 	menu_name: string;
-	category: string;
 	quantity: number;
 	cup_type: string;
 	cup_size: string;
-	addon_items?: Array<{ addon_id: number; name: string; price: number; quantity: number }>;
+	addon_items?: Array<{ addon_id: string; name: string; price: number; quantity: number }>;
 	unit_price: number;
 	total_price: number;
 	discount?: string;
@@ -35,25 +33,24 @@ export interface CartItem {
 }
 
 export interface PosOrder {
-	order_number: string;
+	order_id: string;
 	created_at: string;
 	method: string;
 	reference_number?: string;
-	paid?: number;
-	change?: number;
-	total: number;
+	amount_tendered?: number;
+	change_amount?: number;
+	grand_total: number;
+	note?: string;
 	items: Array<{
-		name: string;
+		snapshot_menu_name: string;
 		quantity: number;
 		unit_price: number;
-		discount?: string;
-		discount_name?: string;
-		discount_id?: string;
-		subtotal: number;
-		total: number;
+		discount_type?: string;
+		discount_contact?: string;
+		discount_id_number?: string;
+		line_total: number;
 		note?: string;
-		cup_type?: string;
-		cup_size?: string;
-		addon_items?: Array<{ addon_id: number; name: string; price: number; quantity: number }>;
+		snapshot_inventory: string;
+		addon_items?: Array<{ addon_id: string; addon_name_snapshot: string; addon_price_snapshot: number; quantity: number }>;
 	}>;
 }

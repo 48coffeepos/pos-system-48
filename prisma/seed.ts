@@ -1,186 +1,122 @@
-import { PrismaClient } from '../src/generated/prisma/client.js'
-import { PrismaNeon } from '@prisma/adapter-neon'
+import { prisma } from '../src/integrations/prisma/db.js';
 
-const adapter = new PrismaNeon({
-  connectionString: process.env.DATABASE_URL!,
-})
-
-const prisma = new PrismaClient({ adapter })
 
 async function main() {
-	console.log('🌱 Seeding database...')
+  // Clear existing data to avoid conflicts
+  await prisma.menuInventory.deleteMany();
+  await prisma.orderItemAddon.deleteMany();
+  await prisma.orderItem.deleteMany();
+  await prisma.addon.deleteMany();
+  await prisma.menu.deleteMany();
+  await prisma.inventory.deleteMany();
 
-	// ── Clear existing data ──
+  // Add some inventory items (cups and standalone items)
+  const cup12 = await prisma.inventory.create({
+    data: {
+      name: '12oz hot',
+      stock: 100,
+      type: 'CUP',
+    },
+  });
 
-	await prisma.addonItem.deleteMany()
-	await prisma.orderItem.deleteMany()
-	await prisma.order.deleteMany()
-	await prisma.addon.deleteMany()
-	await prisma.menuInventory.deleteMany()
-	await prisma.menu.deleteMany()
-	await prisma.account.deleteMany()
-	await prisma.role.deleteMany()
-	await prisma.inventory.deleteMany()
+  const cup16 = await prisma.inventory.create({
+    data: {
+      name: '16oz iced',
+      stock: 100,
+      type: 'CUP',
+    },
+  });
 
-	// ── Roles ──
+  const cookieInv = await prisma.inventory.create({
+    data: {
+      name: 'Chocolate Chip Cookie Inventory',
+      stock: 50,
+      type: 'STANDALONE',
+    },
+  });
 
-	const adminRole = await prisma.role.create({ data: { name: 'admin' } })
-	const staffRole = await prisma.role.create({ data: { name: 'staff' } })
+  // Create menu items
+  const menuLatte = await prisma.menu.create({
+    data: {
+      name: 'Latte',
+      type: 'CUP',
+    },
+  });
 
-	// ── Accounts ──
+  const menuMocha = await prisma.menu.create({
+    data: {
+      name: 'Mocha',
+      type: 'CUP',
+    },
+  });
 
-	await prisma.account.create({
-		data: {
-			role_id: adminRole.id,
-			username: 'admin',
-			password: 'admin123',
-		},
-	})
+  const menuCookie = await prisma.menu.create({
+    data: {
+      name: 'Chocolate Chip Cookie',
+      type: 'STANDALONE',
+      price: 65,
+    },
+  });
 
-	await prisma.account.create({
-		data: {
-			role_id: staffRole.id,
-			username: 'staff1',
-			password: 'staff123',
-		},
-	})
+  // Link Menu to Inventory
+  await prisma.menuInventory.create({
+    data: {
+      menu_id: menuLatte.menu_id,
+      inventory_id: cup12.inventory_id,
+      price: 120,
+    },
+  });
 
-	// ── Inventory ──
+  await prisma.menuInventory.create({
+    data: {
+      menu_id: menuLatte.menu_id,
+      inventory_id: cup16.inventory_id,
+      price: 140,
+    },
+  });
 
-	const cup12Hot = await prisma.inventory.create({ data: { name: '12oz Hot', stock: 200, type: 'CUP' } })
-	const cup12Iced = await prisma.inventory.create({ data: { name: '12oz Iced', stock: 200, type: 'CUP' } })
-	const cup16Hot = await prisma.inventory.create({ data: { name: '16oz Hot', stock: 200, type: 'CUP' } })
-	const cup16Iced = await prisma.inventory.create({ data: { name: '16oz Iced', stock: 200, type: 'CUP' } })
-	const beans = await prisma.inventory.create({ data: { name: 'Coffee Beans', stock: 50, type: 'STANDALONE' } })
+  await prisma.menuInventory.create({
+    data: {
+      menu_id: menuMocha.menu_id,
+      inventory_id: cup12.inventory_id,
+      price: 130,
+    },
+  });
 
-	// ── Menu Items ──
+  await prisma.menuInventory.create({
+    data: {
+      menu_id: menuMocha.menu_id,
+      inventory_id: cup16.inventory_id,
+      price: 150,
+    },
+  });
 
-	const americano = await prisma.menu.create({
-		data: {
-			name: 'Americano',
-			price: 130,
-			category: 'coffee',
-			type: 'CUP',
-			inventory_items: {
-				create: [
-					{ inventory_id: cup12Hot.inventory_id, price: 130 },
-					{ inventory_id: cup12Iced.inventory_id, price: 130 },
-					{ inventory_id: cup16Iced.inventory_id, price: 140 },
-				],
-			},
-		},
-	})
+  await prisma.menuInventory.create({
+    data: {
+      menu_id: menuCookie.menu_id,
+      inventory_id: cookieInv.inventory_id,
+      price: 65,
+    },
+  });
 
-	const latte = await prisma.menu.create({
-		data: {
-			name: 'Latte',
-			price: 150,
-			category: 'coffee',
-			type: 'CUP',
-			inventory_items: {
-				create: [
-					{ inventory_id: cup12Hot.inventory_id, price: 150 },
-					{ inventory_id: cup12Iced.inventory_id, price: 150 },
-					{ inventory_id: cup16Iced.inventory_id, price: 160 },
-				],
-			},
-		},
-	})
+  // Create addons
+  await prisma.addon.createMany({
+    data: [
+      { name: 'Extra Shot', price: 30 },
+      { name: 'Oat Milk', price: 40 },
+      { name: 'Vanilla Syrup', price: 20 },
+      { name: 'Caramel Syrup', price: 20 },
+    ],
+  });
 
-	const matchaLatte = await prisma.menu.create({
-		data: {
-			name: 'Matcha Latte',
-			price: 160,
-			category: 'non_coffee',
-			type: 'CUP',
-			inventory_items: {
-				create: [
-					{ inventory_id: cup12Hot.inventory_id, price: 160 },
-					{ inventory_id: cup12Iced.inventory_id, price: 160 },
-					{ inventory_id: cup16Iced.inventory_id, price: 170 },
-				],
-			},
-		},
-	})
-
-	const hotChocolate = await prisma.menu.create({
-		data: {
-			name: 'Hot Chocolate',
-			price: 140,
-			category: 'hot',
-			type: 'CUP',
-			inventory_items: {
-				create: [
-					{ inventory_id: cup12Hot.inventory_id, price: 140 },
-				],
-			},
-		},
-	})
-
-	const coconutLatte = await prisma.menu.create({
-		data: {
-			name: 'Coconut Latte',
-			price: 150,
-			category: 'coconut_milk',
-			type: 'CUP',
-			inventory_items: {
-				create: [
-					{ inventory_id: cup12Iced.inventory_id, price: 150 },
-					{ inventory_id: cup16Iced.inventory_id, price: 160 },
-				],
-			},
-		},
-	})
-
-	const milkteaCoffee = await prisma.menu.create({
-		data: {
-			name: 'Milktea Coffee',
-			price: 160,
-			category: 'milktea_x_coffee',
-			type: 'CUP',
-			inventory_items: {
-				create: [
-					{ inventory_id: cup12Iced.inventory_id, price: 160 },
-					{ inventory_id: cup16Iced.inventory_id, price: 170 },
-				],
-			},
-		},
-	})
-
-	const cookie = await prisma.menu.create({
-		data: {
-			name: 'Chocolate Chip Cookie',
-			price: 75,
-			category: 'extra',
-			type: 'STANDALONE',
-			inventory_items: {
-				create: [
-					{ inventory_id: beans.inventory_id, price: 75 },
-				],
-			},
-		},
-	})
-
-	// ── Addons ──
-
-	await prisma.addon.createMany({
-		data: [
-			{ name: 'Extra Shot', price: 25 },
-			{ name: 'Vanilla Syrup', price: 20 },
-			{ name: 'Caramel Sauce', price: 20 },
-			{ name: 'Whipped Cream', price: 25 },
-			{ name: 'Pearls', price: 20 },
-		],
-	})
-
-	console.log('✅ Seeded roles, accounts, menu, addons, inventory')
+  console.log('Seeded successfully.');
 }
 
 main()
-	.catch((e) => {
-		console.error('❌ Error seeding database:', e)
-		process.exit(1)
-	})
-	.finally(async () => {
-		await prisma.$disconnect()
-	})
+  .catch((e) => {
+    console.error(e);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });

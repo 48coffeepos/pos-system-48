@@ -32,12 +32,6 @@ export function PosCartPanel({
 	const lineSubtotal = cart.reduce((s, c) => s + c.total_price, 0);
 	const cartTotal = lineSubtotal;
 
-	const values = form.state.values;
-	const paymentMethod = values.paymentMethod;
-	const amountPaid = values.amountPaid;
-
-	const paidNum = parseFloat(amountPaid) || 0;
-	const isGrab = paymentMethod === "GRAB";
 
 	return (
 		<div

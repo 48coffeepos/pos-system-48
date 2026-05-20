@@ -27,33 +27,29 @@ export type AggregateMenuInventory = {
 }
 
 export type MenuInventoryAvgAggregateOutputType = {
-  id: number | null
-  menu_id: number | null
-  price: number | null
+  price: runtime.Decimal | null
 }
 
 export type MenuInventorySumAggregateOutputType = {
-  id: number | null
-  menu_id: number | null
-  price: number | null
+  price: runtime.Decimal | null
 }
 
 export type MenuInventoryMinAggregateOutputType = {
-  id: number | null
-  menu_id: number | null
+  menu_inv_id: string | null
+  menu_id: string | null
   inventory_id: string | null
-  price: number | null
+  price: runtime.Decimal | null
 }
 
 export type MenuInventoryMaxAggregateOutputType = {
-  id: number | null
-  menu_id: number | null
+  menu_inv_id: string | null
+  menu_id: string | null
   inventory_id: string | null
-  price: number | null
+  price: runtime.Decimal | null
 }
 
 export type MenuInventoryCountAggregateOutputType = {
-  id: number
+  menu_inv_id: number
   menu_id: number
   inventory_id: number
   price: number
@@ -62,33 +58,29 @@ export type MenuInventoryCountAggregateOutputType = {
 
 
 export type MenuInventoryAvgAggregateInputType = {
-  id?: true
-  menu_id?: true
   price?: true
 }
 
 export type MenuInventorySumAggregateInputType = {
-  id?: true
-  menu_id?: true
   price?: true
 }
 
 export type MenuInventoryMinAggregateInputType = {
-  id?: true
+  menu_inv_id?: true
   menu_id?: true
   inventory_id?: true
   price?: true
 }
 
 export type MenuInventoryMaxAggregateInputType = {
-  id?: true
+  menu_inv_id?: true
   menu_id?: true
   inventory_id?: true
   price?: true
 }
 
 export type MenuInventoryCountAggregateInputType = {
-  id?: true
+  menu_inv_id?: true
   menu_id?: true
   inventory_id?: true
   price?: true
@@ -182,10 +174,10 @@ export type MenuInventoryGroupByArgs<ExtArgs extends runtime.Types.Extensions.In
 }
 
 export type MenuInventoryGroupByOutputType = {
-  id: number
-  menu_id: number
+  menu_inv_id: string
+  menu_id: string
   inventory_id: string
-  price: number
+  price: runtime.Decimal
   _count: MenuInventoryCountAggregateOutputType | null
   _avg: MenuInventoryAvgAggregateOutputType | null
   _sum: MenuInventorySumAggregateOutputType | null
@@ -212,37 +204,38 @@ export type MenuInventoryWhereInput = {
   AND?: Prisma.MenuInventoryWhereInput | Prisma.MenuInventoryWhereInput[]
   OR?: Prisma.MenuInventoryWhereInput[]
   NOT?: Prisma.MenuInventoryWhereInput | Prisma.MenuInventoryWhereInput[]
-  id?: Prisma.IntFilter<"MenuInventory"> | number
-  menu_id?: Prisma.IntFilter<"MenuInventory"> | number
+  menu_inv_id?: Prisma.StringFilter<"MenuInventory"> | string
+  menu_id?: Prisma.StringFilter<"MenuInventory"> | string
   inventory_id?: Prisma.StringFilter<"MenuInventory"> | string
-  price?: Prisma.FloatFilter<"MenuInventory"> | number
+  price?: Prisma.DecimalFilter<"MenuInventory"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   menu?: Prisma.XOR<Prisma.MenuScalarRelationFilter, Prisma.MenuWhereInput>
-  inventory?: Prisma.XOR<Prisma.InventoryScalarRelationFilter, Prisma.inventoryWhereInput>
+  inventory?: Prisma.XOR<Prisma.InventoryScalarRelationFilter, Prisma.InventoryWhereInput>
 }
 
 export type MenuInventoryOrderByWithRelationInput = {
-  id?: Prisma.SortOrder
+  menu_inv_id?: Prisma.SortOrder
   menu_id?: Prisma.SortOrder
   inventory_id?: Prisma.SortOrder
   price?: Prisma.SortOrder
   menu?: Prisma.MenuOrderByWithRelationInput
-  inventory?: Prisma.inventoryOrderByWithRelationInput
+  inventory?: Prisma.InventoryOrderByWithRelationInput
 }
 
 export type MenuInventoryWhereUniqueInput = Prisma.AtLeast<{
-  id?: number
+  menu_inv_id?: string
+  menu_id_inventory_id?: Prisma.MenuInventoryMenu_idInventory_idCompoundUniqueInput
   AND?: Prisma.MenuInventoryWhereInput | Prisma.MenuInventoryWhereInput[]
   OR?: Prisma.MenuInventoryWhereInput[]
   NOT?: Prisma.MenuInventoryWhereInput | Prisma.MenuInventoryWhereInput[]
-  menu_id?: Prisma.IntFilter<"MenuInventory"> | number
+  menu_id?: Prisma.StringFilter<"MenuInventory"> | string
   inventory_id?: Prisma.StringFilter<"MenuInventory"> | string
-  price?: Prisma.FloatFilter<"MenuInventory"> | number
+  price?: Prisma.DecimalFilter<"MenuInventory"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   menu?: Prisma.XOR<Prisma.MenuScalarRelationFilter, Prisma.MenuWhereInput>
-  inventory?: Prisma.XOR<Prisma.InventoryScalarRelationFilter, Prisma.inventoryWhereInput>
-}, "id">
+  inventory?: Prisma.XOR<Prisma.InventoryScalarRelationFilter, Prisma.InventoryWhereInput>
+}, "menu_inv_id" | "menu_id_inventory_id">
 
 export type MenuInventoryOrderByWithAggregationInput = {
-  id?: Prisma.SortOrder
+  menu_inv_id?: Prisma.SortOrder
   menu_id?: Prisma.SortOrder
   inventory_id?: Prisma.SortOrder
   price?: Prisma.SortOrder
@@ -257,54 +250,57 @@ export type MenuInventoryScalarWhereWithAggregatesInput = {
   AND?: Prisma.MenuInventoryScalarWhereWithAggregatesInput | Prisma.MenuInventoryScalarWhereWithAggregatesInput[]
   OR?: Prisma.MenuInventoryScalarWhereWithAggregatesInput[]
   NOT?: Prisma.MenuInventoryScalarWhereWithAggregatesInput | Prisma.MenuInventoryScalarWhereWithAggregatesInput[]
-  id?: Prisma.IntWithAggregatesFilter<"MenuInventory"> | number
-  menu_id?: Prisma.IntWithAggregatesFilter<"MenuInventory"> | number
+  menu_inv_id?: Prisma.StringWithAggregatesFilter<"MenuInventory"> | string
+  menu_id?: Prisma.StringWithAggregatesFilter<"MenuInventory"> | string
   inventory_id?: Prisma.StringWithAggregatesFilter<"MenuInventory"> | string
-  price?: Prisma.FloatWithAggregatesFilter<"MenuInventory"> | number
+  price?: Prisma.DecimalWithAggregatesFilter<"MenuInventory"> | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type MenuInventoryCreateInput = {
-  price: number
+  menu_inv_id?: string
+  price: runtime.Decimal | runtime.DecimalJsLike | number | string
   menu: Prisma.MenuCreateNestedOneWithoutInventory_itemsInput
-  inventory: Prisma.inventoryCreateNestedOneWithoutMenu_itemsInput
+  inventory: Prisma.InventoryCreateNestedOneWithoutMenu_itemsInput
 }
 
 export type MenuInventoryUncheckedCreateInput = {
-  id?: number
-  menu_id: number
+  menu_inv_id?: string
+  menu_id: string
   inventory_id: string
-  price: number
+  price: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type MenuInventoryUpdateInput = {
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
+  menu_inv_id?: Prisma.StringFieldUpdateOperationsInput | string
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   menu?: Prisma.MenuUpdateOneRequiredWithoutInventory_itemsNestedInput
-  inventory?: Prisma.inventoryUpdateOneRequiredWithoutMenu_itemsNestedInput
+  inventory?: Prisma.InventoryUpdateOneRequiredWithoutMenu_itemsNestedInput
 }
 
 export type MenuInventoryUncheckedUpdateInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number
-  menu_id?: Prisma.IntFieldUpdateOperationsInput | number
+  menu_inv_id?: Prisma.StringFieldUpdateOperationsInput | string
+  menu_id?: Prisma.StringFieldUpdateOperationsInput | string
   inventory_id?: Prisma.StringFieldUpdateOperationsInput | string
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type MenuInventoryCreateManyInput = {
-  id?: number
-  menu_id: number
+  menu_inv_id?: string
+  menu_id: string
   inventory_id: string
-  price: number
+  price: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type MenuInventoryUpdateManyMutationInput = {
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
+  menu_inv_id?: Prisma.StringFieldUpdateOperationsInput | string
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type MenuInventoryUncheckedUpdateManyInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number
-  menu_id?: Prisma.IntFieldUpdateOperationsInput | number
+  menu_inv_id?: Prisma.StringFieldUpdateOperationsInput | string
+  menu_id?: Prisma.StringFieldUpdateOperationsInput | string
   inventory_id?: Prisma.StringFieldUpdateOperationsInput | string
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type MenuInventoryListRelationFilter = {
@@ -317,87 +313,38 @@ export type MenuInventoryOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
+export type MenuInventoryMenu_idInventory_idCompoundUniqueInput = {
+  menu_id: string
+  inventory_id: string
+}
+
 export type MenuInventoryCountOrderByAggregateInput = {
-  id?: Prisma.SortOrder
+  menu_inv_id?: Prisma.SortOrder
   menu_id?: Prisma.SortOrder
   inventory_id?: Prisma.SortOrder
   price?: Prisma.SortOrder
 }
 
 export type MenuInventoryAvgOrderByAggregateInput = {
-  id?: Prisma.SortOrder
-  menu_id?: Prisma.SortOrder
   price?: Prisma.SortOrder
 }
 
 export type MenuInventoryMaxOrderByAggregateInput = {
-  id?: Prisma.SortOrder
+  menu_inv_id?: Prisma.SortOrder
   menu_id?: Prisma.SortOrder
   inventory_id?: Prisma.SortOrder
   price?: Prisma.SortOrder
 }
 
 export type MenuInventoryMinOrderByAggregateInput = {
-  id?: Prisma.SortOrder
+  menu_inv_id?: Prisma.SortOrder
   menu_id?: Prisma.SortOrder
   inventory_id?: Prisma.SortOrder
   price?: Prisma.SortOrder
 }
 
 export type MenuInventorySumOrderByAggregateInput = {
-  id?: Prisma.SortOrder
-  menu_id?: Prisma.SortOrder
   price?: Prisma.SortOrder
-}
-
-export type MenuInventoryCreateNestedManyWithoutMenuInput = {
-  create?: Prisma.XOR<Prisma.MenuInventoryCreateWithoutMenuInput, Prisma.MenuInventoryUncheckedCreateWithoutMenuInput> | Prisma.MenuInventoryCreateWithoutMenuInput[] | Prisma.MenuInventoryUncheckedCreateWithoutMenuInput[]
-  connectOrCreate?: Prisma.MenuInventoryCreateOrConnectWithoutMenuInput | Prisma.MenuInventoryCreateOrConnectWithoutMenuInput[]
-  createMany?: Prisma.MenuInventoryCreateManyMenuInputEnvelope
-  connect?: Prisma.MenuInventoryWhereUniqueInput | Prisma.MenuInventoryWhereUniqueInput[]
-}
-
-export type MenuInventoryUncheckedCreateNestedManyWithoutMenuInput = {
-  create?: Prisma.XOR<Prisma.MenuInventoryCreateWithoutMenuInput, Prisma.MenuInventoryUncheckedCreateWithoutMenuInput> | Prisma.MenuInventoryCreateWithoutMenuInput[] | Prisma.MenuInventoryUncheckedCreateWithoutMenuInput[]
-  connectOrCreate?: Prisma.MenuInventoryCreateOrConnectWithoutMenuInput | Prisma.MenuInventoryCreateOrConnectWithoutMenuInput[]
-  createMany?: Prisma.MenuInventoryCreateManyMenuInputEnvelope
-  connect?: Prisma.MenuInventoryWhereUniqueInput | Prisma.MenuInventoryWhereUniqueInput[]
-}
-
-export type MenuInventoryUpdateManyWithoutMenuNestedInput = {
-  create?: Prisma.XOR<Prisma.MenuInventoryCreateWithoutMenuInput, Prisma.MenuInventoryUncheckedCreateWithoutMenuInput> | Prisma.MenuInventoryCreateWithoutMenuInput[] | Prisma.MenuInventoryUncheckedCreateWithoutMenuInput[]
-  connectOrCreate?: Prisma.MenuInventoryCreateOrConnectWithoutMenuInput | Prisma.MenuInventoryCreateOrConnectWithoutMenuInput[]
-  upsert?: Prisma.MenuInventoryUpsertWithWhereUniqueWithoutMenuInput | Prisma.MenuInventoryUpsertWithWhereUniqueWithoutMenuInput[]
-  createMany?: Prisma.MenuInventoryCreateManyMenuInputEnvelope
-  set?: Prisma.MenuInventoryWhereUniqueInput | Prisma.MenuInventoryWhereUniqueInput[]
-  disconnect?: Prisma.MenuInventoryWhereUniqueInput | Prisma.MenuInventoryWhereUniqueInput[]
-  delete?: Prisma.MenuInventoryWhereUniqueInput | Prisma.MenuInventoryWhereUniqueInput[]
-  connect?: Prisma.MenuInventoryWhereUniqueInput | Prisma.MenuInventoryWhereUniqueInput[]
-  update?: Prisma.MenuInventoryUpdateWithWhereUniqueWithoutMenuInput | Prisma.MenuInventoryUpdateWithWhereUniqueWithoutMenuInput[]
-  updateMany?: Prisma.MenuInventoryUpdateManyWithWhereWithoutMenuInput | Prisma.MenuInventoryUpdateManyWithWhereWithoutMenuInput[]
-  deleteMany?: Prisma.MenuInventoryScalarWhereInput | Prisma.MenuInventoryScalarWhereInput[]
-}
-
-export type MenuInventoryUncheckedUpdateManyWithoutMenuNestedInput = {
-  create?: Prisma.XOR<Prisma.MenuInventoryCreateWithoutMenuInput, Prisma.MenuInventoryUncheckedCreateWithoutMenuInput> | Prisma.MenuInventoryCreateWithoutMenuInput[] | Prisma.MenuInventoryUncheckedCreateWithoutMenuInput[]
-  connectOrCreate?: Prisma.MenuInventoryCreateOrConnectWithoutMenuInput | Prisma.MenuInventoryCreateOrConnectWithoutMenuInput[]
-  upsert?: Prisma.MenuInventoryUpsertWithWhereUniqueWithoutMenuInput | Prisma.MenuInventoryUpsertWithWhereUniqueWithoutMenuInput[]
-  createMany?: Prisma.MenuInventoryCreateManyMenuInputEnvelope
-  set?: Prisma.MenuInventoryWhereUniqueInput | Prisma.MenuInventoryWhereUniqueInput[]
-  disconnect?: Prisma.MenuInventoryWhereUniqueInput | Prisma.MenuInventoryWhereUniqueInput[]
-  delete?: Prisma.MenuInventoryWhereUniqueInput | Prisma.MenuInventoryWhereUniqueInput[]
-  connect?: Prisma.MenuInventoryWhereUniqueInput | Prisma.MenuInventoryWhereUniqueInput[]
-  update?: Prisma.MenuInventoryUpdateWithWhereUniqueWithoutMenuInput | Prisma.MenuInventoryUpdateWithWhereUniqueWithoutMenuInput[]
-  updateMany?: Prisma.MenuInventoryUpdateManyWithWhereWithoutMenuInput | Prisma.MenuInventoryUpdateManyWithWhereWithoutMenuInput[]
-  deleteMany?: Prisma.MenuInventoryScalarWhereInput | Prisma.MenuInventoryScalarWhereInput[]
-}
-
-export type FloatFieldUpdateOperationsInput = {
-  set?: number
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
 }
 
 export type MenuInventoryCreateNestedManyWithoutInventoryInput = {
@@ -442,62 +389,58 @@ export type MenuInventoryUncheckedUpdateManyWithoutInventoryNestedInput = {
   deleteMany?: Prisma.MenuInventoryScalarWhereInput | Prisma.MenuInventoryScalarWhereInput[]
 }
 
-export type MenuInventoryCreateWithoutMenuInput = {
-  price: number
-  inventory: Prisma.inventoryCreateNestedOneWithoutMenu_itemsInput
+export type MenuInventoryCreateNestedManyWithoutMenuInput = {
+  create?: Prisma.XOR<Prisma.MenuInventoryCreateWithoutMenuInput, Prisma.MenuInventoryUncheckedCreateWithoutMenuInput> | Prisma.MenuInventoryCreateWithoutMenuInput[] | Prisma.MenuInventoryUncheckedCreateWithoutMenuInput[]
+  connectOrCreate?: Prisma.MenuInventoryCreateOrConnectWithoutMenuInput | Prisma.MenuInventoryCreateOrConnectWithoutMenuInput[]
+  createMany?: Prisma.MenuInventoryCreateManyMenuInputEnvelope
+  connect?: Prisma.MenuInventoryWhereUniqueInput | Prisma.MenuInventoryWhereUniqueInput[]
 }
 
-export type MenuInventoryUncheckedCreateWithoutMenuInput = {
-  id?: number
-  inventory_id: string
-  price: number
+export type MenuInventoryUncheckedCreateNestedManyWithoutMenuInput = {
+  create?: Prisma.XOR<Prisma.MenuInventoryCreateWithoutMenuInput, Prisma.MenuInventoryUncheckedCreateWithoutMenuInput> | Prisma.MenuInventoryCreateWithoutMenuInput[] | Prisma.MenuInventoryUncheckedCreateWithoutMenuInput[]
+  connectOrCreate?: Prisma.MenuInventoryCreateOrConnectWithoutMenuInput | Prisma.MenuInventoryCreateOrConnectWithoutMenuInput[]
+  createMany?: Prisma.MenuInventoryCreateManyMenuInputEnvelope
+  connect?: Prisma.MenuInventoryWhereUniqueInput | Prisma.MenuInventoryWhereUniqueInput[]
 }
 
-export type MenuInventoryCreateOrConnectWithoutMenuInput = {
-  where: Prisma.MenuInventoryWhereUniqueInput
-  create: Prisma.XOR<Prisma.MenuInventoryCreateWithoutMenuInput, Prisma.MenuInventoryUncheckedCreateWithoutMenuInput>
+export type MenuInventoryUpdateManyWithoutMenuNestedInput = {
+  create?: Prisma.XOR<Prisma.MenuInventoryCreateWithoutMenuInput, Prisma.MenuInventoryUncheckedCreateWithoutMenuInput> | Prisma.MenuInventoryCreateWithoutMenuInput[] | Prisma.MenuInventoryUncheckedCreateWithoutMenuInput[]
+  connectOrCreate?: Prisma.MenuInventoryCreateOrConnectWithoutMenuInput | Prisma.MenuInventoryCreateOrConnectWithoutMenuInput[]
+  upsert?: Prisma.MenuInventoryUpsertWithWhereUniqueWithoutMenuInput | Prisma.MenuInventoryUpsertWithWhereUniqueWithoutMenuInput[]
+  createMany?: Prisma.MenuInventoryCreateManyMenuInputEnvelope
+  set?: Prisma.MenuInventoryWhereUniqueInput | Prisma.MenuInventoryWhereUniqueInput[]
+  disconnect?: Prisma.MenuInventoryWhereUniqueInput | Prisma.MenuInventoryWhereUniqueInput[]
+  delete?: Prisma.MenuInventoryWhereUniqueInput | Prisma.MenuInventoryWhereUniqueInput[]
+  connect?: Prisma.MenuInventoryWhereUniqueInput | Prisma.MenuInventoryWhereUniqueInput[]
+  update?: Prisma.MenuInventoryUpdateWithWhereUniqueWithoutMenuInput | Prisma.MenuInventoryUpdateWithWhereUniqueWithoutMenuInput[]
+  updateMany?: Prisma.MenuInventoryUpdateManyWithWhereWithoutMenuInput | Prisma.MenuInventoryUpdateManyWithWhereWithoutMenuInput[]
+  deleteMany?: Prisma.MenuInventoryScalarWhereInput | Prisma.MenuInventoryScalarWhereInput[]
 }
 
-export type MenuInventoryCreateManyMenuInputEnvelope = {
-  data: Prisma.MenuInventoryCreateManyMenuInput | Prisma.MenuInventoryCreateManyMenuInput[]
-  skipDuplicates?: boolean
-}
-
-export type MenuInventoryUpsertWithWhereUniqueWithoutMenuInput = {
-  where: Prisma.MenuInventoryWhereUniqueInput
-  update: Prisma.XOR<Prisma.MenuInventoryUpdateWithoutMenuInput, Prisma.MenuInventoryUncheckedUpdateWithoutMenuInput>
-  create: Prisma.XOR<Prisma.MenuInventoryCreateWithoutMenuInput, Prisma.MenuInventoryUncheckedCreateWithoutMenuInput>
-}
-
-export type MenuInventoryUpdateWithWhereUniqueWithoutMenuInput = {
-  where: Prisma.MenuInventoryWhereUniqueInput
-  data: Prisma.XOR<Prisma.MenuInventoryUpdateWithoutMenuInput, Prisma.MenuInventoryUncheckedUpdateWithoutMenuInput>
-}
-
-export type MenuInventoryUpdateManyWithWhereWithoutMenuInput = {
-  where: Prisma.MenuInventoryScalarWhereInput
-  data: Prisma.XOR<Prisma.MenuInventoryUpdateManyMutationInput, Prisma.MenuInventoryUncheckedUpdateManyWithoutMenuInput>
-}
-
-export type MenuInventoryScalarWhereInput = {
-  AND?: Prisma.MenuInventoryScalarWhereInput | Prisma.MenuInventoryScalarWhereInput[]
-  OR?: Prisma.MenuInventoryScalarWhereInput[]
-  NOT?: Prisma.MenuInventoryScalarWhereInput | Prisma.MenuInventoryScalarWhereInput[]
-  id?: Prisma.IntFilter<"MenuInventory"> | number
-  menu_id?: Prisma.IntFilter<"MenuInventory"> | number
-  inventory_id?: Prisma.StringFilter<"MenuInventory"> | string
-  price?: Prisma.FloatFilter<"MenuInventory"> | number
+export type MenuInventoryUncheckedUpdateManyWithoutMenuNestedInput = {
+  create?: Prisma.XOR<Prisma.MenuInventoryCreateWithoutMenuInput, Prisma.MenuInventoryUncheckedCreateWithoutMenuInput> | Prisma.MenuInventoryCreateWithoutMenuInput[] | Prisma.MenuInventoryUncheckedCreateWithoutMenuInput[]
+  connectOrCreate?: Prisma.MenuInventoryCreateOrConnectWithoutMenuInput | Prisma.MenuInventoryCreateOrConnectWithoutMenuInput[]
+  upsert?: Prisma.MenuInventoryUpsertWithWhereUniqueWithoutMenuInput | Prisma.MenuInventoryUpsertWithWhereUniqueWithoutMenuInput[]
+  createMany?: Prisma.MenuInventoryCreateManyMenuInputEnvelope
+  set?: Prisma.MenuInventoryWhereUniqueInput | Prisma.MenuInventoryWhereUniqueInput[]
+  disconnect?: Prisma.MenuInventoryWhereUniqueInput | Prisma.MenuInventoryWhereUniqueInput[]
+  delete?: Prisma.MenuInventoryWhereUniqueInput | Prisma.MenuInventoryWhereUniqueInput[]
+  connect?: Prisma.MenuInventoryWhereUniqueInput | Prisma.MenuInventoryWhereUniqueInput[]
+  update?: Prisma.MenuInventoryUpdateWithWhereUniqueWithoutMenuInput | Prisma.MenuInventoryUpdateWithWhereUniqueWithoutMenuInput[]
+  updateMany?: Prisma.MenuInventoryUpdateManyWithWhereWithoutMenuInput | Prisma.MenuInventoryUpdateManyWithWhereWithoutMenuInput[]
+  deleteMany?: Prisma.MenuInventoryScalarWhereInput | Prisma.MenuInventoryScalarWhereInput[]
 }
 
 export type MenuInventoryCreateWithoutInventoryInput = {
-  price: number
+  menu_inv_id?: string
+  price: runtime.Decimal | runtime.DecimalJsLike | number | string
   menu: Prisma.MenuCreateNestedOneWithoutInventory_itemsInput
 }
 
 export type MenuInventoryUncheckedCreateWithoutInventoryInput = {
-  id?: number
-  menu_id: number
-  price: number
+  menu_inv_id?: string
+  menu_id: string
+  price: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type MenuInventoryCreateOrConnectWithoutInventoryInput = {
@@ -526,113 +469,163 @@ export type MenuInventoryUpdateManyWithWhereWithoutInventoryInput = {
   data: Prisma.XOR<Prisma.MenuInventoryUpdateManyMutationInput, Prisma.MenuInventoryUncheckedUpdateManyWithoutInventoryInput>
 }
 
-export type MenuInventoryCreateManyMenuInput = {
-  id?: number
+export type MenuInventoryScalarWhereInput = {
+  AND?: Prisma.MenuInventoryScalarWhereInput | Prisma.MenuInventoryScalarWhereInput[]
+  OR?: Prisma.MenuInventoryScalarWhereInput[]
+  NOT?: Prisma.MenuInventoryScalarWhereInput | Prisma.MenuInventoryScalarWhereInput[]
+  menu_inv_id?: Prisma.StringFilter<"MenuInventory"> | string
+  menu_id?: Prisma.StringFilter<"MenuInventory"> | string
+  inventory_id?: Prisma.StringFilter<"MenuInventory"> | string
+  price?: Prisma.DecimalFilter<"MenuInventory"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+}
+
+export type MenuInventoryCreateWithoutMenuInput = {
+  menu_inv_id?: string
+  price: runtime.Decimal | runtime.DecimalJsLike | number | string
+  inventory: Prisma.InventoryCreateNestedOneWithoutMenu_itemsInput
+}
+
+export type MenuInventoryUncheckedCreateWithoutMenuInput = {
+  menu_inv_id?: string
   inventory_id: string
-  price: number
+  price: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
-export type MenuInventoryUpdateWithoutMenuInput = {
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
-  inventory?: Prisma.inventoryUpdateOneRequiredWithoutMenu_itemsNestedInput
+export type MenuInventoryCreateOrConnectWithoutMenuInput = {
+  where: Prisma.MenuInventoryWhereUniqueInput
+  create: Prisma.XOR<Prisma.MenuInventoryCreateWithoutMenuInput, Prisma.MenuInventoryUncheckedCreateWithoutMenuInput>
 }
 
-export type MenuInventoryUncheckedUpdateWithoutMenuInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number
-  inventory_id?: Prisma.StringFieldUpdateOperationsInput | string
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
+export type MenuInventoryCreateManyMenuInputEnvelope = {
+  data: Prisma.MenuInventoryCreateManyMenuInput | Prisma.MenuInventoryCreateManyMenuInput[]
+  skipDuplicates?: boolean
 }
 
-export type MenuInventoryUncheckedUpdateManyWithoutMenuInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number
-  inventory_id?: Prisma.StringFieldUpdateOperationsInput | string
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
+export type MenuInventoryUpsertWithWhereUniqueWithoutMenuInput = {
+  where: Prisma.MenuInventoryWhereUniqueInput
+  update: Prisma.XOR<Prisma.MenuInventoryUpdateWithoutMenuInput, Prisma.MenuInventoryUncheckedUpdateWithoutMenuInput>
+  create: Prisma.XOR<Prisma.MenuInventoryCreateWithoutMenuInput, Prisma.MenuInventoryUncheckedCreateWithoutMenuInput>
+}
+
+export type MenuInventoryUpdateWithWhereUniqueWithoutMenuInput = {
+  where: Prisma.MenuInventoryWhereUniqueInput
+  data: Prisma.XOR<Prisma.MenuInventoryUpdateWithoutMenuInput, Prisma.MenuInventoryUncheckedUpdateWithoutMenuInput>
+}
+
+export type MenuInventoryUpdateManyWithWhereWithoutMenuInput = {
+  where: Prisma.MenuInventoryScalarWhereInput
+  data: Prisma.XOR<Prisma.MenuInventoryUpdateManyMutationInput, Prisma.MenuInventoryUncheckedUpdateManyWithoutMenuInput>
 }
 
 export type MenuInventoryCreateManyInventoryInput = {
-  id?: number
-  menu_id: number
-  price: number
+  menu_inv_id?: string
+  menu_id: string
+  price: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type MenuInventoryUpdateWithoutInventoryInput = {
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
+  menu_inv_id?: Prisma.StringFieldUpdateOperationsInput | string
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   menu?: Prisma.MenuUpdateOneRequiredWithoutInventory_itemsNestedInput
 }
 
 export type MenuInventoryUncheckedUpdateWithoutInventoryInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number
-  menu_id?: Prisma.IntFieldUpdateOperationsInput | number
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
+  menu_inv_id?: Prisma.StringFieldUpdateOperationsInput | string
+  menu_id?: Prisma.StringFieldUpdateOperationsInput | string
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type MenuInventoryUncheckedUpdateManyWithoutInventoryInput = {
-  id?: Prisma.IntFieldUpdateOperationsInput | number
-  menu_id?: Prisma.IntFieldUpdateOperationsInput | number
-  price?: Prisma.FloatFieldUpdateOperationsInput | number
+  menu_inv_id?: Prisma.StringFieldUpdateOperationsInput | string
+  menu_id?: Prisma.StringFieldUpdateOperationsInput | string
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+}
+
+export type MenuInventoryCreateManyMenuInput = {
+  menu_inv_id?: string
+  inventory_id: string
+  price: runtime.Decimal | runtime.DecimalJsLike | number | string
+}
+
+export type MenuInventoryUpdateWithoutMenuInput = {
+  menu_inv_id?: Prisma.StringFieldUpdateOperationsInput | string
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  inventory?: Prisma.InventoryUpdateOneRequiredWithoutMenu_itemsNestedInput
+}
+
+export type MenuInventoryUncheckedUpdateWithoutMenuInput = {
+  menu_inv_id?: Prisma.StringFieldUpdateOperationsInput | string
+  inventory_id?: Prisma.StringFieldUpdateOperationsInput | string
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+}
+
+export type MenuInventoryUncheckedUpdateManyWithoutMenuInput = {
+  menu_inv_id?: Prisma.StringFieldUpdateOperationsInput | string
+  inventory_id?: Prisma.StringFieldUpdateOperationsInput | string
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 
 
 export type MenuInventorySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean
+  menu_inv_id?: boolean
   menu_id?: boolean
   inventory_id?: boolean
   price?: boolean
   menu?: boolean | Prisma.MenuDefaultArgs<ExtArgs>
-  inventory?: boolean | Prisma.inventoryDefaultArgs<ExtArgs>
+  inventory?: boolean | Prisma.InventoryDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["menuInventory"]>
 
 export type MenuInventorySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean
+  menu_inv_id?: boolean
   menu_id?: boolean
   inventory_id?: boolean
   price?: boolean
   menu?: boolean | Prisma.MenuDefaultArgs<ExtArgs>
-  inventory?: boolean | Prisma.inventoryDefaultArgs<ExtArgs>
+  inventory?: boolean | Prisma.InventoryDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["menuInventory"]>
 
 export type MenuInventorySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
-  id?: boolean
+  menu_inv_id?: boolean
   menu_id?: boolean
   inventory_id?: boolean
   price?: boolean
   menu?: boolean | Prisma.MenuDefaultArgs<ExtArgs>
-  inventory?: boolean | Prisma.inventoryDefaultArgs<ExtArgs>
+  inventory?: boolean | Prisma.InventoryDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["menuInventory"]>
 
 export type MenuInventorySelectScalar = {
-  id?: boolean
+  menu_inv_id?: boolean
   menu_id?: boolean
   inventory_id?: boolean
   price?: boolean
 }
 
-export type MenuInventoryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "menu_id" | "inventory_id" | "price", ExtArgs["result"]["menuInventory"]>
+export type MenuInventoryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"menu_inv_id" | "menu_id" | "inventory_id" | "price", ExtArgs["result"]["menuInventory"]>
 export type MenuInventoryInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   menu?: boolean | Prisma.MenuDefaultArgs<ExtArgs>
-  inventory?: boolean | Prisma.inventoryDefaultArgs<ExtArgs>
+  inventory?: boolean | Prisma.InventoryDefaultArgs<ExtArgs>
 }
 export type MenuInventoryIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   menu?: boolean | Prisma.MenuDefaultArgs<ExtArgs>
-  inventory?: boolean | Prisma.inventoryDefaultArgs<ExtArgs>
+  inventory?: boolean | Prisma.InventoryDefaultArgs<ExtArgs>
 }
 export type MenuInventoryIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   menu?: boolean | Prisma.MenuDefaultArgs<ExtArgs>
-  inventory?: boolean | Prisma.inventoryDefaultArgs<ExtArgs>
+  inventory?: boolean | Prisma.InventoryDefaultArgs<ExtArgs>
 }
 
 export type $MenuInventoryPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "MenuInventory"
   objects: {
     menu: Prisma.$MenuPayload<ExtArgs>
-    inventory: Prisma.$inventoryPayload<ExtArgs>
+    inventory: Prisma.$InventoryPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
-    id: number
-    menu_id: number
+    menu_inv_id: string
+    menu_id: string
     inventory_id: string
-    price: number
+    price: runtime.Decimal
   }, ExtArgs["result"]["menuInventory"]>
   composites: {}
 }
@@ -716,8 +709,8 @@ export interface MenuInventoryDelegate<ExtArgs extends runtime.Types.Extensions.
    * // Get first 10 MenuInventories
    * const menuInventories = await prisma.menuInventory.findMany({ take: 10 })
    * 
-   * // Only select the `id`
-   * const menuInventoryWithIdOnly = await prisma.menuInventory.findMany({ select: { id: true } })
+   * // Only select the `menu_inv_id`
+   * const menuInventoryWithMenu_inv_idOnly = await prisma.menuInventory.findMany({ select: { menu_inv_id: true } })
    * 
    */
   findMany<T extends MenuInventoryFindManyArgs>(args?: Prisma.SelectSubset<T, MenuInventoryFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MenuInventoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
@@ -761,9 +754,9 @@ export interface MenuInventoryDelegate<ExtArgs extends runtime.Types.Extensions.
    *   ]
    * })
    * 
-   * // Create many MenuInventories and only return the `id`
-   * const menuInventoryWithIdOnly = await prisma.menuInventory.createManyAndReturn({
-   *   select: { id: true },
+   * // Create many MenuInventories and only return the `menu_inv_id`
+   * const menuInventoryWithMenu_inv_idOnly = await prisma.menuInventory.createManyAndReturn({
+   *   select: { menu_inv_id: true },
    *   data: [
    *     // ... provide data here
    *   ]
@@ -852,9 +845,9 @@ export interface MenuInventoryDelegate<ExtArgs extends runtime.Types.Extensions.
    *   ]
    * })
    * 
-   * // Update zero or more MenuInventories and only return the `id`
-   * const menuInventoryWithIdOnly = await prisma.menuInventory.updateManyAndReturn({
-   *   select: { id: true },
+   * // Update zero or more MenuInventories and only return the `menu_inv_id`
+   * const menuInventoryWithMenu_inv_idOnly = await prisma.menuInventory.updateManyAndReturn({
+   *   select: { menu_inv_id: true },
    *   where: {
    *     // ... provide filter here
    *   },
@@ -1028,7 +1021,7 @@ readonly fields: MenuInventoryFieldRefs;
 export interface Prisma__MenuInventoryClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   menu<T extends Prisma.MenuDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.MenuDefaultArgs<ExtArgs>>): Prisma.Prisma__MenuClient<runtime.Types.Result.GetResult<Prisma.$MenuPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-  inventory<T extends Prisma.inventoryDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.inventoryDefaultArgs<ExtArgs>>): Prisma.Prisma__inventoryClient<runtime.Types.Result.GetResult<Prisma.$inventoryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  inventory<T extends Prisma.InventoryDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.InventoryDefaultArgs<ExtArgs>>): Prisma.Prisma__InventoryClient<runtime.Types.Result.GetResult<Prisma.$InventoryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1058,10 +1051,10 @@ export interface Prisma__MenuInventoryClient<T, Null = never, ExtArgs extends ru
  * Fields of the MenuInventory model
  */
 export interface MenuInventoryFieldRefs {
-  readonly id: Prisma.FieldRef<"MenuInventory", 'Int'>
-  readonly menu_id: Prisma.FieldRef<"MenuInventory", 'Int'>
+  readonly menu_inv_id: Prisma.FieldRef<"MenuInventory", 'String'>
+  readonly menu_id: Prisma.FieldRef<"MenuInventory", 'String'>
   readonly inventory_id: Prisma.FieldRef<"MenuInventory", 'String'>
-  readonly price: Prisma.FieldRef<"MenuInventory", 'Float'>
+  readonly price: Prisma.FieldRef<"MenuInventory", 'Decimal'>
 }
     
 

@@ -20,10 +20,9 @@ export function PosReceiptDialog({
 	if (!order) return null;
 
 	const hasDiscount = order.items?.some(
-		(i) => i.discount && i.discount !== "none",
+		(i) => i.discount_type && i.discount_type !== "none",
 	);
-	const isGrab = order.method === "GRAB";
-	const orderNote = order.items?.find((i) => i.note)?.note;
+	const orderNote = order.note;
 
 	return (
 		<PosModal
@@ -47,7 +46,7 @@ export function PosReceiptDialog({
 				<div className="mb-4 space-y-0.5 text-[11px] font-bold">
 					<div className="flex justify-between">
 						<span>Order No. :</span>
-						<span>{order.order_number}</span>
+						<span>{order.order_id}</span>
 					</div>
 					<div className="flex justify-between">
 						<span>Date :</span>
@@ -80,16 +79,16 @@ export function PosReceiptDialog({
 						<div key={idx} className="text-[10px] leading-tight">
 							<div className="grid grid-cols-[40px_1fr_60px] font-bold">
 								<span>{Math.round(item.quantity)}x</span>
-								<span className="uppercase">{item.name}</span>
+								<span className="uppercase">{item.snapshot_menu_name}</span>
 								<span className="text-right">
-									{(item.total || 0).toFixed(2)}
+									{(item.line_total || 0).toFixed(2)}
 								</span>
 							</div>
-							{(item.cup_size && item.cup_size !== "NONE") || (item.cup_type && item.cup_type !== "NONE") ? (
+							{item.snapshot_inventory && item.snapshot_inventory !== item.snapshot_menu_name ? (
 								<div className="mt-0.5 grid grid-cols-[40px_1fr_60px] text-[9px] font-bold opacity-75">
 									<span />
 									<span className="uppercase">
-										{item.cup_type && item.cup_type !== "NONE" ? `${item.cup_type} ` : ""}{item.cup_size && item.cup_size !== "NONE" ? item.cup_size : ""}
+										{item.snapshot_inventory}
 									</span>
 									<span />
 								</div>
@@ -98,7 +97,7 @@ export function PosReceiptDialog({
 								<div className="mt-0.5 grid grid-cols-[40px_1fr_60px] text-[9px] opacity-70">
 									<span />
 									<span>
-										+ {item.addon_items.map((a) => `${a.name} x${a.quantity}`).join(", ")}
+										+ {item.addon_items.map((a) => `${a.addon_name_snapshot} x${a.quantity}`).join(", ")}
 									</span>
 									<span />
 								</div>
@@ -116,7 +115,7 @@ export function PosReceiptDialog({
 					</div>
 					<div className="flex justify-between pt-1 text-xs font-black">
 						<span>Total Paid Sales :</span>
-						<span>{order.total.toFixed(2)}</span>
+						<span>{order.grand_total.toFixed(2)}</span>
 					</div>
 				</div>
 
@@ -124,14 +123,14 @@ export function PosReceiptDialog({
 					<div className="mt-2 space-y-1 border-t border-dotted border-black pt-2 text-[9px] font-bold">
 						{hasDiscount
 							? order.items
-									?.filter((i) => i.discount && i.discount !== "none")
+									?.filter((i) => i.discount_type && i.discount_type !== "none")
 									.map((item, idx) => (
 										<div key={idx} className="space-y-0.5">
 											<div className="flex justify-between uppercase">
-												<span>NAME: {item.discount_name}</span>
+												<span>NAME: {item.discount_contact}</span>
 											</div>
 											<div className="flex justify-between uppercase">
-												<span>ID NO: {item.discount_id}</span>
+												<span>ID NO: {item.discount_id_number}</span>
 											</div>
 										</div>
 									))
@@ -164,11 +163,11 @@ export function PosReceiptDialog({
 						<>
 							<div className="flex justify-between">
 								<span>Amount PAID :</span>
-								<span>{(order.paid || 0).toFixed(2)}</span>
+								<span>{(order.amount_tendered || 0).toFixed(2)}</span>
 							</div>
 							<div className="flex justify-between text-sm font-black">
 								<span>CHANGE :</span>
-								<span>{(order.change || 0).toFixed(2)}</span>
+								<span>{(order.change_amount || 0).toFixed(2)}</span>
 							</div>
 						</>
 					) : null}

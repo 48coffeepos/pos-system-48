@@ -1,31 +1,35 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { prisma } from "@/integrations/prisma/db";
+import { Payment_Method, Discount_Type } from "@/generated/prisma/enums.js";
 
 const createOrderInput = z.object({
-  method: z.string(),
+  method: z.enum(["CASH", "GCASH", "GRAB"]),
   reference_number: z.string().optional(),
-  paid: z.number().optional(),
-  change: z.number().optional(),
-  total: z.number(),
+  amount_tendered: z.number().optional(),
+  change_amount: z.number().optional(),
+  grand_total: z.number(),
+  note: z.string().optional(),
   items: z.array(
     z.object({
-      menu_item_id: z.number(),
-      name: z.string(),
+      menu_id: z.string(),
+      snapshot_menu_name: z.string(),
+      snapshot_inventory: z.string(),
       quantity: z.number(),
       unit_price: z.number(),
-      discount: z.string().optional(),
-      discount_name: z.string().optional(),
-      discount_id: z.string().optional(),
-      subtotal: z.number(),
-      total: z.number(),
+      discount_type: z.enum(["PWD", "SENIOR"]).optional(),
+      discount_contact: z.string().optional(),
+      discount_id_number: z.string().optional(),
+      line_total: z.number(),
       note: z.string().optional(),
       cup_type: z.string(),
       cup_size: z.string(),
       addon_items: z
         .array(
           z.object({
-            addon_id: z.number(),
+            addon_id: z.string(),
+            addon_name_snapshot: z.string(),
+            addon_price_snapshot: z.number(),
             quantity: z.number(),
           })
         )
@@ -38,19 +42,21 @@ export const createOrder = createServerFn({ method: "POST" })
   .inputValidator(createOrderInput)
   .handler(async ({ data }) => {
     return await prisma.$transaction(async (tx) => {
-      // Get the highest order ID to determine the next serial number
+      let user = await tx.user.findFirst();
+      if (!user) {
+        user = await tx.user.create({
+          data: {
+            name: "Default Staff",
+            email: "staff@example.com",
+            role: "STAFF"
+          }
+        });
+      }
+
       const lastOrder = await tx.order.findFirst({
-        where: {
-          order_id: {
-            startsWith: "100-",
-          },
-        },
-        orderBy: {
-          order_id: "desc",
-        },
-        select: {
-          order_id: true,
-        },
+        where: { order_id: { startsWith: "100-" } },
+        orderBy: { order_id: "desc" },
+        select: { order_id: true },
       });
 
       let nextNumber = 1;
@@ -62,37 +68,40 @@ export const createOrder = createServerFn({ method: "POST" })
         }
       }
 
-      // Format with leading zeros to 6 digits (e.g. 100-000001)
       const paddedNumber = String(nextNumber).padStart(6, "0");
       const generatedOrderId = `100-${paddedNumber}`;
 
-      // 1. Save the order and its order items
       const order = await tx.order.create({
         data: {
           order_id: generatedOrderId,
-          method: data.method,
+          staff_id: user.id,
+          method: data.method as Payment_Method,
           reference_number: data.reference_number || null,
-          paid: data.paid !== undefined ? data.paid : null,
-          change: data.change !== undefined ? data.change : null,
-          total: data.total,
+          amount_tendered: data.amount_tendered !== undefined ? data.amount_tendered : null,
+          change_amount: data.change_amount !== undefined ? data.change_amount : null,
+          grand_total: data.grand_total,
+          note: data.note || null,
           order_items: {
             create: data.items.map((item) => ({
-              menu_id: item.menu_item_id,
-              name: item.name,
-              discount: item.discount || null,
-              discount_name: item.discount_name || null,
-              discount_id: item.discount_id || null,
+              menu_id: item.menu_id,
+              snapshot_menu_name: item.snapshot_menu_name,
+              snapshot_price: item.unit_price,
+              snapshot_inventory: item.snapshot_inventory,
+              unit_price: item.unit_price,
               quantity: item.quantity,
-              subtotal: item.subtotal,
-              total: item.total,
-              note: item.note || null,
-              cup_type: item.cup_type || null,
-              cup_size: item.cup_size || null,
+              line_total: item.line_total,
+              discount_amount: 5,
+              discount_type: item.discount_type as Discount_Type || null,
+              discount_id_number: item.discount_id_number || null,
+              discount_contact: item.discount_contact || null,
               addon_items: item.addon_items
                 ? {
                     create: item.addon_items.map((addon) => ({
                       addon_id: addon.addon_id,
+                      addon_name_snapshot: addon.addon_name_snapshot,
+                      addon_price_snapshot: addon.addon_price_snapshot,
                       quantity: addon.quantity,
+                      total_price: addon.addon_price_snapshot * addon.quantity
                     })),
                   }
                 : undefined,
@@ -108,7 +117,6 @@ export const createOrder = createServerFn({ method: "POST" })
         },
       });
 
-      // 2. Deduct matching cup sizes from the inventory
       for (const item of data.items) {
         if (
           item.cup_type &&
@@ -116,30 +124,41 @@ export const createOrder = createServerFn({ method: "POST" })
           item.cup_size &&
           item.cup_size !== "NONE"
         ) {
-          // Normalize cup type and size to match database names, e.g. "12oz Hot" or "16oz Iced"
-          const normalizedSize = item.cup_size.toLowerCase(); // "12oz" or "16oz"
+          const normalizedSize = item.cup_size.toLowerCase();
           const normalizedType =
             item.cup_type.charAt(0).toUpperCase() +
-            item.cup_type.slice(1).toLowerCase(); // "Hot" or "Iced"
+            item.cup_type.slice(1).toLowerCase();
           const cupName = `${normalizedSize} ${normalizedType}`;
 
           await tx.inventory.updateMany({
             where: {
-              name: {
-                equals: cupName,
-                mode: "insensitive", // Perform case-insensitive check just in case
-              },
+              name: { equals: cupName, mode: "insensitive" },
               type: "CUP",
             },
             data: {
-              stock: {
-                decrement: item.quantity,
-              },
+              stock: { decrement: item.quantity },
             },
           });
         }
       }
 
-      return order;
+      return {
+        ...order,
+        amount_tendered: order.amount_tendered ? Number(order.amount_tendered) : null,
+        change_amount: order.change_amount ? Number(order.change_amount) : null,
+        grand_total: Number(order.grand_total),
+        order_items: order.order_items.map((item) => ({
+          ...item,
+          snapshot_price: Number(item.snapshot_price),
+          unit_price: Number(item.unit_price),
+          line_total: Number(item.line_total),
+          discount_amount: item.discount_amount ? Number(item.discount_amount) : null,
+          addon_items: item.addon_items.map((addon) => ({
+            ...addon,
+            addon_price_snapshot: Number(addon.addon_price_snapshot),
+            total_price: Number(addon.total_price),
+          })),
+        })),
+      };
     });
   });

@@ -8,7 +8,7 @@ import { cartLineKey, getCupSizes } from "../utils";
 import { Input } from "@/components/ui/input";
 
 interface AddOnItem {
-	id: number;
+	addon_id: string;
 	name: string;
 	price: number;
 }
@@ -19,9 +19,8 @@ interface PosCupPickerDialogProps {
 	onClose: () => void;
 	onConfirm: (params: {
 		lineKey: string;
-		menu_item_id: number;
+		menu_id: string;
 		menu_name: string;
-		category: string;
 		cup_type: string;
 		cup_size: string;
 		unit_price: number;
@@ -30,7 +29,7 @@ interface PosCupPickerDialogProps {
 		discount_name?: string;
 		discount_id?: string;
 		is_free_drink?: boolean;
-		addon_items?: Array<{ addon_id: number; name: string; price: number; quantity: number }>;
+		addon_items?: Array<{ addon_id: string; name: string; price: number; quantity: number }>;
 	}) => void;
 }
 
@@ -44,7 +43,7 @@ export function PosCupPickerDialog({
 	const [pickCupSize, setPickCupSize] = useState("12OZ");
 	const [showAddons, setShowAddons] = useState(false);
 	const [selectedAddons, setSelectedAddons] = useState<
-		Record<number, { name: string; price: number; quantity: number }>
+		Record<string, { name: string; price: number; quantity: number }>
 	>({});
 	const [itemDiscountType, setItemDiscountType] = useState<
 		"none" | "SENIOR" | "PWD"
@@ -125,10 +124,10 @@ export function PosCupPickerDialog({
 
 	const incrementAddon = (addon: AddOnItem) => {
 		setSelectedAddons((prev) => {
-			const existing = prev[addon.id];
+			const existing = prev[addon.addon_id];
 			return {
 				...prev,
-				[addon.id]: {
+				[addon.addon_id]: {
 					name: addon.name,
 					price: addon.price,
 					quantity: (existing?.quantity ?? 0) + 1,
@@ -139,14 +138,14 @@ export function PosCupPickerDialog({
 
 	const decrementAddon = (addon: AddOnItem) => {
 		setSelectedAddons((prev) => {
-			const existing = prev[addon.id];
+			const existing = prev[addon.addon_id];
 			if (!existing || existing.quantity <= 1) {
-				const { [addon.id]: _, ...rest } = prev;
+				const { [addon.addon_id]: _, ...rest } = prev;
 				return rest;
 			}
 			return {
 				...prev,
-				[addon.id]: { ...existing, quantity: existing.quantity - 1 },
+				[addon.addon_id]: { ...existing, quantity: existing.quantity - 1 },
 			};
 		});
 	};
@@ -168,7 +167,7 @@ export function PosCupPickerDialog({
 		const addonItems = Object.entries(selectedAddons)
 			.filter(([, v]) => v.quantity > 0)
 			.map(([id, v]) => ({
-				addon_id: Number(id),
+				addon_id: id,
 				name: v.name,
 				price: v.price,
 				quantity: v.quantity,
@@ -190,7 +189,7 @@ export function PosCupPickerDialog({
 
 		const addonKey = addonItems.map((a) => `${a.addon_id}x${a.quantity}`).join("_");
 		const lineKey = cartLineKey(
-			item.id,
+			item.menu_id,
 			pickCupType,
 			pickCupSize,
 			addonKey || undefined,
@@ -198,9 +197,8 @@ export function PosCupPickerDialog({
 
 		onConfirm({
 			lineKey,
-			menu_item_id: item.id,
+			menu_id: item.menu_id,
 			menu_name: item.name,
-			category: item.category,
 			cup_type: pickCupType,
 			cup_size: pickCupSize,
 			unit_price: finalUnitPrice,
@@ -350,10 +348,10 @@ export function PosCupPickerDialog({
 				{showAddons ? (
 					<div className="space-y-2">
 						{addOns.map((addon) => {
-							const qty = selectedAddons[addon.id]?.quantity ?? 0;
+							const qty = selectedAddons[addon.addon_id]?.quantity ?? 0;
 							return (
 								<div
-									key={addon.id}
+									key={addon.addon_id}
 									className={`flex items-center justify-between rounded-xl border p-2.5 transition-all ${qty > 0 ? "border-amber-400 bg-amber-50" : "border-gray-100 bg-gray-50"}`}
 								>
 									<div className="flex flex-col gap-0.5">

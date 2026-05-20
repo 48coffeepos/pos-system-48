@@ -24,8 +24,6 @@ const posFormSchema = z.object({
 
 export function PosScreen() {
 	const {
-		activeCategory,
-		setActiveCategory,
 		search,
 		setSearch,
 		showReceipt,
@@ -87,13 +85,11 @@ export function PosScreen() {
 	);
 
 	const addOns = data?.addOns ?? [];
-	const categories = data?.categories ?? [];
+
 
 	const menuItems = useMemo(
 		() =>
 			allMenuItems.filter((item) => {
-				if (activeCategory !== "all" && item.category !== activeCategory)
-					return false;
 				if (
 					search &&
 					!item.name.toLowerCase().includes(search.toLowerCase())
@@ -101,15 +97,14 @@ export function PosScreen() {
 					return false;
 				return true;
 			}),
-		[allMenuItems, activeCategory, search],
+		[allMenuItems, search],
 	);
 
 	const handleCustomizeConfirm = useCallback(
 		(params: {
 			lineKey: string;
-			menu_item_id: number;
+			menu_id: string;
 			menu_name: string;
-			category: string;
 			cup_type: string;
 			cup_size: string;
 			unit_price: number;
@@ -118,7 +113,7 @@ export function PosScreen() {
 			discount_name?: string;
 			discount_id?: string;
 			is_free_drink?: boolean;
-			addon_items?: Array<{ addon_id: number; name: string; price: number; quantity: number }>;
+			addon_items?: Array<{ addon_id: string; name: string; price: number; quantity: number }>;
 		}) => {
 			addToCart({ ...params, quantity: 1 } as CartItem);
 			toast.success(`${params.menu_name} added to cart`);
@@ -128,20 +123,21 @@ export function PosScreen() {
 
 	const handleProductClick = useCallback((item: MenuItem) => {
 		if (item.type === "STANDALONE") {
-			handleCustomizeConfirm({
-				lineKey: `${item.id}-NONE-NONE`,
-				menu_item_id: item.id,
+			const newItem: CartItem = {
+				lineKey: `${item.menu_id}-NONE-NONE`,
+				menu_id: item.menu_id,
 				menu_name: item.name,
-				category: item.category,
+				quantity: 1,
 				cup_type: "NONE",
 				cup_size: "NONE",
-				unit_price: item.price ?? 0,
-				total_price: item.price ?? 0,
-			});
+				unit_price: item.price || 0,
+				total_price: item.price || 0,
+			};
+			addToCart(newItem);
 		} else {
 			setCustomizeItem(item);
 		}
-	}, [handleCustomizeConfirm, setCustomizeItem]);
+	}, [setCustomizeItem, addToCart]);
 
 	const handleUpdateQuantity = useCallback(
 		(lineKey: string, delta: number) => {
@@ -160,52 +156,57 @@ export function PosScreen() {
 
 		try {
 			const placedOrder = await createOrderMutation.mutateAsync({
-				method: values.paymentMethod,
+				method: values.paymentMethod as any,
 				reference_number: values.referenceNumber || undefined,
-				paid: values.paymentMethod === "GRAB" ? undefined : paidNum,
-				change: values.paymentMethod === "GRAB" ? undefined : changeAmt,
-				total: cartTotal,
+				amount_tendered: values.paymentMethod === "GRAB" ? undefined : paidNum,
+				change_amount: values.paymentMethod === "GRAB" ? undefined : changeAmt,
+				grand_total: cartTotal,
+				note: values.note || undefined,
 				items: cart.map((c) => ({
-					menu_item_id: c.menu_item_id,
-					name: c.menu_name,
+					menu_id: c.menu_id,
+					snapshot_menu_name: c.menu_name,
+					snapshot_inventory: c.cup_type && c.cup_type !== "NONE" ? `${c.cup_size} ${c.cup_type}` : c.menu_name,
 					quantity: c.quantity,
 					unit_price: c.unit_price,
-					discount: c.discount,
-					discount_name: c.discount_name,
-					discount_id: c.discount_id,
-					subtotal: c.unit_price * c.quantity,
-					total: c.total_price,
-					note: values.note || undefined,
+					discount_type: c.discount as any,
+					discount_contact: c.discount_name,
+					discount_id_number: c.discount_id,
+					line_total: c.total_price,
 					cup_type: c.cup_type,
 					cup_size: c.cup_size,
 					addon_items: c.addon_items?.map((a) => ({
 						addon_id: a.addon_id,
+						addon_name_snapshot: a.name,
+						addon_price_snapshot: a.price,
 						quantity: a.quantity,
 					})),
 				})),
 			});
 
 			const order: PosOrder = {
-				order_number: placedOrder.order_id,
+				order_id: placedOrder.order_id,
 				created_at: new Date(placedOrder.created_at).toISOString(),
 				method: placedOrder.method,
 				reference_number: placedOrder.reference_number || undefined,
-				paid: placedOrder.paid !== null ? placedOrder.paid : undefined,
-				change: placedOrder.change !== null ? placedOrder.change : undefined,
-				total: placedOrder.total,
+				amount_tendered: placedOrder.amount_tendered !== null ? Number(placedOrder.amount_tendered) : undefined,
+				change_amount: placedOrder.change_amount !== null ? Number(placedOrder.change_amount) : undefined,
+				grand_total: Number(placedOrder.grand_total),
+				note: values.note || undefined,
 				items: cart.map((c) => ({
-					name: c.menu_name,
+					snapshot_menu_name: c.menu_name,
 					quantity: c.quantity,
 					unit_price: c.unit_price,
-					discount: c.discount,
-					discount_name: c.discount_name,
-					discount_id: c.discount_id,
-					subtotal: c.unit_price * c.quantity,
-					total: c.total_price,
-					note: values.note,
-					cup_type: c.cup_type,
-					cup_size: c.cup_size,
-					addon_items: c.addon_items,
+					discount_type: c.discount,
+					discount_contact: c.discount_name,
+					discount_id_number: c.discount_id,
+					line_total: c.total_price,
+					snapshot_inventory: c.cup_type && c.cup_type !== "NONE" ? `${c.cup_size} ${c.cup_type}` : c.menu_name,
+					addon_items: c.addon_items?.map((a) => ({
+						addon_id: a.addon_id,
+						addon_name_snapshot: a.name,
+						addon_price_snapshot: a.price,
+						quantity: a.quantity,
+					})),
 				})),
 			};
 
@@ -214,7 +215,7 @@ export function PosScreen() {
 			clearCart();
 			form.reset();
 			setShowPlaceOrderConfirm(false);
-			toast.success(`Order #${order.order_number} placed successfully!`);
+			toast.success(`Order #${order.order_id} placed successfully!`);
 		} catch (err: any) {
 			console.error("Order placement failed:", err);
 			toast.error("Failed to place order: " + (err.message || "Unknown error"));
@@ -239,16 +240,7 @@ export function PosScreen() {
 					menuItems={menuItems}
 					loading={isLoading}
 					search={search}
-					activeCategory={activeCategory}
-					categories={categories.map((c: string) => ({
-						key: c,
-						label: c
-							.split("_")
-							.map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-							.join(" "),
-					}))}
 					onSearchChange={setSearch}
-					onCategoryChange={setActiveCategory}
 					onProductClick={handleProductClick}
 				/>
 				<PosCartPanel

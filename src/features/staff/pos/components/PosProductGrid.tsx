@@ -1,5 +1,4 @@
 import { MagnifyingGlass, Coffee } from "@phosphor-icons/react";
-import { PosCategoryTabs } from "./ui/PosCategoryTabs";
 import { PosProductCard } from "./ui/PosProductCard";
 import type { MenuItem } from "../types";
 
@@ -7,10 +6,7 @@ interface PosProductGridProps {
 	menuItems: MenuItem[];
 	loading: boolean;
 	search: string;
-	activeCategory: string;
-	categories: Array<{ key: string; label: string }>;
 	onSearchChange: (value: string) => void;
-	onCategoryChange: (key: string) => void;
 	onProductClick: (item: MenuItem) => void;
 }
 
@@ -18,10 +14,7 @@ export function PosProductGrid({
 	menuItems,
 	loading,
 	search,
-	activeCategory,
-	categories,
 	onSearchChange,
-	onCategoryChange,
 	onProductClick,
 }: PosProductGridProps) {
 	return (
@@ -70,7 +63,7 @@ export function PosProductGrid({
 					<div className="grid grid-cols-4 gap-4">
 						{menuItems.map((item) => (
 							<PosProductCard
-								key={item.id}
+								key={item.menu_id}
 								name={item.name}
 								price={item.price}
 								onSelect={() => onProductClick(item)}

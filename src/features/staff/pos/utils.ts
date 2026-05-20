@@ -9,7 +9,7 @@ export function formatCupLine(
 }
 
 export function cartLineKey(
-	itemId: number,
+	itemId: string,
 	cupType: string,
 	cupSize: string,
 	addonKey?: string,
