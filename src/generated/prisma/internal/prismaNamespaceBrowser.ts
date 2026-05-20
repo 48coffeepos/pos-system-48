@@ -205,6 +205,7 @@ export const OrderItemScalarFieldEnum = {
   order_item_id: 'order_item_id',
   order_id: 'order_id',
   menu_id: 'menu_id',
+  inventory_id: 'inventory_id',
   snapshot_menu_name: 'snapshot_menu_name',
   snapshot_price: 'snapshot_price',
   snapshot_inventory: 'snapshot_inventory',

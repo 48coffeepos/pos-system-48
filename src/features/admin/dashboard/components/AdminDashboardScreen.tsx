@@ -1,48 +1,43 @@
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { mockCupSales, mockExpenses, mockStats } from "../data/mockData";
+import type { PaymentMethodFilter } from "../constants";
+import { getDashboardDataQueryOptions } from "../queryOptions";
 import { formatPeso } from "../utils";
 import { CupSalesBreakdown } from "./CupSalesBreakdown";
 import { RevenueCard } from "./RevenueCard";
-import { StatsSummary } from "./StatsSummary";
 
 export function AdminDashboardScreen() {
+	const { data } = useSuspenseQuery(getDashboardDataQueryOptions);
+	const [selectedPayment, setSelectedPayment] =
+		useState<PaymentMethodFilter>("all");
 	const [showExportModal, setShowExportModal] = useState(false);
 
-	// Mock computed values
-	const revenue = 45680.5;
-	const orderCount = 312;
-	const periodSubtitle = "May 1 — May 19, 2024";
-	const totalExpenseAmount = mockExpenses.reduce((sum, e) => sum + e.amount, 0);
+	const { revenue, cupSales, periodLabel } = data;
 
 	return (
-		<div className="p-6">
-			<div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-6">
-				<RevenueCard
-					revenue={revenue}
-					orderCount={orderCount}
-					periodSubtitle={periodSubtitle}
-					onExportClick={() => setShowExportModal(true)}
-				/>
-				<StatsSummary
-					stats={mockStats}
-					totalExpenseAmount={totalExpenseAmount}
-				/>
-			</div>
+		<div className="space-y-5">
+			<RevenueCard
+				revenueByMethod={revenue.byMethod}
+				ordersByMethod={revenue.ordersByMethod}
+				totalRevenue={revenue.total}
+				totalOrders={revenue.totalOrders}
+				selectedPayment={selectedPayment}
+				onPaymentChange={setSelectedPayment}
+				periodLabel={periodLabel}
+				onExportClick={() => setShowExportModal(true)}
+			/>
 
 			<CupSalesBreakdown
-				cupSales={mockCupSales}
-				onPrintClick={() => setShowExportModal(true)}
+				cupSales={cupSales}
+				selectedPayment={selectedPayment}
 			/>
 
 			{showExportModal && (
-				<div
+				<button
 					className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
 					onClick={() => setShowExportModal(false)}
 				>
-					<div
-						className="card-white p-6 w-full max-w-sm mx-4"
-						onClick={(e) => e.stopPropagation()}
-					>
+					<div className="card-white p-6 w-full max-w-sm mx-4">
 						<h3 className="text-sm font-bold mb-4 text-(--near-black)">
 							Export Options
 						</h3>
@@ -61,7 +56,7 @@ export function AdminDashboardScreen() {
 								type="button"
 								onClick={() => {
 									alert(
-										`Export triggered!\nRevenue: ${formatPeso(revenue)}\nOrders: ${orderCount}`,
+										`Export triggered!\nRevenue: ${formatPeso(revenue.total)}\nOrders: ${revenue.totalOrders}`,
 									);
 									setShowExportModal(false);
 								}}
@@ -71,7 +66,7 @@ export function AdminDashboardScreen() {
 							</button>
 						</div>
 					</div>
-				</div>
+				</button>
 			)}
 		</div>
 	);
