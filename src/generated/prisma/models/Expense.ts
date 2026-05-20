@@ -338,6 +338,16 @@ export type ExpenseUncheckedUpdateManyInput = {
   timestamp?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
+export type ExpenseListRelationFilter = {
+  every?: Prisma.ExpenseWhereInput
+  some?: Prisma.ExpenseWhereInput
+  none?: Prisma.ExpenseWhereInput
+}
+
+export type ExpenseOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
+}
+
 export type ExpenseCountOrderByAggregateInput = {
   expense_id?: Prisma.SortOrder
   staff_id?: Prisma.SortOrder
@@ -371,20 +381,6 @@ export type ExpenseMinOrderByAggregateInput = {
 
 export type ExpenseSumOrderByAggregateInput = {
   amount?: Prisma.SortOrder
-}
-
-export type ExpenseListRelationFilter = {
-  every?: Prisma.ExpenseWhereInput
-  some?: Prisma.ExpenseWhereInput
-  none?: Prisma.ExpenseWhereInput
-}
-
-export type ExpenseOrderByRelationAggregateInput = {
-  _count?: Prisma.SortOrder
-}
-
-export type EnumExpense_TypeFieldUpdateOperationsInput = {
-  set?: $Enums.Expense_Type
 }
 
 export type ExpenseCreateNestedManyWithoutStaffInput = {
@@ -427,6 +423,10 @@ export type ExpenseUncheckedUpdateManyWithoutStaffNestedInput = {
   update?: Prisma.ExpenseUpdateWithWhereUniqueWithoutStaffInput | Prisma.ExpenseUpdateWithWhereUniqueWithoutStaffInput[]
   updateMany?: Prisma.ExpenseUpdateManyWithWhereWithoutStaffInput | Prisma.ExpenseUpdateManyWithWhereWithoutStaffInput[]
   deleteMany?: Prisma.ExpenseScalarWhereInput | Prisma.ExpenseScalarWhereInput[]
+}
+
+export type EnumExpense_TypeFieldUpdateOperationsInput = {
+  set?: $Enums.Expense_Type
 }
 
 export type ExpenseCreateWithoutStaffInput = {

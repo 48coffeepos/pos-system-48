@@ -6,6 +6,7 @@ import {
 	Scripts,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
+import { Toaster } from "@/components/ui/sonner";
 import { TanstackFormDevtools } from "@/integrations/tanstack-form";
 import {
 	RouteErrorBoundary,
@@ -31,7 +32,10 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 				name: "viewport",
 				content: "width=device-width, initial-scale=1",
 			},
-			...createSeo().meta,
+			...createSeo({
+				title: "48 Coffee POS",
+				description: "POS for 48 Coffee - Ledesma",
+			}).meta,
 		],
 		links: [
 			{
@@ -51,6 +55,12 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 			</head>
 			<body className="font-sans antialiased wrap-anywhere selection:bg-[rgba(79,184,178,0.24)]">
 				{children}
+				<Toaster
+					position="bottom-right"
+					richColors
+					duration={3000}
+					closeButton
+				/>
 				<TanStackDevtools
 					config={{
 						position: "bottom-right",
