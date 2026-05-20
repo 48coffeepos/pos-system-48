@@ -23,8 +23,9 @@ export function PosProductCard({
 			}}
 		>
 			<h3
-				className="mb-1 text-lg font-bold"
+				className="mb-1 text-lg font-bold line-clamp-2 break-words"
 				style={{ color: "var(--dark-gray)" }}
+				title={name}
 			>
 				{name}
 			</h3>

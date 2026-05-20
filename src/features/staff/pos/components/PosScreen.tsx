@@ -227,13 +227,14 @@ export function PosScreen() {
 
 	return (
 		<div
-			className="flex h-screen flex-col"
+			className="flex h-screen flex-col overflow-x-auto"
 			style={{ background: "var(--warm-beige)" }}
 		>
-			<Toaster position="top-right" richColors />
-			<StaffHeader />
+			<div className="flex flex-col h-full min-w-[1024px]">
+				<Toaster position="top-right" richColors />
+				<StaffHeader />
 
-			<div className="flex flex-1 overflow-hidden">
+				<div className="flex flex-1 overflow-hidden">
 				<PosProductGrid
 					menuItems={menuItems}
 					loading={isLoading}
@@ -260,6 +261,7 @@ export function PosScreen() {
 						form.handleSubmit();
 					}}
 				/>
+			</div>
 			</div>
 
 			<PosCupPickerDialog
