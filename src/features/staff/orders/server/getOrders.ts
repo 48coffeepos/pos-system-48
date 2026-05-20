@@ -4,6 +4,7 @@ import { prisma } from "@/integrations/prisma/db";
 export const getOrders = createServerFn({ method: "GET" }).handler(async () => {
   const orders = await prisma.order.findMany({
     include: {
+      staff: true,
       order_items: {
         include: {
           addon_items: {
@@ -25,6 +26,7 @@ export const getOrders = createServerFn({ method: "GET" }).handler(async () => {
     change_amount: order.change_amount ? Number(order.change_amount) : null,
     grand_total: Number(order.grand_total),
     note: order.note || null,
+    staff: { name: order.staff?.name || "Cashier" },
     order_items: order.order_items.map((item) => ({
       ...item,
       snapshot_price: Number(item.snapshot_price),
