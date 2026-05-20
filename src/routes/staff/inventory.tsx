@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { StaffHeader } from "@/features/staff/components/StaffHeader";
 import { Package } from "@phosphor-icons/react";
-import { getInventoryQueryOptions } from "@/features/admin/inventory/queryOptions";
+import { getAllInventoryQueryOptions } from "@/features/admin/inventory/queryOptions";
 import { InventoryList } from "@/features/admin/inventory/components/InventoryList";
 
 export const Route = createFileRoute("/staff/inventory")({
@@ -10,7 +10,7 @@ export const Route = createFileRoute("/staff/inventory")({
 });
 
 function StaffInventory() {
-	const { data: inventory, isLoading, error } = useQuery(getInventoryQueryOptions);
+	const { data: inventory, isLoading, error } = useQuery(getAllInventoryQueryOptions);
 
 	if (error) {
 		console.error("Failed to fetch inventory:", error);
@@ -42,8 +42,6 @@ function StaffInventory() {
 				) : (
 					<InventoryList
 						items={inventory as any}
-						title="Inventory items"
-						description="Track item quantity and category"
 					/>
 				)}
 			</main>
