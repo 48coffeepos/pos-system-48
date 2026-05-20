@@ -34,7 +34,6 @@ async function main() {
 
 	console.log("🌱 Seeding database...");
 
-	await prisma.todo.deleteMany();
 	await prisma.user.deleteMany();
 
 	const existingAdmin = await prisma.user.findFirst({
@@ -69,15 +68,7 @@ async function main() {
 		console.log("✅ Admin user already exists");
 	}
 
-	const todos = await prisma.todo.createMany({
-		data: [
-			{ title: "Buy groceries" },
-			{ title: "Read a book" },
-			{ title: "Workout" },
-		],
-	});
-
-	console.log(`✅ Created ${todos.count} todos`);
+	console.log("✅ Seeding complete");
 }
 
 main()
