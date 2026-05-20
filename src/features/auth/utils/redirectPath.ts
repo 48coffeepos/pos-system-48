@@ -1,3 +1,3 @@
 export function getAuthRedirectPath(role?: string | null) {
-	return role === "admin" ? "/admin/accounts" : "/staff/pos"
+	return role === "admin" ? "/admin" : "/staff/pos";
 }

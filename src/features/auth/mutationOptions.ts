@@ -2,15 +2,15 @@ import { mutationOptions } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
 import { toast } from "sonner";
 import authKeys from "./keys";
-import type { SignInInput } from "./schemas/auth";
-import signIn from "./server/signIn";
-import signOut from "./server/signOut";
+import type { LogInInput } from "./schemas/auth";
+import logIn from "./server/logIn";
+import logOut from "./server/logOut";
 
-export const signInMutationOptions = () => {
+export const logInMutationOptions = () => {
 	const router = useRouter();
 	return mutationOptions({
-		mutationFn: async (input: SignInInput) => {
-			return await signIn({ data: input });
+		mutationFn: async (input: LogInInput) => {
+			return await logIn({ data: input });
 		},
 		onSuccess: (user, __, ___, context) => {
 			toast.success(
@@ -25,10 +25,10 @@ export const signInMutationOptions = () => {
 	});
 };
 
-export const signOutMutationOptions = () => {
+export const logOutMutationOptions = () => {
 	const router = useRouter();
 	return mutationOptions({
-		mutationFn: signOut,
+		mutationFn: logOut,
 		onSuccess: (_, __, ___, context) => {
 			toast.success("Signed out successfully");
 			context.client.invalidateQueries({ queryKey: authKeys.all });

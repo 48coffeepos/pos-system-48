@@ -1,5 +1,5 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import SignInPage from "@/features/auth/components/SignInPage";
+import LogInPage from "@/features/auth/components/LogInPage";
 import { sessionQueryOptions } from "@/features/auth/queryOptions";
 import { getAuthRedirectPath } from "@/features/auth/utils";
 
@@ -12,5 +12,5 @@ export const Route = createFileRoute("/")({
 			});
 		}
 	},
-	component: SignInPage,
+	component: LogInPage,
 });

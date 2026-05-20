@@ -1,10 +1,10 @@
 import { useMutation } from "@tanstack/react-query";
 import { useAppForm } from "@/integrations/tanstack-form";
-import { signInMutationOptions } from "../mutationOptions";
-import { type SignInInput, signInFormSchema } from "../schemas/auth";
+import { logInMutationOptions } from "../mutationOptions";
+import { LogInFormSchema, type LogInInput } from "../schemas/auth";
 
-export const useSignIn = () => {
-	const mutation = useMutation(signInMutationOptions());
+export const useLogIn = () => {
+	const mutation = useMutation(logInMutationOptions());
 
 	const form = useAppForm({
 		defaultValues: {
@@ -12,10 +12,10 @@ export const useSignIn = () => {
 			password: "",
 		},
 		validators: {
-			onSubmit: signInFormSchema,
+			onSubmit: LogInFormSchema,
 		},
 		onSubmit: async ({ value }) => {
-			const input: SignInInput = value.identifier.includes("@")
+			const input: LogInInput = value.identifier.includes("@")
 				? {
 						method: "email" as const,
 						email: value.identifier,

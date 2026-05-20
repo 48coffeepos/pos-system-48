@@ -1,7 +1,7 @@
-import { useSignIn } from "../hooks/useSignIn";
+import { useLogIn } from "../hooks/useLogIn";
 
-export function SignInForm() {
-	const form = useSignIn();
+export function LogInForm() {
+	const form = useLogIn();
 	return (
 		<div>
 			<form
@@ -28,7 +28,7 @@ export function SignInForm() {
 
 				{/* Submit Button */}
 				<form.AppForm>
-					<form.SubmitButton label="Sign In" />
+					<form.SubmitButton label="Log In" />
 				</form.AppForm>
 			</form>
 		</div>
