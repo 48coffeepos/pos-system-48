@@ -3,9 +3,9 @@ import { Inventory_Type } from "@/generated/prisma/enums.js";
 export interface MenuItem {
 	id: number;
 	name: string;
-	price: number;
+	price: number | null;
 	category: string;
-	type: Inventory_Type;
+	type: Inventory_Type | null;
 	inventory_items: Array<{
 		price: number;
 		inventory: {

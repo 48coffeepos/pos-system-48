@@ -135,8 +135,8 @@ export function PosScreen() {
 				category: item.category,
 				cup_type: "NONE",
 				cup_size: "NONE",
-				unit_price: item.price,
-				total_price: item.price,
+				unit_price: item.price ?? 0,
+				total_price: item.price ?? 0,
 			});
 		} else {
 			setCustomizeItem(item);

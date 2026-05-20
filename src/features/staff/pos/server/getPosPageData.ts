@@ -7,10 +7,11 @@ export interface PosPageData {
   menuItems: Array<{
     id: number;
     name: string;
-    price: number;
+    price: number | null;
     category: string;
-    type: Inventory_Type;
+    type: Inventory_Type | null;
     inventory_items: Array<{
+      price: number;
       inventory: {
         inventory_id: string;
         name: string;

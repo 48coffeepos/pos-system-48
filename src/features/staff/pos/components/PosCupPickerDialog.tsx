@@ -5,6 +5,7 @@ import { formatPeso } from "@/lib/format-currency";
 import { PosModal } from "./ui/PosModal";
 import type { MenuItem } from "../types";
 import { cartLineKey, getCupSizes } from "../utils";
+import { Input } from "@/components/ui/input";
 
 interface AddOnItem {
 	id: number;
@@ -443,20 +444,20 @@ export function PosCupPickerDialog({
 
 				{itemDiscountType !== "none" ? (
 					<div className="mb-3 space-y-2">
-						<input
+						<Input
 							type="text"
 							value={itemDiscountName}
 							onChange={(e) => setItemDiscountName(e.target.value)}
 							placeholder="Name"
-							className="h-9 w-full rounded-lg border px-3 text-xs outline-none"
+							className="h-9 w-full rounded-lg border px-3 text-xs outline-none bg-white"
 							style={{ borderColor: "var(--light-gray)" }}
 						/>
-						<input
+						<Input
 							type="text"
 							value={itemDiscountId}
 							onChange={(e) => setItemDiscountId(e.target.value)}
 							placeholder="ID Number"
-							className="h-9 w-full rounded-lg border px-3 text-xs outline-none"
+							className="h-9 w-full rounded-lg border px-3 text-xs outline-none bg-white"
 							style={{ borderColor: "var(--light-gray)" }}
 						/>
 					</div>

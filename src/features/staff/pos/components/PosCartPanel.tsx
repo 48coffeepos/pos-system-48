@@ -186,7 +186,7 @@ export function PosCartPanel({
 
 				{/* Note */}
 				{cart.length > 0 ? (
-					<form.Field name="note">
+					<form.AppField name="note">
 						{(field: any) => (
 							<div className="mb-3">
 								<input
@@ -202,13 +202,13 @@ export function PosCartPanel({
 								/>
 							</div>
 						)}
-					</form.Field>
+					</form.AppField>
 				) : null}
 
 				{/* Payment */}
 				{cart.length > 0 ? (
 					<div className="mb-4 space-y-4">
-						<form.Field name="paymentMethod">
+						<form.AppField name="paymentMethod">
 							{(field: any) => (
 								<div>
 									<label
@@ -251,11 +251,11 @@ export function PosCartPanel({
 									</div>
 								</div>
 							)}
-						</form.Field>
+						</form.AppField>
 
 						<div className="space-y-3">
 							{paymentMethod !== "GRAB" ? (
-								<form.Field name="amountPaid">
+								<form.AppField name="amountPaid">
 									{(field: any) => {
 										const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
 										return (
@@ -290,7 +290,7 @@ export function PosCartPanel({
 											</div>
 										);
 									}}
-								</form.Field>
+								</form.AppField>
 							) : null}
 
 							{paymentMethod === "CASH" &&
@@ -311,7 +311,7 @@ export function PosCartPanel({
 							) : null}
 
 							{paymentMethod === "GCASH" || paymentMethod === "GRAB" ? (
-								<form.Field name="referenceNumber">
+								<form.AppField name="referenceNumber">
 									{(field: any) => {
 										const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
 										return (
@@ -344,7 +344,7 @@ export function PosCartPanel({
 											</div>
 										);
 									}}
-								</form.Field>
+								</form.AppField>
 							) : null}
 						</div>
 					</div>
@@ -373,14 +373,16 @@ export function PosCartPanel({
 					</div>
 				) : null}
 
-				<button
-					type="submit"
-					disabled={cart.length === 0}
-					className="btn-primary flex w-full items-center justify-center gap-2"
-					style={{ opacity: cart.length === 0 ? 0.5 : 1 }}
-				>
-					Place Order <ArrowRight className="size-4" />
-				</button>
+				<form.AppForm>
+					<button
+						type="submit"
+						disabled={cart.length === 0}
+						className="btn-primary flex w-full items-center justify-center gap-2"
+						style={{ opacity: cart.length === 0 ? 0.5 : 1 }}
+					>
+						Place Order <ArrowRight className="size-4" />
+					</button>
+				</form.AppForm>
 			</form>
 		</div>
 	);

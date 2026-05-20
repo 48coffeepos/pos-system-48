@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { Receipt, CreditCard, User, Tag } from "@phosphor-icons/react";
+import { Receipt, CreditCard } from "@phosphor-icons/react";
 import { formatPeso } from "@/lib/format-currency";
 import { PosReceiptDialog } from "@/features/staff/pos/components/PosReceiptDialog";
 import type { PosOrder } from "@/features/staff/pos/types";
