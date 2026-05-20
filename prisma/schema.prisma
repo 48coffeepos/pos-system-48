@@ -21,6 +21,8 @@ model User {
   role            String?
   username        String?
   accounts        Account[]
+  expenses        Expense[]
+  orders          Order[]
   sessions        Session[]
 
   banExpires DateTime?
@@ -77,83 +79,135 @@ model Verification {
   @@map("verification")
 }
 
-model inventory {
+model Inventory {
   inventory_id    String          @id @default(uuid())
-  name            String
-  stock           Int
+  name            String          @unique
+  stock           Int             @default(0)
   yesterday_stock Int?
   type            Inventory_Type
-  menu_items      MenuInventory[]
+  menuInventories MenuInventory[]
+
+  @@map("inventory")
 }
 
 model Menu {
-  id              Int             @id @default(autoincrement())
-  name            String
-  price           Float?
-  category        String
+  menu_id         String          @id @default(uuid())
+  name            String          @unique
+  price           Decimal?        @db.Decimal(10, 2)
+  menuInventories MenuInventory[]
   type            Inventory_Type?
-  inventory_items MenuInventory[]
-  order_items     OrderItem[]
+  orderItems      OrderItem[]
+
+  @@map("menu")
 }
 
 model MenuInventory {
-  id           Int       @id @default(autoincrement())
-  menu_id      Int
-  menu         Menu      @relation(fields: [menu_id], references: [id])
+  menu_inv_id  String    @id @default(uuid())
+  menu_id      String
   inventory_id String
-  inventory    inventory @relation(fields: [inventory_id], references: [inventory_id])
-  price        Float
-}
+  price        Decimal   @db.Decimal(10, 2)
+  inventory    Inventory @relation(fields: [inventory_id], references: [inventory_id])
+  menu         Menu      @relation(fields: [menu_id], references: [menu_id], onDelete: Cascade)
 
-model Order {
-  order_id         String      @id
-  method           String
-  reference_number String?
-  paid             Float?
-  change           Float?
-  total            Float
-  created_at       DateTime    @default(now())
-  order_items      OrderItem[]
-}
-
-model OrderItem {
-  id            Int         @id @default(autoincrement())
-  order_id      String
-  order         Order       @relation(fields: [order_id], references: [order_id])
-  menu_id       Int
-  menu          Menu        @relation(fields: [menu_id], references: [id])
-  name          String
-  discount      String?
-  quantity      Int
-  loyalty       Boolean?
-  discount_name String?
-  discount_id   String?
-  subtotal      Float
-  total         Float
-  change        Float?
-  note          String?
-  cup_type      String?
-  cup_size      String?
-  addon_items   AddonItem[]
+  @@unique([menu_id, inventory_id])
+  @@map("menu_inventory")
 }
 
 model Addon {
-  id          Int         @id @default(autoincrement())
-  name        String
-  price       Float
-  addon_items AddonItem[]
+  addon_id        String           @id @default(uuid())
+  name            String           @unique
+  price           Decimal          @db.Decimal(10, 2)
+  orderItemAddons OrderItemAddon[]
+
+  @@map("addons")
 }
 
-model AddonItem {
-  id            Int       @id @default(autoincrement())
-  addon_id      Int
-  addon         Addon     @relation(fields: [addon_id], references: [id])
-  order_item_id Int
-  order_item    OrderItem @relation(fields: [order_item_id], references: [id])
-  quantity      Int
+model Order {
+  order_id         String         @id @default(uuid())
+  staff_id         String
+  grand_total      Decimal        @db.Decimal(10, 2)
+  method           Payment_Method
+  reference_number String?
+  amount_tendered  Decimal?       @db.Decimal(10, 2)
+  change_amount    Decimal?       @db.Decimal(10, 2)
+  note             String?
+  created_at       DateTime       @default(now())
+  orderItems       OrderItem[]
+  staff            User           @relation(fields: [staff_id], references: [id])
+
+  @@map("orders")
+}
+
+model OrderItem {
+  order_item_id      String           @id @default(uuid())
+  order_id           String
+  menu_id            String
+  snapshot_menu_name String
+  snapshot_price     Decimal          @db.Decimal(10, 2)
+  snapshot_inventory String
+  unit_price         Decimal          @db.Decimal(10, 2)
+  quantity           Int              @default(1)
+  line_total         Decimal          @db.Decimal(10, 2)
+  loyalty            Boolean          @default(false)
+  discount_amount    Decimal          @default(5) @db.Decimal(10, 2)
+  discount_type      Discount_Type?
+  discount_id_number String?
+  discount_contact   String?
+  orderItemAddons    OrderItemAddon[]
+  menu               Menu             @relation(fields: [menu_id], references: [menu_id])
+  order              Order            @relation(fields: [order_id], references: [order_id], onDelete: Cascade)
+
+  @@map("order_items")
+}
+
+model OrderItemAddon {
+  order_item_addon_id  String    @id @default(uuid())
+  addon_id             String
+  order_item_id        String
+  addon_name_snapshot  String
+  addon_price_snapshot Decimal   @db.Decimal(10, 2)
+  quantity             Int
+  total_price          Decimal   @db.Decimal(10, 2)
+  addon                Addon     @relation(fields: [addon_id], references: [addon_id])
+  orderItem            OrderItem @relation(fields: [order_item_id], references: [order_item_id], onDelete: Cascade)
+
+  @@map("order_item_addons")
+}
+
+model Expense {
+  expense_id  String       @id @default(uuid())
+  staff_id    String
+  type        Expense_Type
+  description String
+  amount      Decimal      @db.Decimal(10, 2)
+  timestamp   DateTime     @default(now())
+  staff       User         @relation(fields: [staff_id], references: [id])
+
+  @@map("expenses")
 }
 
 enum Inventory_Type {
   CUP
   STANDALONE
+}
+
+enum Inventory_Status {
+  AVAILABLE
+  UNAVAILABLE
+}
+
+enum Expense_Type {
+  CASH_IN
+  CASH_OUT
+}
+
+enum Payment_Method {
+  CASH
+  GCASH
+  GRAB
+}
+
+enum Discount_Type {
+  PWD
+  SENIOR
 }

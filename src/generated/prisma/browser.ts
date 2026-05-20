@@ -38,10 +38,10 @@ export type Account = Prisma.AccountModel
  */
 export type Verification = Prisma.VerificationModel
 /**
- * Model inventory
+ * Model Inventory
  * 
  */
-export type inventory = Prisma.inventoryModel
+export type Inventory = Prisma.InventoryModel
 /**
  * Model Menu
  * 
@@ -53,6 +53,11 @@ export type Menu = Prisma.MenuModel
  */
 export type MenuInventory = Prisma.MenuInventoryModel
 /**
+ * Model Addon
+ * 
+ */
+export type Addon = Prisma.AddonModel
+/**
  * Model Order
  * 
  */
@@ -63,12 +68,12 @@ export type Order = Prisma.OrderModel
  */
 export type OrderItem = Prisma.OrderItemModel
 /**
- * Model Addon
+ * Model OrderItemAddon
  * 
  */
-export type Addon = Prisma.AddonModel
+export type OrderItemAddon = Prisma.OrderItemAddonModel
 /**
- * Model AddonItem
+ * Model Expense
  * 
  */
-export type AddonItem = Prisma.AddonItemModel
+export type Expense = Prisma.ExpenseModel

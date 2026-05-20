@@ -55,13 +55,14 @@ export const ModelName = {
   Session: 'Session',
   Account: 'Account',
   Verification: 'Verification',
-  inventory: 'inventory',
+  Inventory: 'Inventory',
   Menu: 'Menu',
   MenuInventory: 'MenuInventory',
+  Addon: 'Addon',
   Order: 'Order',
   OrderItem: 'OrderItem',
-  Addon: 'Addon',
-  AddonItem: 'AddonItem'
+  OrderItemAddon: 'OrderItemAddon',
+  Expense: 'Expense'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -157,10 +158,9 @@ export type InventoryScalarFieldEnum = (typeof InventoryScalarFieldEnum)[keyof t
 
 
 export const MenuScalarFieldEnum = {
-  id: 'id',
+  menu_id: 'menu_id',
   name: 'name',
   price: 'price',
-  category: 'category',
   type: 'type'
 } as const
 
@@ -168,7 +168,7 @@ export type MenuScalarFieldEnum = (typeof MenuScalarFieldEnum)[keyof typeof Menu
 
 
 export const MenuInventoryScalarFieldEnum = {
-  id: 'id',
+  menu_inv_id: 'menu_inv_id',
   menu_id: 'menu_id',
   inventory_id: 'inventory_id',
   price: 'price'
@@ -177,42 +177,8 @@ export const MenuInventoryScalarFieldEnum = {
 export type MenuInventoryScalarFieldEnum = (typeof MenuInventoryScalarFieldEnum)[keyof typeof MenuInventoryScalarFieldEnum]
 
 
-export const OrderScalarFieldEnum = {
-  order_id: 'order_id',
-  method: 'method',
-  reference_number: 'reference_number',
-  paid: 'paid',
-  change: 'change',
-  total: 'total',
-  created_at: 'created_at'
-} as const
-
-export type OrderScalarFieldEnum = (typeof OrderScalarFieldEnum)[keyof typeof OrderScalarFieldEnum]
-
-
-export const OrderItemScalarFieldEnum = {
-  id: 'id',
-  order_id: 'order_id',
-  menu_id: 'menu_id',
-  name: 'name',
-  discount: 'discount',
-  quantity: 'quantity',
-  loyalty: 'loyalty',
-  discount_name: 'discount_name',
-  discount_id: 'discount_id',
-  subtotal: 'subtotal',
-  total: 'total',
-  change: 'change',
-  note: 'note',
-  cup_type: 'cup_type',
-  cup_size: 'cup_size'
-} as const
-
-export type OrderItemScalarFieldEnum = (typeof OrderItemScalarFieldEnum)[keyof typeof OrderItemScalarFieldEnum]
-
-
 export const AddonScalarFieldEnum = {
-  id: 'id',
+  addon_id: 'addon_id',
   name: 'name',
   price: 'price'
 } as const
@@ -220,14 +186,64 @@ export const AddonScalarFieldEnum = {
 export type AddonScalarFieldEnum = (typeof AddonScalarFieldEnum)[keyof typeof AddonScalarFieldEnum]
 
 
-export const AddonItemScalarFieldEnum = {
-  id: 'id',
-  addon_id: 'addon_id',
-  order_item_id: 'order_item_id',
-  quantity: 'quantity'
+export const OrderScalarFieldEnum = {
+  order_id: 'order_id',
+  staff_id: 'staff_id',
+  grand_total: 'grand_total',
+  method: 'method',
+  reference_number: 'reference_number',
+  amount_tendered: 'amount_tendered',
+  change_amount: 'change_amount',
+  note: 'note',
+  created_at: 'created_at'
 } as const
 
-export type AddonItemScalarFieldEnum = (typeof AddonItemScalarFieldEnum)[keyof typeof AddonItemScalarFieldEnum]
+export type OrderScalarFieldEnum = (typeof OrderScalarFieldEnum)[keyof typeof OrderScalarFieldEnum]
+
+
+export const OrderItemScalarFieldEnum = {
+  order_item_id: 'order_item_id',
+  order_id: 'order_id',
+  menu_id: 'menu_id',
+  snapshot_menu_name: 'snapshot_menu_name',
+  snapshot_price: 'snapshot_price',
+  snapshot_inventory: 'snapshot_inventory',
+  unit_price: 'unit_price',
+  quantity: 'quantity',
+  line_total: 'line_total',
+  loyalty: 'loyalty',
+  discount_amount: 'discount_amount',
+  discount_type: 'discount_type',
+  discount_id_number: 'discount_id_number',
+  discount_contact: 'discount_contact'
+} as const
+
+export type OrderItemScalarFieldEnum = (typeof OrderItemScalarFieldEnum)[keyof typeof OrderItemScalarFieldEnum]
+
+
+export const OrderItemAddonScalarFieldEnum = {
+  order_item_addon_id: 'order_item_addon_id',
+  addon_id: 'addon_id',
+  order_item_id: 'order_item_id',
+  addon_name_snapshot: 'addon_name_snapshot',
+  addon_price_snapshot: 'addon_price_snapshot',
+  quantity: 'quantity',
+  total_price: 'total_price'
+} as const
+
+export type OrderItemAddonScalarFieldEnum = (typeof OrderItemAddonScalarFieldEnum)[keyof typeof OrderItemAddonScalarFieldEnum]
+
+
+export const ExpenseScalarFieldEnum = {
+  expense_id: 'expense_id',
+  staff_id: 'staff_id',
+  type: 'type',
+  description: 'description',
+  amount: 'amount',
+  timestamp: 'timestamp'
+} as const
+
+export type ExpenseScalarFieldEnum = (typeof ExpenseScalarFieldEnum)[keyof typeof ExpenseScalarFieldEnum]
 
 
 export const SortOrder = {
