@@ -1,4 +1,3 @@
-import { Toaster } from "@/components/ui/sonner";
 import { TanStackDevtools } from "@tanstack/react-devtools";
 import type { QueryClient } from "@tanstack/react-query";
 import {
@@ -7,6 +6,7 @@ import {
 	Scripts,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
+import { Toaster } from "@/components/ui/sonner";
 import { TanstackFormDevtools } from "@/integrations/tanstack-form";
 import {
 	RouteErrorBoundary,
@@ -32,7 +32,10 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 				name: "viewport",
 				content: "width=device-width, initial-scale=1",
 			},
-			...createSeo().meta,
+			...createSeo({
+				title: "48 Coffee POS",
+				description: "POS for 48 Coffee - Ledesma",
+			}).meta,
 		],
 		links: [
 			{

@@ -13,7 +13,8 @@
 		"db:pull": "dotenv -e .env.local -- prisma db pull",
 		"db:migrate": "dotenv -e .env.local -- prisma migrate dev",
 		"db:studio": "dotenv -e .env.local -- prisma studio",
-		"db:seed": "dotenv -e .env.local -- prisma db seed"
+		"db:seed": "dotenv -e .env.local -- prisma db seed",
+		"auth:generate": "npx auth@latest generate --config ./src/integrations/better-auth/auth.ts"
 	},
 	"dependencies": {
 		"@base-ui/react": "^1.4.1",
@@ -36,6 +37,7 @@
 		"@tanstack/react-start": "latest",
 		"@tanstack/react-table": "latest",
 		"@tanstack/router-plugin": "^1.132.0",
+		"babel-plugin-react-compiler": "^1.0.0",
 		"better-auth": "^1.5.3",
 		"class-variance-authority": "^0.7.1",
 		"clsx": "^2.1.1",
