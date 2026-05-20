@@ -55,6 +55,7 @@ export const createOrder = createServerFn({ method: "POST" })
         if (!fallbackUser) {
           fallbackUser = await tx.user.create({
             data: {
+              id: crypto.randomUUID(),
               name: "Default Staff",
               email: "staff@example.com",
               role: "STAFF"
