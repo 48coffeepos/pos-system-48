@@ -1,4 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
+import { getRequestHeaders } from "@tanstack/react-start/server";
+import { auth } from "@/integrations/better-auth/auth";
 import { z } from "zod";
 import { prisma } from "@/integrations/prisma/db";
 import { Payment_Method, Discount_Type } from "@/generated/prisma/enums.js";
@@ -42,15 +44,24 @@ export const createOrder = createServerFn({ method: "POST" })
   .inputValidator(createOrderInput)
   .handler(async ({ data }) => {
     return await prisma.$transaction(async (tx) => {
-      let user = await tx.user.findFirst();
-      if (!user) {
-        user = await tx.user.create({
-          data: {
-            name: "Default Staff",
-            email: "staff@example.com",
-            role: "STAFF"
-          }
-        });
+      const headers = getRequestHeaders();
+      const session = await auth.api.getSession({ headers });
+      
+      let userId: string;
+      if (session?.user) {
+        userId = session.user.id;
+      } else {
+        let fallbackUser = await tx.user.findFirst();
+        if (!fallbackUser) {
+          fallbackUser = await tx.user.create({
+            data: {
+              name: "Default Staff",
+              email: "staff@example.com",
+              role: "STAFF"
+            }
+          });
+        }
+        userId = fallbackUser.id;
       }
 
       const lastOrder = await tx.order.findFirst({
@@ -74,7 +85,7 @@ export const createOrder = createServerFn({ method: "POST" })
       const order = await tx.order.create({
         data: {
           order_id: generatedOrderId,
-          staff_id: user.id,
+          staff_id: userId,
           method: data.method as Payment_Method,
           reference_number: data.reference_number || null,
           amount_tendered: data.amount_tendered !== undefined ? data.amount_tendered : null,

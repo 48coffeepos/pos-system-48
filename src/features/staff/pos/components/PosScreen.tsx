@@ -13,6 +13,7 @@ import { PosReceiptDialog } from "./PosReceiptDialog";
 import { posPageDataQueryOptions } from "../queryOptions";
 import { createOrderMutationOptions } from "../mutationOptions";
 import { usePosStore } from "../stores/usePosStore";
+import { sessionQueryOptions } from "@/features/auth/queryOptions";
 import type { MenuItem, CartItem, PosOrder } from "../types";
 
 const posFormSchema = z.object({
@@ -43,6 +44,7 @@ export function PosScreen() {
 
 	const queryClient = useQueryClient();
 	const { data, isLoading, error } = useQuery(posPageDataQueryOptions);
+	const { data: session } = useQuery(sessionQueryOptions);
 	const createOrderMutation = useMutation(createOrderMutationOptions(queryClient));
 
 	const cartTotal = cart.reduce((s, c) => s + c.total_price, 0);
@@ -276,7 +278,7 @@ export function PosScreen() {
 				open={showReceipt}
 				onClose={() => setShowReceipt(false)}
 				onPrint={handlePrint}
-				cashierName="Cashier"
+				cashierName={session?.user?.name || "Cashier"}
 			/>
 		</div>
 	);
