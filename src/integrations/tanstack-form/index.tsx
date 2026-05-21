@@ -2,6 +2,7 @@ import { createFormHook, createFormHookContexts } from "@tanstack/react-form";
 import { FormDevtoolsPanel } from "@tanstack/react-form-devtools";
 import { FormCheckbox } from "./components/form-checkbox";
 import { FormInput } from "./components/form-input";
+import { FormPassword } from "./components/form-password";
 import { FormRadio } from "./components/form-radio";
 import { FormSelect } from "./components/form-select";
 import { FormSubmitButton } from "./components/form-submit-button";
@@ -14,6 +15,7 @@ export const { fieldContext, formContext, useFieldContext, useFormContext } =
 export const { useAppForm, withForm } = createFormHook({
 	fieldComponents: {
 		Input: FormInput,
+		Password: FormPassword,
 		Textarea: FormTextarea,
 		Select: FormSelect,
 		Checkbox: FormCheckbox,
@@ -29,5 +31,5 @@ export const { useAppForm, withForm } = createFormHook({
 
 export const TanstackFormDevtools = {
 	name: "Tanstack Form",
-	render: () => <FormDevtoolsPanel />,
+	render: <FormDevtoolsPanel />,
 };

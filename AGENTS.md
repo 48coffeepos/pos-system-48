@@ -30,7 +30,7 @@ npx @tanstack/cli@latest create 48-coffee-pos --framework React --yes --package-
 - **State/Data**: TanStack Query (SSR-integrated via `@tanstack/react-router-ssr-query`)
 - **Client State**: Zustand (global UI + domain client state)
 - **Forms**: TanStack Form v1 w/ Zod (Standard Schema validation, no adapter needed)
-- **UI Table**: TanStack Table w/ match-sorter-utils for fuzzy filtering
+- **UI Table**: TanStack Table w/ fuse.js for fuzzy filtering (match-sorter-utils available but unused)
 - **Devtools**: TanStack Devtools, React Router Devtools, Query Devtools
 - **Testing**: Vitest + jsdom + Testing Library
 - **Toolchain**: TypeScript 6, Vite 8, Rolldown
@@ -57,13 +57,13 @@ DIRECT_URL=pq://... (direct — for Prisma CLI commands)
 - `/src/generated/prisma/` — Generated Prisma client (gitignored)
 - `/src/stores/` — Global client state (Zustand)
 - `/src/components/ui/data-table.tsx` — Generic table primitive (TanStack Table + shadcn)
-- `/src/features/todos/` — Todos feature entrypoint (`keys.ts`, `queryOptions.ts`, `mutationOptions.ts`, `server/`, `components/`)
+- `/src/features/<domain>/<subdomain>/` — Feature modules. Features nest sub-features inside the parent domain (e.g. `admin/accounts/`, `admin/inventory/`). Each owns `keys.ts`, `queryOptions.ts`, `mutationOptions.ts`, `server/`, `components/`, and optionally `schemas/` and `stores/`.
 
 ## Repo Conventions
 
 - Organize code by domain/feature first, not by technical layer alone.
 - Each feature should own its own `components/`, `server/`, `schemas/`, `keys.ts`, `queryOptions.ts`, and `mutationOptions.ts` as needed.
-- Keep feature logic colocated inside `src/features/<domain>/`.
+- Keep feature logic colocated inside `src/features/<domain>/` or `src/features/<domain>/<subdomain>/`.
 - Keep `src/routes/` files thin; they should handle route-level concerns like loaders, `beforeLoad`, params/search/url handling, redirects, server fetching, and prefetching, while rendering domain-specific components.
 - Keep client-side components and interaction logic in `src/features/<domain>/` or `src/components/`, not in `src/routes/`.
 - Use `@/` imports for app code under `src/`.
@@ -76,7 +76,7 @@ DIRECT_URL=pq://... (direct — for Prisma CLI commands)
 ## Zustand Conventions
 
 - Global UI state (theme, sidebar, cart) lives in `src/stores/`.
-- Domain-specific client state lives in `src/features/<domain>/stores/`.
+- Domain-specific client state lives in `src/features/<domain>/stores/` or `src/features/<domain>/<subdomain>/stores/`.
 - Server state stays in TanStack Query. Never mirror server data in Zustand.
 
 ## Server Function Wiring
@@ -125,8 +125,8 @@ import todoKeys from "./keys";
 import getTodos from "./server/getTodos";
 
 export const getAllTodosQueryOptions = queryOptions({
-	queryKey: todoKeys.all,
-	queryFn: getTodos,
+  queryKey: todoKeys.all,
+  queryFn: getTodos,
 });
 ```
 
@@ -140,10 +140,10 @@ import { createFileRoute } from "@tanstack/react-router";
 import { getAllTodosQueryOptions } from "@/features/todos/queryOptions";
 
 export const Route = createFileRoute("/demo/todos")({
-	loader: async ({ context: { queryClient } }) => {
-		await queryClient.ensureQueryData(getAllTodosQueryOptions);
-	},
-	component: TodosRoute,
+  loader: async ({ context: { queryClient } }) => {
+    await queryClient.ensureQueryData(getAllTodosQueryOptions);
+  },
+  component: TodosRoute,
 });
 ```
 
@@ -153,9 +153,9 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { getAllTodosQueryOptions } from "@/features/todos/queryOptions";
 
 function TodosRoute() {
-	const { data } = useSuspenseQuery(getAllTodosQueryOptions);
+  const { data } = useSuspenseQuery(getAllTodosQueryOptions);
 
-	return <pre>{JSON.stringify(data, null, 2)}</pre>;
+  return <pre>{JSON.stringify(data, null, 2)}</pre>;
 }
 ```
 
@@ -194,16 +194,16 @@ import { useQuery } from "@tanstack/react-query";
 import { getAllTodosQueryOptions } from "@/features/todos/queryOptions";
 
 export const Route = createFileRoute("/demo/todos")({
-	component: TodosRoute,
+  component: TodosRoute,
 });
 
 function TodosRoute() {
-	const { data, isLoading, error } = useQuery(getAllTodosQueryOptions);
+  const { data, isLoading, error } = useQuery(getAllTodosQueryOptions);
 
-	if (isLoading) return <div>Loading...</div>;
-	if (error) return <div>Failed to load todos.</div>;
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Failed to load todos.</div>;
 
-	return <pre>{JSON.stringify(data, null, 2)}</pre>;
+  return <pre>{JSON.stringify(data, null, 2)}</pre>;
 }
 ```
 
@@ -232,17 +232,17 @@ Use route boundaries for navigation-level loading and route-level failures, not 
 import { createFileRoute } from "@tanstack/react-router";
 import { ordersQueryOptions } from "@/features/orders/queryOptions";
 import {
-	RouteErrorBoundary,
-	RoutePendingBoundary,
+  RouteErrorBoundary,
+  RoutePendingBoundary,
 } from "@/components/route-boundaries";
 
 export const Route = createFileRoute("/orders")({
-	loader: async ({ context: { queryClient } }) => {
-		await queryClient.ensureQueryData(ordersQueryOptions);
-	},
-	pendingComponent: RoutePendingBoundary,
-	errorComponent: RouteErrorBoundary,
-	component: OrdersRoute,
+  loader: async ({ context: { queryClient } }) => {
+    await queryClient.ensureQueryData(ordersQueryOptions);
+  },
+  pendingComponent: RoutePendingBoundary,
+  errorComponent: RouteErrorBoundary,
+  component: OrdersRoute,
 });
 ```
 
@@ -261,23 +261,23 @@ Use `useInfiniteQuery(...)` for cursor-based or unbounded collections such as fe
 
 ```ts
 export const activityKeys = {
-	all: ["activity"] as const,
+  all: ["activity"] as const,
 };
 
 const getActivity = createServerFn({ method: "GET" }).handler(
-	async ({ data }: { data?: { cursor?: string | null } }) => {
-		return {
-			items: [{ id: 1, label: "Opened register" }],
-			nextCursor: null as string | null,
-		};
-	},
+  async ({ data }: { data?: { cursor?: string | null } }) => {
+    return {
+      items: [{ id: 1, label: "Opened register" }],
+      nextCursor: null as string | null,
+    };
+  },
 );
 
 export const activityInfiniteQueryOptions = infiniteQueryOptions({
-	queryKey: activityKeys.all,
-	initialPageParam: null as string | null,
-	queryFn: ({ pageParam }) => getActivity({ data: { cursor: pageParam } }),
-	getNextPageParam: (lastPage) => lastPage.nextCursor,
+  queryKey: activityKeys.all,
+  initialPageParam: null as string | null,
+  queryFn: ({ pageParam }) => getActivity({ data: { cursor: pageParam } }),
+  getNextPageParam: (lastPage) => lastPage.nextCursor,
 });
 ```
 
@@ -287,12 +287,12 @@ import { createFileRoute } from "@tanstack/react-router";
 import { activityInfiniteQueryOptions } from "@/features/activity/queryOptions";
 
 export const Route = createFileRoute("/activity")({
-	loader: async ({ context }) => {
-		await context.queryClient.prefetchInfiniteQuery(
-			activityInfiniteQueryOptions,
-		);
-	},
-	component: ActivityRoute,
+  loader: async ({ context }) => {
+    await context.queryClient.prefetchInfiniteQuery(
+      activityInfiniteQueryOptions,
+    );
+  },
+  component: ActivityRoute,
 });
 ```
 
@@ -302,24 +302,24 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { activityInfiniteQueryOptions } from "@/features/activity/queryOptions";
 
 function ActivityRoute() {
-	const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
-		useInfiniteQuery(activityInfiniteQueryOptions);
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useInfiniteQuery(activityInfiniteQueryOptions);
 
-	const items = data?.pages.flatMap((page) => page.items) ?? [];
+  const items = data?.pages.flatMap((page) => page.items) ?? [];
 
-	return (
-		<div>
-			{items.map((item) => (
-				<div key={item.id}>{item.label}</div>
-			))}
-			<button
-				disabled={!hasNextPage || isFetchingNextPage}
-				onClick={() => fetchNextPage()}
-			>
-				Load more
-			</button>
-		</div>
-	);
+  return (
+    <div>
+      {items.map((item) => (
+        <div key={item.id}>{item.label}</div>
+      ))}
+      <button
+        disabled={!hasNextPage || isFetchingNextPage}
+        onClick={() => fetchNextPage()}
+      >
+        Load more
+      </button>
+    </div>
+  );
 }
 ```
 
@@ -337,7 +337,7 @@ Define query key factories/constants in `keys.ts`.
 ```ts
 // src/features/todos/keys.ts
 const todoKeys = {
-	all: ["todos"] as const,
+  all: ["todos"] as const,
 };
 
 export default todoKeys;
@@ -364,11 +364,11 @@ import createTodo from "./server/createTodo";
 import todoKeys from "./keys";
 
 export const createTodoMutationOptions = mutationOptions({
-	mutationFn: async (title: string) => createTodo({ data: { title } }),
-	onSuccess: async (_data, _variables, context) => {
-		// Invalidate the "todos" query to refetch the list after creating a new todo
-		await context.client.invalidateQueries({ queryKey: todoKeys.all });
-	},
+  mutationFn: async (title: string) => createTodo({ data: { title } }),
+  onSuccess: async (_data, _variables, context) => {
+    // Invalidate the "todos" query to refetch the list after creating a new todo
+    await context.client.invalidateQueries({ queryKey: todoKeys.all });
+  },
 });
 ```
 
@@ -414,41 +414,41 @@ import { useAppForm } from '@/integrations/tanstack-form'
 
 ```tsx
 const form = useAppForm({
-	defaultValues: { name: "" },
-	validators: { onChange: MyZodSchema },
-	onSubmit: async ({ value }) => {
-		// createServerFn call
-	},
+  defaultValues: { name: "" },
+  validators: { onChange: MyZodSchema },
+  onSubmit: async ({ value }) => {
+    // createServerFn call
+  },
 });
 
 return (
-	<form
-		onSubmit={(e) => {
-			e.preventDefault();
-			form.handleSubmit();
-		}}
-	>
-		<form.AppField name="name">
-			{(field) => <field.Input label="Name" placeholder="Enter name" />}
-		</form.AppField>
-		<form.AppField name="role">
-			{(field) => (
-				<field.Select
-					label="Role"
-					options={[
-						{ value: "admin", label: "Admin" },
-						{ value: "user", label: "User" },
-					]}
-				/>
-			)}
-		</form.AppField>
-		<form.AppField name="notify">
-			{(field) => <field.Checkbox label="Send notifications" />}
-		</form.AppField>
-		<form.AppForm>
-			<form.SubmitButton label="Save" />
-		</form.AppForm>
-	</form>
+  <form
+    onSubmit={(e) => {
+      e.preventDefault();
+      form.handleSubmit();
+    }}
+  >
+    <form.AppField name="name">
+      {(field) => <field.Input label="Name" placeholder="Enter name" />}
+    </form.AppField>
+    <form.AppField name="role">
+      {(field) => (
+        <field.Select
+          label="Role"
+          options={[
+            { value: "admin", label: "Admin" },
+            { value: "user", label: "User" },
+          ]}
+        />
+      )}
+    </form.AppField>
+    <form.AppField name="notify">
+      {(field) => <field.Checkbox label="Send notifications" />}
+    </form.AppField>
+    <form.AppForm>
+      <form.SubmitButton label="Save" />
+    </form.AppForm>
+  </form>
 );
 ```
 
@@ -465,23 +465,23 @@ return (
 
 ```
 src/integrations/tanstack-form/
-├── index.ts                            ← createFormHookContexts + createFormHook + exports
+├── index.tsx                            ← createFormHookContexts + createFormHook + exports
 └── components/                         ← registered field and form components
 ```
 
 ## Commands
 
-| Command                    | Purpose                                        |
-| -------------------------- | ---------------------------------------------- |
-| `npm run dev`              | Start dev server (port 3000)                   |
-| `npm run build`            | Production build                               |
-| `npm run test`             | Run Vitest tests                               |
-| `npm run db:generate`      | Generate Prisma client                         |
-| `npm run db:push`          | Push schema to DB                              |
-| `npm run db:migrate`       | Run Prisma migrations                          |
-| `npm run db:studio`        | Open Prisma Studio                             |
-| `npm run db:seed`          | Seed database                                  |
-| `npx auth@latest generate` | Regenerate Better Auth schema in schema.prisma |
+| Command                 | Purpose                                        |
+| ----------------------- | ---------------------------------------------- |
+| `npm run dev`           | Start dev server (port 3000)                   |
+| `npm run build`         | Production build                               |
+| `npm run test`          | Run Vitest tests                               |
+| `npm run db:generate`   | Generate Prisma client                         |
+| `npm run db:push`       | Push schema to DB                              |
+| `npm run db:migrate`    | Run Prisma migrations                          |
+| `npm run db:studio`     | Open Prisma Studio                             |
+| `npm run db:seed`       | Seed database                                  |
+| `npm run auth:generate` | Regenerate Better Auth schema in schema.prisma |
 
 ## Known Gotchas
 
@@ -494,7 +494,10 @@ src/integrations/tanstack-form/
 - **Better Auth experimental joins** enabled for 2-3x perf on session/org queries (big win on Neon cold starts)
 - Before architectural or library-specific changes, load relevant TanStack Intent skill: `npx @tanstack/intent@latest load <package>#<skill>`
 - Tailwind v4 — use `@import "tailwindcss"` not `@tailwind base/components/utilities`
-- **TanStack Form v1 uses Standard Schema** — no `@tanstack/zod-form-adapter`. Pass Zod schemas directly to `validators: { onChange: schema }`.
+- **TanStack Form v1 uses Standard Schema** — no `@tanstack/zod-form-adapter`. Pass Zod schemas directly to `validators: { onSubmit: schema }`.
+- **`verbatimModuleSyntax: true`** — type-only imports require `import type { ... }` or `import { type ... }`. Using bare `import` for a type that is only used as a type annotation will cause a compile error.
+- **`.env.local` (not `.env`)** — all `db:*` commands run via `dotenv -e .env.local`. Copy `.env.example` to `.env.local` and fill in the values. `.env` is gitignored but the npm scripts won't read it.
+- **`fuse.js` for client-side fuzzy search** — the project uses `fuse.js`, not `@tanstack/match-sorter-utils` (available in deps but unused in practice).
 
 ```
 

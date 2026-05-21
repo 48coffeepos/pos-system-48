@@ -1,13 +1,25 @@
-import { createFileRoute, Outlet } from "@tanstack/react-router";
+import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import { sessionQueryOptions } from "@/features/auth/queryOptions";
+import { StaffHeader } from "../../components/StaffHeader";
 
 export const Route = createFileRoute("/staff")({
-	component: StaffLayout,
+	component: RouteComponent,
+	loader: async ({ context }) => {
+		const currentUser =
+			await context.queryClient.ensureQueryData(sessionQueryOptions);
+		if (!currentUser) {
+			throw redirect({
+				to: "/",
+			});
+		}
+	},
 });
 
-function StaffLayout() {
+function RouteComponent() {
 	return (
-		<div className="min-h-screen">
+		<main className="min-h-screen">
+			<StaffHeader />
 			<Outlet />
-		</div>
+		</main>
 	);
 }

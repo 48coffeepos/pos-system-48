@@ -200,7 +200,7 @@ model User {
 }
 
 model Verification {
-  id         String   @id @default(uuid())
+  id         String   @id
   identifier String
   value      String
   expiresAt  DateTime
@@ -210,3 +210,4 @@ model Verification {
   @@index([identifier])
   @@map("verification")
 }
+
