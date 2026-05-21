@@ -1,9 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { PosScreen } from "@/features/staff/pos/components/PosScreen";
 
 export const Route = createFileRoute("/staff/pos")({
-	component: RouteComponent,
+	component: StaffPosRoute,
 });
 
-function RouteComponent() {
-	return <div>Hello "/staff/pos"!</div>;
+function StaffPosRoute() {
+	return <PosScreen />;
 }

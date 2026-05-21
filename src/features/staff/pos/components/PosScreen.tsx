@@ -1,0 +1,283 @@
+import { useMemo, useCallback } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Toaster, toast } from "sonner";
+import { z } from "zod";
+import { useAppForm } from "@/integrations/tanstack-form";
+import { formatPeso } from "@/lib/format-currency";
+import { StaffHeader } from "@/features/staff/components/StaffHeader";
+import { PosProductGrid } from "./PosProductGrid";
+import { PosCartPanel } from "./PosCartPanel";
+import { PosCupPickerDialog } from "./PosCupPickerDialog";
+import { PosOrderConfirmDialog } from "./PosOrderConfirmDialog";
+import { PosReceiptDialog } from "./PosReceiptDialog";
+import { posPageDataQueryOptions } from "../queryOptions";
+import { createOrderMutationOptions } from "../mutationOptions";
+import { usePosStore } from "../stores/usePosStore";
+import type { MenuItem, CartItem, PosOrder } from "../types";
+
+const posFormSchema = z.object({
+	note: z.string(),
+	paymentMethod: z.enum(["CASH", "GCASH", "GRAB"]),
+	amountPaid: z.string(),
+	referenceNumber: z.string(),
+});
+
+export function PosScreen() {
+	const {
+		search,
+		setSearch,
+		showReceipt,
+		setShowReceipt,
+		showPlaceOrderConfirm,
+		setShowPlaceOrderConfirm,
+		lastOrder,
+		setLastOrder,
+		customizeItem,
+		setCustomizeItem,
+		cart,
+		addToCart,
+		removeFromCart,
+		updateQuantity,
+		clearCart,
+	} = usePosStore();
+
+	const queryClient = useQueryClient();
+	const { data, isLoading, error } = useQuery(posPageDataQueryOptions);
+	const createOrderMutation = useMutation(createOrderMutationOptions(queryClient));
+
+	const cartTotal = cart.reduce((s, c) => s + c.total_price, 0);
+
+	const form = useAppForm({
+		defaultValues: {
+			note: "",
+			paymentMethod: "CASH" as "CASH" | "GCASH" | "GRAB",
+			amountPaid: "",
+			referenceNumber: "",
+		},
+		validators: {
+			onChange: posFormSchema,
+		},
+		onSubmit: async ({ value }) => {
+			if (cart.length === 0) {
+				toast.error("Cart is empty");
+				return;
+			}
+			const paidNum = parseFloat(value.amountPaid) || 0;
+			if (value.paymentMethod !== "GRAB" && paidNum < cartTotal) {
+				toast.error(`Insufficient amount. Total is ${formatPeso(cartTotal)}`);
+				return;
+			}
+			if ((value.paymentMethod === "GCASH" || value.paymentMethod === "GRAB") && !value.referenceNumber.trim()) {
+				toast.error("Please enter reference number");
+				return;
+			}
+			setShowPlaceOrderConfirm(true);
+		},
+	});
+
+	if (error) {
+		console.error("POS page data query failed:", error);
+	}
+
+	const allMenuItems: MenuItem[] = useMemo(
+		() => (data?.menuItems ?? []) as MenuItem[],
+		[data],
+	);
+
+	const addOns = data?.addOns ?? [];
+
+
+	const menuItems = useMemo(
+		() =>
+			allMenuItems.filter((item) => {
+				if (
+					search &&
+					!item.name.toLowerCase().includes(search.toLowerCase())
+				)
+					return false;
+				return true;
+			}),
+		[allMenuItems, search],
+	);
+
+	const handleCustomizeConfirm = useCallback(
+		(params: {
+			lineKey: string;
+			menu_id: string;
+			menu_name: string;
+			cup_type: string;
+			cup_size: string;
+			unit_price: number;
+			total_price: number;
+			discount?: string;
+			discount_name?: string;
+			discount_id?: string;
+			is_free_drink?: boolean;
+			addon_items?: Array<{ addon_id: string; name: string; price: number; quantity: number }>;
+		}) => {
+			addToCart({ ...params, quantity: 1 } as CartItem);
+			toast.success(`${params.menu_name} added to cart`);
+		},
+		[addToCart],
+	);
+
+	const handleProductClick = useCallback((item: MenuItem) => {
+		if (item.type === "STANDALONE") {
+			const newItem: CartItem = {
+				lineKey: `${item.menu_id}-NONE-NONE`,
+				menu_id: item.menu_id,
+				menu_name: item.name,
+				quantity: 1,
+				cup_type: "NONE",
+				cup_size: "NONE",
+				unit_price: item.price || 0,
+				total_price: item.price || 0,
+			};
+			addToCart(newItem);
+		} else {
+			setCustomizeItem(item);
+		}
+	}, [setCustomizeItem, addToCart]);
+
+	const handleUpdateQuantity = useCallback(
+		(lineKey: string, delta: number) => {
+			const existing = cart.find((c) => c.lineKey === lineKey);
+			if (existing) {
+				updateQuantity(lineKey, existing.quantity + delta);
+			}
+		},
+		[cart, updateQuantity],
+	);
+
+	const handlePlaceOrder = useCallback(async () => {
+		const values = form.state.values;
+		const paidNum = parseFloat(values.amountPaid) || 0;
+		const changeAmt = paidNum - cartTotal;
+
+		try {
+			const placedOrder = await createOrderMutation.mutateAsync({
+				method: values.paymentMethod as any,
+				reference_number: values.referenceNumber || undefined,
+				amount_tendered: values.paymentMethod === "GRAB" ? undefined : paidNum,
+				change_amount: values.paymentMethod === "GRAB" ? undefined : changeAmt,
+				grand_total: cartTotal,
+				note: values.note || undefined,
+				items: cart.map((c) => ({
+					menu_id: c.menu_id,
+					snapshot_menu_name: c.menu_name,
+					snapshot_inventory: c.cup_type && c.cup_type !== "NONE" ? `${c.cup_size} ${c.cup_type}` : c.menu_name,
+					quantity: c.quantity,
+					unit_price: c.unit_price,
+					discount_type: c.discount as any,
+					discount_contact: c.discount_name,
+					discount_id_number: c.discount_id,
+					line_total: c.total_price,
+					cup_type: c.cup_type,
+					cup_size: c.cup_size,
+					addon_items: c.addon_items?.map((a) => ({
+						addon_id: a.addon_id,
+						addon_name_snapshot: a.name,
+						addon_price_snapshot: a.price,
+						quantity: a.quantity,
+					})),
+				})),
+			});
+
+			const order: PosOrder = {
+				order_id: placedOrder.order_id,
+				created_at: new Date(placedOrder.created_at).toISOString(),
+				method: placedOrder.method,
+				reference_number: placedOrder.reference_number || undefined,
+				amount_tendered: placedOrder.amount_tendered !== null ? Number(placedOrder.amount_tendered) : undefined,
+				change_amount: placedOrder.change_amount !== null ? Number(placedOrder.change_amount) : undefined,
+				grand_total: Number(placedOrder.grand_total),
+				note: values.note || undefined,
+				items: cart.map((c) => ({
+					snapshot_menu_name: c.menu_name,
+					quantity: c.quantity,
+					unit_price: c.unit_price,
+					discount_type: c.discount,
+					discount_contact: c.discount_name,
+					discount_id_number: c.discount_id,
+					line_total: c.total_price,
+					snapshot_inventory: c.cup_type && c.cup_type !== "NONE" ? `${c.cup_size} ${c.cup_type}` : c.menu_name,
+					addon_items: c.addon_items?.map((a) => ({
+						addon_id: a.addon_id,
+						addon_name_snapshot: a.name,
+						addon_price_snapshot: a.price,
+						quantity: a.quantity,
+					})),
+				})),
+			};
+
+			setLastOrder(order);
+			setShowReceipt(true);
+			clearCart();
+			form.reset();
+			setShowPlaceOrderConfirm(false);
+			toast.success(`Order #${order.order_id} placed successfully!`);
+		} catch (err: any) {
+			console.error("Order placement failed:", err);
+			toast.error("Failed to place order: " + (err.message || "Unknown error"));
+		}
+	}, [cart, cartTotal, clearCart, createOrderMutation, form, setLastOrder, setShowReceipt, setShowPlaceOrderConfirm]);
+
+	const handlePrint = useCallback(() => {
+		window.print();
+	}, []);
+
+	return (
+		<div
+			className="flex h-screen flex-col overflow-x-auto"
+			style={{ background: "var(--warm-beige)" }}
+		>
+			<div className="flex flex-col h-full min-w-[1024px]">
+				<Toaster position="top-right" richColors />
+				<StaffHeader />
+
+				<div className="flex flex-1 overflow-hidden">
+				<PosProductGrid
+					menuItems={menuItems}
+					loading={isLoading}
+					search={search}
+					onSearchChange={setSearch}
+					onProductClick={handleProductClick}
+				/>
+				<PosCartPanel
+					cart={cart}
+					form={form}
+					onRemoveFromCart={removeFromCart}
+					onUpdateQuantity={handleUpdateQuantity}
+					onClearCart={clearCart}
+					onPlaceOrderClick={() => {
+						form.handleSubmit();
+					}}
+				/>
+			</div>
+			</div>
+
+			<PosCupPickerDialog
+				item={customizeItem}
+				addOns={addOns}
+				onClose={() => setCustomizeItem(null)}
+				onConfirm={handleCustomizeConfirm}
+			/>
+
+			<PosOrderConfirmDialog
+				open={showPlaceOrderConfirm}
+				total={cartTotal}
+				isLoading={createOrderMutation.isPending}
+				onClose={() => setShowPlaceOrderConfirm(false)}
+				onConfirm={handlePlaceOrder}
+			/>
+
+			<PosReceiptDialog
+				order={lastOrder}
+				open={showReceipt}
+				onClose={() => setShowReceipt(false)}
+				onPrint={handlePrint}
+				cashierName="Cashier"
+			/>
+		</div>
+	);
+}
