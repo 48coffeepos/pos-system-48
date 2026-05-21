@@ -42,6 +42,7 @@ function StaffInventory() {
 				) : (
 					<InventoryList
 						items={inventory as any}
+						hideActions={true}
 					/>
 				)}
 			</main>

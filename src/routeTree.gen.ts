@@ -14,6 +14,7 @@ import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as StaffIndexRouteImport } from './routes/staff/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as StaffXreadingRouteImport } from './routes/staff/xreading'
 import { Route as StaffPosRouteImport } from './routes/staff/pos'
 import { Route as StaffOrdersRouteImport } from './routes/staff/orders'
 import { Route as StaffInventoryRouteImport } from './routes/staff/inventory'
@@ -47,6 +48,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AdminRouteRoute,
+} as any)
+const StaffXreadingRoute = StaffXreadingRouteImport.update({
+  id: '/xreading',
+  path: '/xreading',
+  getParentRoute: () => StaffRouteRoute,
 } as any)
 const StaffPosRoute = StaffPosRouteImport.update({
   id: '/pos',
@@ -100,6 +106,7 @@ export interface FileRoutesByFullPath {
   '/staff/inventory': typeof StaffInventoryRoute
   '/staff/orders': typeof StaffOrdersRoute
   '/staff/pos': typeof StaffPosRoute
+  '/staff/xreading': typeof StaffXreadingRoute
   '/admin/': typeof AdminIndexRoute
   '/staff/': typeof StaffIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -113,6 +120,7 @@ export interface FileRoutesByTo {
   '/staff/inventory': typeof StaffInventoryRoute
   '/staff/orders': typeof StaffOrdersRoute
   '/staff/pos': typeof StaffPosRoute
+  '/staff/xreading': typeof StaffXreadingRoute
   '/admin': typeof AdminIndexRoute
   '/staff': typeof StaffIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -129,6 +137,7 @@ export interface FileRoutesById {
   '/staff/inventory': typeof StaffInventoryRoute
   '/staff/orders': typeof StaffOrdersRoute
   '/staff/pos': typeof StaffPosRoute
+  '/staff/xreading': typeof StaffXreadingRoute
   '/admin/': typeof AdminIndexRoute
   '/staff/': typeof StaffIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -146,6 +155,7 @@ export interface FileRouteTypes {
     | '/staff/inventory'
     | '/staff/orders'
     | '/staff/pos'
+    | '/staff/xreading'
     | '/admin/'
     | '/staff/'
     | '/api/auth/$'
@@ -159,6 +169,7 @@ export interface FileRouteTypes {
     | '/staff/inventory'
     | '/staff/orders'
     | '/staff/pos'
+    | '/staff/xreading'
     | '/admin'
     | '/staff'
     | '/api/auth/$'
@@ -174,6 +185,7 @@ export interface FileRouteTypes {
     | '/staff/inventory'
     | '/staff/orders'
     | '/staff/pos'
+    | '/staff/xreading'
     | '/admin/'
     | '/staff/'
     | '/api/auth/$'
@@ -222,6 +234,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRouteRoute
+    }
+    '/staff/xreading': {
+      id: '/staff/xreading'
+      path: '/xreading'
+      fullPath: '/staff/xreading'
+      preLoaderRoute: typeof StaffXreadingRouteImport
+      parentRoute: typeof StaffRouteRoute
     }
     '/staff/pos': {
       id: '/staff/pos'
@@ -305,6 +324,7 @@ interface StaffRouteRouteChildren {
   StaffInventoryRoute: typeof StaffInventoryRoute
   StaffOrdersRoute: typeof StaffOrdersRoute
   StaffPosRoute: typeof StaffPosRoute
+  StaffXreadingRoute: typeof StaffXreadingRoute
   StaffIndexRoute: typeof StaffIndexRoute
 }
 
@@ -313,6 +333,7 @@ const StaffRouteRouteChildren: StaffRouteRouteChildren = {
   StaffInventoryRoute: StaffInventoryRoute,
   StaffOrdersRoute: StaffOrdersRoute,
   StaffPosRoute: StaffPosRoute,
+  StaffXreadingRoute: StaffXreadingRoute,
   StaffIndexRoute: StaffIndexRoute,
 }
 
