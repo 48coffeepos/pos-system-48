@@ -130,12 +130,13 @@ export const createOrder = createServerFn({ method: "POST" })
       });
 
       for (const item of data.items) {
-        if (
+        const isCupLine =
           item.cup_type &&
           item.cup_type !== "NONE" &&
           item.cup_size &&
-          item.cup_size !== "NONE"
-        ) {
+          item.cup_size !== "NONE";
+
+        if (isCupLine) {
           const normalizedSize = item.cup_size.toLowerCase();
           const normalizedType =
             item.cup_type.charAt(0).toUpperCase() +
@@ -150,6 +151,19 @@ export const createOrder = createServerFn({ method: "POST" })
             data: {
               stock: { decrement: item.quantity },
             },
+          });
+          continue;
+        }
+
+        const menuInventoryLinks = await tx.menuInventory.findMany({
+          where: { menu_id: item.menu_id },
+          select: { inventory_id: true },
+        });
+
+        for (const link of menuInventoryLinks) {
+          await tx.inventory.update({
+            where: { inventory_id: link.inventory_id },
+            data: { stock: { decrement: item.quantity } },
           });
         }
       }
