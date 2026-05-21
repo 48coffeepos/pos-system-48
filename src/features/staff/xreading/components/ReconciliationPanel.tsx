@@ -1,31 +1,26 @@
 import { Printer, WarningCircle, CheckCircle } from "@phosphor-icons/react";
+import { useXReadingStore } from "@/features/staff/xreading/stores/useXReadingStore";
 
 interface ReconciliationPanelProps {
-	totalCashSales: number;
-	totalExpenses: number;
 	totalCashCounted: number;
-	onExportSales: () => void;
-	onExportCashCount: () => void;
 }
 
-export function ReconciliationPanel({
-	totalCashSales,
-	totalExpenses,
-	totalCashCounted,
-	onExportSales,
-	onExportCashCount,
-}: ReconciliationPanelProps) {
-	// Let's implement the formula:
-	// Cash Counted + Expenses should equal Total Cash Sales if drawer started at 0.
+export function ReconciliationPanel({ totalCashCounted }: ReconciliationPanelProps) {
+	const totalCashSales = useXReadingStore((state) => state.totalCashSales);
+	const totalExpenses = useXReadingStore((state) => state.totalExpenses);
+	const openSalesReceipt = useXReadingStore((state) => state.openSalesReceipt);
+	const openCashCountReceipt = useXReadingStore(
+		(state) => state.openCashCountReceipt,
+	);
+
 	const netSales = totalCashSales - totalExpenses;
 	const discrepancy = totalCashCounted - netSales;
-	
+
 	const isMatched = Math.abs(discrepancy) < 0.01;
 	const isOver = discrepancy > 0;
-	
+
 	return (
 		<div className="flex flex-col gap-6">
-			{/* Sales Container */}
 			<div className="rounded-2xl border border-(--light-gray) bg-(--pure-white) p-6 shadow-sm">
 				<h3 className="mb-1 text-sm font-medium text-(--medium-gray)">
 					Total Cash Sales Today
@@ -35,7 +30,6 @@ export function ReconciliationPanel({
 				</p>
 			</div>
 
-			{/* Expenses Container */}
 			<div className="rounded-2xl border border-(--light-gray) bg-(--pure-white) p-6 shadow-sm">
 				<h3 className="mb-1 text-sm font-medium text-(--medium-gray)">
 					Expenses Today
@@ -44,9 +38,7 @@ export function ReconciliationPanel({
 					₱{totalExpenses.toFixed(2)}
 				</p>
 			</div>
-			
 
-			{/* Discrepancy Container */}
 			<div className="rounded-2xl border border-(--light-gray) bg-(--pure-white) p-6 shadow-sm">
 				<h3 className="mb-1 text-sm font-medium text-(--medium-gray)">
 					OVER / SHORT
@@ -82,17 +74,18 @@ export function ReconciliationPanel({
 				</p>
 			</div>
 
-			{/* Export Buttons */}
 			<div className="mt-auto grid grid-cols-2 gap-4">
 				<button
-					onClick={onExportSales}
+					type="button"
+					onClick={openSalesReceipt}
 					className="flex w-full items-center justify-center gap-2 rounded-xl bg-(--deep-forest) px-4 py-4 font-medium text-(--pale-yellow) transition-colors hover:bg-(--deep-forest)/90"
 				>
 					<Printer weight="bold" className="size-5" />
 					Print Sales X-Reading
 				</button>
 				<button
-					onClick={onExportCashCount}
+					type="button"
+					onClick={openCashCountReceipt}
 					className="flex w-full items-center justify-center gap-2 rounded-xl border border-(--deep-forest) px-4 py-4 font-medium text-(--deep-forest) transition-colors hover:bg-(--pale-yellow)"
 				>
 					<Printer weight="bold" className="size-5" />

@@ -1,7 +1,8 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { Receipt, CreditCard } from "@phosphor-icons/react";
 import { formatPeso } from "@/lib/format-currency";
 import { PosReceiptDialog } from "@/features/staff/pos/components/PosReceiptDialog";
+import { StaffTimeframeField } from "@/features/staff/components/StaffTimeframeField";
 import type { PosOrder } from "@/features/staff/pos/types";
 
 interface DBOrder {
@@ -44,31 +45,36 @@ interface DBOrder {
 
 interface OrdersListProps {
   orders: DBOrder[];
+  filterForm: any;
+  timeframe: "today" | "yesterday";
 }
 
-export function OrdersList({ orders = [] }: OrdersListProps) {
+export function OrdersList({
+  orders = [],
+  filterForm,
+  timeframe,
+}: OrdersListProps) {
   const [selectedOrder, setSelectedOrder] = useState<PosOrder | null>(null);
-  const [timeframe, setTimeframe] = useState<"today" | "yesterday">("today");
 
   const handlePrint = useCallback(() => {
     window.print();
   }, []);
 
-  const filteredOrders = orders.filter((order) => {
-    const orderDate = new Date(order.created_at);
+  const filteredOrders = useMemo(() => {
     const todayStr = new Date().toDateString();
-    
     const yesterdayDate = new Date();
     yesterdayDate.setDate(yesterdayDate.getDate() - 1);
     const yesterdayStr = yesterdayDate.toDateString();
+    return orders.filter((order) => {
+      const orderDate = new Date(order.created_at);
+      const orderDateStr = orderDate.toDateString();
+      const activeTimeframe = timeframe ?? "today";
 
-    const orderDateStr = orderDate.toDateString();
-
-    if (timeframe === "today") {
-      return orderDateStr === todayStr;
-    }
-    return orderDateStr === yesterdayStr;
-  });
+      return activeTimeframe === "today"
+        ? orderDateStr === todayStr
+        : orderDateStr === yesterdayStr;
+    });
+  }, [orders, timeframe]);
 
   const viewReceipt = (order: DBOrder) => {
     const mapped: PosOrder = {
@@ -126,31 +132,9 @@ export function OrdersList({ orders = [] }: OrdersListProps) {
             </p>
           </div>
 
-          {/* Timeframe Pill Switcher */}
-          <div className="flex self-start gap-1.5 rounded-full bg-(--light-gray)/30 p-1">
-            <button
-              type="button"
-              onClick={() => setTimeframe("today")}
-              className={`rounded-full px-4 py-1.5 text-xs font-semibold transition-all duration-200 ${
-                timeframe === "today"
-                  ? "bg-(--deep-forest) text-white shadow-sm"
-                  : "text-(--medium-gray) hover:bg-(--light-gray)/50"
-              }`}
-            >
-              Today
-            </button>
-            <button
-              type="button"
-              onClick={() => setTimeframe("yesterday")}
-              className={`rounded-full px-4 py-1.5 text-xs font-semibold transition-all duration-200 ${
-                timeframe === "yesterday"
-                  ? "bg-(--deep-forest) text-white shadow-sm"
-                  : "text-(--medium-gray) hover:bg-(--light-gray)/50"
-              }`}
-            >
-              Yesterday
-            </button>
-          </div>
+          <filterForm.AppField name="timeframe">
+            {() => <StaffTimeframeField />}
+          </filterForm.AppField>
         </div>
 
         <div className="w-full overflow-x-auto rounded-xl border border-(--light-gray)/40">

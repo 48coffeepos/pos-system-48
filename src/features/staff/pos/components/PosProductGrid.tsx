@@ -1,39 +1,26 @@
-import { MagnifyingGlass, Coffee } from "@phosphor-icons/react";
+import { Coffee } from "@phosphor-icons/react";
 import { PosProductCard } from "./ui/PosProductCard";
+import { PosMenuSearchField } from "./PosMenuSearchField";
 import type { MenuItem } from "../types";
 
 interface PosProductGridProps {
+	form: any;
 	menuItems: MenuItem[];
 	loading: boolean;
-	search: string;
-	onSearchChange: (value: string) => void;
 	onProductClick: (item: MenuItem) => void;
 }
 
 export function PosProductGrid({
+	form,
 	menuItems,
 	loading,
-	search,
-	onSearchChange,
 	onProductClick,
 }: PosProductGridProps) {
 	return (
 		<div className="flex flex-1 flex-col overflow-hidden p-4">
-			<div className="relative mb-4">
-				<MagnifyingGlass
-					className="absolute top-1/2 left-4 size-5 -translate-y-1/2"
-					style={{ color: "var(--medium-gray)" }}
-				/>
-				<input
-					type="text"
-					value={search}
-					onChange={(e) => onSearchChange(e.target.value)}
-					placeholder="Search menu items..."
-					className="h-12 w-full rounded-xl border pl-12 pr-4 text-sm outline-none transition-all"
-					style={{ background: "white", borderColor: "var(--light-gray)" }}
-				/>
-			</div>
-
+			<form.AppField name="menuSearch">
+				{() => <PosMenuSearchField />}
+			</form.AppField>
 
 			<div className="flex-1 overflow-y-auto pr-2">
 				{loading ? (

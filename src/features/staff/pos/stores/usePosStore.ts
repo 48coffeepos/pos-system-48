@@ -3,7 +3,6 @@ import type { CartItem, MenuItem, PosOrder } from "../types";
 
 interface PosState {
 	activeCategory: string;
-	search: string;
 	showReceipt: boolean;
 	showPlaceOrderConfirm: boolean;
 	lastOrder: PosOrder | null;
@@ -11,7 +10,6 @@ interface PosState {
 	cart: CartItem[];
 
 	setActiveCategory: (category: string) => void;
-	setSearch: (search: string) => void;
 	setShowReceipt: (show: boolean) => void;
 	setShowPlaceOrderConfirm: (show: boolean) => void;
 	setLastOrder: (order: PosOrder | null) => void;
@@ -26,7 +24,6 @@ interface PosState {
 
 export const usePosStore = create<PosState>((set) => ({
 	activeCategory: "all",
-	search: "",
 	showReceipt: false,
 	showPlaceOrderConfirm: false,
 	lastOrder: null,
@@ -34,7 +31,6 @@ export const usePosStore = create<PosState>((set) => ({
 	cart: [],
 
 	setActiveCategory: (category) => set({ activeCategory: category }),
-	setSearch: (search) => set({ search }),
 	setShowReceipt: (show) => set({ showReceipt: show }),
 	setShowPlaceOrderConfirm: (show) => set({ showPlaceOrderConfirm: show }),
 	setLastOrder: (order) => set({ lastOrder: order }),

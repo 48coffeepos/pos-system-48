@@ -18,7 +18,6 @@ interface PosCartPanelProps {
 	onRemoveFromCart: (lineKey: string) => void;
 	onUpdateQuantity: (lineKey: string, delta: number) => void;
 	onClearCart: () => void;
-	onPlaceOrderClick: () => void;
 }
 
 export function PosCartPanel({
@@ -375,16 +374,14 @@ export function PosCartPanel({
 								</div>
 							) : null}
 
-							<form.AppForm>
-								<button
-									type="submit"
-									disabled={cart.length === 0}
-									className="btn-primary flex w-full items-center justify-center gap-2"
-									style={{ opacity: cart.length === 0 ? 0.5 : 1 }}
-								>
-									Place Order <ArrowRight className="size-4" />
-								</button>
-							</form.AppForm>
+							<button
+								type="submit"
+								disabled={cart.length === 0}
+								className="btn-primary flex w-full items-center justify-center gap-2"
+								style={{ opacity: cart.length === 0 ? 0.5 : 1 }}
+							>
+								Place Order <ArrowRight className="size-4" />
+							</button>
 						</form>
 					);
 				}}

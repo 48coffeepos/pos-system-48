@@ -1,4 +1,5 @@
 import { useMemo, useCallback } from "react";
+import { useStore } from "@tanstack/react-form";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Toaster, toast } from "sonner";
 import { z } from "zod";
@@ -17,6 +18,7 @@ import { sessionQueryOptions } from "@/features/auth/queryOptions";
 import type { MenuItem, CartItem, PosOrder } from "../types";
 
 const posFormSchema = z.object({
+	menuSearch: z.string(),
 	note: z.string(),
 	paymentMethod: z.enum(["CASH", "GCASH", "GRAB"]),
 	amountPaid: z.string(),
@@ -25,8 +27,6 @@ const posFormSchema = z.object({
 
 export function PosScreen() {
 	const {
-		search,
-		setSearch,
 		showReceipt,
 		setShowReceipt,
 		showPlaceOrderConfirm,
@@ -51,6 +51,7 @@ export function PosScreen() {
 
 	const form = useAppForm({
 		defaultValues: {
+			menuSearch: "",
 			note: "",
 			paymentMethod: "CASH" as "CASH" | "GCASH" | "GRAB",
 			amountPaid: "",
@@ -88,18 +89,19 @@ export function PosScreen() {
 
 	const addOns = data?.addOns ?? [];
 
+	const menuSearch = useStore(form.store, (state) => state.values.menuSearch);
 
 	const menuItems = useMemo(
 		() =>
 			allMenuItems.filter((item) => {
 				if (
-					search &&
-					!item.name.toLowerCase().includes(search.toLowerCase())
+					menuSearch &&
+					!item.name.toLowerCase().includes(menuSearch.toLowerCase())
 				)
 					return false;
 				return true;
 			}),
-		[allMenuItems, search],
+		[allMenuItems, menuSearch],
 	);
 
 	const handleCustomizeConfirm = useCallback(
@@ -237,25 +239,23 @@ export function PosScreen() {
 				<Toaster position="top-right" richColors />
 				<StaffHeader />
 
-				<div className="flex flex-1 overflow-hidden">
-				<PosProductGrid
-					menuItems={menuItems}
-					loading={isLoading}
-					search={search}
-					onSearchChange={setSearch}
-					onProductClick={handleProductClick}
-				/>
-				<PosCartPanel
-					cart={cart}
-					form={form}
-					onRemoveFromCart={removeFromCart}
-					onUpdateQuantity={handleUpdateQuantity}
-					onClearCart={clearCart}
-					onPlaceOrderClick={() => {
-						form.handleSubmit();
-					}}
-				/>
-			</div>
+				<form.AppForm>
+					<div className="flex flex-1 overflow-hidden">
+						<PosProductGrid
+							form={form}
+							menuItems={menuItems}
+							loading={isLoading}
+							onProductClick={handleProductClick}
+						/>
+						<PosCartPanel
+							cart={cart}
+							form={form}
+							onRemoveFromCart={removeFromCart}
+							onUpdateQuantity={handleUpdateQuantity}
+							onClearCart={clearCart}
+						/>
+					</div>
+				</form.AppForm>
 			</div>
 
 			<PosCupPickerDialog

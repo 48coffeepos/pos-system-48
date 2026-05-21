@@ -1,36 +1,34 @@
 import { Printer } from "@phosphor-icons/react";
 import { PosModal } from "@/features/staff/pos/components/ui/PosModal";
-import type { Denomination } from "./CashCountPanel";
-import type { CashCountValues } from "./XReadingScreen";
+import {
+	CASH_COUNT_DENOMINATIONS,
+	type CashCountValues,
+} from "@/features/staff/xreading/schemas/cashCount";
+import { useXReadingStore } from "@/features/staff/xreading/stores/useXReadingStore";
 
 interface XReadingReceiptDialogProps {
-	open: boolean;
-	onClose: () => void;
-	onPrint: () => void;
-	mode: "sales" | "cashcount" | null;
 	staffName: string;
-	totalCashSales: number;
-	totalExpenses: number;
 	totalCashCounted: number;
 	cashCount: CashCountValues;
 }
 
-const denominations: Denomination[] = [
-	1000, 500, 200, 100, 50, 20, 10, 5, 1,
-];
+const denominations = CASH_COUNT_DENOMINATIONS;
 
 export function XReadingReceiptDialog({
-	open,
-	onClose,
-	onPrint,
-	mode,
 	staffName,
-	totalCashSales,
-	totalExpenses,
 	totalCashCounted,
 	cashCount,
 }: XReadingReceiptDialogProps) {
+	const mode = useXReadingStore((state) => state.receiptMode);
+	const totalCashSales = useXReadingStore((state) => state.totalCashSales);
+	const totalExpenses = useXReadingStore((state) => state.totalExpenses);
+	const closeReceipt = useXReadingStore((state) => state.closeReceipt);
+
 	if (!mode) return null;
+
+	const handlePrint = () => {
+		window.print();
+	};
 
 	// Gross Sales = Total Cash IN + Total Sales.
 	const totalCashIn = 0; 
@@ -52,8 +50,8 @@ export function XReadingReceiptDialog({
 
 	return (
 		<PosModal
-			open={open}
-			onClose={onClose}
+			open={!!mode}
+			onClose={closeReceipt}
 			showClose
 			className="max-w-[380px] p-8"
 			overlayClassName="overflow-y-auto no-print"
@@ -130,7 +128,9 @@ export function XReadingReceiptDialog({
 							<table className="w-full text-sm">
 								<tbody>
 									{denominations.map((denom) => {
-										const qty = cashCount[denom] || 0;
+										const qty =
+											cashCount[String(denom) as keyof typeof cashCount] ||
+											0;
 										if (qty === 0) return null;
 										return (
 											<tr key={denom}>
@@ -165,7 +165,7 @@ export function XReadingReceiptDialog({
 			<div className="no-print mt-8 flex gap-3">
 				<button
 					type="button"
-					onClick={onClose}
+					onClick={closeReceipt}
 					className="h-12 flex-1 rounded-xl border-2 text-sm font-bold transition-all hover:bg-gray-50 active:scale-95"
 					style={{
 						borderColor: "var(--near-black)",
@@ -176,7 +176,7 @@ export function XReadingReceiptDialog({
 				</button>
 				<button
 					type="button"
-					onClick={onPrint}
+					onClick={handlePrint}
 					className="flex h-12 flex-1 items-center justify-center gap-2 rounded-xl text-sm font-bold text-white transition-all hover:opacity-90 active:scale-95"
 					style={{ background: "var(--near-black)" }}
 				>

@@ -1,11 +1,13 @@
 import { useState, useRef, useEffect, useMemo } from "react";
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
+import { useStore } from "@tanstack/react-form";
 import Fuse from "fuse.js";
 import { authClient } from "@/integrations/better-auth/auth-client";
 import { cn } from "@/lib/utils";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { useStaffSearchForm } from "@/features/staff/hooks/useStaffSearchForm";
+import { StaffHeaderSearchField } from "./StaffHeaderSearchField";
 
 import {
   MagnifyingGlass,
@@ -58,7 +60,8 @@ function StaffHeader({
   const navigate = useNavigate();
   const { data: session, isPending: sessionLoading } = authClient.useSession();
 
-  const [searchQuery, setSearchQuery] = useState("");
+  const searchForm = useStaffSearchForm();
+  const searchQuery = useStore(searchForm.store, (state) => state.values.query);
   const [showResults, setShowResults] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
@@ -87,9 +90,10 @@ function StaffHeader({
   }, [searchQuery, fuse]);
 
   const handleSearchSelect = (path: string) => {
-    setSearchQuery("");
+    searchForm.setFieldValue("query", "");
     setShowResults(false);
-    navigate({ to: staffTo(path) });
+    const target = path.startsWith("/") ? path : `/${path}`;
+    navigate({ to: target as "/" });
   };
 
   const handleLogout = async () => {
@@ -110,6 +114,12 @@ function StaffHeader({
   useEffect(() => {
     setMobileMenuOpen(false);
   }, [location.pathname]);
+
+  useEffect(() => {
+    if (searchQuery.trim()) {
+      setShowResults(true);
+    }
+  }, [searchQuery]);
 
   const isActive = (path: string) => {
     if (path === "/staff/pos") return location.pathname === "/staff/pos";
@@ -135,36 +145,37 @@ function StaffHeader({
         />
 
         {/* Search */}
-        <div
-          ref={searchRef}
-          className="relative hidden flex-1 sm:block max-w-md"
-        >
-          <div className="relative">
-            <MagnifyingGlass className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2" />
-            <Input
-              ref={inputRef}
-              value={searchQuery}
-              onChange={(e) => {
-                setSearchQuery(e.target.value);
-                setShowResults(true);
-              }}
-              onFocus={() => setShowResults(true)}
-              placeholder={searchPlaceholder}
-              className="h-9 w-full rounded-xl border-(--light-gray) pl-9 pr-8 text-sm"
-            />
-            {searchQuery && (
-              <button
-                onClick={() => {
-                  setSearchQuery("");
-                  setShowResults(false);
-                  inputRef.current?.focus();
-                }}
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-[var(--medium-gray)] hover:text-[var(--deep-forest)]"
-              >
-                <X className="size-4" />
-              </button>
-            )}
-          </div>
+        <searchForm.AppForm>
+          <div
+            ref={searchRef}
+            className="relative hidden flex-1 sm:block max-w-md"
+          >
+            <div className="relative">
+              <MagnifyingGlass className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2" />
+              <searchForm.AppField name="query">
+                {() => (
+                  <StaffHeaderSearchField
+                    inputRef={inputRef}
+                    placeholder={searchPlaceholder}
+                    onFocus={() => setShowResults(true)}
+                    className="h-9 w-full rounded-xl border-(--light-gray) pl-9 pr-8 text-sm"
+                  />
+                )}
+              </searchForm.AppField>
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    searchForm.setFieldValue("query", "");
+                    setShowResults(false);
+                    inputRef.current?.focus();
+                  }}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-[var(--medium-gray)] hover:text-[var(--deep-forest)]"
+                >
+                  <X className="size-4" />
+                </button>
+              )}
+            </div>
 
           {/* Search Results Dropdown */}
           {showResults && searchQuery.trim() && (
@@ -201,7 +212,8 @@ function StaffHeader({
               )}
             </div>
           )}
-        </div>
+          </div>
+        </searchForm.AppForm>
 
         {/* Desktop Navigation */}
         <nav className="hidden items-center gap-1 lg:flex">
@@ -291,21 +303,20 @@ function StaffHeader({
       {/* Mobile Menu */}
       {mobileMenuOpen && (
         <div className="border-t border-[var(--light-gray)] bg-[var(--pure-white)] px-4 pb-4 pt-2 lg:hidden animate-fade-in-up">
-          {/* Mobile Search */}
-          <div className="relative mb-3">
-            <MagnifyingGlass className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[var(--medium-gray)]" />
-            <Input
-              value={searchQuery}
-              onChange={(e) => {
-                setSearchQuery(e.target.value);
-                setShowResults(true);
-              }}
-              onFocus={() => setShowResults(true)}
-              placeholder={searchPlaceholder}
-              className="h-9 w-full rounded-xl border-[var(--light-gray)] pl-9 text-sm text-[var(--deep-forest)] placeholder:text-[var(--medium-gray)]"
-              style={{ backgroundColor: "var(--warm-beige)" }}
-            />
-          </div>
+          <searchForm.AppForm>
+            <div className="relative mb-3">
+              <MagnifyingGlass className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[var(--medium-gray)]" />
+              <searchForm.AppField name="query">
+                {() => (
+                  <StaffHeaderSearchField
+                    placeholder={searchPlaceholder}
+                    onFocus={() => setShowResults(true)}
+                    className="h-9 w-full rounded-xl border-[var(--light-gray)] pl-9 text-sm text-[var(--deep-forest)] placeholder:text-[var(--medium-gray)]"
+                  />
+                )}
+              </searchForm.AppField>
+            </div>
+          </searchForm.AppForm>
 
           {/* Mobile Results */}
           {showResults && searchQuery.trim() && results.length > 0 && (

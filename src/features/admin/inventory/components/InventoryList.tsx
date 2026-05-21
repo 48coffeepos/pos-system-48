@@ -30,12 +30,17 @@ function InventoryList({
 	items = [],
 	onEdit,
 	hideActions = false,
+	timeframe: controlledTimeframe,
 }: {
 	items?: ExtendedInventoryItem[];
 	onEdit?: (item: ExtendedInventoryItem) => void;
 	hideActions?: boolean;
+	timeframe?: "today" | "yesterday";
 }) {
-	const [timeframe, setTimeframe] = useState<"today" | "yesterday">("today");
+	const [internalTimeframe, setInternalTimeframe] = useState<
+		"today" | "yesterday"
+	>("today");
+	const timeframe = controlledTimeframe ?? internalTimeframe;
 	const [deletingItem, setDeletingItem] =
 		useState<ExtendedInventoryItem | null>(null);
 	const hasItems = items.length > 0;
@@ -62,31 +67,32 @@ function InventoryList({
 							</p>
 						</div>
 
-						{/* Timeframe Pill Switcher */}
-						<div className="flex gap-1.5 rounded-full bg-(--light-gray)/30 p-1">
-							<button
-								type="button"
-								onClick={() => setTimeframe("today")}
-								className={`rounded-full px-4 py-1.5 text-xs font-medium transition-colors ${
-									timeframe === "today"
-										? "bg-(--deep-forest) text-(--pure-white)"
-										: "text-(--medium-gray) hover:bg-(--light-gray)/50"
-								}`}
-							>
-								Today
-							</button>
-							<button
-								type="button"
-								onClick={() => setTimeframe("yesterday")}
-								className={`rounded-full px-4 py-1.5 text-xs font-medium transition-colors ${
-									timeframe === "yesterday"
-										? "bg-(--deep-forest) text-(--pure-white)"
-										: "text-(--medium-gray) hover:bg-(--light-gray)/50"
-								}`}
-							>
-								Yesterday
-							</button>
-						</div>
+						{controlledTimeframe == null ? (
+							<div className="flex gap-1.5 rounded-full bg-(--light-gray)/30 p-1">
+								<button
+									type="button"
+									onClick={() => setInternalTimeframe("today")}
+									className={`rounded-full px-4 py-1.5 text-xs font-medium transition-colors ${
+										timeframe === "today"
+											? "bg-(--deep-forest) text-(--pure-white)"
+											: "text-(--medium-gray) hover:bg-(--light-gray)/50"
+									}`}
+								>
+									Today
+								</button>
+								<button
+									type="button"
+									onClick={() => setInternalTimeframe("yesterday")}
+									className={`rounded-full px-4 py-1.5 text-xs font-medium transition-colors ${
+										timeframe === "yesterday"
+											? "bg-(--deep-forest) text-(--pure-white)"
+											: "text-(--medium-gray) hover:bg-(--light-gray)/50"
+									}`}
+								>
+									Yesterday
+								</button>
+							</div>
+						) : null}
 					</div>
 
 					{/* Structured Responsive Table */}
