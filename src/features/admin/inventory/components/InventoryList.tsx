@@ -50,7 +50,7 @@ function InventoryList({
 	return (
 		<div>
 			{hasItems ? (
-				<div className="rounded-2xl border border-(--light-gray) bg-(--pure-white) p-6">
+				<div className="rounded-2xl border border-(--light-gray) bg-(--pure-white) p-6 shadow-sm">
 					{/* Header Controls */}
 					<div className="mb-6 flex items-center justify-between">
 						<div>
@@ -90,14 +90,14 @@ function InventoryList({
 					</div>
 
 					{/* Structured Responsive Table */}
-					<div className="w-full overflow-x-auto">
+					<div className="w-full overflow-x-auto rounded-xl border border-(--light-gray)/40">
 						<table className="w-full border-collapse text-left">
 							<thead>
-								<tr className="border-b border-(--light-gray)/40 bg-(--soft-peach)/20 text-[11px] font-bold tracking-wider text-(--medium-gray)/80 uppercase">
-									<th className="rounded-l-lg p-3 pl-4">Item</th>
-									<th className="p-3 text-center">Quantity</th>
+								<tr className="border-b border-(--light-gray)/40 bg-(--off-white) text-xs font-bold uppercase tracking-wider text-(--medium-gray)">
+									<th className="p-4 pl-6">Item</th>
+									<th className="p-4 text-center">Quantity</th>
 									{!hideActions && (
-										<th className="rounded-r-lg p-3 pr-4 text-right">Actions</th>
+										<th className="p-4 pr-6 text-right">Actions</th>
 									)}
 								</tr>
 							</thead>
@@ -105,10 +105,10 @@ function InventoryList({
 								{items.map((item) => (
 									<tr
 										key={item.id}
-										className="group hover:bg-(--light-gray)/10"
+										className="group transition-colors hover:bg-(--off-white)/50"
 									>
 										{/* Column 1: Metadata Badge & Labels */}
-										<td className="p-4 pl-4">
+										<td className="p-4 pl-6">
 											<div className="flex items-center gap-3">
 												<div>
 													<p className="font-semibold text-sm text-(--deep-forest)">
@@ -130,7 +130,7 @@ function InventoryList({
 
 										{/* Column 3: Row Mutations (Edit Profile/Remove) */}
 										{!hideActions && (
-											<td className="p-4 pr-4 text-right">
+											<td className="p-4 pr-6 text-right">
 												<div className="flex items-center justify-end gap-3 text-(--medium-gray)">
 													<button
 														type="button"

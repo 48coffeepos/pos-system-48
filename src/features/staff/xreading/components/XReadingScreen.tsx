@@ -1,10 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAppForm } from "@/integrations/tanstack-form";
 import { CashCountPanel } from "./CashCountPanel";
 import { ReconciliationPanel } from "./ReconciliationPanel";
 import { XReadingReceiptDialog } from "./XReadingReceiptDialog";
 import { authClient } from "@/integrations/better-auth/auth-client";
-import { useStore } from "@tanstack/react-form";
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -15,6 +14,10 @@ import {
 	AlertDialogHeader,
 	AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+	emptyCashCountValues,
+	useXReadingStore,
+} from "../stores/useXReadingStore";
 
 interface XReadingScreenProps {
 	data: {
@@ -23,51 +26,34 @@ interface XReadingScreenProps {
 	};
 }
 
-export type CashCountValues = {
-	1: number;
-	5: number;
-	10: number;
-	20: number;
-	50: number;
-	100: number;
-	200: number;
-	500: number;
-	1000: number;
-};
-
-
-
 export function XReadingScreen({ data }: XReadingScreenProps) {
 	const { data: session } = authClient.useSession();
 	const staffName = session?.user?.name || "Staff";
-	
-	const [isLocked, setIsLocked] = useState(false);
-	const [showConfirmModal, setShowConfirmModal] = useState(false);
-	const [receiptMode, setReceiptMode] = useState<"sales" | "cashcount" | null>(null);
+
+	const cashCount = useXReadingStore((state) => state.cashCount);
+	const resetCashCount = useXReadingStore((state) => state.resetCashCount);
+
+	const [showResetModal, setShowResetModal] = useState(false);
+	const [receiptMode, setReceiptMode] = useState<"sales" | "cashcount" | null>(
+		null,
+	);
 
 	const form = useAppForm({
-		defaultValues: {
-			1: 0,
-			5: 0,
-			10: 0,
-			20: 0,
-			50: 0,
-			100: 0,
-			200: 0,
-			500: 0,
-			1000: 0,
-		} as CashCountValues,
-		onSubmit: async () => {
-			if (!isLocked) {
-				setShowConfirmModal(true);
-			}
-		},
+		defaultValues: cashCount,
 	});
 
-	const formValues = useStore(form.store, (state: any) => state.values as CashCountValues);
+	useEffect(() => {
+		const syncFormFromStore = () => {
+			form.reset(useXReadingStore.getState().cashCount);
+		};
 
-	const totalCashCounted = Object.entries(formValues).reduce(
-		(sum, [denom, qty]) => sum + Number(denom) * (qty as number),
+		syncFormFromStore();
+
+		return useXReadingStore.persist.onFinishHydration(syncFormFromStore);
+	}, [form]);
+
+	const totalCashCounted = Object.entries(cashCount).reduce(
+		(sum, [denom, qty]) => sum + Number(denom) * qty,
 		0,
 	);
 
@@ -87,20 +73,13 @@ export function XReadingScreen({ data }: XReadingScreenProps) {
 		<>
 			{/* On-screen UI */}
 			<div className="grid grid-cols-1 gap-8 print:hidden lg:grid-cols-2">
-				<form
-					onSubmit={(e) => {
-						e.preventDefault();
-						form.handleSubmit();
-					}}
-				>
-					<form.AppForm>
-						<CashCountPanel 
-							form={form}
-							totalCashCounted={totalCashCounted} 
-							isLocked={isLocked}
-						/>
-					</form.AppForm>
-				</form>
+				<form.AppForm>
+					<CashCountPanel
+						form={form}
+						totalCashCounted={totalCashCounted}
+						onResetClick={() => setShowResetModal(true)}
+					/>
+				</form.AppForm>
 
 				<ReconciliationPanel
 					totalCashSales={data.totalCashSales}
@@ -111,23 +90,26 @@ export function XReadingScreen({ data }: XReadingScreenProps) {
 				/>
 			</div>
 
-			<AlertDialog open={showConfirmModal} onOpenChange={setShowConfirmModal}>
+			<AlertDialog open={showResetModal} onOpenChange={setShowResetModal}>
 				<AlertDialogContent size="sm">
 					<AlertDialogHeader>
-						<AlertDialogTitle>Lock Cash Count?</AlertDialogTitle>
+						<AlertDialogTitle>Reset Cash Count?</AlertDialogTitle>
 						<AlertDialogDescription>
-							Are you sure you want to confirm this cash count? This will lock the inputs for this session.
+							This will clear all denomination counts. Saved counts will be removed
+							from this device.
 						</AlertDialogDescription>
 					</AlertDialogHeader>
 					<AlertDialogFooter>
 						<AlertDialogCancel>Cancel</AlertDialogCancel>
 						<AlertDialogAction
+							variant="destructive"
 							onClick={() => {
-								setIsLocked(true);
-								setShowConfirmModal(false);
+								resetCashCount();
+								form.reset(emptyCashCountValues);
+								setShowResetModal(false);
 							}}
 						>
-							Confirm
+							Reset
 						</AlertDialogAction>
 					</AlertDialogFooter>
 				</AlertDialogContent>
@@ -142,7 +124,7 @@ export function XReadingScreen({ data }: XReadingScreenProps) {
 				totalCashSales={data.totalCashSales}
 				totalExpenses={data.totalExpenses}
 				totalCashCounted={totalCashCounted}
-				cashCount={formValues}
+				cashCount={cashCount}
 			/>
 		</>
 	);

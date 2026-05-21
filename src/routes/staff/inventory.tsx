@@ -18,21 +18,23 @@ function StaffInventory() {
 
 	return (
 		<div className="min-h-screen">
-			{inventoryItems.length === 0 ? (
-				<div className="flex h-64 items-center justify-center">
-					<div className="rounded-2xl border border-(--light-gray) bg-(--pure-white) p-12 text-center shadow-sm">
-						<PackageIcon className="mx-auto size-16 text-(--medium-gray)/30" />
-						<h2 className="mt-4 text-lg font-bold text-(--deep-forest)">
-							No inventory items found
-						</h2>
-						<p className="mt-1 text-sm text-(--medium-gray)">
-							Seeded data is missing. Please run the seeder script.
-						</p>
+			<main className="mx-auto max-w-screen-2xl px-4 py-8 sm:px-6 lg:px-8">
+				{inventoryItems.length === 0 ? (
+					<div className="flex h-64 items-center justify-center">
+						<div className="rounded-2xl border border-(--light-gray) bg-(--pure-white) p-12 text-center shadow-sm">
+							<PackageIcon className="mx-auto size-16 text-(--medium-gray)/30" />
+							<h2 className="mt-4 text-lg font-bold text-(--deep-forest)">
+								No inventory items found
+							</h2>
+							<p className="mt-1 text-sm text-(--medium-gray)">
+								Seeded data is missing. Please run the seeder script.
+							</p>
+						</div>
 					</div>
-				</div>
-			) : (
-				<InventoryList items={inventoryItems} />
-			)}
+				) : (
+					<InventoryList items={inventoryItems} hideActions />
+				)}
+			</main>
 		</div>
 	);
 }

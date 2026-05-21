@@ -1,7 +1,7 @@
 import { Printer } from "@phosphor-icons/react";
 import { PosModal } from "@/features/staff/pos/components/ui/PosModal";
 import type { Denomination } from "./CashCountPanel";
-import type { CashCountValues } from "./XReadingScreen";
+import type { CashCountValues } from "../stores/useXReadingStore";
 
 interface XReadingReceiptDialogProps {
 	open: boolean;

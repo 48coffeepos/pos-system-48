@@ -1,12 +1,12 @@
-
-import type { CashCountValues } from "./XReadingScreen";
+import type { CashCountValues } from "../stores/useXReadingStore";
+import { useXReadingStore } from "../stores/useXReadingStore";
 
 export type Denomination = 1 | 5 | 10 | 20 | 50 | 100 | 200 | 500 | 1000;
 
 interface CashCountPanelProps {
 	form: any;
 	totalCashCounted: number;
-	isLocked?: boolean;
+	onResetClick: () => void;
 }
 
 const denominations: Denomination[] = [
@@ -16,9 +16,9 @@ const denominations: Denomination[] = [
 export function CashCountPanel({
 	form,
 	totalCashCounted,
-	isLocked = false,
+	onResetClick,
 }: CashCountPanelProps) {
-	const _isLocked = isLocked;
+	const setDenom = useXReadingStore((state) => state.setDenom);
 
 	return (
 		<div className="flex flex-col rounded-2xl border border-(--light-gray) bg-(--pure-white) p-6 shadow-sm">
@@ -48,15 +48,17 @@ export function CashCountPanel({
 										id={field.name}
 										type="number"
 										min="0"
-										disabled={_isLocked}
 										value={field.state.value === 0 ? "" : field.state.value}
 										onChange={(e) => {
 											if (e.target.value === "") {
 												field.handleChange(0);
+												setDenom(denom, 0);
 												return;
 											}
 											const val = parseInt(e.target.value, 10);
-											field.handleChange(isNaN(val) || val < 0 ? 0 : val);
+											const qty = isNaN(val) || val < 0 ? 0 : val;
+											field.handleChange(qty);
+											setDenom(denom, qty);
 										}}
 										className="w-20 rounded-lg border border-(--light-gray) bg-white px-3 py-1.5 text-center font-medium focus:border-(--forest-green) focus:outline-none focus:ring-1 focus:ring-(--forest-green)"
 									/>
@@ -89,15 +91,11 @@ export function CashCountPanel({
 					</span>
 				</div>
 				<button
-					type="submit"
-					disabled={_isLocked}
-					className={`w-full rounded-xl px-4 py-4 font-bold transition-colors ${
-						_isLocked 
-							? "bg-(--light-gray) text-(--medium-gray) cursor-not-allowed" 
-							: "bg-(--forest-green) text-white hover:bg-(--forest-green)/90"
-					}`}
+					type="button"
+					onClick={onResetClick}
+					className="w-full rounded-xl border border-red-200 bg-red-50 px-4 py-4 font-bold text-red-700 transition-colors hover:bg-red-100"
 				>
-					{_isLocked ? "Cash Count Locked" : "Confirm Cash Count"}
+					Reset Cash Count
 				</button>
 			</div>
 		</div>
