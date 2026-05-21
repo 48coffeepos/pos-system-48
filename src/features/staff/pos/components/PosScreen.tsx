@@ -1,20 +1,19 @@
-import { useMemo, useCallback } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useCallback, useMemo } from "react";
 import { Toaster, toast } from "sonner";
 import { z } from "zod";
+import { sessionQueryOptions } from "@/features/auth/queryOptions";
 import { useAppForm } from "@/integrations/tanstack-form";
 import { formatPeso } from "@/lib/format-currency";
-import { StaffHeader } from "@/features/staff/components/StaffHeader";
-import { PosProductGrid } from "./PosProductGrid";
+import { createOrderMutationOptions } from "../mutationOptions";
+import { posPageDataQueryOptions } from "../queryOptions";
+import { usePosStore } from "../stores/usePosStore";
+import type { CartItem, MenuItem, PosOrder } from "../types";
 import { PosCartPanel } from "./PosCartPanel";
 import { PosCupPickerDialog } from "./PosCupPickerDialog";
 import { PosOrderConfirmDialog } from "./PosOrderConfirmDialog";
+import { PosProductGrid } from "./PosProductGrid";
 import { PosReceiptDialog } from "./PosReceiptDialog";
-import { posPageDataQueryOptions } from "../queryOptions";
-import { createOrderMutationOptions } from "../mutationOptions";
-import { usePosStore } from "../stores/usePosStore";
-import { sessionQueryOptions } from "@/features/auth/queryOptions";
-import type { MenuItem, CartItem, PosOrder } from "../types";
 
 const posFormSchema = z.object({
 	note: z.string(),
@@ -45,7 +44,9 @@ export function PosScreen() {
 	const queryClient = useQueryClient();
 	const { data, isLoading, error } = useQuery(posPageDataQueryOptions);
 	const { data: session } = useQuery(sessionQueryOptions);
-	const createOrderMutation = useMutation(createOrderMutationOptions(queryClient));
+	const createOrderMutation = useMutation(
+		createOrderMutationOptions(queryClient),
+	);
 
 	const cartTotal = cart.reduce((s, c) => s + c.total_price, 0);
 
@@ -69,7 +70,10 @@ export function PosScreen() {
 				toast.error(`Insufficient amount. Total is ${formatPeso(cartTotal)}`);
 				return;
 			}
-			if ((value.paymentMethod === "GCASH" || value.paymentMethod === "GRAB") && !value.referenceNumber.trim()) {
+			if (
+				(value.paymentMethod === "GCASH" || value.paymentMethod === "GRAB") &&
+				!value.referenceNumber.trim()
+			) {
 				toast.error("Please enter reference number");
 				return;
 			}
@@ -88,14 +92,10 @@ export function PosScreen() {
 
 	const addOns = data?.addOns ?? [];
 
-
 	const menuItems = useMemo(
 		() =>
 			allMenuItems.filter((item) => {
-				if (
-					search &&
-					!item.name.toLowerCase().includes(search.toLowerCase())
-				)
+				if (search && !item.name.toLowerCase().includes(search.toLowerCase()))
 					return false;
 				return true;
 			}),
@@ -115,7 +115,12 @@ export function PosScreen() {
 			discount_name?: string;
 			discount_id?: string;
 			is_free_drink?: boolean;
-			addon_items?: Array<{ addon_id: string; name: string; price: number; quantity: number }>;
+			addon_items?: Array<{
+				addon_id: string;
+				name: string;
+				price: number;
+				quantity: number;
+			}>;
 		}) => {
 			addToCart({ ...params, quantity: 1 } as CartItem);
 			toast.success(`${params.menu_name} added to cart`);
@@ -123,23 +128,26 @@ export function PosScreen() {
 		[addToCart],
 	);
 
-	const handleProductClick = useCallback((item: MenuItem) => {
-		if (item.type === "STANDALONE") {
-			const newItem: CartItem = {
-				lineKey: `${item.menu_id}-NONE-NONE`,
-				menu_id: item.menu_id,
-				menu_name: item.name,
-				quantity: 1,
-				cup_type: "NONE",
-				cup_size: "NONE",
-				unit_price: item.price || 0,
-				total_price: item.price || 0,
-			};
-			addToCart(newItem);
-		} else {
-			setCustomizeItem(item);
-		}
-	}, [setCustomizeItem, addToCart]);
+	const handleProductClick = useCallback(
+		(item: MenuItem) => {
+			if (item.type === "STANDALONE") {
+				const newItem: CartItem = {
+					lineKey: `${item.menu_id}-NONE-NONE`,
+					menu_id: item.menu_id,
+					menu_name: item.name,
+					quantity: 1,
+					cup_type: "NONE",
+					cup_size: "NONE",
+					unit_price: item.price || 0,
+					total_price: item.price || 0,
+				};
+				addToCart(newItem);
+			} else {
+				setCustomizeItem(item);
+			}
+		},
+		[setCustomizeItem, addToCart],
+	);
 
 	const handleUpdateQuantity = useCallback(
 		(lineKey: string, delta: number) => {
@@ -167,7 +175,10 @@ export function PosScreen() {
 				items: cart.map((c) => ({
 					menu_id: c.menu_id,
 					snapshot_menu_name: c.menu_name,
-					snapshot_inventory: c.cup_type && c.cup_type !== "NONE" ? `${c.cup_size} ${c.cup_type}` : c.menu_name,
+					snapshot_inventory:
+						c.cup_type && c.cup_type !== "NONE"
+							? `${c.cup_size} ${c.cup_type}`
+							: c.menu_name,
 					quantity: c.quantity,
 					unit_price: c.unit_price,
 					discount_type: c.discount as any,
@@ -190,8 +201,14 @@ export function PosScreen() {
 				created_at: new Date(placedOrder.created_at).toISOString(),
 				method: placedOrder.method,
 				reference_number: placedOrder.reference_number || undefined,
-				amount_tendered: placedOrder.amount_tendered !== null ? Number(placedOrder.amount_tendered) : undefined,
-				change_amount: placedOrder.change_amount !== null ? Number(placedOrder.change_amount) : undefined,
+				amount_tendered:
+					placedOrder.amount_tendered !== null
+						? Number(placedOrder.amount_tendered)
+						: undefined,
+				change_amount:
+					placedOrder.change_amount !== null
+						? Number(placedOrder.change_amount)
+						: undefined,
 				grand_total: Number(placedOrder.grand_total),
 				note: values.note || undefined,
 				items: cart.map((c) => ({
@@ -202,7 +219,10 @@ export function PosScreen() {
 					discount_contact: c.discount_name,
 					discount_id_number: c.discount_id,
 					line_total: c.total_price,
-					snapshot_inventory: c.cup_type && c.cup_type !== "NONE" ? `${c.cup_size} ${c.cup_type}` : c.menu_name,
+					snapshot_inventory:
+						c.cup_type && c.cup_type !== "NONE"
+							? `${c.cup_size} ${c.cup_type}`
+							: c.menu_name,
 					addon_items: c.addon_items?.map((a) => ({
 						addon_id: a.addon_id,
 						addon_name_snapshot: a.name,
@@ -222,7 +242,16 @@ export function PosScreen() {
 			console.error("Order placement failed:", err);
 			toast.error("Failed to place order: " + (err.message || "Unknown error"));
 		}
-	}, [cart, cartTotal, clearCart, createOrderMutation, form, setLastOrder, setShowReceipt, setShowPlaceOrderConfirm]);
+	}, [
+		cart,
+		cartTotal,
+		clearCart,
+		createOrderMutation,
+		form,
+		setLastOrder,
+		setShowReceipt,
+		setShowPlaceOrderConfirm,
+	]);
 
 	const handlePrint = useCallback(() => {
 		window.print();
@@ -235,27 +264,26 @@ export function PosScreen() {
 		>
 			<div className="flex flex-col h-full min-w-[1024px]">
 				<Toaster position="top-right" richColors />
-				<StaffHeader />
 
 				<div className="flex flex-1 overflow-hidden">
-				<PosProductGrid
-					menuItems={menuItems}
-					loading={isLoading}
-					search={search}
-					onSearchChange={setSearch}
-					onProductClick={handleProductClick}
-				/>
-				<PosCartPanel
-					cart={cart}
-					form={form}
-					onRemoveFromCart={removeFromCart}
-					onUpdateQuantity={handleUpdateQuantity}
-					onClearCart={clearCart}
-					onPlaceOrderClick={() => {
-						form.handleSubmit();
-					}}
-				/>
-			</div>
+					<PosProductGrid
+						menuItems={menuItems}
+						loading={isLoading}
+						search={search}
+						onSearchChange={setSearch}
+						onProductClick={handleProductClick}
+					/>
+					<PosCartPanel
+						cart={cart}
+						form={form}
+						onRemoveFromCart={removeFromCart}
+						onUpdateQuantity={handleUpdateQuantity}
+						onClearCart={clearCart}
+						onPlaceOrderClick={() => {
+							form.handleSubmit();
+						}}
+					/>
+				</div>
 			</div>
 
 			<PosCupPickerDialog

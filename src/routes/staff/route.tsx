@@ -15,7 +15,7 @@ export const Route = createFileRoute("/staff")({
 	},
 });
 
-function RouteComponent() {
+function StaffLayout() {
 	return (
 		<main className="min-h-screen">
 			<StaffHeader />

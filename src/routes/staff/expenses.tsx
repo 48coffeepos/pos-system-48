@@ -1,6 +1,5 @@
+import { CurrencyDollarIcon } from "@phosphor-icons/react";
 import { createFileRoute } from "@tanstack/react-router";
-import { StaffHeader } from "@/features/staff/components/StaffHeader";
-import { CurrencyDollar } from "@phosphor-icons/react";
 
 export const Route = createFileRoute("/staff/expenses")({
 	component: StaffExpenses,
@@ -9,11 +8,10 @@ export const Route = createFileRoute("/staff/expenses")({
 function StaffExpenses() {
 	return (
 		<div className="min-h-screen">
-			<StaffHeader />
 			<main className="mx-auto max-w-screen-2xl px-4 py-8 sm:px-6 lg:px-8">
 				<div className="mb-8 flex items-center gap-3">
 					<div className="flex size-10 items-center justify-center rounded-xl bg-(--deep-forest)">
-						<CurrencyDollar
+						<CurrencyDollarIcon
 							weight="fill"
 							className="size-5 text-(--pale-yellow)"
 						/>
@@ -28,7 +26,7 @@ function StaffExpenses() {
 					</div>
 				</div>
 				<div className="rounded-2xl border border-(--light-gray) bg-(--pure-white) p-8 text-center">
-					<CurrencyDollar className="mx-auto size-12 text-(--medium-gray)/40" />
+					<CurrencyDollarIcon className="mx-auto size-12 text-(--medium-gray)/40" />
 					<h2 className="mt-4 text-lg font-semibold text-(--deep-forest)">
 						No expenses recorded yet
 					</h2>
