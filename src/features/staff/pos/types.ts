@@ -41,6 +41,7 @@ export interface PosOrder {
 	change_amount?: number;
 	grand_total: number;
 	note?: string;
+	cashier_name?: string;
 	items: Array<{
 		snapshot_menu_name: string;
 		quantity: number;

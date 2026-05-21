@@ -17,6 +17,7 @@ import {
   SignOut,
   UserCircle,
   X,
+  Calculator,
 } from "@phosphor-icons/react";
 
 interface SearchItem {
@@ -36,6 +37,7 @@ const defaultSearchItems: SearchItem[] = [
   { label: "Inventory", path: "/staff/inventory", category: "Page" },
   { label: "Expenses", path: "/staff/expenses", category: "Page" },
   { label: "Orders", path: "/staff/orders", category: "Page" },
+  { label: "X-Reading", path: "/staff/xreading", category: "Page" },
 ];
 
 const navLinks = [
@@ -43,6 +45,7 @@ const navLinks = [
   { label: "Inventory", path: "/staff/inventory", icon: Package },
   { label: "Expenses", path: "/staff/expenses", icon: CurrencyDollar },
   { label: "Orders", path: "/staff/orders", icon: ClipboardText },
+  { label: "X-Reading", path: "/staff/xreading", icon: Calculator },
 ];
 
 const staffTo = (path: string) => path as never;

@@ -256,7 +256,7 @@ export type OrderWhereInput = {
   change_amount?: Prisma.DecimalNullableFilter<"Order"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   note?: Prisma.StringNullableFilter<"Order"> | string | null
   created_at?: Prisma.DateTimeFilter<"Order"> | Date | string
-  orderItems?: Prisma.OrderItemListRelationFilter
+  order_items?: Prisma.OrderItemListRelationFilter
   staff?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }
 
@@ -270,7 +270,7 @@ export type OrderOrderByWithRelationInput = {
   change_amount?: Prisma.SortOrderInput | Prisma.SortOrder
   note?: Prisma.SortOrderInput | Prisma.SortOrder
   created_at?: Prisma.SortOrder
-  orderItems?: Prisma.OrderItemOrderByRelationAggregateInput
+  order_items?: Prisma.OrderItemOrderByRelationAggregateInput
   staff?: Prisma.UserOrderByWithRelationInput
 }
 
@@ -287,7 +287,7 @@ export type OrderWhereUniqueInput = Prisma.AtLeast<{
   change_amount?: Prisma.DecimalNullableFilter<"Order"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   note?: Prisma.StringNullableFilter<"Order"> | string | null
   created_at?: Prisma.DateTimeFilter<"Order"> | Date | string
-  orderItems?: Prisma.OrderItemListRelationFilter
+  order_items?: Prisma.OrderItemListRelationFilter
   staff?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }, "order_id">
 
@@ -332,7 +332,7 @@ export type OrderCreateInput = {
   change_amount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   note?: string | null
   created_at?: Date | string
-  orderItems?: Prisma.OrderItemCreateNestedManyWithoutOrderInput
+  order_items?: Prisma.OrderItemCreateNestedManyWithoutOrderInput
   staff: Prisma.UserCreateNestedOneWithoutOrdersInput
 }
 
@@ -346,7 +346,7 @@ export type OrderUncheckedCreateInput = {
   change_amount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   note?: string | null
   created_at?: Date | string
-  orderItems?: Prisma.OrderItemUncheckedCreateNestedManyWithoutOrderInput
+  order_items?: Prisma.OrderItemUncheckedCreateNestedManyWithoutOrderInput
 }
 
 export type OrderUpdateInput = {
@@ -358,7 +358,7 @@ export type OrderUpdateInput = {
   change_amount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  orderItems?: Prisma.OrderItemUpdateManyWithoutOrderNestedInput
+  order_items?: Prisma.OrderItemUpdateManyWithoutOrderNestedInput
   staff?: Prisma.UserUpdateOneRequiredWithoutOrdersNestedInput
 }
 
@@ -372,7 +372,7 @@ export type OrderUncheckedUpdateInput = {
   change_amount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  orderItems?: Prisma.OrderItemUncheckedUpdateManyWithoutOrderNestedInput
+  order_items?: Prisma.OrderItemUncheckedUpdateManyWithoutOrderNestedInput
 }
 
 export type OrderCreateManyInput = {
@@ -418,6 +418,11 @@ export type OrderListRelationFilter = {
 
 export type OrderOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
+}
+
+export type OrderScalarRelationFilter = {
+  is?: Prisma.OrderWhereInput
+  isNot?: Prisma.OrderWhereInput
 }
 
 export type OrderCountOrderByAggregateInput = {
@@ -468,11 +473,6 @@ export type OrderSumOrderByAggregateInput = {
   change_amount?: Prisma.SortOrder
 }
 
-export type OrderScalarRelationFilter = {
-  is?: Prisma.OrderWhereInput
-  isNot?: Prisma.OrderWhereInput
-}
-
 export type OrderCreateNestedManyWithoutStaffInput = {
   create?: Prisma.XOR<Prisma.OrderCreateWithoutStaffInput, Prisma.OrderUncheckedCreateWithoutStaffInput> | Prisma.OrderCreateWithoutStaffInput[] | Prisma.OrderUncheckedCreateWithoutStaffInput[]
   connectOrCreate?: Prisma.OrderCreateOrConnectWithoutStaffInput | Prisma.OrderCreateOrConnectWithoutStaffInput[]
@@ -515,22 +515,22 @@ export type OrderUncheckedUpdateManyWithoutStaffNestedInput = {
   deleteMany?: Prisma.OrderScalarWhereInput | Prisma.OrderScalarWhereInput[]
 }
 
+export type OrderCreateNestedOneWithoutOrder_itemsInput = {
+  create?: Prisma.XOR<Prisma.OrderCreateWithoutOrder_itemsInput, Prisma.OrderUncheckedCreateWithoutOrder_itemsInput>
+  connectOrCreate?: Prisma.OrderCreateOrConnectWithoutOrder_itemsInput
+  connect?: Prisma.OrderWhereUniqueInput
+}
+
+export type OrderUpdateOneRequiredWithoutOrder_itemsNestedInput = {
+  create?: Prisma.XOR<Prisma.OrderCreateWithoutOrder_itemsInput, Prisma.OrderUncheckedCreateWithoutOrder_itemsInput>
+  connectOrCreate?: Prisma.OrderCreateOrConnectWithoutOrder_itemsInput
+  upsert?: Prisma.OrderUpsertWithoutOrder_itemsInput
+  connect?: Prisma.OrderWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.OrderUpdateToOneWithWhereWithoutOrder_itemsInput, Prisma.OrderUpdateWithoutOrder_itemsInput>, Prisma.OrderUncheckedUpdateWithoutOrder_itemsInput>
+}
+
 export type EnumPayment_MethodFieldUpdateOperationsInput = {
   set?: $Enums.Payment_Method
-}
-
-export type OrderCreateNestedOneWithoutOrderItemsInput = {
-  create?: Prisma.XOR<Prisma.OrderCreateWithoutOrderItemsInput, Prisma.OrderUncheckedCreateWithoutOrderItemsInput>
-  connectOrCreate?: Prisma.OrderCreateOrConnectWithoutOrderItemsInput
-  connect?: Prisma.OrderWhereUniqueInput
-}
-
-export type OrderUpdateOneRequiredWithoutOrderItemsNestedInput = {
-  create?: Prisma.XOR<Prisma.OrderCreateWithoutOrderItemsInput, Prisma.OrderUncheckedCreateWithoutOrderItemsInput>
-  connectOrCreate?: Prisma.OrderCreateOrConnectWithoutOrderItemsInput
-  upsert?: Prisma.OrderUpsertWithoutOrderItemsInput
-  connect?: Prisma.OrderWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.OrderUpdateToOneWithWhereWithoutOrderItemsInput, Prisma.OrderUpdateWithoutOrderItemsInput>, Prisma.OrderUncheckedUpdateWithoutOrderItemsInput>
 }
 
 export type OrderCreateWithoutStaffInput = {
@@ -542,7 +542,7 @@ export type OrderCreateWithoutStaffInput = {
   change_amount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   note?: string | null
   created_at?: Date | string
-  orderItems?: Prisma.OrderItemCreateNestedManyWithoutOrderInput
+  order_items?: Prisma.OrderItemCreateNestedManyWithoutOrderInput
 }
 
 export type OrderUncheckedCreateWithoutStaffInput = {
@@ -554,7 +554,7 @@ export type OrderUncheckedCreateWithoutStaffInput = {
   change_amount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   note?: string | null
   created_at?: Date | string
-  orderItems?: Prisma.OrderItemUncheckedCreateNestedManyWithoutOrderInput
+  order_items?: Prisma.OrderItemUncheckedCreateNestedManyWithoutOrderInput
 }
 
 export type OrderCreateOrConnectWithoutStaffInput = {
@@ -598,7 +598,7 @@ export type OrderScalarWhereInput = {
   created_at?: Prisma.DateTimeFilter<"Order"> | Date | string
 }
 
-export type OrderCreateWithoutOrderItemsInput = {
+export type OrderCreateWithoutOrder_itemsInput = {
   order_id?: string
   grand_total: runtime.Decimal | runtime.DecimalJsLike | number | string
   method: $Enums.Payment_Method
@@ -610,7 +610,7 @@ export type OrderCreateWithoutOrderItemsInput = {
   staff: Prisma.UserCreateNestedOneWithoutOrdersInput
 }
 
-export type OrderUncheckedCreateWithoutOrderItemsInput = {
+export type OrderUncheckedCreateWithoutOrder_itemsInput = {
   order_id?: string
   staff_id: string
   grand_total: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -622,23 +622,23 @@ export type OrderUncheckedCreateWithoutOrderItemsInput = {
   created_at?: Date | string
 }
 
-export type OrderCreateOrConnectWithoutOrderItemsInput = {
+export type OrderCreateOrConnectWithoutOrder_itemsInput = {
   where: Prisma.OrderWhereUniqueInput
-  create: Prisma.XOR<Prisma.OrderCreateWithoutOrderItemsInput, Prisma.OrderUncheckedCreateWithoutOrderItemsInput>
+  create: Prisma.XOR<Prisma.OrderCreateWithoutOrder_itemsInput, Prisma.OrderUncheckedCreateWithoutOrder_itemsInput>
 }
 
-export type OrderUpsertWithoutOrderItemsInput = {
-  update: Prisma.XOR<Prisma.OrderUpdateWithoutOrderItemsInput, Prisma.OrderUncheckedUpdateWithoutOrderItemsInput>
-  create: Prisma.XOR<Prisma.OrderCreateWithoutOrderItemsInput, Prisma.OrderUncheckedCreateWithoutOrderItemsInput>
+export type OrderUpsertWithoutOrder_itemsInput = {
+  update: Prisma.XOR<Prisma.OrderUpdateWithoutOrder_itemsInput, Prisma.OrderUncheckedUpdateWithoutOrder_itemsInput>
+  create: Prisma.XOR<Prisma.OrderCreateWithoutOrder_itemsInput, Prisma.OrderUncheckedCreateWithoutOrder_itemsInput>
   where?: Prisma.OrderWhereInput
 }
 
-export type OrderUpdateToOneWithWhereWithoutOrderItemsInput = {
+export type OrderUpdateToOneWithWhereWithoutOrder_itemsInput = {
   where?: Prisma.OrderWhereInput
-  data: Prisma.XOR<Prisma.OrderUpdateWithoutOrderItemsInput, Prisma.OrderUncheckedUpdateWithoutOrderItemsInput>
+  data: Prisma.XOR<Prisma.OrderUpdateWithoutOrder_itemsInput, Prisma.OrderUncheckedUpdateWithoutOrder_itemsInput>
 }
 
-export type OrderUpdateWithoutOrderItemsInput = {
+export type OrderUpdateWithoutOrder_itemsInput = {
   order_id?: Prisma.StringFieldUpdateOperationsInput | string
   grand_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   method?: Prisma.EnumPayment_MethodFieldUpdateOperationsInput | $Enums.Payment_Method
@@ -650,7 +650,7 @@ export type OrderUpdateWithoutOrderItemsInput = {
   staff?: Prisma.UserUpdateOneRequiredWithoutOrdersNestedInput
 }
 
-export type OrderUncheckedUpdateWithoutOrderItemsInput = {
+export type OrderUncheckedUpdateWithoutOrder_itemsInput = {
   order_id?: Prisma.StringFieldUpdateOperationsInput | string
   staff_id?: Prisma.StringFieldUpdateOperationsInput | string
   grand_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -682,7 +682,7 @@ export type OrderUpdateWithoutStaffInput = {
   change_amount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  orderItems?: Prisma.OrderItemUpdateManyWithoutOrderNestedInput
+  order_items?: Prisma.OrderItemUpdateManyWithoutOrderNestedInput
 }
 
 export type OrderUncheckedUpdateWithoutStaffInput = {
@@ -694,7 +694,7 @@ export type OrderUncheckedUpdateWithoutStaffInput = {
   change_amount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  orderItems?: Prisma.OrderItemUncheckedUpdateManyWithoutOrderNestedInput
+  order_items?: Prisma.OrderItemUncheckedUpdateManyWithoutOrderNestedInput
 }
 
 export type OrderUncheckedUpdateManyWithoutStaffInput = {
@@ -714,11 +714,11 @@ export type OrderUncheckedUpdateManyWithoutStaffInput = {
  */
 
 export type OrderCountOutputType = {
-  orderItems: number
+  order_items: number
 }
 
 export type OrderCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  orderItems?: boolean | OrderCountOutputTypeCountOrderItemsArgs
+  order_items?: boolean | OrderCountOutputTypeCountOrder_itemsArgs
 }
 
 /**
@@ -734,7 +734,7 @@ export type OrderCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extens
 /**
  * OrderCountOutputType without action
  */
-export type OrderCountOutputTypeCountOrderItemsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type OrderCountOutputTypeCountOrder_itemsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.OrderItemWhereInput
 }
 
@@ -749,7 +749,7 @@ export type OrderSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   change_amount?: boolean
   note?: boolean
   created_at?: boolean
-  orderItems?: boolean | Prisma.Order$orderItemsArgs<ExtArgs>
+  order_items?: boolean | Prisma.Order$order_itemsArgs<ExtArgs>
   staff?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   _count?: boolean | Prisma.OrderCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["order"]>
@@ -794,7 +794,7 @@ export type OrderSelectScalar = {
 
 export type OrderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"order_id" | "staff_id" | "grand_total" | "method" | "reference_number" | "amount_tendered" | "change_amount" | "note" | "created_at", ExtArgs["result"]["order"]>
 export type OrderInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  orderItems?: boolean | Prisma.Order$orderItemsArgs<ExtArgs>
+  order_items?: boolean | Prisma.Order$order_itemsArgs<ExtArgs>
   staff?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   _count?: boolean | Prisma.OrderCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -808,7 +808,7 @@ export type OrderIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
 export type $OrderPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Order"
   objects: {
-    orderItems: Prisma.$OrderItemPayload<ExtArgs>[]
+    order_items: Prisma.$OrderItemPayload<ExtArgs>[]
     staff: Prisma.$UserPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -1215,7 +1215,7 @@ readonly fields: OrderFieldRefs;
  */
 export interface Prisma__OrderClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  orderItems<T extends Prisma.Order$orderItemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Order$orderItemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OrderItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  order_items<T extends Prisma.Order$order_itemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Order$order_itemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OrderItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   staff<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1656,9 +1656,9 @@ export type OrderDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Interna
 }
 
 /**
- * Order.orderItems
+ * Order.order_items
  */
-export type Order$orderItemsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type Order$order_itemsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
    * Select specific fields to fetch from the OrderItem
    */

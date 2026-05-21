@@ -1,5 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { StaffHeader } from "@/features/staff/components/StaffHeader";
 
 export const Route = createFileRoute("/staff/")({
 	component: StaffDashboard,
@@ -8,7 +7,6 @@ export const Route = createFileRoute("/staff/")({
 function StaffDashboard() {
 	return (
 		<div className="min-h-screen">
-			<StaffHeader />
 			<main className="mx-auto max-w-screen-2xl px-4 py-8 sm:px-6 lg:px-8">
 				<div className="mb-8">
 					<h1 className="text-2xl font-bold text-[var(--deep-forest)]">
