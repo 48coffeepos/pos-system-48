@@ -13,14 +13,21 @@ export function cartLineKey(
 	cupType: string,
 	cupSize: string,
 	addonKey?: string,
+	isFreeDrink?: boolean,
+	discountType?: string,
 ): string {
-	return `${itemId}-${cupType}-${cupSize}${addonKey ? `-${addonKey}` : ""}`;
+	let key = `${itemId}-${cupType}-${cupSize}${addonKey ? `-${addonKey}` : ""}`;
+	if (isFreeDrink) key += "-FREE";
+	if (discountType && discountType !== "none") key += `-${discountType}`;
+	return key;
 }
 
-export function getCupSizes(ozList: number[] | undefined | null): Array<{ key: string; label: string; ounces: number }> {
-	return (ozList ?? []).map((oz) => ({
-		key: oz === 12 ? "12OZ" : "16OZ",
-		label: oz === 12 ? "12oz" : "16oz",
-		ounces: oz,
-	}));
+export function parseCupInfo(name: string): {
+	cup_type: string;
+	cup_size: string;
+} {
+	const lower = name.toLowerCase();
+	const cup_type = lower.includes("iced") ? "ICED" : "HOT";
+	const cup_size = lower.includes("16oz") ? "16OZ" : "12OZ";
+	return { cup_type, cup_size };
 }

@@ -1,3 +1,4 @@
+import { toast } from "sonner";
 import { create } from "zustand";
 import type { CartItem, MenuItem, PosOrder } from "../types";
 
@@ -43,7 +44,9 @@ export const usePosStore = create<PosState>((set) => ({
 
 	addToCart: (item) =>
 		set((state) => {
-			const existingIndex = state.cart.findIndex((c) => c.lineKey === item.lineKey);
+			const existingIndex = state.cart.findIndex(
+				(c) => c.lineKey === item.lineKey,
+			);
 			if (existingIndex > -1) {
 				const updated = [...state.cart];
 				const newQuantity = updated[existingIndex].quantity + 1;
@@ -52,8 +55,12 @@ export const usePosStore = create<PosState>((set) => ({
 					quantity: newQuantity,
 					total_price: updated[existingIndex].unit_price * newQuantity,
 				};
+
+				toast.success(`${item.menu_name} added to cart`);
 				return { cart: updated };
 			}
+			toast.success(`${item.menu_name} added to cart`);
+
 			return { cart: [...state.cart, item] };
 		}),
 

@@ -1,26 +1,17 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useMemo } from "react";
-import { Toaster, toast } from "sonner";
-import { z } from "zod";
+import { toast } from "sonner";
 import { sessionQueryOptions } from "@/features/auth/queryOptions";
-import { useAppForm } from "@/integrations/tanstack-form";
-import { formatPeso } from "@/lib/format-currency";
+import { usePosForm } from "../hooks/usePosForm";
 import { createOrderMutationOptions } from "../mutationOptions";
 import { posPageDataQueryOptions } from "../queryOptions";
 import { usePosStore } from "../stores/usePosStore";
 import type { CartItem, MenuItem, PosOrder } from "../types";
 import { PosCartPanel } from "./PosCartPanel";
-import { PosCupPickerDialog } from "./PosCupPickerDialog";
+import { PosItemCustomizeDialog } from "./PosItemCustomizeDialog";
 import { PosOrderConfirmDialog } from "./PosOrderConfirmDialog";
 import { PosProductGrid } from "./PosProductGrid";
 import { PosReceiptDialog } from "./PosReceiptDialog";
-
-const posFormSchema = z.object({
-	note: z.string(),
-	paymentMethod: z.enum(["CASH", "GCASH", "GRAB"]),
-	amountPaid: z.string(),
-	referenceNumber: z.string(),
-});
 
 export function PosScreen() {
 	const {
@@ -50,36 +41,7 @@ export function PosScreen() {
 
 	const cartTotal = cart.reduce((s, c) => s + c.total_price, 0);
 
-	const form = useAppForm({
-		defaultValues: {
-			note: "",
-			paymentMethod: "CASH" as "CASH" | "GCASH" | "GRAB",
-			amountPaid: "",
-			referenceNumber: "",
-		},
-		validators: {
-			onChange: posFormSchema,
-		},
-		onSubmit: async ({ value }) => {
-			if (cart.length === 0) {
-				toast.error("Cart is empty");
-				return;
-			}
-			const paidNum = parseFloat(value.amountPaid) || 0;
-			if (value.paymentMethod !== "GRAB" && paidNum < cartTotal) {
-				toast.error(`Insufficient amount. Total is ${formatPeso(cartTotal)}`);
-				return;
-			}
-			if (
-				(value.paymentMethod === "GCASH" || value.paymentMethod === "GRAB") &&
-				!value.referenceNumber.trim()
-			) {
-				toast.error("Please enter reference number");
-				return;
-			}
-			setShowPlaceOrderConfirm(true);
-		},
-	});
+	const form = usePosForm();
 
 	if (error) {
 		console.error("POS page data query failed:", error);
@@ -92,6 +54,9 @@ export function PosScreen() {
 
 	const addOns = data?.addOns ?? [];
 
+	const hasDiscountInCart = cart.some((c) => c.discount);
+	const hasFreeDrinkInCart = cart.some((c) => c.is_free_drink);
+
 	const menuItems = useMemo(
 		() =>
 			allMenuItems.filter((item) => {
@@ -102,35 +67,37 @@ export function PosScreen() {
 		[allMenuItems, search],
 	);
 
-	const handleCustomizeConfirm = useCallback(
-		(params: {
-			lineKey: string;
-			menu_id: string;
-			menu_name: string;
-			cup_type: string;
-			cup_size: string;
-			unit_price: number;
-			total_price: number;
-			discount?: string;
-			discount_name?: string;
-			discount_id?: string;
-			is_free_drink?: boolean;
-			addon_items?: Array<{
-				addon_id: string;
-				name: string;
-				price: number;
-				quantity: number;
-			}>;
-		}) => {
-			addToCart({ ...params, quantity: 1 } as CartItem);
-			toast.success(`${params.menu_name} added to cart`);
-		},
-		[addToCart],
-	);
+	const handleCustomizeConfirm = (params: {
+		lineKey: string;
+		menu_id: string;
+		menu_name: string;
+		cup_type: string;
+		cup_size: string;
+		unit_price: number;
+		total_price: number;
+		discount?: string;
+		discount_name?: string;
+		discount_id?: string;
+		is_free_drink?: boolean;
+		addon_items?: Array<{
+			addon_id: string;
+			name: string;
+			price: number;
+			quantity: number;
+		}>;
+	}) => {
+		addToCart({ ...params, quantity: 1 } as CartItem);
+	};
 
 	const handleProductClick = useCallback(
 		(item: MenuItem) => {
-			if (item.type === "STANDALONE") {
+			const hasInventory = item.inventory_items.length > 0;
+			const isStandalone = item.type === "STANDALONE";
+
+			if (!hasInventory || isStandalone) {
+				const price = hasInventory
+					? Number(item.inventory_items[0].price)
+					: (item.price ?? 0);
 				const newItem: CartItem = {
 					lineKey: `${item.menu_id}-NONE-NONE`,
 					menu_id: item.menu_id,
@@ -138,8 +105,8 @@ export function PosScreen() {
 					quantity: 1,
 					cup_type: "NONE",
 					cup_size: "NONE",
-					unit_price: item.price || 0,
-					total_price: item.price || 0,
+					unit_price: price,
+					total_price: price,
 				};
 				addToCart(newItem);
 			} else {
@@ -166,7 +133,7 @@ export function PosScreen() {
 
 		try {
 			const placedOrder = await createOrderMutation.mutateAsync({
-				method: values.paymentMethod as any,
+				method: values.paymentMethod,
 				reference_number: values.referenceNumber || undefined,
 				amount_tendered: values.paymentMethod === "GRAB" ? undefined : paidNum,
 				change_amount: values.paymentMethod === "GRAB" ? undefined : changeAmt,
@@ -181,7 +148,7 @@ export function PosScreen() {
 							: c.menu_name,
 					quantity: c.quantity,
 					unit_price: c.unit_price,
-					discount_type: c.discount as any,
+					discount_type: c.discount,
 					discount_contact: c.discount_name,
 					discount_id_number: c.discount_id,
 					line_total: c.total_price,
@@ -238,9 +205,10 @@ export function PosScreen() {
 			form.reset();
 			setShowPlaceOrderConfirm(false);
 			toast.success(`Order #${order.order_id} placed successfully!`);
-		} catch (err: any) {
+		} catch (err: unknown) {
 			console.error("Order placement failed:", err);
-			toast.error("Failed to place order: " + (err.message || "Unknown error"));
+			const msg = err instanceof Error ? err.message : "Unknown error";
+			toast.error(`Failed to place order: ${msg}`);
 		}
 	}, [
 		cart,
@@ -262,9 +230,7 @@ export function PosScreen() {
 			className="flex h-screen flex-col overflow-x-auto"
 			style={{ background: "var(--warm-beige)" }}
 		>
-			<div className="flex flex-col h-full min-w-[1024px]">
-				<Toaster position="top-right" richColors />
-
+			<div className="flex flex-col h-full min-w-5xl">
 				<div className="flex flex-1 overflow-hidden">
 					<PosProductGrid
 						menuItems={menuItems}
@@ -279,18 +245,17 @@ export function PosScreen() {
 						onRemoveFromCart={removeFromCart}
 						onUpdateQuantity={handleUpdateQuantity}
 						onClearCart={clearCart}
-						onPlaceOrderClick={() => {
-							form.handleSubmit();
-						}}
 					/>
 				</div>
 			</div>
 
-			<PosCupPickerDialog
+			<PosItemCustomizeDialog
 				item={customizeItem}
 				addOns={addOns}
 				onClose={() => setCustomizeItem(null)}
 				onConfirm={handleCustomizeConfirm}
+				hasDiscountInCart={hasDiscountInCart}
+				hasFreeDrinkInCart={hasFreeDrinkInCart}
 			/>
 
 			<PosOrderConfirmDialog

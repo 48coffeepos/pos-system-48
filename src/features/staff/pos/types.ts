@@ -1,4 +1,7 @@
-import type { Inventory_Type } from "@/generated/prisma/enums.js";
+import type {
+	Discount_Type,
+	Inventory_Type,
+} from "@/generated/prisma/enums.js";
 
 export interface MenuItem {
 	menu_id: string;
@@ -23,10 +26,15 @@ export interface CartItem {
 	quantity: number;
 	cup_type: string;
 	cup_size: string;
-	addon_items?: Array<{ addon_id: string; name: string; price: number; quantity: number }>;
+	addon_items?: Array<{
+		addon_id: string;
+		name: string;
+		price: number;
+		quantity: number;
+	}>;
 	unit_price: number;
 	total_price: number;
-	discount?: string;
+	discount?: Discount_Type;
 	discount_name?: string;
 	discount_id?: string;
 	is_free_drink?: boolean;
@@ -52,6 +60,11 @@ export interface PosOrder {
 		line_total: number;
 		note?: string;
 		snapshot_inventory: string;
-		addon_items?: Array<{ addon_id: string; addon_name_snapshot: string; addon_price_snapshot: number; quantity: number }>;
+		addon_items?: Array<{
+			addon_id: string;
+			addon_name_snapshot: string;
+			addon_price_snapshot: number;
+			quantity: number;
+		}>;
 	}>;
 }
