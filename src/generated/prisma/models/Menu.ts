@@ -346,6 +346,11 @@ export type MenuScalarRelationFilter = {
   isNot?: Prisma.MenuWhereInput
 }
 
+export type MenuNullableScalarRelationFilter = {
+  is?: Prisma.MenuWhereInput | null
+  isNot?: Prisma.MenuWhereInput | null
+}
+
 export type NullableDecimalFieldUpdateOperationsInput = {
   set?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   increment?: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -378,10 +383,12 @@ export type MenuCreateNestedOneWithoutOrder_itemsInput = {
   connect?: Prisma.MenuWhereUniqueInput
 }
 
-export type MenuUpdateOneRequiredWithoutOrder_itemsNestedInput = {
+export type MenuUpdateOneWithoutOrder_itemsNestedInput = {
   create?: Prisma.XOR<Prisma.MenuCreateWithoutOrder_itemsInput, Prisma.MenuUncheckedCreateWithoutOrder_itemsInput>
   connectOrCreate?: Prisma.MenuCreateOrConnectWithoutOrder_itemsInput
   upsert?: Prisma.MenuUpsertWithoutOrder_itemsInput
+  disconnect?: Prisma.MenuWhereInput | boolean
+  delete?: Prisma.MenuWhereInput | boolean
   connect?: Prisma.MenuWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.MenuUpdateToOneWithWhereWithoutOrder_itemsInput, Prisma.MenuUpdateWithoutOrder_itemsInput>, Prisma.MenuUncheckedUpdateWithoutOrder_itemsInput>
 }
