@@ -31,7 +31,7 @@ function StaffInventory() {
 					</div>
 				</div>
 			) : (
-				<InventoryList items={inventoryItems} />
+				<InventoryList items={inventoryItems} hideActions />
 			)}
 		</div>
 	);
