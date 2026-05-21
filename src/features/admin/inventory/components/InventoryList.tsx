@@ -29,9 +29,11 @@ interface ExtendedInventoryItem extends InventoryItem {
 function InventoryList({
 	items = [],
 	onEdit,
+	hideActions = false,
 }: {
 	items?: ExtendedInventoryItem[];
 	onEdit?: (item: ExtendedInventoryItem) => void;
+	hideActions?: boolean;
 }) {
 	const [timeframe, setTimeframe] = useState<"today" | "yesterday">("today");
 	const [deletingItem, setDeletingItem] =
@@ -94,7 +96,9 @@ function InventoryList({
 								<tr className="border-b border-(--light-gray)/40 bg-(--soft-peach)/20 text-[11px] font-bold tracking-wider text-(--medium-gray)/80 uppercase">
 									<th className="rounded-l-lg p-3 pl-4">Item</th>
 									<th className="p-3 text-center">Quantity</th>
-									<th className="rounded-r-lg p-3 pr-4 text-right">Actions</th>
+									{!hideActions && (
+										<th className="rounded-r-lg p-3 pr-4 text-right">Actions</th>
+									)}
 								</tr>
 							</thead>
 							<tbody className="divide-y divide-(--light-gray)/40">
@@ -125,26 +129,28 @@ function InventoryList({
 										</td>
 
 										{/* Column 3: Row Mutations (Edit Profile/Remove) */}
-										<td className="p-4 pr-4 text-right">
-											<div className="flex items-center justify-end gap-3 text-(--medium-gray)">
-												<button
-													type="button"
-													onClick={() => onEdit?.(item)}
-													className="p-1 hover:text-(--deep-forest) transition-colors"
-													aria-label="Edit item"
-												>
-													<NotePencilIcon size={18} />
-												</button>
-												<button
-													type="button"
-													onClick={() => setDeletingItem(item)}
-													className="p-1 hover:text-red-600 transition-colors"
-													aria-label="Delete item record"
-												>
-													<TrashIcon size={18} />
-												</button>
-											</div>
-										</td>
+										{!hideActions && (
+											<td className="p-4 pr-4 text-right">
+												<div className="flex items-center justify-end gap-3 text-(--medium-gray)">
+													<button
+														type="button"
+														onClick={() => onEdit?.(item)}
+														className="p-1 hover:text-(--deep-forest) transition-colors"
+														aria-label="Edit item"
+													>
+														<NotePencilIcon size={18} />
+													</button>
+													<button
+														type="button"
+														onClick={() => setDeletingItem(item)}
+														className="p-1 hover:text-red-600 transition-colors"
+														aria-label="Delete item record"
+													>
+														<TrashIcon size={18} />
+													</button>
+												</div>
+											</td>
+										)}
 									</tr>
 								))}
 							</tbody>

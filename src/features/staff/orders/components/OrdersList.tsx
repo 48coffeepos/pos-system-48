@@ -13,6 +13,7 @@ interface DBOrder {
   grand_total: number;
   created_at: string | Date;
   note: string | null;
+  staff: { name: string };
   order_items: Array<{
     order_item_id: string;
     menu_id: string;
@@ -79,6 +80,7 @@ export function OrdersList({ orders = [] }: OrdersListProps) {
       change_amount: order.change_amount !== null ? order.change_amount : undefined,
       grand_total: order.grand_total,
       note: order.note || undefined,
+      cashier_name: order.staff?.name || "Cashier",
       items: order.order_items.map((item) => ({
         snapshot_menu_name: item.snapshot_menu_name,
         quantity: item.quantity,
@@ -245,7 +247,7 @@ export function OrdersList({ orders = [] }: OrdersListProps) {
         open={!!selectedOrder}
         onClose={() => setSelectedOrder(null)}
         onPrint={handlePrint}
-        cashierName="Cashier"
+        cashierName={selectedOrder?.cashier_name || "Cashier"}
       />
     </div>
   );

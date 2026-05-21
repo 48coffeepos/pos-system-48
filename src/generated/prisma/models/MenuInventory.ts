@@ -259,8 +259,8 @@ export type MenuInventoryScalarWhereWithAggregatesInput = {
 export type MenuInventoryCreateInput = {
   menu_inv_id?: string
   price: runtime.Decimal | runtime.DecimalJsLike | number | string
-  inventory: Prisma.InventoryCreateNestedOneWithoutMenuInventoriesInput
-  menu: Prisma.MenuCreateNestedOneWithoutMenuInventoriesInput
+  inventory: Prisma.InventoryCreateNestedOneWithoutMenu_itemsInput
+  menu: Prisma.MenuCreateNestedOneWithoutInventory_itemsInput
 }
 
 export type MenuInventoryUncheckedCreateInput = {
@@ -273,8 +273,8 @@ export type MenuInventoryUncheckedCreateInput = {
 export type MenuInventoryUpdateInput = {
   menu_inv_id?: Prisma.StringFieldUpdateOperationsInput | string
   price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  inventory?: Prisma.InventoryUpdateOneRequiredWithoutMenuInventoriesNestedInput
-  menu?: Prisma.MenuUpdateOneRequiredWithoutMenuInventoriesNestedInput
+  inventory?: Prisma.InventoryUpdateOneRequiredWithoutMenu_itemsNestedInput
+  menu?: Prisma.MenuUpdateOneRequiredWithoutInventory_itemsNestedInput
 }
 
 export type MenuInventoryUncheckedUpdateInput = {
@@ -431,18 +431,10 @@ export type MenuInventoryUncheckedUpdateManyWithoutMenuNestedInput = {
   deleteMany?: Prisma.MenuInventoryScalarWhereInput | Prisma.MenuInventoryScalarWhereInput[]
 }
 
-export type DecimalFieldUpdateOperationsInput = {
-  set?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  increment?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  decrement?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  multiply?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  divide?: runtime.Decimal | runtime.DecimalJsLike | number | string
-}
-
 export type MenuInventoryCreateWithoutInventoryInput = {
   menu_inv_id?: string
   price: runtime.Decimal | runtime.DecimalJsLike | number | string
-  menu: Prisma.MenuCreateNestedOneWithoutMenuInventoriesInput
+  menu: Prisma.MenuCreateNestedOneWithoutInventory_itemsInput
 }
 
 export type MenuInventoryUncheckedCreateWithoutInventoryInput = {
@@ -490,7 +482,7 @@ export type MenuInventoryScalarWhereInput = {
 export type MenuInventoryCreateWithoutMenuInput = {
   menu_inv_id?: string
   price: runtime.Decimal | runtime.DecimalJsLike | number | string
-  inventory: Prisma.InventoryCreateNestedOneWithoutMenuInventoriesInput
+  inventory: Prisma.InventoryCreateNestedOneWithoutMenu_itemsInput
 }
 
 export type MenuInventoryUncheckedCreateWithoutMenuInput = {
@@ -534,7 +526,7 @@ export type MenuInventoryCreateManyInventoryInput = {
 export type MenuInventoryUpdateWithoutInventoryInput = {
   menu_inv_id?: Prisma.StringFieldUpdateOperationsInput | string
   price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  menu?: Prisma.MenuUpdateOneRequiredWithoutMenuInventoriesNestedInput
+  menu?: Prisma.MenuUpdateOneRequiredWithoutInventory_itemsNestedInput
 }
 
 export type MenuInventoryUncheckedUpdateWithoutInventoryInput = {
@@ -558,7 +550,7 @@ export type MenuInventoryCreateManyMenuInput = {
 export type MenuInventoryUpdateWithoutMenuInput = {
   menu_inv_id?: Prisma.StringFieldUpdateOperationsInput | string
   price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  inventory?: Prisma.InventoryUpdateOneRequiredWithoutMenuInventoriesNestedInput
+  inventory?: Prisma.InventoryUpdateOneRequiredWithoutMenu_itemsNestedInput
 }
 
 export type MenuInventoryUncheckedUpdateWithoutMenuInput = {
