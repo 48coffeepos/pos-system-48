@@ -172,7 +172,6 @@ model Order {
   @@map("orders")
 }
 
-
 model Verification {
   id         String   @id
   identifier String
@@ -184,7 +183,6 @@ model Verification {
   @@index([identifier])
   @@map("verification")
 }
-
 
 enum Inventory_Type {
   CUP

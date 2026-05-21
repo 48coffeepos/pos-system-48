@@ -1,5 +1,6 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { sessionQueryOptions } from "@/features/auth/queryOptions";
+import { StaffHeader } from "@/features/staff/components/StaffHeader";
 
 export const Route = createFileRoute("/staff")({
 	component: StaffLayout,
@@ -14,10 +15,11 @@ export const Route = createFileRoute("/staff")({
 	},
 });
 
-function StaffLayout() {
+function RouteComponent() {
 	return (
-		<div className="min-h-screen">
+		<main className="min-h-screen">
+			<StaffHeader />
 			<Outlet />
-		</div>
+		</main>
 	);
 }
