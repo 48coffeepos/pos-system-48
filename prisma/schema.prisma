@@ -50,7 +50,6 @@ model Account {
   accountId             String
   providerId            String
   userId                String
-  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   accessToken           String?
   refreshToken          String?
   idToken               String?
@@ -60,6 +59,7 @@ model Account {
   password              String?
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@map("account")
@@ -77,11 +77,11 @@ model Addon {
 model Expense {
   expense_id  String       @id @default(uuid())
   staff_id    String
-  staff       User         @relation(fields: [staff_id], references: [id], onDelete: Restrict)
   type        Expense_Type
   description String
   amount      Decimal      @db.Decimal(10, 2)
   timestamp   DateTime     @default(now())
+  staff       User         @relation(fields: [staff_id], references: [id])
 
   @@map("expenses")
 }
@@ -111,10 +111,10 @@ model Menu {
 model MenuInventory {
   menu_inv_id  String    @id @default(uuid())
   menu_id      String
-  menu         Menu      @relation(fields: [menu_id], references: [menu_id], onDelete: Cascade)
   inventory_id String
-  inventory    Inventory @relation(fields: [inventory_id], references: [inventory_id], onDelete: Restrict)
   price        Decimal   @db.Decimal(10, 2)
+  inventory    Inventory @relation(fields: [inventory_id], references: [inventory_id])
+  menu         Menu      @relation(fields: [menu_id], references: [menu_id], onDelete: Cascade)
 
   @@unique([menu_id, inventory_id])
   @@map("menu_inventory")
@@ -123,13 +123,13 @@ model MenuInventory {
 model OrderItemAddon {
   order_item_addon_id  String    @id @default(uuid())
   addon_id             String
-  addon                Addon     @relation(fields: [addon_id], references: [addon_id], onDelete: Restrict)
   order_item_id        String
-  order_item           OrderItem @relation(fields: [order_item_id], references: [order_item_id], onDelete: Cascade)
   addon_name_snapshot  String
   addon_price_snapshot Decimal   @db.Decimal(10, 2)
   quantity             Int
   total_price          Decimal   @db.Decimal(10, 2)
+  addon                Addon     @relation(fields: [addon_id], references: [addon_id])
+  order_item           OrderItem @relation(fields: [order_item_id], references: [order_item_id], onDelete: Cascade)
 
   @@map("order_item_addons")
 }
@@ -137,9 +137,7 @@ model OrderItemAddon {
 model OrderItem {
   order_item_id      String           @id @default(uuid())
   order_id           String
-  order              Order            @relation(fields: [order_id], references: [order_id], onDelete: Cascade)
-  menu_id            String
-  menu               Menu             @relation(fields: [menu_id], references: [menu_id], onDelete: Restrict)
+  menu_id            String?
   snapshot_menu_name String
   snapshot_price     Decimal          @db.Decimal(10, 2)
   snapshot_inventory String
@@ -152,6 +150,8 @@ model OrderItem {
   discount_id_number String?
   discount_contact   String?
   addon_items        OrderItemAddon[]
+  menu               Menu?            @relation(fields: [menu_id], references: [menu_id])
+  order              Order            @relation(fields: [order_id], references: [order_id], onDelete: Cascade)
 
   @@map("order_items")
 }
@@ -159,7 +159,6 @@ model OrderItem {
 model Order {
   order_id         String         @id @default(uuid())
   staff_id         String
-  staff            User           @relation(fields: [staff_id], references: [id], onDelete: Restrict)
   grand_total      Decimal        @db.Decimal(10, 2)
   method           Payment_Method
   reference_number String?
@@ -168,6 +167,7 @@ model Order {
   note             String?
   created_at       DateTime       @default(now())
   order_items      OrderItem[]
+  staff            User           @relation(fields: [staff_id], references: [id])
 
   @@map("orders")
 }
