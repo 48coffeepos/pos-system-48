@@ -139,7 +139,7 @@ model Order {
 model OrderItem {
   order_item_id      String           @id @default(uuid())
   order_id           String
-  menu_id            String
+  menu_id            String?
   snapshot_menu_name String
   snapshot_price     Decimal          @db.Decimal(10, 2)
   snapshot_inventory String
@@ -152,7 +152,7 @@ model OrderItem {
   discount_id_number String?
   discount_contact   String?
   orderItemAddons    OrderItemAddon[]
-  menu               Menu             @relation(fields: [menu_id], references: [menu_id])
+  menu               Menu?            @relation(fields: [menu_id], references: [menu_id], onDelete: SetNull)
   order              Order            @relation(fields: [order_id], references: [order_id], onDelete: Cascade)
 
   @@map("order_items")
