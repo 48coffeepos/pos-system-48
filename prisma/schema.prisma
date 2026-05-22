@@ -19,15 +19,13 @@ model User {
   banned          Boolean?  @default(false)
   displayUsername String?
   role            String?
-  username        String?
+  username        String?   @unique
+  banExpires      DateTime?
   accounts        Account[]
   expenses        Expense[]
   orders          Order[]
   sessions        Session[]
 
-  banExpires DateTime?
-
-  @@unique([username])
   @@map("user")
 }
 
@@ -48,7 +46,7 @@ model Session {
 }
 
 model Account {
-  id                    String    @id
+  id                    String    @id @default(uuid())
   accountId             String
   providerId            String
   userId                String
@@ -67,16 +65,25 @@ model Account {
   @@map("account")
 }
 
-model Verification {
-  id         String   @id
-  identifier String
-  value      String
-  expiresAt  DateTime
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+model Addon {
+  addon_id    String           @id @default(uuid())
+  name        String           @unique
+  price       Decimal          @db.Decimal(10, 2)
+  addon_items OrderItemAddon[]
 
-  @@index([identifier])
-  @@map("verification")
+  @@map("addons")
+}
+
+model Expense {
+  expense_id  String       @id @default(uuid())
+  staff_id    String
+  type        Expense_Type
+  description String
+  amount      Decimal      @db.Decimal(10, 2)
+  timestamp   DateTime     @default(now())
+  staff       User         @relation(fields: [staff_id], references: [id])
+
+  @@map("expenses")
 }
 
 model Inventory {
@@ -85,8 +92,7 @@ model Inventory {
   stock           Int             @default(0)
   yesterday_stock Int?
   type            Inventory_Type
-  menuInventories MenuInventory[]
-  orderItems      OrderItem[]
+  menu_items      MenuInventory[]
 
   @@map("inventory")
 }
@@ -95,9 +101,9 @@ model Menu {
   menu_id         String          @id @default(uuid())
   name            String          @unique
   price           Decimal?        @db.Decimal(10, 2)
-  menuInventories MenuInventory[]
   type            Inventory_Type?
-  orderItems      OrderItem[]
+  inventory_items MenuInventory[]
+  order_items     OrderItem[]
 
   @@map("menu")
 }
@@ -114,13 +120,40 @@ model MenuInventory {
   @@map("menu_inventory")
 }
 
-model Addon {
-  addon_id        String           @id @default(uuid())
-  name            String           @unique
-  price           Decimal          @db.Decimal(10, 2)
-  orderItemAddons OrderItemAddon[]
+model OrderItemAddon {
+  order_item_addon_id  String    @id @default(uuid())
+  addon_id             String
+  order_item_id        String
+  addon_name_snapshot  String
+  addon_price_snapshot Decimal   @db.Decimal(10, 2)
+  quantity             Int
+  total_price          Decimal   @db.Decimal(10, 2)
+  addon                Addon     @relation(fields: [addon_id], references: [addon_id])
+  order_item           OrderItem @relation(fields: [order_item_id], references: [order_item_id], onDelete: Cascade)
 
-  @@map("addons")
+  @@map("order_item_addons")
+}
+
+model OrderItem {
+  order_item_id      String           @id @default(uuid())
+  order_id           String
+  menu_id            String?
+  snapshot_menu_name String
+  snapshot_price     Decimal          @db.Decimal(10, 2)
+  snapshot_inventory String
+  unit_price         Decimal          @db.Decimal(10, 2)
+  quantity           Int              @default(1)
+  line_total         Decimal          @db.Decimal(10, 2)
+  loyalty            Boolean          @default(false)
+  discount_amount    Decimal          @default(5) @db.Decimal(10, 2)
+  discount_type      Discount_Type?
+  discount_id_number String?
+  discount_contact   String?
+  addon_items        OrderItemAddon[]
+  menu               Menu?            @relation(fields: [menu_id], references: [menu_id])
+  order              Order            @relation(fields: [order_id], references: [order_id], onDelete: Cascade)
+
+  @@map("order_items")
 }
 
 model Order {
@@ -133,60 +166,22 @@ model Order {
   change_amount    Decimal?       @db.Decimal(10, 2)
   note             String?
   created_at       DateTime       @default(now())
-  orderItems       OrderItem[]
+  order_items      OrderItem[]
   staff            User           @relation(fields: [staff_id], references: [id])
 
   @@map("orders")
 }
 
-model OrderItem {
-  order_item_id      String           @id @default(uuid())
-  order_id           String
-  menu_id            String
-  inventory_id       String?
-  snapshot_menu_name String
-  snapshot_price     Decimal          @db.Decimal(10, 2)
-  snapshot_inventory String
-  unit_price         Decimal          @db.Decimal(10, 2)
-  quantity           Int              @default(1)
-  line_total         Decimal          @db.Decimal(10, 2)
-  loyalty            Boolean          @default(false)
-  discount_amount    Decimal          @default(5) @db.Decimal(10, 2)
-  discount_type      Discount_Type?
-  discount_id_number String?
-  discount_contact   String?
-  orderItemAddons    OrderItemAddon[]
-  menu               Menu             @relation(fields: [menu_id], references: [menu_id])
-  inventory          Inventory?       @relation(fields: [inventory_id], references: [inventory_id])
-  order              Order            @relation(fields: [order_id], references: [order_id], onDelete: Cascade)
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
-  @@map("order_items")
-}
-
-model OrderItemAddon {
-  order_item_addon_id  String    @id @default(uuid())
-  addon_id             String
-  order_item_id        String
-  addon_name_snapshot  String
-  addon_price_snapshot Decimal   @db.Decimal(10, 2)
-  quantity             Int
-  total_price          Decimal   @db.Decimal(10, 2)
-  addon                Addon     @relation(fields: [addon_id], references: [addon_id])
-  orderItem            OrderItem @relation(fields: [order_item_id], references: [order_item_id], onDelete: Cascade)
-
-  @@map("order_item_addons")
-}
-
-model Expense {
-  expense_id  String       @id @default(uuid())
-  staff_id    String
-  type        Expense_Type
-  description String
-  amount      Decimal      @db.Decimal(10, 2)
-  timestamp   DateTime     @default(now())
-  staff       User         @relation(fields: [staff_id], references: [id])
-
-  @@map("expenses")
+  @@index([identifier])
+  @@map("verification")
 }
 
 enum Inventory_Type {

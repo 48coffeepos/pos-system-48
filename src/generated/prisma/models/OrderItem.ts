@@ -46,7 +46,6 @@ export type OrderItemMinAggregateOutputType = {
   order_item_id: string | null
   order_id: string | null
   menu_id: string | null
-  inventory_id: string | null
   snapshot_menu_name: string | null
   snapshot_price: runtime.Decimal | null
   snapshot_inventory: string | null
@@ -64,7 +63,6 @@ export type OrderItemMaxAggregateOutputType = {
   order_item_id: string | null
   order_id: string | null
   menu_id: string | null
-  inventory_id: string | null
   snapshot_menu_name: string | null
   snapshot_price: runtime.Decimal | null
   snapshot_inventory: string | null
@@ -82,7 +80,6 @@ export type OrderItemCountAggregateOutputType = {
   order_item_id: number
   order_id: number
   menu_id: number
-  inventory_id: number
   snapshot_menu_name: number
   snapshot_price: number
   snapshot_inventory: number
@@ -118,7 +115,6 @@ export type OrderItemMinAggregateInputType = {
   order_item_id?: true
   order_id?: true
   menu_id?: true
-  inventory_id?: true
   snapshot_menu_name?: true
   snapshot_price?: true
   snapshot_inventory?: true
@@ -136,7 +132,6 @@ export type OrderItemMaxAggregateInputType = {
   order_item_id?: true
   order_id?: true
   menu_id?: true
-  inventory_id?: true
   snapshot_menu_name?: true
   snapshot_price?: true
   snapshot_inventory?: true
@@ -154,7 +149,6 @@ export type OrderItemCountAggregateInputType = {
   order_item_id?: true
   order_id?: true
   menu_id?: true
-  inventory_id?: true
   snapshot_menu_name?: true
   snapshot_price?: true
   snapshot_inventory?: true
@@ -258,8 +252,7 @@ export type OrderItemGroupByArgs<ExtArgs extends runtime.Types.Extensions.Intern
 export type OrderItemGroupByOutputType = {
   order_item_id: string
   order_id: string
-  menu_id: string
-  inventory_id: string | null
+  menu_id: string | null
   snapshot_menu_name: string
   snapshot_price: runtime.Decimal
   snapshot_inventory: string
@@ -299,8 +292,7 @@ export type OrderItemWhereInput = {
   NOT?: Prisma.OrderItemWhereInput | Prisma.OrderItemWhereInput[]
   order_item_id?: Prisma.StringFilter<"OrderItem"> | string
   order_id?: Prisma.StringFilter<"OrderItem"> | string
-  menu_id?: Prisma.StringFilter<"OrderItem"> | string
-  inventory_id?: Prisma.StringNullableFilter<"OrderItem"> | string | null
+  menu_id?: Prisma.StringNullableFilter<"OrderItem"> | string | null
   snapshot_menu_name?: Prisma.StringFilter<"OrderItem"> | string
   snapshot_price?: Prisma.DecimalFilter<"OrderItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   snapshot_inventory?: Prisma.StringFilter<"OrderItem"> | string
@@ -312,17 +304,15 @@ export type OrderItemWhereInput = {
   discount_type?: Prisma.EnumDiscount_TypeNullableFilter<"OrderItem"> | $Enums.Discount_Type | null
   discount_id_number?: Prisma.StringNullableFilter<"OrderItem"> | string | null
   discount_contact?: Prisma.StringNullableFilter<"OrderItem"> | string | null
-  orderItemAddons?: Prisma.OrderItemAddonListRelationFilter
-  menu?: Prisma.XOR<Prisma.MenuScalarRelationFilter, Prisma.MenuWhereInput>
-  inventory?: Prisma.XOR<Prisma.InventoryNullableScalarRelationFilter, Prisma.InventoryWhereInput> | null
+  addon_items?: Prisma.OrderItemAddonListRelationFilter
+  menu?: Prisma.XOR<Prisma.MenuNullableScalarRelationFilter, Prisma.MenuWhereInput> | null
   order?: Prisma.XOR<Prisma.OrderScalarRelationFilter, Prisma.OrderWhereInput>
 }
 
 export type OrderItemOrderByWithRelationInput = {
   order_item_id?: Prisma.SortOrder
   order_id?: Prisma.SortOrder
-  menu_id?: Prisma.SortOrder
-  inventory_id?: Prisma.SortOrderInput | Prisma.SortOrder
+  menu_id?: Prisma.SortOrderInput | Prisma.SortOrder
   snapshot_menu_name?: Prisma.SortOrder
   snapshot_price?: Prisma.SortOrder
   snapshot_inventory?: Prisma.SortOrder
@@ -334,9 +324,8 @@ export type OrderItemOrderByWithRelationInput = {
   discount_type?: Prisma.SortOrderInput | Prisma.SortOrder
   discount_id_number?: Prisma.SortOrderInput | Prisma.SortOrder
   discount_contact?: Prisma.SortOrderInput | Prisma.SortOrder
-  orderItemAddons?: Prisma.OrderItemAddonOrderByRelationAggregateInput
+  addon_items?: Prisma.OrderItemAddonOrderByRelationAggregateInput
   menu?: Prisma.MenuOrderByWithRelationInput
-  inventory?: Prisma.InventoryOrderByWithRelationInput
   order?: Prisma.OrderOrderByWithRelationInput
 }
 
@@ -346,8 +335,7 @@ export type OrderItemWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.OrderItemWhereInput[]
   NOT?: Prisma.OrderItemWhereInput | Prisma.OrderItemWhereInput[]
   order_id?: Prisma.StringFilter<"OrderItem"> | string
-  menu_id?: Prisma.StringFilter<"OrderItem"> | string
-  inventory_id?: Prisma.StringNullableFilter<"OrderItem"> | string | null
+  menu_id?: Prisma.StringNullableFilter<"OrderItem"> | string | null
   snapshot_menu_name?: Prisma.StringFilter<"OrderItem"> | string
   snapshot_price?: Prisma.DecimalFilter<"OrderItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   snapshot_inventory?: Prisma.StringFilter<"OrderItem"> | string
@@ -359,17 +347,15 @@ export type OrderItemWhereUniqueInput = Prisma.AtLeast<{
   discount_type?: Prisma.EnumDiscount_TypeNullableFilter<"OrderItem"> | $Enums.Discount_Type | null
   discount_id_number?: Prisma.StringNullableFilter<"OrderItem"> | string | null
   discount_contact?: Prisma.StringNullableFilter<"OrderItem"> | string | null
-  orderItemAddons?: Prisma.OrderItemAddonListRelationFilter
-  menu?: Prisma.XOR<Prisma.MenuScalarRelationFilter, Prisma.MenuWhereInput>
-  inventory?: Prisma.XOR<Prisma.InventoryNullableScalarRelationFilter, Prisma.InventoryWhereInput> | null
+  addon_items?: Prisma.OrderItemAddonListRelationFilter
+  menu?: Prisma.XOR<Prisma.MenuNullableScalarRelationFilter, Prisma.MenuWhereInput> | null
   order?: Prisma.XOR<Prisma.OrderScalarRelationFilter, Prisma.OrderWhereInput>
 }, "order_item_id">
 
 export type OrderItemOrderByWithAggregationInput = {
   order_item_id?: Prisma.SortOrder
   order_id?: Prisma.SortOrder
-  menu_id?: Prisma.SortOrder
-  inventory_id?: Prisma.SortOrderInput | Prisma.SortOrder
+  menu_id?: Prisma.SortOrderInput | Prisma.SortOrder
   snapshot_menu_name?: Prisma.SortOrder
   snapshot_price?: Prisma.SortOrder
   snapshot_inventory?: Prisma.SortOrder
@@ -394,8 +380,7 @@ export type OrderItemScalarWhereWithAggregatesInput = {
   NOT?: Prisma.OrderItemScalarWhereWithAggregatesInput | Prisma.OrderItemScalarWhereWithAggregatesInput[]
   order_item_id?: Prisma.StringWithAggregatesFilter<"OrderItem"> | string
   order_id?: Prisma.StringWithAggregatesFilter<"OrderItem"> | string
-  menu_id?: Prisma.StringWithAggregatesFilter<"OrderItem"> | string
-  inventory_id?: Prisma.StringNullableWithAggregatesFilter<"OrderItem"> | string | null
+  menu_id?: Prisma.StringNullableWithAggregatesFilter<"OrderItem"> | string | null
   snapshot_menu_name?: Prisma.StringWithAggregatesFilter<"OrderItem"> | string
   snapshot_price?: Prisma.DecimalWithAggregatesFilter<"OrderItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   snapshot_inventory?: Prisma.StringWithAggregatesFilter<"OrderItem"> | string
@@ -422,17 +407,15 @@ export type OrderItemCreateInput = {
   discount_type?: $Enums.Discount_Type | null
   discount_id_number?: string | null
   discount_contact?: string | null
-  orderItemAddons?: Prisma.OrderItemAddonCreateNestedManyWithoutOrderItemInput
-  menu: Prisma.MenuCreateNestedOneWithoutOrderItemsInput
-  inventory?: Prisma.InventoryCreateNestedOneWithoutOrderItemsInput
-  order: Prisma.OrderCreateNestedOneWithoutOrderItemsInput
+  addon_items?: Prisma.OrderItemAddonCreateNestedManyWithoutOrder_itemInput
+  menu?: Prisma.MenuCreateNestedOneWithoutOrder_itemsInput
+  order: Prisma.OrderCreateNestedOneWithoutOrder_itemsInput
 }
 
 export type OrderItemUncheckedCreateInput = {
   order_item_id?: string
   order_id: string
-  menu_id: string
-  inventory_id?: string | null
+  menu_id?: string | null
   snapshot_menu_name: string
   snapshot_price: runtime.Decimal | runtime.DecimalJsLike | number | string
   snapshot_inventory: string
@@ -444,7 +427,7 @@ export type OrderItemUncheckedCreateInput = {
   discount_type?: $Enums.Discount_Type | null
   discount_id_number?: string | null
   discount_contact?: string | null
-  orderItemAddons?: Prisma.OrderItemAddonUncheckedCreateNestedManyWithoutOrderItemInput
+  addon_items?: Prisma.OrderItemAddonUncheckedCreateNestedManyWithoutOrder_itemInput
 }
 
 export type OrderItemUpdateInput = {
@@ -460,17 +443,15 @@ export type OrderItemUpdateInput = {
   discount_type?: Prisma.NullableEnumDiscount_TypeFieldUpdateOperationsInput | $Enums.Discount_Type | null
   discount_id_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   discount_contact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  orderItemAddons?: Prisma.OrderItemAddonUpdateManyWithoutOrderItemNestedInput
-  menu?: Prisma.MenuUpdateOneRequiredWithoutOrderItemsNestedInput
-  inventory?: Prisma.InventoryUpdateOneWithoutOrderItemsNestedInput
-  order?: Prisma.OrderUpdateOneRequiredWithoutOrderItemsNestedInput
+  addon_items?: Prisma.OrderItemAddonUpdateManyWithoutOrder_itemNestedInput
+  menu?: Prisma.MenuUpdateOneWithoutOrder_itemsNestedInput
+  order?: Prisma.OrderUpdateOneRequiredWithoutOrder_itemsNestedInput
 }
 
 export type OrderItemUncheckedUpdateInput = {
   order_item_id?: Prisma.StringFieldUpdateOperationsInput | string
   order_id?: Prisma.StringFieldUpdateOperationsInput | string
-  menu_id?: Prisma.StringFieldUpdateOperationsInput | string
-  inventory_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  menu_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   snapshot_menu_name?: Prisma.StringFieldUpdateOperationsInput | string
   snapshot_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   snapshot_inventory?: Prisma.StringFieldUpdateOperationsInput | string
@@ -482,14 +463,13 @@ export type OrderItemUncheckedUpdateInput = {
   discount_type?: Prisma.NullableEnumDiscount_TypeFieldUpdateOperationsInput | $Enums.Discount_Type | null
   discount_id_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   discount_contact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  orderItemAddons?: Prisma.OrderItemAddonUncheckedUpdateManyWithoutOrderItemNestedInput
+  addon_items?: Prisma.OrderItemAddonUncheckedUpdateManyWithoutOrder_itemNestedInput
 }
 
 export type OrderItemCreateManyInput = {
   order_item_id?: string
   order_id: string
-  menu_id: string
-  inventory_id?: string | null
+  menu_id?: string | null
   snapshot_menu_name: string
   snapshot_price: runtime.Decimal | runtime.DecimalJsLike | number | string
   snapshot_inventory: string
@@ -521,8 +501,7 @@ export type OrderItemUpdateManyMutationInput = {
 export type OrderItemUncheckedUpdateManyInput = {
   order_item_id?: Prisma.StringFieldUpdateOperationsInput | string
   order_id?: Prisma.StringFieldUpdateOperationsInput | string
-  menu_id?: Prisma.StringFieldUpdateOperationsInput | string
-  inventory_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  menu_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   snapshot_menu_name?: Prisma.StringFieldUpdateOperationsInput | string
   snapshot_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   snapshot_inventory?: Prisma.StringFieldUpdateOperationsInput | string
@@ -546,11 +525,15 @@ export type OrderItemOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
+export type OrderItemScalarRelationFilter = {
+  is?: Prisma.OrderItemWhereInput
+  isNot?: Prisma.OrderItemWhereInput
+}
+
 export type OrderItemCountOrderByAggregateInput = {
   order_item_id?: Prisma.SortOrder
   order_id?: Prisma.SortOrder
   menu_id?: Prisma.SortOrder
-  inventory_id?: Prisma.SortOrder
   snapshot_menu_name?: Prisma.SortOrder
   snapshot_price?: Prisma.SortOrder
   snapshot_inventory?: Prisma.SortOrder
@@ -576,7 +559,6 @@ export type OrderItemMaxOrderByAggregateInput = {
   order_item_id?: Prisma.SortOrder
   order_id?: Prisma.SortOrder
   menu_id?: Prisma.SortOrder
-  inventory_id?: Prisma.SortOrder
   snapshot_menu_name?: Prisma.SortOrder
   snapshot_price?: Prisma.SortOrder
   snapshot_inventory?: Prisma.SortOrder
@@ -594,7 +576,6 @@ export type OrderItemMinOrderByAggregateInput = {
   order_item_id?: Prisma.SortOrder
   order_id?: Prisma.SortOrder
   menu_id?: Prisma.SortOrder
-  inventory_id?: Prisma.SortOrder
   snapshot_menu_name?: Prisma.SortOrder
   snapshot_price?: Prisma.SortOrder
   snapshot_inventory?: Prisma.SortOrder
@@ -614,53 +595,6 @@ export type OrderItemSumOrderByAggregateInput = {
   quantity?: Prisma.SortOrder
   line_total?: Prisma.SortOrder
   discount_amount?: Prisma.SortOrder
-}
-
-export type OrderItemScalarRelationFilter = {
-  is?: Prisma.OrderItemWhereInput
-  isNot?: Prisma.OrderItemWhereInput
-}
-
-export type OrderItemCreateNestedManyWithoutInventoryInput = {
-  create?: Prisma.XOR<Prisma.OrderItemCreateWithoutInventoryInput, Prisma.OrderItemUncheckedCreateWithoutInventoryInput> | Prisma.OrderItemCreateWithoutInventoryInput[] | Prisma.OrderItemUncheckedCreateWithoutInventoryInput[]
-  connectOrCreate?: Prisma.OrderItemCreateOrConnectWithoutInventoryInput | Prisma.OrderItemCreateOrConnectWithoutInventoryInput[]
-  createMany?: Prisma.OrderItemCreateManyInventoryInputEnvelope
-  connect?: Prisma.OrderItemWhereUniqueInput | Prisma.OrderItemWhereUniqueInput[]
-}
-
-export type OrderItemUncheckedCreateNestedManyWithoutInventoryInput = {
-  create?: Prisma.XOR<Prisma.OrderItemCreateWithoutInventoryInput, Prisma.OrderItemUncheckedCreateWithoutInventoryInput> | Prisma.OrderItemCreateWithoutInventoryInput[] | Prisma.OrderItemUncheckedCreateWithoutInventoryInput[]
-  connectOrCreate?: Prisma.OrderItemCreateOrConnectWithoutInventoryInput | Prisma.OrderItemCreateOrConnectWithoutInventoryInput[]
-  createMany?: Prisma.OrderItemCreateManyInventoryInputEnvelope
-  connect?: Prisma.OrderItemWhereUniqueInput | Prisma.OrderItemWhereUniqueInput[]
-}
-
-export type OrderItemUpdateManyWithoutInventoryNestedInput = {
-  create?: Prisma.XOR<Prisma.OrderItemCreateWithoutInventoryInput, Prisma.OrderItemUncheckedCreateWithoutInventoryInput> | Prisma.OrderItemCreateWithoutInventoryInput[] | Prisma.OrderItemUncheckedCreateWithoutInventoryInput[]
-  connectOrCreate?: Prisma.OrderItemCreateOrConnectWithoutInventoryInput | Prisma.OrderItemCreateOrConnectWithoutInventoryInput[]
-  upsert?: Prisma.OrderItemUpsertWithWhereUniqueWithoutInventoryInput | Prisma.OrderItemUpsertWithWhereUniqueWithoutInventoryInput[]
-  createMany?: Prisma.OrderItemCreateManyInventoryInputEnvelope
-  set?: Prisma.OrderItemWhereUniqueInput | Prisma.OrderItemWhereUniqueInput[]
-  disconnect?: Prisma.OrderItemWhereUniqueInput | Prisma.OrderItemWhereUniqueInput[]
-  delete?: Prisma.OrderItemWhereUniqueInput | Prisma.OrderItemWhereUniqueInput[]
-  connect?: Prisma.OrderItemWhereUniqueInput | Prisma.OrderItemWhereUniqueInput[]
-  update?: Prisma.OrderItemUpdateWithWhereUniqueWithoutInventoryInput | Prisma.OrderItemUpdateWithWhereUniqueWithoutInventoryInput[]
-  updateMany?: Prisma.OrderItemUpdateManyWithWhereWithoutInventoryInput | Prisma.OrderItemUpdateManyWithWhereWithoutInventoryInput[]
-  deleteMany?: Prisma.OrderItemScalarWhereInput | Prisma.OrderItemScalarWhereInput[]
-}
-
-export type OrderItemUncheckedUpdateManyWithoutInventoryNestedInput = {
-  create?: Prisma.XOR<Prisma.OrderItemCreateWithoutInventoryInput, Prisma.OrderItemUncheckedCreateWithoutInventoryInput> | Prisma.OrderItemCreateWithoutInventoryInput[] | Prisma.OrderItemUncheckedCreateWithoutInventoryInput[]
-  connectOrCreate?: Prisma.OrderItemCreateOrConnectWithoutInventoryInput | Prisma.OrderItemCreateOrConnectWithoutInventoryInput[]
-  upsert?: Prisma.OrderItemUpsertWithWhereUniqueWithoutInventoryInput | Prisma.OrderItemUpsertWithWhereUniqueWithoutInventoryInput[]
-  createMany?: Prisma.OrderItemCreateManyInventoryInputEnvelope
-  set?: Prisma.OrderItemWhereUniqueInput | Prisma.OrderItemWhereUniqueInput[]
-  disconnect?: Prisma.OrderItemWhereUniqueInput | Prisma.OrderItemWhereUniqueInput[]
-  delete?: Prisma.OrderItemWhereUniqueInput | Prisma.OrderItemWhereUniqueInput[]
-  connect?: Prisma.OrderItemWhereUniqueInput | Prisma.OrderItemWhereUniqueInput[]
-  update?: Prisma.OrderItemUpdateWithWhereUniqueWithoutInventoryInput | Prisma.OrderItemUpdateWithWhereUniqueWithoutInventoryInput[]
-  updateMany?: Prisma.OrderItemUpdateManyWithWhereWithoutInventoryInput | Prisma.OrderItemUpdateManyWithWhereWithoutInventoryInput[]
-  deleteMany?: Prisma.OrderItemScalarWhereInput | Prisma.OrderItemScalarWhereInput[]
 }
 
 export type OrderItemCreateNestedManyWithoutMenuInput = {
@@ -705,6 +639,24 @@ export type OrderItemUncheckedUpdateManyWithoutMenuNestedInput = {
   deleteMany?: Prisma.OrderItemScalarWhereInput | Prisma.OrderItemScalarWhereInput[]
 }
 
+export type OrderItemCreateNestedOneWithoutAddon_itemsInput = {
+  create?: Prisma.XOR<Prisma.OrderItemCreateWithoutAddon_itemsInput, Prisma.OrderItemUncheckedCreateWithoutAddon_itemsInput>
+  connectOrCreate?: Prisma.OrderItemCreateOrConnectWithoutAddon_itemsInput
+  connect?: Prisma.OrderItemWhereUniqueInput
+}
+
+export type OrderItemUpdateOneRequiredWithoutAddon_itemsNestedInput = {
+  create?: Prisma.XOR<Prisma.OrderItemCreateWithoutAddon_itemsInput, Prisma.OrderItemUncheckedCreateWithoutAddon_itemsInput>
+  connectOrCreate?: Prisma.OrderItemCreateOrConnectWithoutAddon_itemsInput
+  upsert?: Prisma.OrderItemUpsertWithoutAddon_itemsInput
+  connect?: Prisma.OrderItemWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.OrderItemUpdateToOneWithWhereWithoutAddon_itemsInput, Prisma.OrderItemUpdateWithoutAddon_itemsInput>, Prisma.OrderItemUncheckedUpdateWithoutAddon_itemsInput>
+}
+
+export type NullableEnumDiscount_TypeFieldUpdateOperationsInput = {
+  set?: $Enums.Discount_Type | null
+}
+
 export type OrderItemCreateNestedManyWithoutOrderInput = {
   create?: Prisma.XOR<Prisma.OrderItemCreateWithoutOrderInput, Prisma.OrderItemUncheckedCreateWithoutOrderInput> | Prisma.OrderItemCreateWithoutOrderInput[] | Prisma.OrderItemUncheckedCreateWithoutOrderInput[]
   connectOrCreate?: Prisma.OrderItemCreateOrConnectWithoutOrderInput | Prisma.OrderItemCreateOrConnectWithoutOrderInput[]
@@ -747,107 +699,6 @@ export type OrderItemUncheckedUpdateManyWithoutOrderNestedInput = {
   deleteMany?: Prisma.OrderItemScalarWhereInput | Prisma.OrderItemScalarWhereInput[]
 }
 
-export type NullableEnumDiscount_TypeFieldUpdateOperationsInput = {
-  set?: $Enums.Discount_Type | null
-}
-
-export type OrderItemCreateNestedOneWithoutOrderItemAddonsInput = {
-  create?: Prisma.XOR<Prisma.OrderItemCreateWithoutOrderItemAddonsInput, Prisma.OrderItemUncheckedCreateWithoutOrderItemAddonsInput>
-  connectOrCreate?: Prisma.OrderItemCreateOrConnectWithoutOrderItemAddonsInput
-  connect?: Prisma.OrderItemWhereUniqueInput
-}
-
-export type OrderItemUpdateOneRequiredWithoutOrderItemAddonsNestedInput = {
-  create?: Prisma.XOR<Prisma.OrderItemCreateWithoutOrderItemAddonsInput, Prisma.OrderItemUncheckedCreateWithoutOrderItemAddonsInput>
-  connectOrCreate?: Prisma.OrderItemCreateOrConnectWithoutOrderItemAddonsInput
-  upsert?: Prisma.OrderItemUpsertWithoutOrderItemAddonsInput
-  connect?: Prisma.OrderItemWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.OrderItemUpdateToOneWithWhereWithoutOrderItemAddonsInput, Prisma.OrderItemUpdateWithoutOrderItemAddonsInput>, Prisma.OrderItemUncheckedUpdateWithoutOrderItemAddonsInput>
-}
-
-export type OrderItemCreateWithoutInventoryInput = {
-  order_item_id?: string
-  snapshot_menu_name: string
-  snapshot_price: runtime.Decimal | runtime.DecimalJsLike | number | string
-  snapshot_inventory: string
-  unit_price: runtime.Decimal | runtime.DecimalJsLike | number | string
-  quantity?: number
-  line_total: runtime.Decimal | runtime.DecimalJsLike | number | string
-  loyalty?: boolean
-  discount_amount?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  discount_type?: $Enums.Discount_Type | null
-  discount_id_number?: string | null
-  discount_contact?: string | null
-  orderItemAddons?: Prisma.OrderItemAddonCreateNestedManyWithoutOrderItemInput
-  menu: Prisma.MenuCreateNestedOneWithoutOrderItemsInput
-  order: Prisma.OrderCreateNestedOneWithoutOrderItemsInput
-}
-
-export type OrderItemUncheckedCreateWithoutInventoryInput = {
-  order_item_id?: string
-  order_id: string
-  menu_id: string
-  snapshot_menu_name: string
-  snapshot_price: runtime.Decimal | runtime.DecimalJsLike | number | string
-  snapshot_inventory: string
-  unit_price: runtime.Decimal | runtime.DecimalJsLike | number | string
-  quantity?: number
-  line_total: runtime.Decimal | runtime.DecimalJsLike | number | string
-  loyalty?: boolean
-  discount_amount?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  discount_type?: $Enums.Discount_Type | null
-  discount_id_number?: string | null
-  discount_contact?: string | null
-  orderItemAddons?: Prisma.OrderItemAddonUncheckedCreateNestedManyWithoutOrderItemInput
-}
-
-export type OrderItemCreateOrConnectWithoutInventoryInput = {
-  where: Prisma.OrderItemWhereUniqueInput
-  create: Prisma.XOR<Prisma.OrderItemCreateWithoutInventoryInput, Prisma.OrderItemUncheckedCreateWithoutInventoryInput>
-}
-
-export type OrderItemCreateManyInventoryInputEnvelope = {
-  data: Prisma.OrderItemCreateManyInventoryInput | Prisma.OrderItemCreateManyInventoryInput[]
-  skipDuplicates?: boolean
-}
-
-export type OrderItemUpsertWithWhereUniqueWithoutInventoryInput = {
-  where: Prisma.OrderItemWhereUniqueInput
-  update: Prisma.XOR<Prisma.OrderItemUpdateWithoutInventoryInput, Prisma.OrderItemUncheckedUpdateWithoutInventoryInput>
-  create: Prisma.XOR<Prisma.OrderItemCreateWithoutInventoryInput, Prisma.OrderItemUncheckedCreateWithoutInventoryInput>
-}
-
-export type OrderItemUpdateWithWhereUniqueWithoutInventoryInput = {
-  where: Prisma.OrderItemWhereUniqueInput
-  data: Prisma.XOR<Prisma.OrderItemUpdateWithoutInventoryInput, Prisma.OrderItemUncheckedUpdateWithoutInventoryInput>
-}
-
-export type OrderItemUpdateManyWithWhereWithoutInventoryInput = {
-  where: Prisma.OrderItemScalarWhereInput
-  data: Prisma.XOR<Prisma.OrderItemUpdateManyMutationInput, Prisma.OrderItemUncheckedUpdateManyWithoutInventoryInput>
-}
-
-export type OrderItemScalarWhereInput = {
-  AND?: Prisma.OrderItemScalarWhereInput | Prisma.OrderItemScalarWhereInput[]
-  OR?: Prisma.OrderItemScalarWhereInput[]
-  NOT?: Prisma.OrderItemScalarWhereInput | Prisma.OrderItemScalarWhereInput[]
-  order_item_id?: Prisma.StringFilter<"OrderItem"> | string
-  order_id?: Prisma.StringFilter<"OrderItem"> | string
-  menu_id?: Prisma.StringFilter<"OrderItem"> | string
-  inventory_id?: Prisma.StringNullableFilter<"OrderItem"> | string | null
-  snapshot_menu_name?: Prisma.StringFilter<"OrderItem"> | string
-  snapshot_price?: Prisma.DecimalFilter<"OrderItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  snapshot_inventory?: Prisma.StringFilter<"OrderItem"> | string
-  unit_price?: Prisma.DecimalFilter<"OrderItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  quantity?: Prisma.IntFilter<"OrderItem"> | number
-  line_total?: Prisma.DecimalFilter<"OrderItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  loyalty?: Prisma.BoolFilter<"OrderItem"> | boolean
-  discount_amount?: Prisma.DecimalFilter<"OrderItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  discount_type?: Prisma.EnumDiscount_TypeNullableFilter<"OrderItem"> | $Enums.Discount_Type | null
-  discount_id_number?: Prisma.StringNullableFilter<"OrderItem"> | string | null
-  discount_contact?: Prisma.StringNullableFilter<"OrderItem"> | string | null
-}
-
 export type OrderItemCreateWithoutMenuInput = {
   order_item_id?: string
   snapshot_menu_name: string
@@ -861,15 +712,13 @@ export type OrderItemCreateWithoutMenuInput = {
   discount_type?: $Enums.Discount_Type | null
   discount_id_number?: string | null
   discount_contact?: string | null
-  orderItemAddons?: Prisma.OrderItemAddonCreateNestedManyWithoutOrderItemInput
-  inventory?: Prisma.InventoryCreateNestedOneWithoutOrderItemsInput
-  order: Prisma.OrderCreateNestedOneWithoutOrderItemsInput
+  addon_items?: Prisma.OrderItemAddonCreateNestedManyWithoutOrder_itemInput
+  order: Prisma.OrderCreateNestedOneWithoutOrder_itemsInput
 }
 
 export type OrderItemUncheckedCreateWithoutMenuInput = {
   order_item_id?: string
   order_id: string
-  inventory_id?: string | null
   snapshot_menu_name: string
   snapshot_price: runtime.Decimal | runtime.DecimalJsLike | number | string
   snapshot_inventory: string
@@ -881,7 +730,7 @@ export type OrderItemUncheckedCreateWithoutMenuInput = {
   discount_type?: $Enums.Discount_Type | null
   discount_id_number?: string | null
   discount_contact?: string | null
-  orderItemAddons?: Prisma.OrderItemAddonUncheckedCreateNestedManyWithoutOrderItemInput
+  addon_items?: Prisma.OrderItemAddonUncheckedCreateNestedManyWithoutOrder_itemInput
 }
 
 export type OrderItemCreateOrConnectWithoutMenuInput = {
@@ -910,6 +759,110 @@ export type OrderItemUpdateManyWithWhereWithoutMenuInput = {
   data: Prisma.XOR<Prisma.OrderItemUpdateManyMutationInput, Prisma.OrderItemUncheckedUpdateManyWithoutMenuInput>
 }
 
+export type OrderItemScalarWhereInput = {
+  AND?: Prisma.OrderItemScalarWhereInput | Prisma.OrderItemScalarWhereInput[]
+  OR?: Prisma.OrderItemScalarWhereInput[]
+  NOT?: Prisma.OrderItemScalarWhereInput | Prisma.OrderItemScalarWhereInput[]
+  order_item_id?: Prisma.StringFilter<"OrderItem"> | string
+  order_id?: Prisma.StringFilter<"OrderItem"> | string
+  menu_id?: Prisma.StringNullableFilter<"OrderItem"> | string | null
+  snapshot_menu_name?: Prisma.StringFilter<"OrderItem"> | string
+  snapshot_price?: Prisma.DecimalFilter<"OrderItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  snapshot_inventory?: Prisma.StringFilter<"OrderItem"> | string
+  unit_price?: Prisma.DecimalFilter<"OrderItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: Prisma.IntFilter<"OrderItem"> | number
+  line_total?: Prisma.DecimalFilter<"OrderItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  loyalty?: Prisma.BoolFilter<"OrderItem"> | boolean
+  discount_amount?: Prisma.DecimalFilter<"OrderItem"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount_type?: Prisma.EnumDiscount_TypeNullableFilter<"OrderItem"> | $Enums.Discount_Type | null
+  discount_id_number?: Prisma.StringNullableFilter<"OrderItem"> | string | null
+  discount_contact?: Prisma.StringNullableFilter<"OrderItem"> | string | null
+}
+
+export type OrderItemCreateWithoutAddon_itemsInput = {
+  order_item_id?: string
+  snapshot_menu_name: string
+  snapshot_price: runtime.Decimal | runtime.DecimalJsLike | number | string
+  snapshot_inventory: string
+  unit_price: runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: number
+  line_total: runtime.Decimal | runtime.DecimalJsLike | number | string
+  loyalty?: boolean
+  discount_amount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount_type?: $Enums.Discount_Type | null
+  discount_id_number?: string | null
+  discount_contact?: string | null
+  menu?: Prisma.MenuCreateNestedOneWithoutOrder_itemsInput
+  order: Prisma.OrderCreateNestedOneWithoutOrder_itemsInput
+}
+
+export type OrderItemUncheckedCreateWithoutAddon_itemsInput = {
+  order_item_id?: string
+  order_id: string
+  menu_id?: string | null
+  snapshot_menu_name: string
+  snapshot_price: runtime.Decimal | runtime.DecimalJsLike | number | string
+  snapshot_inventory: string
+  unit_price: runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: number
+  line_total: runtime.Decimal | runtime.DecimalJsLike | number | string
+  loyalty?: boolean
+  discount_amount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount_type?: $Enums.Discount_Type | null
+  discount_id_number?: string | null
+  discount_contact?: string | null
+}
+
+export type OrderItemCreateOrConnectWithoutAddon_itemsInput = {
+  where: Prisma.OrderItemWhereUniqueInput
+  create: Prisma.XOR<Prisma.OrderItemCreateWithoutAddon_itemsInput, Prisma.OrderItemUncheckedCreateWithoutAddon_itemsInput>
+}
+
+export type OrderItemUpsertWithoutAddon_itemsInput = {
+  update: Prisma.XOR<Prisma.OrderItemUpdateWithoutAddon_itemsInput, Prisma.OrderItemUncheckedUpdateWithoutAddon_itemsInput>
+  create: Prisma.XOR<Prisma.OrderItemCreateWithoutAddon_itemsInput, Prisma.OrderItemUncheckedCreateWithoutAddon_itemsInput>
+  where?: Prisma.OrderItemWhereInput
+}
+
+export type OrderItemUpdateToOneWithWhereWithoutAddon_itemsInput = {
+  where?: Prisma.OrderItemWhereInput
+  data: Prisma.XOR<Prisma.OrderItemUpdateWithoutAddon_itemsInput, Prisma.OrderItemUncheckedUpdateWithoutAddon_itemsInput>
+}
+
+export type OrderItemUpdateWithoutAddon_itemsInput = {
+  order_item_id?: Prisma.StringFieldUpdateOperationsInput | string
+  snapshot_menu_name?: Prisma.StringFieldUpdateOperationsInput | string
+  snapshot_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  snapshot_inventory?: Prisma.StringFieldUpdateOperationsInput | string
+  unit_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  line_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  loyalty?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  discount_amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount_type?: Prisma.NullableEnumDiscount_TypeFieldUpdateOperationsInput | $Enums.Discount_Type | null
+  discount_id_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  discount_contact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  menu?: Prisma.MenuUpdateOneWithoutOrder_itemsNestedInput
+  order?: Prisma.OrderUpdateOneRequiredWithoutOrder_itemsNestedInput
+}
+
+export type OrderItemUncheckedUpdateWithoutAddon_itemsInput = {
+  order_item_id?: Prisma.StringFieldUpdateOperationsInput | string
+  order_id?: Prisma.StringFieldUpdateOperationsInput | string
+  menu_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  snapshot_menu_name?: Prisma.StringFieldUpdateOperationsInput | string
+  snapshot_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  snapshot_inventory?: Prisma.StringFieldUpdateOperationsInput | string
+  unit_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  line_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  loyalty?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  discount_amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discount_type?: Prisma.NullableEnumDiscount_TypeFieldUpdateOperationsInput | $Enums.Discount_Type | null
+  discount_id_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  discount_contact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+}
+
 export type OrderItemCreateWithoutOrderInput = {
   order_item_id?: string
   snapshot_menu_name: string
@@ -923,15 +876,13 @@ export type OrderItemCreateWithoutOrderInput = {
   discount_type?: $Enums.Discount_Type | null
   discount_id_number?: string | null
   discount_contact?: string | null
-  orderItemAddons?: Prisma.OrderItemAddonCreateNestedManyWithoutOrderItemInput
-  menu: Prisma.MenuCreateNestedOneWithoutOrderItemsInput
-  inventory?: Prisma.InventoryCreateNestedOneWithoutOrderItemsInput
+  addon_items?: Prisma.OrderItemAddonCreateNestedManyWithoutOrder_itemInput
+  menu?: Prisma.MenuCreateNestedOneWithoutOrder_itemsInput
 }
 
 export type OrderItemUncheckedCreateWithoutOrderInput = {
   order_item_id?: string
-  menu_id: string
-  inventory_id?: string | null
+  menu_id?: string | null
   snapshot_menu_name: string
   snapshot_price: runtime.Decimal | runtime.DecimalJsLike | number | string
   snapshot_inventory: string
@@ -943,7 +894,7 @@ export type OrderItemUncheckedCreateWithoutOrderInput = {
   discount_type?: $Enums.Discount_Type | null
   discount_id_number?: string | null
   discount_contact?: string | null
-  orderItemAddons?: Prisma.OrderItemAddonUncheckedCreateNestedManyWithoutOrderItemInput
+  addon_items?: Prisma.OrderItemAddonUncheckedCreateNestedManyWithoutOrder_itemInput
 }
 
 export type OrderItemCreateOrConnectWithoutOrderInput = {
@@ -972,168 +923,9 @@ export type OrderItemUpdateManyWithWhereWithoutOrderInput = {
   data: Prisma.XOR<Prisma.OrderItemUpdateManyMutationInput, Prisma.OrderItemUncheckedUpdateManyWithoutOrderInput>
 }
 
-export type OrderItemCreateWithoutOrderItemAddonsInput = {
-  order_item_id?: string
-  snapshot_menu_name: string
-  snapshot_price: runtime.Decimal | runtime.DecimalJsLike | number | string
-  snapshot_inventory: string
-  unit_price: runtime.Decimal | runtime.DecimalJsLike | number | string
-  quantity?: number
-  line_total: runtime.Decimal | runtime.DecimalJsLike | number | string
-  loyalty?: boolean
-  discount_amount?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  discount_type?: $Enums.Discount_Type | null
-  discount_id_number?: string | null
-  discount_contact?: string | null
-  menu: Prisma.MenuCreateNestedOneWithoutOrderItemsInput
-  inventory?: Prisma.InventoryCreateNestedOneWithoutOrderItemsInput
-  order: Prisma.OrderCreateNestedOneWithoutOrderItemsInput
-}
-
-export type OrderItemUncheckedCreateWithoutOrderItemAddonsInput = {
-  order_item_id?: string
-  order_id: string
-  menu_id: string
-  inventory_id?: string | null
-  snapshot_menu_name: string
-  snapshot_price: runtime.Decimal | runtime.DecimalJsLike | number | string
-  snapshot_inventory: string
-  unit_price: runtime.Decimal | runtime.DecimalJsLike | number | string
-  quantity?: number
-  line_total: runtime.Decimal | runtime.DecimalJsLike | number | string
-  loyalty?: boolean
-  discount_amount?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  discount_type?: $Enums.Discount_Type | null
-  discount_id_number?: string | null
-  discount_contact?: string | null
-}
-
-export type OrderItemCreateOrConnectWithoutOrderItemAddonsInput = {
-  where: Prisma.OrderItemWhereUniqueInput
-  create: Prisma.XOR<Prisma.OrderItemCreateWithoutOrderItemAddonsInput, Prisma.OrderItemUncheckedCreateWithoutOrderItemAddonsInput>
-}
-
-export type OrderItemUpsertWithoutOrderItemAddonsInput = {
-  update: Prisma.XOR<Prisma.OrderItemUpdateWithoutOrderItemAddonsInput, Prisma.OrderItemUncheckedUpdateWithoutOrderItemAddonsInput>
-  create: Prisma.XOR<Prisma.OrderItemCreateWithoutOrderItemAddonsInput, Prisma.OrderItemUncheckedCreateWithoutOrderItemAddonsInput>
-  where?: Prisma.OrderItemWhereInput
-}
-
-export type OrderItemUpdateToOneWithWhereWithoutOrderItemAddonsInput = {
-  where?: Prisma.OrderItemWhereInput
-  data: Prisma.XOR<Prisma.OrderItemUpdateWithoutOrderItemAddonsInput, Prisma.OrderItemUncheckedUpdateWithoutOrderItemAddonsInput>
-}
-
-export type OrderItemUpdateWithoutOrderItemAddonsInput = {
-  order_item_id?: Prisma.StringFieldUpdateOperationsInput | string
-  snapshot_menu_name?: Prisma.StringFieldUpdateOperationsInput | string
-  snapshot_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  snapshot_inventory?: Prisma.StringFieldUpdateOperationsInput | string
-  unit_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
-  line_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  loyalty?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  discount_amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  discount_type?: Prisma.NullableEnumDiscount_TypeFieldUpdateOperationsInput | $Enums.Discount_Type | null
-  discount_id_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  discount_contact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  menu?: Prisma.MenuUpdateOneRequiredWithoutOrderItemsNestedInput
-  inventory?: Prisma.InventoryUpdateOneWithoutOrderItemsNestedInput
-  order?: Prisma.OrderUpdateOneRequiredWithoutOrderItemsNestedInput
-}
-
-export type OrderItemUncheckedUpdateWithoutOrderItemAddonsInput = {
-  order_item_id?: Prisma.StringFieldUpdateOperationsInput | string
-  order_id?: Prisma.StringFieldUpdateOperationsInput | string
-  menu_id?: Prisma.StringFieldUpdateOperationsInput | string
-  inventory_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  snapshot_menu_name?: Prisma.StringFieldUpdateOperationsInput | string
-  snapshot_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  snapshot_inventory?: Prisma.StringFieldUpdateOperationsInput | string
-  unit_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
-  line_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  loyalty?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  discount_amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  discount_type?: Prisma.NullableEnumDiscount_TypeFieldUpdateOperationsInput | $Enums.Discount_Type | null
-  discount_id_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  discount_contact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-}
-
-export type OrderItemCreateManyInventoryInput = {
-  order_item_id?: string
-  order_id: string
-  menu_id: string
-  snapshot_menu_name: string
-  snapshot_price: runtime.Decimal | runtime.DecimalJsLike | number | string
-  snapshot_inventory: string
-  unit_price: runtime.Decimal | runtime.DecimalJsLike | number | string
-  quantity?: number
-  line_total: runtime.Decimal | runtime.DecimalJsLike | number | string
-  loyalty?: boolean
-  discount_amount?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  discount_type?: $Enums.Discount_Type | null
-  discount_id_number?: string | null
-  discount_contact?: string | null
-}
-
-export type OrderItemUpdateWithoutInventoryInput = {
-  order_item_id?: Prisma.StringFieldUpdateOperationsInput | string
-  snapshot_menu_name?: Prisma.StringFieldUpdateOperationsInput | string
-  snapshot_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  snapshot_inventory?: Prisma.StringFieldUpdateOperationsInput | string
-  unit_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
-  line_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  loyalty?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  discount_amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  discount_type?: Prisma.NullableEnumDiscount_TypeFieldUpdateOperationsInput | $Enums.Discount_Type | null
-  discount_id_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  discount_contact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  orderItemAddons?: Prisma.OrderItemAddonUpdateManyWithoutOrderItemNestedInput
-  menu?: Prisma.MenuUpdateOneRequiredWithoutOrderItemsNestedInput
-  order?: Prisma.OrderUpdateOneRequiredWithoutOrderItemsNestedInput
-}
-
-export type OrderItemUncheckedUpdateWithoutInventoryInput = {
-  order_item_id?: Prisma.StringFieldUpdateOperationsInput | string
-  order_id?: Prisma.StringFieldUpdateOperationsInput | string
-  menu_id?: Prisma.StringFieldUpdateOperationsInput | string
-  snapshot_menu_name?: Prisma.StringFieldUpdateOperationsInput | string
-  snapshot_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  snapshot_inventory?: Prisma.StringFieldUpdateOperationsInput | string
-  unit_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
-  line_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  loyalty?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  discount_amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  discount_type?: Prisma.NullableEnumDiscount_TypeFieldUpdateOperationsInput | $Enums.Discount_Type | null
-  discount_id_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  discount_contact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  orderItemAddons?: Prisma.OrderItemAddonUncheckedUpdateManyWithoutOrderItemNestedInput
-}
-
-export type OrderItemUncheckedUpdateManyWithoutInventoryInput = {
-  order_item_id?: Prisma.StringFieldUpdateOperationsInput | string
-  order_id?: Prisma.StringFieldUpdateOperationsInput | string
-  menu_id?: Prisma.StringFieldUpdateOperationsInput | string
-  snapshot_menu_name?: Prisma.StringFieldUpdateOperationsInput | string
-  snapshot_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  snapshot_inventory?: Prisma.StringFieldUpdateOperationsInput | string
-  unit_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  quantity?: Prisma.IntFieldUpdateOperationsInput | number
-  line_total?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  loyalty?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  discount_amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  discount_type?: Prisma.NullableEnumDiscount_TypeFieldUpdateOperationsInput | $Enums.Discount_Type | null
-  discount_id_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  discount_contact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-}
-
 export type OrderItemCreateManyMenuInput = {
   order_item_id?: string
   order_id: string
-  inventory_id?: string | null
   snapshot_menu_name: string
   snapshot_price: runtime.Decimal | runtime.DecimalJsLike | number | string
   snapshot_inventory: string
@@ -1160,15 +952,13 @@ export type OrderItemUpdateWithoutMenuInput = {
   discount_type?: Prisma.NullableEnumDiscount_TypeFieldUpdateOperationsInput | $Enums.Discount_Type | null
   discount_id_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   discount_contact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  orderItemAddons?: Prisma.OrderItemAddonUpdateManyWithoutOrderItemNestedInput
-  inventory?: Prisma.InventoryUpdateOneWithoutOrderItemsNestedInput
-  order?: Prisma.OrderUpdateOneRequiredWithoutOrderItemsNestedInput
+  addon_items?: Prisma.OrderItemAddonUpdateManyWithoutOrder_itemNestedInput
+  order?: Prisma.OrderUpdateOneRequiredWithoutOrder_itemsNestedInput
 }
 
 export type OrderItemUncheckedUpdateWithoutMenuInput = {
   order_item_id?: Prisma.StringFieldUpdateOperationsInput | string
   order_id?: Prisma.StringFieldUpdateOperationsInput | string
-  inventory_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   snapshot_menu_name?: Prisma.StringFieldUpdateOperationsInput | string
   snapshot_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   snapshot_inventory?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1180,13 +970,12 @@ export type OrderItemUncheckedUpdateWithoutMenuInput = {
   discount_type?: Prisma.NullableEnumDiscount_TypeFieldUpdateOperationsInput | $Enums.Discount_Type | null
   discount_id_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   discount_contact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  orderItemAddons?: Prisma.OrderItemAddonUncheckedUpdateManyWithoutOrderItemNestedInput
+  addon_items?: Prisma.OrderItemAddonUncheckedUpdateManyWithoutOrder_itemNestedInput
 }
 
 export type OrderItemUncheckedUpdateManyWithoutMenuInput = {
   order_item_id?: Prisma.StringFieldUpdateOperationsInput | string
   order_id?: Prisma.StringFieldUpdateOperationsInput | string
-  inventory_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   snapshot_menu_name?: Prisma.StringFieldUpdateOperationsInput | string
   snapshot_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   snapshot_inventory?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1202,8 +991,7 @@ export type OrderItemUncheckedUpdateManyWithoutMenuInput = {
 
 export type OrderItemCreateManyOrderInput = {
   order_item_id?: string
-  menu_id: string
-  inventory_id?: string | null
+  menu_id?: string | null
   snapshot_menu_name: string
   snapshot_price: runtime.Decimal | runtime.DecimalJsLike | number | string
   snapshot_inventory: string
@@ -1230,15 +1018,13 @@ export type OrderItemUpdateWithoutOrderInput = {
   discount_type?: Prisma.NullableEnumDiscount_TypeFieldUpdateOperationsInput | $Enums.Discount_Type | null
   discount_id_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   discount_contact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  orderItemAddons?: Prisma.OrderItemAddonUpdateManyWithoutOrderItemNestedInput
-  menu?: Prisma.MenuUpdateOneRequiredWithoutOrderItemsNestedInput
-  inventory?: Prisma.InventoryUpdateOneWithoutOrderItemsNestedInput
+  addon_items?: Prisma.OrderItemAddonUpdateManyWithoutOrder_itemNestedInput
+  menu?: Prisma.MenuUpdateOneWithoutOrder_itemsNestedInput
 }
 
 export type OrderItemUncheckedUpdateWithoutOrderInput = {
   order_item_id?: Prisma.StringFieldUpdateOperationsInput | string
-  menu_id?: Prisma.StringFieldUpdateOperationsInput | string
-  inventory_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  menu_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   snapshot_menu_name?: Prisma.StringFieldUpdateOperationsInput | string
   snapshot_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   snapshot_inventory?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1250,13 +1036,12 @@ export type OrderItemUncheckedUpdateWithoutOrderInput = {
   discount_type?: Prisma.NullableEnumDiscount_TypeFieldUpdateOperationsInput | $Enums.Discount_Type | null
   discount_id_number?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   discount_contact?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  orderItemAddons?: Prisma.OrderItemAddonUncheckedUpdateManyWithoutOrderItemNestedInput
+  addon_items?: Prisma.OrderItemAddonUncheckedUpdateManyWithoutOrder_itemNestedInput
 }
 
 export type OrderItemUncheckedUpdateManyWithoutOrderInput = {
   order_item_id?: Prisma.StringFieldUpdateOperationsInput | string
-  menu_id?: Prisma.StringFieldUpdateOperationsInput | string
-  inventory_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  menu_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   snapshot_menu_name?: Prisma.StringFieldUpdateOperationsInput | string
   snapshot_price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   snapshot_inventory?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1276,11 +1061,11 @@ export type OrderItemUncheckedUpdateManyWithoutOrderInput = {
  */
 
 export type OrderItemCountOutputType = {
-  orderItemAddons: number
+  addon_items: number
 }
 
 export type OrderItemCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  orderItemAddons?: boolean | OrderItemCountOutputTypeCountOrderItemAddonsArgs
+  addon_items?: boolean | OrderItemCountOutputTypeCountAddon_itemsArgs
 }
 
 /**
@@ -1296,7 +1081,7 @@ export type OrderItemCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Ex
 /**
  * OrderItemCountOutputType without action
  */
-export type OrderItemCountOutputTypeCountOrderItemAddonsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type OrderItemCountOutputTypeCountAddon_itemsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.OrderItemAddonWhereInput
 }
 
@@ -1305,7 +1090,6 @@ export type OrderItemSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   order_item_id?: boolean
   order_id?: boolean
   menu_id?: boolean
-  inventory_id?: boolean
   snapshot_menu_name?: boolean
   snapshot_price?: boolean
   snapshot_inventory?: boolean
@@ -1317,9 +1101,8 @@ export type OrderItemSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   discount_type?: boolean
   discount_id_number?: boolean
   discount_contact?: boolean
-  orderItemAddons?: boolean | Prisma.OrderItem$orderItemAddonsArgs<ExtArgs>
-  menu?: boolean | Prisma.MenuDefaultArgs<ExtArgs>
-  inventory?: boolean | Prisma.OrderItem$inventoryArgs<ExtArgs>
+  addon_items?: boolean | Prisma.OrderItem$addon_itemsArgs<ExtArgs>
+  menu?: boolean | Prisma.OrderItem$menuArgs<ExtArgs>
   order?: boolean | Prisma.OrderDefaultArgs<ExtArgs>
   _count?: boolean | Prisma.OrderItemCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["orderItem"]>
@@ -1328,7 +1111,6 @@ export type OrderItemSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   order_item_id?: boolean
   order_id?: boolean
   menu_id?: boolean
-  inventory_id?: boolean
   snapshot_menu_name?: boolean
   snapshot_price?: boolean
   snapshot_inventory?: boolean
@@ -1340,8 +1122,7 @@ export type OrderItemSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   discount_type?: boolean
   discount_id_number?: boolean
   discount_contact?: boolean
-  menu?: boolean | Prisma.MenuDefaultArgs<ExtArgs>
-  inventory?: boolean | Prisma.OrderItem$inventoryArgs<ExtArgs>
+  menu?: boolean | Prisma.OrderItem$menuArgs<ExtArgs>
   order?: boolean | Prisma.OrderDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["orderItem"]>
 
@@ -1349,7 +1130,6 @@ export type OrderItemSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   order_item_id?: boolean
   order_id?: boolean
   menu_id?: boolean
-  inventory_id?: boolean
   snapshot_menu_name?: boolean
   snapshot_price?: boolean
   snapshot_inventory?: boolean
@@ -1361,8 +1141,7 @@ export type OrderItemSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   discount_type?: boolean
   discount_id_number?: boolean
   discount_contact?: boolean
-  menu?: boolean | Prisma.MenuDefaultArgs<ExtArgs>
-  inventory?: boolean | Prisma.OrderItem$inventoryArgs<ExtArgs>
+  menu?: boolean | Prisma.OrderItem$menuArgs<ExtArgs>
   order?: boolean | Prisma.OrderDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["orderItem"]>
 
@@ -1370,7 +1149,6 @@ export type OrderItemSelectScalar = {
   order_item_id?: boolean
   order_id?: boolean
   menu_id?: boolean
-  inventory_id?: boolean
   snapshot_menu_name?: boolean
   snapshot_price?: boolean
   snapshot_inventory?: boolean
@@ -1384,38 +1162,33 @@ export type OrderItemSelectScalar = {
   discount_contact?: boolean
 }
 
-export type OrderItemOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"order_item_id" | "order_id" | "menu_id" | "inventory_id" | "snapshot_menu_name" | "snapshot_price" | "snapshot_inventory" | "unit_price" | "quantity" | "line_total" | "loyalty" | "discount_amount" | "discount_type" | "discount_id_number" | "discount_contact", ExtArgs["result"]["orderItem"]>
+export type OrderItemOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"order_item_id" | "order_id" | "menu_id" | "snapshot_menu_name" | "snapshot_price" | "snapshot_inventory" | "unit_price" | "quantity" | "line_total" | "loyalty" | "discount_amount" | "discount_type" | "discount_id_number" | "discount_contact", ExtArgs["result"]["orderItem"]>
 export type OrderItemInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  orderItemAddons?: boolean | Prisma.OrderItem$orderItemAddonsArgs<ExtArgs>
-  menu?: boolean | Prisma.MenuDefaultArgs<ExtArgs>
-  inventory?: boolean | Prisma.OrderItem$inventoryArgs<ExtArgs>
+  addon_items?: boolean | Prisma.OrderItem$addon_itemsArgs<ExtArgs>
+  menu?: boolean | Prisma.OrderItem$menuArgs<ExtArgs>
   order?: boolean | Prisma.OrderDefaultArgs<ExtArgs>
   _count?: boolean | Prisma.OrderItemCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type OrderItemIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  menu?: boolean | Prisma.MenuDefaultArgs<ExtArgs>
-  inventory?: boolean | Prisma.OrderItem$inventoryArgs<ExtArgs>
+  menu?: boolean | Prisma.OrderItem$menuArgs<ExtArgs>
   order?: boolean | Prisma.OrderDefaultArgs<ExtArgs>
 }
 export type OrderItemIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  menu?: boolean | Prisma.MenuDefaultArgs<ExtArgs>
-  inventory?: boolean | Prisma.OrderItem$inventoryArgs<ExtArgs>
+  menu?: boolean | Prisma.OrderItem$menuArgs<ExtArgs>
   order?: boolean | Prisma.OrderDefaultArgs<ExtArgs>
 }
 
 export type $OrderItemPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "OrderItem"
   objects: {
-    orderItemAddons: Prisma.$OrderItemAddonPayload<ExtArgs>[]
-    menu: Prisma.$MenuPayload<ExtArgs>
-    inventory: Prisma.$InventoryPayload<ExtArgs> | null
+    addon_items: Prisma.$OrderItemAddonPayload<ExtArgs>[]
+    menu: Prisma.$MenuPayload<ExtArgs> | null
     order: Prisma.$OrderPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     order_item_id: string
     order_id: string
-    menu_id: string
-    inventory_id: string | null
+    menu_id: string | null
     snapshot_menu_name: string
     snapshot_price: runtime.Decimal
     snapshot_inventory: string
@@ -1821,9 +1594,8 @@ readonly fields: OrderItemFieldRefs;
  */
 export interface Prisma__OrderItemClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  orderItemAddons<T extends Prisma.OrderItem$orderItemAddonsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.OrderItem$orderItemAddonsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OrderItemAddonPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  menu<T extends Prisma.MenuDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.MenuDefaultArgs<ExtArgs>>): Prisma.Prisma__MenuClient<runtime.Types.Result.GetResult<Prisma.$MenuPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-  inventory<T extends Prisma.OrderItem$inventoryArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.OrderItem$inventoryArgs<ExtArgs>>): Prisma.Prisma__InventoryClient<runtime.Types.Result.GetResult<Prisma.$InventoryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  addon_items<T extends Prisma.OrderItem$addon_itemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.OrderItem$addon_itemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OrderItemAddonPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  menu<T extends Prisma.OrderItem$menuArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.OrderItem$menuArgs<ExtArgs>>): Prisma.Prisma__MenuClient<runtime.Types.Result.GetResult<Prisma.$MenuPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   order<T extends Prisma.OrderDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.OrderDefaultArgs<ExtArgs>>): Prisma.Prisma__OrderClient<runtime.Types.Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1857,7 +1629,6 @@ export interface OrderItemFieldRefs {
   readonly order_item_id: Prisma.FieldRef<"OrderItem", 'String'>
   readonly order_id: Prisma.FieldRef<"OrderItem", 'String'>
   readonly menu_id: Prisma.FieldRef<"OrderItem", 'String'>
-  readonly inventory_id: Prisma.FieldRef<"OrderItem", 'String'>
   readonly snapshot_menu_name: Prisma.FieldRef<"OrderItem", 'String'>
   readonly snapshot_price: Prisma.FieldRef<"OrderItem", 'Decimal'>
   readonly snapshot_inventory: Prisma.FieldRef<"OrderItem", 'String'>
@@ -2270,9 +2041,9 @@ export type OrderItemDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Int
 }
 
 /**
- * OrderItem.orderItemAddons
+ * OrderItem.addon_items
  */
-export type OrderItem$orderItemAddonsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type OrderItem$addon_itemsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
    * Select specific fields to fetch from the OrderItemAddon
    */
@@ -2294,22 +2065,22 @@ export type OrderItem$orderItemAddonsArgs<ExtArgs extends runtime.Types.Extensio
 }
 
 /**
- * OrderItem.inventory
+ * OrderItem.menu
  */
-export type OrderItem$inventoryArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type OrderItem$menuArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the Inventory
+   * Select specific fields to fetch from the Menu
    */
-  select?: Prisma.InventorySelect<ExtArgs> | null
+  select?: Prisma.MenuSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the Inventory
+   * Omit specific fields from the Menu
    */
-  omit?: Prisma.InventoryOmit<ExtArgs> | null
+  omit?: Prisma.MenuOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.InventoryInclude<ExtArgs> | null
-  where?: Prisma.InventoryWhereInput
+  include?: Prisma.MenuInclude<ExtArgs> | null
+  where?: Prisma.MenuWhereInput
 }
 
 /**
