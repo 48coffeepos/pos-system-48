@@ -17,9 +17,6 @@ import { sessionQueryOptions } from "@/features/auth/queryOptions";
 import { authClient } from "@/integrations/better-auth/auth-client";
 import { cn } from "@/lib/utils";
 
-interface AdminHeaderProps {
-}
-
 const navLinks = [
 	{ label: "Dashboard", path: "/admin", icon: SquaresFourIcon },
 	{ label: "Menu", path: "/admin/menu", icon: ListIcon },
@@ -29,7 +26,7 @@ const navLinks = [
 
 const adminTo = (path: string) => path as never;
 
-function AdminHeader({}: AdminHeaderProps) {
+function AdminHeader() {
 	const location = useLocation();
 	const navigate = useNavigate();
 	const { data } = useSuspenseQuery(sessionQueryOptions);
@@ -216,5 +213,4 @@ function AdminHeader({}: AdminHeaderProps) {
 	);
 }
 
-export type { AdminHeaderProps };
 export { AdminHeader };

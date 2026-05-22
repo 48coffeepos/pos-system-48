@@ -1,5 +1,13 @@
+import {
+	AlertDialog,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 import { formatPeso } from "@/lib/format-currency";
-import { PosModal } from "./ui/PosModal";
 
 interface PosOrderConfirmDialogProps {
 	open: boolean;
@@ -17,39 +25,30 @@ export function PosOrderConfirmDialog({
 	onConfirm,
 }: PosOrderConfirmDialogProps) {
 	return (
-		<PosModal open={open} onClose={onClose}>
-			<h3
-				className="text-lg font-bold"
-				style={{ color: "var(--near-black)" }}
-			>
-				Confirm Order
-			</h3>
-			<p className="mt-2 mb-6 text-sm" style={{ color: "var(--medium-gray)" }}>
-				Are you sure you want to place this order for {formatPeso(total)}?
-			</p>
-			<div className="flex gap-3">
-				<button
-					type="button"
-					onClick={onClose}
-					disabled={isLoading}
-					className="h-11 flex-1 rounded-xl text-sm font-semibold transition-all disabled:opacity-50"
-					style={{
-						background: "var(--off-white)",
-						color: "var(--dark-gray)",
-					}}
-				>
-					Cancel
-				</button>
-				<button
-					type="button"
-					onClick={onConfirm}
-					disabled={isLoading}
-					className="h-11 flex-1 rounded-xl text-sm font-semibold text-white transition-all disabled:opacity-50"
-					style={{ background: "var(--deep-forest)" }}
-				>
-					{isLoading ? "Confirming..." : "Confirm"}
-				</button>
-			</div>
-		</PosModal>
+		<AlertDialog
+			open={open}
+			onOpenChange={(isOpen) => {
+				if (!isOpen) onClose();
+			}}
+		>
+			<AlertDialogContent>
+				<AlertDialogTitle>Confirm Order</AlertDialogTitle>
+				<AlertDialogDescription>
+					Are you sure you want to place this order for {formatPeso(total)}?
+				</AlertDialogDescription>
+				<AlertDialogFooter>
+					<AlertDialogCancel disabled={isLoading}>Cancel</AlertDialogCancel>
+					<Button
+						onClick={() => {
+							onConfirm();
+							onClose();
+						}}
+						disabled={isLoading}
+					>
+						{isLoading ? "Confirming..." : "Confirm"}
+					</Button>
+				</AlertDialogFooter>
+			</AlertDialogContent>
+		</AlertDialog>
 	);
 }
