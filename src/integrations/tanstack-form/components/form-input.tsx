@@ -23,6 +23,7 @@ function FormInput({ label, description, ...props }: FormInputProps) {
         onChange={(e) => field.handleChange(e.target.value)}
         onBlur={field.handleBlur}
         aria-invalid={isInvalid}
+        className='border-(--deep-forest)'
         {...props}
       />
     </FormField>
