@@ -211,5 +211,4 @@ function AdminHeader() {
 	);
 }
 
-export type { AdminHeaderProps };
 export { AdminHeader };

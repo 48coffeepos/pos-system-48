@@ -3,7 +3,6 @@ import {
 	ClipboardTextIcon,
 	CurrencyDollarIcon,
 	ListIcon,
-	MagnifyingGlassIcon,
 	PackageIcon,
 	ShoppingCartIcon,
 	SignOutIcon,
@@ -11,85 +10,28 @@ import {
 	XIcon,
 } from "@phosphor-icons/react";
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
-import Fuse from "fuse.js";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { authClient } from "@/integrations/better-auth/auth-client";
 import { cn } from "@/lib/utils";
 
-interface SearchItem {
-	label: string;
-	path: string;
-	category?: string;
-	keywords?: string[];
-}
-
-interface StaffHeaderProps {
-	searchItems?: SearchItem[];
-	searchPlaceholder?: string;
-}
-
-const defaultSearchItems: SearchItem[] = [
-	{ label: "POS", path: "/staff/pos", category: "Page" },
-	{ label: "Inventory", path: "/staff/inventory", category: "Page" },
-	{ label: "Expenses", path: "/staff/expenses", category: "Page" },
-	{ label: "Orders", path: "/staff/orders", category: "Page" },
-	{ label: "X-Reading", path: "/staff/xreading", category: "Page" },
-];
-
 const navLinks = [
-	{ label: "POS", path: "/staff/pos", icon: ShoppingCart },
-	{ label: "Inventory", path: "/staff/inventory", icon: Package },
-	{ label: "Expenses", path: "/staff/expenses", icon: CurrencyDollar },
-	{ label: "Orders", path: "/staff/orders", icon: ClipboardText },
-	{ label: "X-Reading", path: "/staff/xreading", icon: Calculator },
+	{ label: "POS", path: "/staff/pos", icon: ShoppingCartIcon },
+	{ label: "Inventory", path: "/staff/inventory", icon: PackageIcon },
+	{ label: "Expenses", path: "/staff/expenses", icon: CurrencyDollarIcon },
+	{ label: "Orders", path: "/staff/orders", icon: ClipboardTextIcon },
+	{ label: "X-Reading", path: "/staff/xreading", icon: CalculatorIcon },
 ];
 
 const staffTo = (path: string) => path as never;
 
-function StaffHeader({
-	searchItems = defaultSearchItems,
-	searchPlaceholder = "Search pages, orders...",
-}: StaffHeaderProps) {
+function StaffHeader() {
 	const location = useLocation();
 	const navigate = useNavigate();
 	const { data: session, isPending: sessionLoading } = authClient.useSession();
 
-	const [searchQuery, setSearchQuery] = useState("");
-	const [showResults, setShowResults] = useState(false);
 	const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-	const searchRef = useRef<HTMLDivElement>(null);
-	const inputRef = useRef<HTMLInputElement>(null);
-
-	const fuse = useMemo(
-		() =>
-			new Fuse(searchItems, {
-				keys: [
-					{ name: "label", weight: 3 },
-					{ name: "category", weight: 1 },
-					{ name: "keywords", weight: 2 },
-				],
-				threshold: 0.4,
-				includeScore: true,
-			}),
-		[searchItems],
-	);
-
-	const results = useMemo(() => {
-		if (!searchQuery.trim()) return [];
-		return fuse
-			.search(searchQuery)
-			.map((r) => r.item)
-			.slice(0, 8);
-	}, [searchQuery, fuse]);
-
-	const handleSearchSelect = (path: string) => {
-		setSearchQuery("");
-		setShowResults(false);
-		navigate({ to: staffTo(path) });
-	};
 
 	const handleLogout = async () => {
 		await authClient.signOut();
@@ -97,21 +39,11 @@ function StaffHeader({
 	};
 
 	useEffect(() => {
-		function handleClickOutside(e: MouseEvent) {
-			if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
-				setShowResults(false);
-			}
-		}
-		document.addEventListener("mousedown", handleClickOutside);
-		return () => document.removeEventListener("mousedown", handleClickOutside);
-	}, []);
-
-	useEffect(() => {
 		setMobileMenuOpen(false);
 	}, []);
 
 	const isActive = (path: string) => {
-		if (path === "/staff/pos") return location.pathname === "/staff/pos";
+		if (path === "/staff") return location.pathname === "/staff";
 		return location.pathname.startsWith(path);
 	};
 
@@ -136,75 +68,6 @@ function StaffHeader({
 					orientation="vertical"
 					className="hidden h-16 bg-(--light-gray) sm:block"
 				/>
-
-				{/* Search */}
-				<div
-					ref={searchRef}
-					className="relative hidden flex-1 sm:block max-w-md"
-				>
-					<div className="relative">
-						<MagnifyingGlassIcon className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2" />
-						<Input
-							ref={inputRef}
-							value={searchQuery}
-							onChange={(e) => {
-								setSearchQuery(e.target.value);
-								setShowResults(true);
-							}}
-							onFocus={() => setShowResults(true)}
-							placeholder={searchPlaceholder}
-							className="h-9 w-full rounded-xl border-(--light-gray) pl-9 pr-8 text-sm"
-						/>
-						{searchQuery && (
-							<button
-								onClick={() => {
-									setSearchQuery("");
-									setShowResults(false);
-									inputRef.current?.focus();
-								}}
-								className="absolute right-2 top-1/2 -translate-y-1/2 text-[var(--medium-gray)] hover:text-[var(--deep-forest)]"
-							>
-								<XIcon className="size-4" />
-							</button>
-						)}
-					</div>
-
-					{/* Search Results Dropdown */}
-					{showResults && searchQuery.trim() && (
-						<div className="absolute top-full mt-1.5 w-full rounded-xl border border-[var(--light-gray)] bg-[var(--pure-white)] p-1.5 shadow-lg animate-fade-in-up">
-							{results.length > 0 ? (
-								<ul className="space-y-0.5">
-									{results.map((item) => (
-										<li key={`${item.path}-${item.label}`}>
-											<button
-												onClick={() => handleSearchSelect(item.path)}
-												className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-[var(--pale-yellow)]"
-											>
-												<span className="flex size-6 items-center justify-center rounded-md bg-[var(--off-white)] text-xs font-medium text-[var(--medium-gray)]">
-													{item.category?.[0] ?? "P"}
-												</span>
-												<div className="flex-1">
-													<span className="font-medium text-[var(--deep-forest)]">
-														{item.label}
-													</span>
-													{item.category && (
-														<span className="ml-2 text-xs text-[var(--medium-gray)]">
-															{item.category}
-														</span>
-													)}
-												</div>
-											</button>
-										</li>
-									))}
-								</ul>
-							) : (
-								<p className="px-3 py-4 text-center text-sm text-[var(--medium-gray)]">
-									No results found for "{searchQuery}"
-								</p>
-							)}
-						</div>
-					)}
-				</div>
 
 				{/* Desktop Navigation */}
 				<nav className="hidden items-center gap-1 lg:flex">
@@ -294,44 +157,6 @@ function StaffHeader({
 			{/* Mobile Menu */}
 			{mobileMenuOpen && (
 				<div className="border-t border-[var(--light-gray)] bg-[var(--pure-white)] px-4 pb-4 pt-2 lg:hidden animate-fade-in-up">
-					{/* Mobile Search */}
-					<div className="relative mb-3">
-						<MagnifyingGlassIcon className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[var(--medium-gray)]" />
-						<Input
-							value={searchQuery}
-							onChange={(e) => {
-								setSearchQuery(e.target.value);
-								setShowResults(true);
-							}}
-							onFocus={() => setShowResults(true)}
-							placeholder={searchPlaceholder}
-							className="h-9 w-full rounded-xl border-[var(--light-gray)] pl-9 text-sm text-[var(--deep-forest)] placeholder:text-[var(--medium-gray)]"
-							style={{ backgroundColor: "var(--warm-beige)" }}
-						/>
-					</div>
-
-					{/* Mobile Results */}
-					{showResults && searchQuery.trim() && results.length > 0 && (
-						<div className="mb-3 rounded-xl border border-[var(--light-gray)] bg-[var(--off-white)]/50 p-1">
-							{results.map((item) => (
-								<button
-									key={`${item.path}-${item.label}`}
-									onClick={() => handleSearchSelect(item.path)}
-									className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-[var(--pale-yellow)]"
-								>
-									<span className="text-[var(--deep-forest)]">
-										{item.label}
-									</span>
-									{item.category && (
-										<span className="text-xs text-[var(--medium-gray)]">
-											{item.category}
-										</span>
-									)}
-								</button>
-							))}
-						</div>
-					)}
-
 					{/* Mobile Nav */}
 					<nav className="flex flex-col gap-1">
 						{navLinks.map((link) => {
@@ -374,6 +199,7 @@ function StaffHeader({
 										{"role" in session.user
 											? (session.user as { role?: string }).role
 											: "Staff"}
+										a{" "}
 									</span>
 								</div>
 							</div>
@@ -400,5 +226,4 @@ function StaffHeader({
 	);
 }
 
-export type { SearchItem, StaffHeaderProps };
 export { StaffHeader };
