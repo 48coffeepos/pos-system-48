@@ -1,11 +1,13 @@
 import {
+	MagnifyingGlassIcon,
 	NotePencilIcon,
 	PackageIcon,
 	TrashIcon,
 	WarningCircleIcon,
 } from "@phosphor-icons/react";
 import { useMutation } from "@tanstack/react-query";
-import { useState } from "react";
+import Fuse from "fuse.js";
+import { useMemo, useState } from "react";
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -36,9 +38,23 @@ function InventoryList({
 	hideActions?: boolean;
 }) {
 	const [timeframe, setTimeframe] = useState<"today" | "yesterday">("today");
+	const [search, setSearch] = useState("");
 	const [deletingItem, setDeletingItem] =
 		useState<ExtendedInventoryItem | null>(null);
-	const hasItems = items.length > 0;
+
+	const fuse = useMemo(
+		() =>
+			new Fuse(items, {
+				keys: ["name"],
+				threshold: 0.3,
+			}),
+		[items],
+	);
+
+	const filtered = useMemo(
+		() => (search ? fuse.search(search).map((r) => r.item) : items),
+		[search, fuse, items],
+	);
 
 	const deleteMutation = useMutation({
 		...deleteInventoryItemMutationOptions,
@@ -49,7 +65,15 @@ function InventoryList({
 
 	return (
 		<div>
-			{hasItems ? (
+			{items.length === 0 ? (
+				/* Empty State Fallback Dropzone */
+				<div className="rounded-2xl border border-(--light-gray) bg-(--pure-white) p-8 text-center">
+					<PackageIcon className="mx-auto size-12 text-(--medium-gray)/40" />
+					<h2 className="mt-4 text-lg font-semibold text-(--deep-forest)">
+						No inventory items yet
+					</h2>
+				</div>
+			) : (
 				<div className="rounded-2xl border border-(--light-gray) bg-(--pure-white) p-6">
 					{/* Header Controls */}
 					<div className="mb-6 flex items-center justify-between">
@@ -89,6 +113,22 @@ function InventoryList({
 						</div>
 					</div>
 
+					{/* Search */}
+					<div className="relative mb-4">
+						<MagnifyingGlassIcon
+							className="absolute top-1/2 left-4 size-4 -translate-y-1/2"
+							style={{ color: "var(--medium-gray)" }}
+						/>
+						<input
+							type="text"
+							value={search}
+							onChange={(e) => setSearch(e.target.value)}
+							placeholder="Search inventory items..."
+							className="h-10 w-full rounded-xl border pl-10 pr-4 text-sm outline-none transition-all"
+							style={{ background: "white", borderColor: "var(--light-gray)" }}
+						/>
+					</div>
+
 					{/* Structured Responsive Table */}
 					<div className="w-full overflow-x-auto">
 						<table className="w-full border-collapse text-left">
@@ -102,68 +142,71 @@ function InventoryList({
 								</tr>
 							</thead>
 							<tbody className="divide-y divide-(--light-gray)/40">
-								{items.map((item) => (
-									<tr
-										key={item.id}
-										className="group hover:bg-(--light-gray)/10"
-									>
-										{/* Column 1: Metadata Badge & Labels */}
-										<td className="p-4 pl-4">
-											<div className="flex items-center gap-3">
-												<div>
-													<p className="font-semibold text-sm text-(--deep-forest)">
-														{item.name}
-													</p>
-													<span className="inline-block rounded px-1.5 py-0.5 text-[10px] font-medium mt-0.5 bg-amber-100 text-amber-800">
-														{item.type === "CUP" ? "Cup Size" : "Standalone"}
-													</span>
-												</div>
-											</div>
-										</td>
-
-										{/* Column 2: Selected Timeframe Quantity Counter */}
-										<td className="p-4 text-center font-bold text-sm text-(--deep-forest)">
-											{timeframe === "today"
-												? item.stock
-												: (item.yesterdayStock ?? 0)}
-										</td>
-
-										{/* Column 3: Row Mutations (Edit Profile/Remove) */}
-										{!hideActions && (
-											<td className="p-4 pr-4 text-right">
-												<div className="flex items-center justify-end gap-3 text-(--medium-gray)">
-													<button
-														type="button"
-														onClick={() => onEdit?.(item)}
-														className="p-1 hover:text-(--deep-forest) transition-colors"
-														aria-label="Edit item"
-													>
-														<NotePencilIcon size={18} />
-													</button>
-													<button
-														type="button"
-														onClick={() => setDeletingItem(item)}
-														className="p-1 hover:text-red-600 transition-colors"
-														aria-label="Delete item record"
-													>
-														<TrashIcon size={18} />
-													</button>
+								{filtered.length > 0 ? (
+									filtered.map((item) => (
+										<tr
+											key={item.id}
+											className="group hover:bg-(--light-gray)/10"
+										>
+											{/* Column 1: Metadata Badge & Labels */}
+											<td className="p-4 pl-4">
+												<div className="flex items-center gap-3">
+													<div>
+														<p className="font-semibold text-sm text-(--deep-forest)">
+															{item.name}
+														</p>
+														<span className="inline-block rounded px-1.5 py-0.5 text-[10px] font-medium mt-0.5 bg-amber-100 text-amber-800">
+															{item.type === "CUP" ? "Cup Size" : "Standalone"}
+														</span>
+													</div>
 												</div>
 											</td>
-										)}
+
+											{/* Column 2: Selected Timeframe Quantity Counter */}
+											<td className="p-4 text-center font-bold text-sm text-(--deep-forest)">
+												{timeframe === "today"
+													? item.stock
+													: (item.yesterdayStock ?? 0)}
+											</td>
+
+											{/* Column 3: Row Mutations (Edit Profile/Remove) */}
+											{!hideActions && (
+												<td className="p-4 pr-4 text-right">
+													<div className="flex items-center justify-end gap-3 text-(--medium-gray)">
+														<button
+															type="button"
+															onClick={() => onEdit?.(item)}
+															className="p-1 hover:text-(--deep-forest) transition-colors"
+															aria-label="Edit item"
+														>
+															<NotePencilIcon size={18} />
+														</button>
+														<button
+															type="button"
+															onClick={() => setDeletingItem(item)}
+															className="p-1 hover:text-red-600 transition-colors"
+															aria-label="Delete item record"
+														>
+															<TrashIcon size={18} />
+														</button>
+													</div>
+												</td>
+											)}
+										</tr>
+									))
+								) : (
+									<tr>
+										<td
+											colSpan={hideActions ? 2 : 3}
+											className="h-24 text-center text-sm text-(--medium-gray)"
+										>
+											No items match your search.
+										</td>
 									</tr>
-								))}
+								)}
 							</tbody>
 						</table>
 					</div>
-				</div>
-			) : (
-				/* Empty State Fallback Dropzone */
-				<div className="rounded-2xl border border-(--light-gray) bg-(--pure-white) p-8 text-center">
-					<PackageIcon className="mx-auto size-12 text-(--medium-gray)/40" />
-					<h2 className="mt-4 text-lg font-semibold text-(--deep-forest)">
-						No inventory items yet
-					</h2>
 				</div>
 			)}
 
