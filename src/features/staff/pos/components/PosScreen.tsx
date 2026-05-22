@@ -81,6 +81,7 @@ export function PosScreen() {
 		discount_name?: string;
 		discount_id?: string;
 		is_free_drink?: boolean;
+		selected_inventory_id?: string;
 		addon_items?: Array<{
 			addon_id: string;
 			name: string;
@@ -109,6 +110,7 @@ export function PosScreen() {
 					cup_size: "NONE",
 					unit_price: price,
 					total_price: price,
+					selected_inventory_id: hasInventory ? item.inventory_items[0].inventory.inventory_id : undefined,
 				};
 				addToCart(newItem);
 			} else {
@@ -156,6 +158,7 @@ export function PosScreen() {
 					line_total: c.total_price,
 					cup_type: c.cup_type,
 					cup_size: c.cup_size,
+					selected_inventory_id: c.selected_inventory_id,
 					addon_items: c.addon_items?.map((a) => ({
 						addon_id: a.addon_id,
 						addon_name_snapshot: a.name,

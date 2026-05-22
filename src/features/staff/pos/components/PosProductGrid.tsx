@@ -47,12 +47,13 @@ export function PosProductGrid({
 						))}
 					</div>
 				) : (
-					<div className="grid grid-cols-4 gap-4">
+					<div className="grid grid-cols-4 gap-4 pt-3">
 						{menuItems.map((item) => (
 							<PosProductCard
 								key={item.menu_id}
 								name={item.name}
 								price={item.price ?? item.inventory_items[0]?.price ?? null}
+								type={item.type}
 								onSelect={() => onProductClick(item)}
 							/>
 						))}

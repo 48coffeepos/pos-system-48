@@ -37,6 +37,7 @@ interface UsePosItemCustomizeDialogProps {
 		discount_name?: string;
 		discount_id?: string;
 		is_free_drink?: boolean;
+		selected_inventory_id?: string;
 		addon_items?: Array<{
 			addon_id: string;
 			name: string;
@@ -139,6 +140,7 @@ export function usePosItemCustomizeDialog({
 				discount_id:
 					value.discountType !== "NONE" ? value.discountId : undefined,
 				is_free_drink: value.isFreeDrink || undefined,
+				selected_inventory_id: selectedInvItem || undefined,
 				addon_items: addonItems.length > 0 ? addonItems : undefined,
 			});
 

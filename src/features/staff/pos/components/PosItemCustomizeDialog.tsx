@@ -48,6 +48,7 @@ interface PosItemCustomizeDialogProps {
 		discount_name?: string;
 		discount_id?: string;
 		is_free_drink?: boolean;
+		selected_inventory_id?: string;
 		addon_items?: Array<{
 			addon_id: string;
 			name: string;
@@ -169,6 +170,11 @@ export function PosItemCustomizeDialog({
 							);
 						})}
 					</div>
+					{selectedCup && selectedCup.inventory.stock <= 0 && (
+						<p className="mt-2 rounded-lg border border-(--soft-peach) bg-(--pale-yellow) px-3 py-2 text-xs font-medium text-(--coral)">
+							Out of stock &mdash; you can still add this item
+						</p>
+					)}
 				</>
 			) : null}
 
