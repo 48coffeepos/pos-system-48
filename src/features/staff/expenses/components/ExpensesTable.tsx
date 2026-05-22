@@ -174,7 +174,7 @@ export function ExpensesTable() {
             <span className="h-5 w-5 animate-spin rounded-full border-2 border-(--deep-forest) border-t-transparent" />
           </div>
         ) : (
-          <DataTable<ExpenseRow, string | number> columns={columns} data={expenses ?? []} />
+          <DataTable<ExpenseRow, string | number> columns={columns} data={expenses ?? []} pageSize={9999} />
         )}
       </div>
     </div>
