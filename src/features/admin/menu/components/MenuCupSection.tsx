@@ -87,9 +87,7 @@ function MenuCupSection({
 								</Label>
 								<Input
 									type="number"
-									min={1}
-									step={1}
-									value={cupPrices[cupId] ?? ""}
+									value={cupPrices[cupId]}
 									onChange={(e) => onChangePrice(cupId, e.target.valueAsNumber)}
 									className="h-10 flex-1 text-sm"
 								/>
