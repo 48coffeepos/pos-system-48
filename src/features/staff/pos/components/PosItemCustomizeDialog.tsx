@@ -9,8 +9,19 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { cn } from "@/lib/utils";
 import { formatPeso } from "@/lib/format-currency";
 import { usePosItemCustomizeDialog } from "../hooks/usePosItemCustomizeDialog";
+import {
+	posAddonDefault,
+	posAddonSelected,
+	posBtnGhost,
+	posBtnOutline,
+	posBtnPrimary,
+	posBtnSecondary,
+	posMutedLabel,
+	posSectionMuted,
+} from "../pos-ui";
 import type { MenuItem } from "../types";
 import { PosModal } from "./ui/PosModal";
 
@@ -130,11 +141,11 @@ export function PosItemCustomizeDialog({
 
 	return (
 		<PosModal open={Boolean(item)} onClose={onClose}>
-			<h2 className="font-bold text-foreground">{item.name}</h2>
+			<h2 className="font-bold text-(--deep-forest)">{item.name}</h2>
 
 			{cupItems.length > 0 ? (
 				<>
-					<p className="text-xs font-medium text-muted-foreground">
+					<p className="text-xs font-medium text-(--medium-gray)">
 						Cup options
 					</p>
 					<div className="flex flex-wrap gap-2">
@@ -144,7 +155,10 @@ export function PosItemCustomizeDialog({
 								<Button
 									key={ci.inventory.inventory_id}
 									variant={isSelected ? "default" : "outline"}
-									className="flex flex-1 flex-col items-center gap-0.5 rounded-xl py-2 text-xs font-semibold h-auto"
+									className={cn(
+										"flex h-auto flex-1 flex-col items-center gap-0.5 rounded-xl py-2 text-xs font-semibold",
+										isSelected ? posBtnPrimary : posBtnOutline,
+									)}
 									onClick={() => setSelectedInvItem(ci.inventory.inventory_id)}
 								>
 									<span>{ci.inventory.name}</span>
@@ -161,11 +175,10 @@ export function PosItemCustomizeDialog({
 			{/* Add-ons */}
 			<div>
 				<div className="flex items-center justify-between">
-					<p className="text-xs font-bold tracking-wider uppercase text-muted-foreground">
-						Add-ons
-					</p>
+					<p className={posMutedLabel}>Add-ons</p>
 					<Button
 						variant={showAddons ? "default" : "secondary"}
+						className={showAddons ? posBtnPrimary : posBtnSecondary}
 						onClick={() => setShowAddons(!showAddons)}
 					>
 						{showAddons ? "Active" : "Add?"}
@@ -178,11 +191,19 @@ export function PosItemCustomizeDialog({
 							return (
 								<div
 									key={addon.addon_id}
-									className={`flex items-center justify-between rounded-xl border p-2.5 transition-all ${qty > 0 ? "border-amber-400 bg-amber-50" : "border-border bg-muted"}`}
+									className={cn(
+										"flex items-center justify-between rounded-xl border p-2.5 transition-all",
+										qty > 0 ? posAddonSelected : posAddonDefault,
+									)}
 								>
 									<div className="flex flex-col gap-0.5">
 										<span
-											className={`text-[10px] font-bold ${qty > 0 ? "text-foreground" : "text-muted-foreground"}`}
+											className={cn(
+												"text-[10px] font-bold",
+												qty > 0
+													? "text-(--deep-forest)"
+													: "text-(--medium-gray)",
+											)}
 										>
 											{addon.name}
 										</span>
@@ -194,6 +215,7 @@ export function PosItemCustomizeDialog({
 										<Button
 											variant="secondary"
 											size="icon-xs"
+											className={posBtnSecondary}
 											onClick={() => decrementAddon(addon)}
 											disabled={qty === 0}
 										>
@@ -205,6 +227,7 @@ export function PosItemCustomizeDialog({
 										<Button
 											variant="default"
 											size="icon-xs"
+											className={posBtnPrimary}
 											onClick={() => incrementAddon(addon)}
 										>
 											<PlusIcon className="size-3" />
@@ -218,7 +241,7 @@ export function PosItemCustomizeDialog({
 			</div>
 
 			{/* Discount & Free Drink */}
-			<div className="mt-4 border-t border-border pt-4">
+			<div className="mt-4 border-t border-(--light-gray) pt-4">
 				{canDiscount ? (
 					<>
 						<form.AppField
@@ -231,14 +254,12 @@ export function PosItemCustomizeDialog({
 						>
 							{(field) => (
 								<div className="mb-3 flex items-center justify-between">
-									<p className="text-xs font-bold tracking-wider uppercase text-muted-foreground">
-										Discount
-									</p>
+									<p className={posMutedLabel}>Discount</p>
 									<Select
 										value={field.state.value}
 										onValueChange={(v) => field.handleChange(v ?? "NONE")}
 									>
-										<SelectTrigger className="w-auto rounded-full text-[10px] font-semibold h-8 px-3 py-1">
+										<SelectTrigger className="h-8 w-auto rounded-full border-(--light-gray) bg-(--off-white) px-3 py-1 text-[10px] font-semibold text-(--deep-forest)">
 											<SelectValue placeholder="None" />
 										</SelectTrigger>
 										<SelectContent>
@@ -275,8 +296,13 @@ export function PosItemCustomizeDialog({
 				{canUseFreeDrink && !hasFreeDrinkInCart ? (
 					<form.AppField name="isFreeDrink">
 						{(field) => (
-							<div className="flex items-center justify-between rounded-lg bg-muted p-2.5">
-								<span className="text-xs font-semibold text-foreground">
+							<div
+								className={cn(
+									"flex items-center justify-between rounded-lg p-2.5",
+									posSectionMuted,
+								)}
+							>
+								<span className="text-xs font-semibold text-(--deep-forest)">
 									Free Drink
 								</span>
 								<Switch
@@ -305,15 +331,14 @@ export function PosItemCustomizeDialog({
 						vals.isFreeDrink || vals.discountType !== "NONE";
 					return (
 						<div className="mt-4 flex items-center justify-between">
-							<p className="text-xs font-bold tracking-wider uppercase text-muted-foreground">
-								Quantity
-							</p>
+							<p className={posMutedLabel}>Quantity</p>
 							<form.AppField name="quantity">
 								{(field) => (
 									<div className="flex items-center gap-2">
 										<Button
 											variant="secondary"
 											size="icon-xs"
+											className={posBtnSecondary}
 											disabled={quantityLocked || field.state.value <= 1}
 											onClick={() =>
 												field.handleChange(Math.max(1, field.state.value - 1))
@@ -321,12 +346,13 @@ export function PosItemCustomizeDialog({
 										>
 											<MinusIcon className="size-3" />
 										</Button>
-										<span className="w-5 text-center text-xs font-bold">
+										<span className="w-5 text-center text-xs font-bold text-(--deep-forest)">
 											{field.state.value}
 										</span>
 										<Button
 											variant="default"
 											size="icon-xs"
+											className={posBtnPrimary}
 											disabled={quantityLocked}
 											onClick={() => field.handleChange(field.state.value + 1)}
 										>
@@ -347,14 +373,19 @@ export function PosItemCustomizeDialog({
 				})}
 			>
 				{(vals) => (
-					<div className="mt-4 flex items-center justify-between rounded-xl bg-muted px-4 py-3">
-						<span className="text-xs font-semibold text-muted-foreground">
+					<div
+						className={cn(
+							"mt-4 flex items-center justify-between rounded-xl px-4 py-3",
+							posSectionMuted,
+						)}
+					>
+						<span className="text-xs font-semibold text-(--medium-gray)">
 							Total
 							{liveAddonsTotal > 0 && !vals.isFreeDrink
 								? " (incl. add-ons)"
 								: ""}
 						</span>
-						<span className="text-sm font-bold text-foreground">
+						<span className="text-sm font-bold text-(--deep-forest)">
 							{formatPeso(
 								vals.isFreeDrink
 									? 0
@@ -366,10 +397,17 @@ export function PosItemCustomizeDialog({
 			</form.Subscribe>
 
 			<div className="mt-4 flex gap-2">
-				<Button variant="ghost" className="flex-1" onClick={onClose}>
+				<Button
+					variant="ghost"
+					className={cn("flex-1", posBtnGhost)}
+					onClick={onClose}
+				>
 					Cancel
 				</Button>
-				<Button className="flex-1" onClick={() => form.handleSubmit()}>
+				<Button
+					className={cn("flex-1", posBtnPrimary)}
+					onClick={() => form.handleSubmit()}
+				>
 					Add to cart
 				</Button>
 			</div>

@@ -1,6 +1,8 @@
 import { Printer } from "@phosphor-icons/react";
 import { AlertDialog, AlertDialogContent } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { posBtnOutline, posBtnPrimary } from "../pos-ui";
 import type { PosOrder } from "../types";
 
 interface PosReceiptDialogProps {
@@ -32,7 +34,7 @@ export function PosReceiptDialog({
 				if (!isOpen) onClose();
 			}}
 		>
-			<AlertDialogContent className="max-w-[380px] p-8">
+			<AlertDialogContent className="max-w-[380px] border-(--light-gray) bg-(--pure-white) p-8">
 				<div
 					id="receipt-content"
 					className="receipt-thermal font-mono text-[#1a1a1a] select-none"
@@ -204,10 +206,17 @@ export function PosReceiptDialog({
 				</div>
 
 				<div className="no-print mt-8 flex gap-3">
-					<Button variant="outline" onClick={onClose} className="flex-1 h-12">
+					<Button
+						variant="outline"
+						onClick={onClose}
+						className={cn("h-12 flex-1", posBtnOutline)}
+					>
 						Save
 					</Button>
-					<Button onClick={onPrint} className="flex flex-1 h-12 gap-2">
+					<Button
+						onClick={onPrint}
+						className={cn("flex h-12 flex-1 gap-2", posBtnPrimary)}
+					>
 						<Printer className="size-4" /> Print
 					</Button>
 				</div>

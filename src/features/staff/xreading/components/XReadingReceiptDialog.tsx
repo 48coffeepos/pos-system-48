@@ -1,5 +1,10 @@
 import { Printer } from "@phosphor-icons/react";
 import { PosModal } from "@/features/staff/pos/components/ui/PosModal";
+import type { DailyReconciliationTotals } from "../utils/reconciliation";
+import {
+	getExpectedCashInDrawer,
+	getOverShort,
+} from "../utils/reconciliation";
 import type { Denomination } from "./CashCountPanel";
 import type { CashCountValues } from "../stores/useXReadingStore";
 
@@ -9,8 +14,7 @@ interface XReadingReceiptDialogProps {
 	onPrint: () => void;
 	mode: "sales" | "cashcount" | null;
 	staffName: string;
-	totalCashSales: number;
-	totalExpenses: number;
+	totals: DailyReconciliationTotals;
 	totalCashCounted: number;
 	cashCount: CashCountValues;
 }
@@ -25,20 +29,15 @@ export function XReadingReceiptDialog({
 	onPrint,
 	mode,
 	staffName,
-	totalCashSales,
-	totalExpenses,
+	totals,
 	totalCashCounted,
 	cashCount,
 }: XReadingReceiptDialogProps) {
 	if (!mode) return null;
 
-	// Gross Sales = Total Cash IN + Total Sales.
-	const totalCashIn = 0; 
-	const grossSales = totalCashIn + totalCashSales;
-	const totalPickup = totalExpenses;
-	const netSales = grossSales - totalPickup;
-	
-	const overShort = totalCashCounted - netSales;
+	const { totalCashSales, totalCashOut } = totals;
+	const expectedCash = getExpectedCashInDrawer(totals);
+	const { overShort } = getOverShort(totalCashCounted, totals);
 
 	const targetDate = new Date();
 
@@ -80,32 +79,27 @@ export function XReadingReceiptDialog({
 
 						<div className="space-y-4 text-sm">
 							<div className="flex justify-between">
-								<span>Total Cash IN :</span>
-								<span>{totalCashIn.toFixed(2)}</span>
-							</div>
-							<div className="flex justify-between">
-								<span>Total Sales :</span>
+								<span>Cash Sales Today :</span>
 								<span>{totalCashSales.toFixed(2)}</span>
 							</div>
-							<div className="flex justify-between font-bold pt-2">
-								<span>Gross Sales :</span>
-								<span>{grossSales.toFixed(2)}</span>
-							</div>
-							<div className="flex justify-between mt-4">
-								<span>Total Expenses :</span>
-								<span>{totalPickup.toFixed(2)}</span>
+							<div className="flex justify-between">
+								<span>Expenses Today :</span>
+								<span>{totalCashOut.toFixed(2)}</span>
 							</div>
 							<div className="flex justify-between font-bold pt-2">
-								<span>NET SALES :</span>
-								<span>{netSales.toFixed(2)}</span>
+								<span>Expected in Drawer :</span>
+								<span>{expectedCash.toFixed(2)}</span>
 							</div>
 							<div className="flex justify-between font-bold mt-4">
-								<span>CASH COUNT :</span>
+								<span>Cash Counted :</span>
 								<span>{totalCashCounted.toFixed(2)}</span>
 							</div>
 							<div className="flex justify-between font-bold mt-4">
 								<span>OVER/SHORT :</span>
-								<span>{overShort.toFixed(2)}</span>
+								<span>
+									{overShort > 0 ? "+" : ""}
+									{overShort.toFixed(2)}
+								</span>
 							</div>
 						</div>
 

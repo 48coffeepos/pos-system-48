@@ -1,41 +1,24 @@
 import { createServerFn } from "@tanstack/react-start";
+import { getTodayBounds } from "@/lib/day-bounds";
 import { prisma } from "@/integrations/prisma/db";
-
 
 export const getDailyReconciliation = createServerFn({ method: "GET" }).handler(
 	async () => {
-		const targetDate = new Date();
-		
-		const start = new Date(targetDate);
-		start.setHours(0, 0, 0, 0);
-		
-		const end = new Date(targetDate);
-		end.setHours(23, 59, 59, 999);
+		const { start, end } = getTodayBounds();
 
 		const [orders, expenses] = await Promise.all([
 			prisma.order.findMany({
 				where: {
-					created_at: {
-						gte: start,
-						lte: end,
-					},
+					created_at: { gte: start, lte: end },
 					method: "CASH",
 				},
-				select: {
-					grand_total: true,
-				},
+				select: { grand_total: true },
 			}),
 			prisma.expense.findMany({
 				where: {
-					timestamp: {
-						gte: start,
-						lte: end,
-					},
+					timestamp: { gte: start, lte: end },
 				},
-				select: {
-					amount: true,
-					type: true,
-				},
+				select: { amount: true, type: true },
 			}),
 		]);
 
@@ -44,19 +27,21 @@ export const getDailyReconciliation = createServerFn({ method: "GET" }).handler(
 			0,
 		);
 
-		let totalExpenses = 0;
-		expenses.forEach((exp) => {
+		let totalCashOut = 0;
+		let totalCashIn = 0;
+		for (const exp of expenses) {
+			const amount = Number(exp.amount);
 			if (exp.type === "CASH_OUT") {
-				totalExpenses += Number(exp.amount);
+				totalCashOut += amount;
 			} else if (exp.type === "CASH_IN") {
-				// Technically CASH_IN reduces the net expenses or increases expected cash
-				totalExpenses -= Number(exp.amount);
+				totalCashIn += amount;
 			}
-		});
+		}
 
 		return {
 			totalCashSales,
-			totalExpenses,
+			totalCashOut,
+			totalCashIn,
 		};
 	},
 );

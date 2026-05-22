@@ -22,7 +22,8 @@ import {
 interface XReadingScreenProps {
 	data: {
 		totalCashSales: number;
-		totalExpenses: number;
+		totalCashOut: number;
+		totalCashIn: number;
 	};
 }
 
@@ -82,8 +83,11 @@ export function XReadingScreen({ data }: XReadingScreenProps) {
 				</form.AppForm>
 
 				<ReconciliationPanel
-					totalCashSales={data.totalCashSales}
-					totalExpenses={data.totalExpenses}
+					totals={{
+						totalCashSales: data.totalCashSales,
+						totalCashOut: data.totalCashOut,
+						totalCashIn: data.totalCashIn,
+					}}
 					totalCashCounted={totalCashCounted}
 					onExportSales={handleExportSales}
 					onExportCashCount={handleExportCashCount}
@@ -121,8 +125,11 @@ export function XReadingScreen({ data }: XReadingScreenProps) {
 				onPrint={handlePrint}
 				mode={receiptMode}
 				staffName={staffName}
-				totalCashSales={data.totalCashSales}
-				totalExpenses={data.totalExpenses}
+				totals={{
+					totalCashSales: data.totalCashSales,
+					totalCashOut: data.totalCashOut,
+					totalCashIn: data.totalCashIn,
+				}}
 				totalCashCounted={totalCashCounted}
 				cashCount={cashCount}
 			/>

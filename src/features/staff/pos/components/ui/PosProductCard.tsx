@@ -1,4 +1,6 @@
+import { cn } from "@/lib/utils";
 import { formatPeso } from "@/lib/format-currency";
+import { posCard } from "../../pos-ui";
 
 interface PosProductCardProps {
 	name: string;
@@ -11,10 +13,13 @@ export function PosProductCard({ name, price, onSelect }: PosProductCardProps) {
 		<button
 			type="button"
 			onClick={onSelect}
-			className="group flex h-32 cursor-pointer flex-col rounded-2xl border border-border bg-white p-6 text-left shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg active:scale-95"
+			className={cn(
+				posCard,
+				"group flex h-32 cursor-pointer flex-col p-6 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-(--forest-green) hover:shadow-md active:scale-95",
+			)}
 		>
 			<h3
-				className="mb-1 text-lg font-bold line-clamp-2 wrap-break-word text-foreground"
+				className="mb-1 line-clamp-2 wrap-break-word text-lg font-bold text-(--deep-forest)"
 				title={name}
 			>
 				{name}

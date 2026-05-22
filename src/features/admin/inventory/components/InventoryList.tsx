@@ -65,7 +65,15 @@ function InventoryList({
 
 	return (
 		<div>
-			{hasItems ? (
+			{items.length === 0 ? (
+				/* Empty State Fallback Dropzone */
+				<div className="rounded-2xl border border-(--light-gray) bg-(--pure-white) p-8 text-center">
+					<PackageIcon className="mx-auto size-12 text-(--medium-gray)/40" />
+					<h2 className="mt-4 text-lg font-semibold text-(--deep-forest)">
+						No inventory items yet
+					</h2>
+				</div>
+			) : (
 				<div className="rounded-2xl border border-(--light-gray) bg-(--pure-white) p-6">
 					{/* Header Controls */}
 					<div className="mb-6 flex items-center justify-between">
@@ -122,36 +130,37 @@ function InventoryList({
 					</div>
 
 					{/* Structured Responsive Table */}
-					<div className="w-full overflow-x-auto rounded-xl border border-(--light-gray)/40">
+					<div className="w-full overflow-x-auto">
 						<table className="w-full border-collapse text-left">
 							<thead>
-								<tr className="border-b border-(--light-gray)/40 bg-(--off-white) text-xs font-bold uppercase tracking-wider text-(--medium-gray)">
-									<th className="p-4 pl-6">Item</th>
-									<th className="p-4 text-center">Quantity</th>
+								<tr className="border-b border-(--light-gray)/40 bg-(--soft-peach)/20 text-[11px] font-bold tracking-wider text-(--medium-gray)/80 uppercase">
+									<th className="rounded-l-lg p-3 pl-4">Item</th>
+									<th className="p-3 text-center">Quantity</th>
 									{!hideActions && (
-										<th className="p-4 pr-6 text-right">Actions</th>
+										<th className="rounded-r-lg p-3 pr-4 text-right">Actions</th>
 									)}
 								</tr>
 							</thead>
 							<tbody className="divide-y divide-(--light-gray)/40">
-								{items.map((item) => (
-									<tr
-										key={item.id}
-										className="group hover:bg-(--light-gray)/10"
-									>
-										{/* Column 1: Metadata Badge & Labels */}
-										<td className="p-4 pl-4">
-											<div className="flex items-center gap-3">
-												<div>
-													<p className="font-semibold text-sm text-(--deep-forest)">
-														{item.name}
-													</p>
-													<span className="inline-block rounded px-1.5 py-0.5 text-[10px] font-medium mt-0.5 bg-amber-100 text-amber-800">
-														{item.type === "CUP" ? "Cup Size" : "Standalone"}
-													</span>
+								{filtered.length > 0 ? (
+									filtered.map((item) => (
+										<tr
+											key={item.id}
+											className="group hover:bg-(--light-gray)/10"
+										>
+											{/* Column 1: Metadata Badge & Labels */}
+											<td className="p-4 pl-4">
+												<div className="flex items-center gap-3">
+													<div>
+														<p className="font-semibold text-sm text-(--deep-forest)">
+															{item.name}
+														</p>
+														<span className="inline-block rounded px-1.5 py-0.5 text-[10px] font-medium mt-0.5 bg-amber-100 text-amber-800">
+															{item.type === "CUP" ? "Cup Size" : "Standalone"}
+														</span>
+													</div>
 												</div>
-											</div>
-										</td>
+											</td>
 
 											{/* Column 2: Selected Timeframe Quantity Counter */}
 											<td className="p-4 text-center font-bold text-sm text-(--deep-forest)">
@@ -160,31 +169,41 @@ function InventoryList({
 													: (item.yesterdayStock ?? 0)}
 											</td>
 
-										{/* Column 3: Row Mutations (Edit Profile/Remove) */}
-										{!hideActions && (
-											<td className="p-4 pr-4 text-right">
-												<div className="flex items-center justify-end gap-3 text-(--medium-gray)">
-													<button
-														type="button"
-														onClick={() => onEdit?.(item)}
-														className="p-1 hover:text-(--deep-forest) transition-colors"
-														aria-label="Edit item"
-													>
-														<NotePencilIcon size={18} />
-													</button>
-													<button
-														type="button"
-														onClick={() => setDeletingItem(item)}
-														className="p-1 hover:text-red-600 transition-colors"
-														aria-label="Delete item record"
-													>
-														<TrashIcon size={18} />
-													</button>
-												</div>
-											</td>
-										)}
+											{/* Column 3: Row Mutations (Edit Profile/Remove) */}
+											{!hideActions && (
+												<td className="p-4 pr-4 text-right">
+													<div className="flex items-center justify-end gap-3 text-(--medium-gray)">
+														<button
+															type="button"
+															onClick={() => onEdit?.(item)}
+															className="p-1 hover:text-(--deep-forest) transition-colors"
+															aria-label="Edit item"
+														>
+															<NotePencilIcon size={18} />
+														</button>
+														<button
+															type="button"
+															onClick={() => setDeletingItem(item)}
+															className="p-1 hover:text-red-600 transition-colors"
+															aria-label="Delete item record"
+														>
+															<TrashIcon size={18} />
+														</button>
+													</div>
+												</td>
+											)}
+										</tr>
+									))
+								) : (
+									<tr>
+										<td
+											colSpan={hideActions ? 2 : 3}
+											className="h-24 text-center text-sm text-(--medium-gray)"
+										>
+											No items match your search.
+										</td>
 									</tr>
-								))}
+								)}
 							</tbody>
 						</table>
 					</div>

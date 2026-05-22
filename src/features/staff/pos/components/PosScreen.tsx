@@ -30,6 +30,7 @@ export function PosScreen() {
 		removeFromCart,
 		updateQuantity,
 		clearCart,
+		resetCheckout,
 	} = usePosStore();
 
 	const queryClient = useQueryClient();
@@ -202,8 +203,8 @@ export function PosScreen() {
 
 			setLastOrder(order);
 			setShowReceipt(true);
-			clearCart();
-			form.reset();
+			resetCheckout();
+			form.reset(usePosStore.getState().formValues);
 			setShowPlaceOrderConfirm(false);
 			toast.success(`Order #${order.order_id} placed successfully!`);
 		} catch (err: unknown) {
@@ -214,7 +215,7 @@ export function PosScreen() {
 	}, [
 		cart,
 		cartTotal,
-		clearCart,
+		resetCheckout,
 		createOrderMutation,
 		form,
 		setLastOrder,
