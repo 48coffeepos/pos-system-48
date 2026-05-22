@@ -5,14 +5,15 @@ export type DailyReconciliationTotals = {
 };
 
 /**
- * Expected cash in drawer after sales and today's cash movements.
- * Formula: Cash Sales − Expenses (cash out)
+ * Net sales after cash in, cash sales, and cash out.
+ * Formula: Cash Sales + Cash In − Cash Out
  */
 export function getExpectedCashInDrawer({
 	totalCashSales,
 	totalCashOut,
+	totalCashIn,
 }: DailyReconciliationTotals) {
-	return totalCashSales - totalCashOut;
+	return totalCashSales + totalCashIn - totalCashOut;
 }
 
 /** Over = counted more than expected; short = counted less. */

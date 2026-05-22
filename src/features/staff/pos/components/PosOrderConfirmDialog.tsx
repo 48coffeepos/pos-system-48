@@ -1,3 +1,4 @@
+import { X } from "@phosphor-icons/react";
 import {
 	AlertDialog,
 	AlertDialogCancel,
@@ -9,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { formatPeso } from "@/lib/format-currency";
-import { posBtnOutline, posBtnPrimary } from "../pos-ui";
+import { posBtnGhost, posBtnOutline, posBtnPrimary } from "../pos-ui";
 
 interface PosOrderConfirmDialogProps {
 	open: boolean;
@@ -34,6 +35,15 @@ export function PosOrderConfirmDialog({
 			}}
 		>
 			<AlertDialogContent className="border-(--light-gray) bg-(--pure-white)">
+				<Button
+					variant="ghost"
+					size="icon"
+					onClick={onClose}
+					className={cn("absolute top-4 right-4 rounded-full", posBtnGhost)}
+					aria-label="Close"
+				>
+					<X className="size-5" />
+				</Button>
 				<AlertDialogTitle className="text-(--deep-forest)">
 					Confirm Order
 				</AlertDialogTitle>

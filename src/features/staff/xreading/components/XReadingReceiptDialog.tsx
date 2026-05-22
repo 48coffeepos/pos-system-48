@@ -35,12 +35,18 @@ export function XReadingReceiptDialog({
 }: XReadingReceiptDialogProps) {
 	if (!mode) return null;
 
-	const { totalCashSales, totalCashOut } = totals;
-	const expectedCash = getExpectedCashInDrawer(totals);
+	const { totalCashSales, totalCashOut, totalCashIn } = totals;
+	const grossSales = totalCashSales + totalCashIn;
+	const netSales = getExpectedCashInDrawer(totals);
 	const { overShort } = getOverShort(totalCashCounted, totals);
 
 	const targetDate = new Date();
 
+	const displayDate = targetDate.toLocaleDateString("en-US", {
+		month: "2-digit",
+		day: "2-digit",
+		year: "numeric",
+	});
 	const displayDateTime = targetDate.toLocaleString("en-US", {
 		month: "2-digit",
 		day: "2-digit",
@@ -54,7 +60,7 @@ export function XReadingReceiptDialog({
 			open={open}
 			onClose={onClose}
 			showClose
-			className="max-w-[380px] p-8"
+			className="max-w-[380px] p-4 sm:p-8"
 			overlayClassName="overflow-y-auto no-print"
 		>
 			<div
@@ -63,39 +69,57 @@ export function XReadingReceiptDialog({
 			>
 				{mode === "sales" && (
 					<div id="sales-xreading-receipt">
-						<div className="mb-6 text-center">
+						<div className="mb-4 text-center">
 							<h2 className="text-2xl font-black tracking-tight">48 COFFEE</h2>
-							<h3 className="mt-0.5 text-lg font-bold uppercase">SALES X- READING</h3>
-						</div>
-						
-						<div className="mb-6 flex gap-2 text-sm">
-							<span className="w-24">Date & Time :</span>
-							<span>{displayDateTime}</span>
+							<h3 className="text-lg font-bold uppercase tracking-widest">SALES X-READING</h3>
 						</div>
 
-						<div className="mb-6 text-sm font-bold">
-							{staffName}
-						</div>
-
-						<div className="space-y-4 text-sm">
+						<div className="mb-4 text-[11px] font-bold">
 							<div className="flex justify-between">
-								<span>Cash Sales Today :</span>
+								<span>Sales Date :</span>
+								<span>{displayDate}</span>
+							</div>
+							<div className="flex justify-between">
+								<span>Cashier :</span>
+								<span>{staffName}</span>
+							</div>
+						</div>
+
+						<div className="mb-4 border-t-2 border-dashed border-black pt-4" />
+
+						<div className="text-[11px] font-bold space-y-1">
+							<div className="flex justify-between">
+								<span>TOTAL CASH IN</span>
+								<span>{totalCashIn.toFixed(2)}</span>
+							</div>
+							<div className="flex justify-between">
+								<span>TOTAL SALES</span>
 								<span>{totalCashSales.toFixed(2)}</span>
 							</div>
+						</div>
+
+						<div className="mt-4 border-t border-dashed border-black pt-4 text-[11px] font-bold space-y-1">
 							<div className="flex justify-between">
-								<span>Expenses Today :</span>
+								<span>GROSS SALES</span>
+								<span>{grossSales.toFixed(2)}</span>
+							</div>
+							<div className="flex justify-between">
+								<span>TOTAL PICKUP</span>
 								<span>{totalCashOut.toFixed(2)}</span>
 							</div>
-							<div className="flex justify-between font-bold pt-2">
-								<span>Expected in Drawer :</span>
-								<span>{expectedCash.toFixed(2)}</span>
+						</div>
+
+						<div className="mt-4 border-t-2 border-dashed border-black pt-4 text-[11px] font-bold space-y-1">
+							<div className="flex justify-between">
+								<span>NET SALES</span>
+								<span>{netSales.toFixed(2)}</span>
 							</div>
-							<div className="flex justify-between font-bold mt-4">
-								<span>Cash Counted :</span>
+							<div className="flex justify-between mt-2">
+								<span>CASH COUNT</span>
 								<span>{totalCashCounted.toFixed(2)}</span>
 							</div>
-							<div className="flex justify-between font-bold mt-4">
-								<span>OVER/SHORT :</span>
+							<div className="flex justify-between mt-2">
+								<span>OVER / SHORT</span>
 								<span>
 									{overShort > 0 ? "+" : ""}
 									{overShort.toFixed(2)}
@@ -103,8 +127,8 @@ export function XReadingReceiptDialog({
 							</div>
 						</div>
 
-						<div className="mt-12 text-center text-sm">
-							<p className="border-t border-dashed border-black pt-2">
+						<div className="mt-12 text-center text-[11px]">
+							<p className="border-t-2 border-dashed border-black pt-2">
 								Signature of Cashier
 							</p>
 						</div>

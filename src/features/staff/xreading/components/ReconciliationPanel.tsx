@@ -46,19 +46,22 @@ export function ReconciliationPanel({
 	return (
 		<div className="flex flex-col gap-6">
 			<SummaryCard
-				label="Cash Sales Today"
+				label="Total Cash In"
+				value={formatPeso(totals.totalCashIn)}
+			/>
+			<SummaryCard
+				label="Total Sales"
 				value={formatPeso(totals.totalCashSales)}
 			/>
-
 			<SummaryCard
-				label="Expenses Today"
+				label="Expenses"
 				value={formatPeso(totals.totalCashOut)}
 				valueClassName="text-(--coral)"
 			/>
 
 			<div className="rounded-2xl border border-(--light-gray) bg-(--pure-white) p-6 shadow-sm">
 				<h3 className="mb-1 text-sm font-medium text-(--medium-gray)">
-					Over / Short
+					Discrepancy
 				</h3>
 				<div className="flex items-center gap-3">
 					<p

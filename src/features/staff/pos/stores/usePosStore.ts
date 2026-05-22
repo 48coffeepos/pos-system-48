@@ -110,11 +110,10 @@ export const usePosStore = create<PosState>()(
 				set({ cart: [], formValues: defaultPosFormValues }),
 		}),
 		{
-			name: "staff-pos-session",
+			name: "staff-pos-session-v2",
 			partialize: (state) => ({
 				activeCategory: state.activeCategory,
 				search: state.search,
-				cart: state.cart,
 				formValues: state.formValues,
 			}),
 		},
