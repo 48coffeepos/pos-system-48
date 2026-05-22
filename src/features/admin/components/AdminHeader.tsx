@@ -1,7 +1,6 @@
 import {
 	CoffeeIcon,
 	ListIcon,
-	MagnifyingGlassIcon,
 	PackageIcon,
 	SignOutIcon,
 	SquaresFourIcon,
@@ -11,33 +10,12 @@ import {
 } from "@phosphor-icons/react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
-import Fuse from "fuse.js";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { sessionQueryOptions } from "@/features/auth/queryOptions";
 import { authClient } from "@/integrations/better-auth/auth-client";
 import { cn } from "@/lib/utils";
-
-interface SearchItem {
-	label: string;
-	path: string;
-	category?: string;
-	keywords?: string[];
-}
-
-interface AdminHeaderProps {
-	searchItems?: SearchItem[];
-	searchPlaceholder?: string;
-}
-
-const defaultSearchItems: SearchItem[] = [
-	{ label: "Dashboard", path: "/admin", category: "Page" },
-	{ label: "Menu", path: "/admin/menu", category: "Page" },
-	{ label: "Inventory", path: "/admin/inventory", category: "Page" },
-	{ label: "Accounts", path: "/admin/accounts", category: "Page" },
-];
 
 const navLinks = [
 	{ label: "Dashboard", path: "/admin", icon: SquaresFourIcon },
@@ -48,61 +26,16 @@ const navLinks = [
 
 const adminTo = (path: string) => path as never;
 
-function AdminHeader({
-	searchItems = defaultSearchItems,
-	searchPlaceholder = "Search pages, items, users...",
-}: AdminHeaderProps) {
+function AdminHeader() {
 	const location = useLocation();
 	const navigate = useNavigate();
 	const { data } = useSuspenseQuery(sessionQueryOptions);
-	const [searchQuery, setSearchQuery] = useState("");
-	const [showResults, setShowResults] = useState(false);
 	const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-	const searchRef = useRef<HTMLDivElement>(null);
-	const inputRef = useRef<HTMLInputElement>(null);
-
-	const fuse = useMemo(
-		() =>
-			new Fuse(searchItems, {
-				keys: [
-					{ name: "label", weight: 3 },
-					{ name: "category", weight: 1 },
-					{ name: "keywords", weight: 2 },
-				],
-				threshold: 0.4,
-				includeScore: true,
-			}),
-		[searchItems],
-	);
-
-	const results = useMemo(() => {
-		if (!searchQuery.trim()) return [];
-		return fuse
-			.search(searchQuery)
-			.map((r) => r.item)
-			.slice(0, 8);
-	}, [searchQuery, fuse]);
-
-	const handleSearchSelect = (path: string) => {
-		setSearchQuery("");
-		setShowResults(false);
-		navigate({ to: adminTo(path) });
-	};
 
 	const handleLogout = async () => {
 		await authClient.signOut();
 		navigate({ to: "/" });
 	};
-
-	useEffect(() => {
-		function handleClickOutside(e: MouseEvent) {
-			if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
-				setShowResults(false);
-			}
-		}
-		document.addEventListener("mousedown", handleClickOutside);
-		return () => document.removeEventListener("mousedown", handleClickOutside);
-	}, []);
 
 	useEffect(() => {
 		if (location.pathname) setMobileMenuOpen(false);
@@ -129,75 +62,6 @@ function AdminHeader({
 						48° Coffee
 					</span>
 				</Link>
-
-				<div
-					ref={searchRef}
-					className="relative hidden flex-1 sm:block max-w-md"
-				>
-					<div className="relative">
-						<MagnifyingGlassIcon className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2" />
-						<Input
-							ref={inputRef}
-							value={searchQuery}
-							onChange={(e) => {
-								setSearchQuery(e.target.value);
-								setShowResults(true);
-							}}
-							onFocus={() => setShowResults(true)}
-							placeholder={searchPlaceholder}
-							className="h-9 w-full rounded-xl border-(--light-gray) pl-9 pr-8 text-sm"
-						/>
-						{searchQuery && (
-							<button
-								type="button"
-								onClick={() => {
-									setSearchQuery("");
-									setShowResults(false);
-									inputRef.current?.focus();
-								}}
-								className="absolute right-2 top-1/2 -translate-y-1/2 text-(--medium-gray) hover:text-(--deep-forest)"
-							>
-								<XIcon className="size-4" />
-							</button>
-						)}
-					</div>
-
-					{showResults && searchQuery.trim() && (
-						<div className="absolute top-full mt-1.5 w-full rounded-xl border border-(--light-gray) bg-(--pure-white) p-1.5 shadow-lg animate-fade-in-up">
-							{results.length > 0 ? (
-								<ul className="space-y-0.5">
-									{results.map((item) => (
-										<li key={`${item.path}-${item.label}`}>
-											<button
-												type="button"
-												onClick={() => handleSearchSelect(item.path)}
-												className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-(--pale-yellow)"
-											>
-												<span className="flex size-6 items-center justify-center rounded-md bg-(--off-white) text-xs font-medium text-(--medium-gray)">
-													{item.category?.[0] ?? "P"}
-												</span>
-												<div className="flex-1">
-													<span className="font-medium text-(--deep-forest)">
-														{item.label}
-													</span>
-													{item.category && (
-														<span className="ml-2 text-xs text-(--medium-gray)">
-															{item.category}
-														</span>
-													)}
-												</div>
-											</button>
-										</li>
-									))}
-								</ul>
-							) : (
-								<p className="px-3 py-4 text-center text-sm text-(--medium-gray)">
-									No results found for "{searchQuery}"
-								</p>
-							)}
-						</div>
-					)}
-				</div>
 
 				<nav className="hidden items-center gap-1 lg:flex">
 					{navLinks.map((link) => {
@@ -282,41 +146,6 @@ function AdminHeader({
 
 			{mobileMenuOpen && (
 				<div className="border-t border-(--light-gray) bg-(--pure-white) px-4 pb-4 pt-2 lg:hidden animate-fade-in-up">
-					<div className="relative mb-3">
-						<MagnifyingGlassIcon className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-(--medium-gray)" />
-						<Input
-							value={searchQuery}
-							onChange={(e) => {
-								setSearchQuery(e.target.value);
-								setShowResults(true);
-							}}
-							onFocus={() => setShowResults(true)}
-							placeholder={searchPlaceholder}
-							className="h-9 w-full rounded-xl border-(--light-gray) pl-9 text-sm text-(--deep-forest) placeholder:text-(--medium-gray)"
-							style={{ backgroundColor: "var(--warm-beige)" }}
-						/>
-					</div>
-
-					{showResults && searchQuery.trim() && results.length > 0 && (
-						<div className="mb-3 rounded-xl border border-(--light-gray) bg-(--off-white)/50 p-1">
-							{results.map((item) => (
-								<button
-									key={`${item.path}-${item.label}`}
-									type="button"
-									onClick={() => handleSearchSelect(item.path)}
-									className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-(--pale-yellow)"
-								>
-									<span className="text-(--deep-forest)">{item.label}</span>
-									{item.category && (
-										<span className="text-xs text-(--medium-gray)">
-											{item.category}
-										</span>
-									)}
-								</button>
-							))}
-						</div>
-					)}
-
 					<nav className="flex flex-col gap-1">
 						{navLinks.map((link) => {
 							const Icon = link.icon;
@@ -382,5 +211,5 @@ function AdminHeader({
 	);
 }
 
-export type { AdminHeaderProps, SearchItem };
+export type { AdminHeaderProps };
 export { AdminHeader };
