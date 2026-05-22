@@ -1,8 +1,6 @@
 import { MinusIcon, PlusIcon } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
-import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
 	Select,
 	SelectContent,
@@ -12,8 +10,8 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { formatPeso } from "@/lib/format-currency";
+import { usePosItemCustomizeDialog } from "../hooks/usePosItemCustomizeDialog";
 import type { MenuItem } from "../types";
-import { cartLineKey, parseCupInfo } from "../utils";
 import { PosModal } from "./ui/PosModal";
 
 interface AddOnItem {
@@ -30,6 +28,7 @@ interface PosItemCustomizeDialogProps {
 		lineKey: string;
 		menu_id: string;
 		menu_name: string;
+		quantity: number;
 		cup_type: string;
 		cup_size: string;
 		unit_price: number;
@@ -62,17 +61,21 @@ export function PosItemCustomizeDialog({
 	const [selectedAddons, setSelectedAddons] = useState<
 		Record<string, { name: string; price: number; quantity: number }>
 	>({});
-	const [itemDiscountType, setItemDiscountType] = useState<
-		"NONE" | "SENIOR" | "PWD"
-	>("NONE");
-	const [itemDiscountName, setItemDiscountName] = useState("");
-	const [itemDiscountId, setItemDiscountId] = useState("");
-	const [isFreeDrink, setIsFreeDrink] = useState(false);
 
 	const cupItems =
 		item?.inventory_items?.filter((ii) => ii.inventory.type === "CUP") ?? [];
 
 	const canUseFreeDrink = selectedInvItem !== null;
+	const canDiscount = !hasDiscountInCart;
+
+	const form = usePosItemCustomizeDialog({
+		item,
+		selectedInvItem,
+		cupItems,
+		selectedAddons,
+		onConfirm,
+		onClose,
+	});
 
 	useEffect(() => {
 		if (!item) return;
@@ -82,13 +85,8 @@ export function PosItemCustomizeDialog({
 		);
 		setShowAddons(false);
 		setSelectedAddons({});
-		setItemDiscountType("NONE");
-		setItemDiscountName("");
-		setItemDiscountId("");
-		setIsFreeDrink(false);
-	}, [item, cupItems.length, cupItems[0]?.inventory?.inventory_id]);
-
-	const canDiscount = !hasDiscountInCart;
+		form.reset();
+	}, [item, cupItems.length, cupItems[0]?.inventory?.inventory_id, form]);
 
 	if (!item) return null;
 
@@ -123,76 +121,6 @@ export function PosItemCustomizeDialog({
 				[addon.addon_id]: { ...existing, quantity: existing.quantity - 1 },
 			};
 		});
-	};
-
-	const getCupInfo = (invId: string) => {
-		const match = cupItems.find((c) => c.inventory.inventory_id === invId);
-		if (!match) return { cup_type: "NONE", cup_size: "NONE" };
-		return parseCupInfo(match.inventory.name);
-	};
-
-	const handleConfirm = () => {
-		if (
-			itemDiscountType !== "NONE" &&
-			(!itemDiscountName.trim() || !itemDiscountId.trim())
-		) {
-			toast.error("Please enter name and ID for senior/PWD discount");
-			return;
-		}
-
-		const addonItems = Object.entries(selectedAddons)
-			.filter(([, v]) => v.quantity > 0)
-			.map(([id, v]) => ({
-				addon_id: id,
-				name: v.name,
-				price: v.price,
-				quantity: v.quantity,
-			}));
-
-		const addonsTotal = addonItems.reduce(
-			(sum, a) => sum + a.price * a.quantity,
-			0,
-		);
-
-		let finalUnitPrice = basePrice + addonsTotal;
-
-		if (isFreeDrink) {
-			finalUnitPrice = 0;
-		} else if (itemDiscountType !== "NONE") {
-			finalUnitPrice = finalUnitPrice - finalUnitPrice * 0.05;
-		}
-
-		const cupInfo = selectedInvItem
-			? getCupInfo(selectedInvItem)
-			: { cup_type: "NONE", cup_size: "NONE" };
-		const addonKey = addonItems
-			.map((a) => `${a.addon_id}x${a.quantity}`)
-			.join("_");
-		const lineKey = cartLineKey(
-			item.menu_id,
-			cupInfo.cup_type,
-			cupInfo.cup_size,
-			addonKey || undefined,
-			isFreeDrink,
-			itemDiscountType !== "NONE" ? itemDiscountType : undefined,
-		);
-
-		onConfirm({
-			lineKey,
-			menu_id: item.menu_id,
-			menu_name: item.name,
-			cup_type: cupInfo.cup_type,
-			cup_size: cupInfo.cup_size,
-			unit_price: finalUnitPrice,
-			total_price: finalUnitPrice,
-			discount: itemDiscountType !== "NONE" ? itemDiscountType : undefined,
-			discount_name: itemDiscountType !== "NONE" ? itemDiscountName : undefined,
-			discount_id: itemDiscountType !== "NONE" ? itemDiscountId : undefined,
-			is_free_drink: isFreeDrink || undefined,
-			addon_items: addonItems.length > 0 ? addonItems : undefined,
-		});
-
-		onClose();
 	};
 
 	const liveAddonsTotal = Object.values(selectedAddons).reduce(
@@ -293,70 +221,155 @@ export function PosItemCustomizeDialog({
 			<div className="mt-4 border-t border-border pt-4">
 				{canDiscount ? (
 					<>
-						<div className="mb-3 flex items-center justify-between">
-							<p className="text-xs font-bold tracking-wider uppercase text-muted-foreground">
-								Discount
-							</p>
-							<Select
-								value={itemDiscountType}
-								onValueChange={(v) => setItemDiscountType(v ?? "NONE")}
-							>
-								<SelectTrigger className="w-auto rounded-full text-[10px] font-semibold h-8 px-3 py-1">
-									<SelectValue placeholder="None" />
-								</SelectTrigger>
-								<SelectContent>
-									<SelectItem value="NONE">None</SelectItem>
-									<SelectItem value="SENIOR">Senior (5%)</SelectItem>
-									<SelectItem value="PWD">PWD (5%)</SelectItem>
-								</SelectContent>
-							</Select>
-						</div>
+						<form.AppField
+							name="discountType"
+							listeners={{
+								onChange: ({ value }) => {
+									if (value !== "NONE") form.setFieldValue("quantity", 1);
+								},
+							}}
+						>
+							{(field) => (
+								<div className="mb-3 flex items-center justify-between">
+									<p className="text-xs font-bold tracking-wider uppercase text-muted-foreground">
+										Discount
+									</p>
+									<Select
+										value={field.state.value}
+										onValueChange={(v) => field.handleChange(v ?? "NONE")}
+									>
+										<SelectTrigger className="w-auto rounded-full text-[10px] font-semibold h-8 px-3 py-1">
+											<SelectValue placeholder="None" />
+										</SelectTrigger>
+										<SelectContent>
+											<SelectItem value="NONE">None</SelectItem>
+											<SelectItem value="SENIOR">Senior (5%)</SelectItem>
+											<SelectItem value="PWD">PWD (5%)</SelectItem>
+										</SelectContent>
+									</Select>
+								</div>
+							)}
+						</form.AppField>
 
-						{itemDiscountType !== "NONE" ? (
-							<div className="mb-3 space-y-2">
-								<Input
-									type="text"
-									value={itemDiscountName}
-									onChange={(e) => setItemDiscountName(e.target.value)}
-									placeholder="Name"
-									className="h-9 w-full rounded-lg border border-border px-3 text-xs outline-none bg-background"
-								/>
-								<Input
-									type="text"
-									value={itemDiscountId}
-									onChange={(e) => setItemDiscountId(e.target.value)}
-									placeholder="ID Number"
-									className="h-9 w-full rounded-lg border border-border px-3 text-xs outline-none bg-background"
-								/>
-							</div>
-						) : null}
+						<form.Subscribe selector={(state) => state.values.discountType}>
+							{(discountType) =>
+								discountType !== "NONE" ? (
+									<div className="mb-3 space-y-2">
+										<form.AppField name="discountName">
+											{(field) => (
+												<field.Input label="Name" placeholder="Full name" />
+											)}
+										</form.AppField>
+										<form.AppField name="discountId">
+											{(field) => (
+												<field.Input label="ID Number" placeholder="ID #" />
+											)}
+										</form.AppField>
+									</div>
+								) : null
+							}
+						</form.Subscribe>
 					</>
 				) : null}
 
 				{canUseFreeDrink && !hasFreeDrinkInCart ? (
-					<div className="flex items-center justify-between rounded-lg bg-muted p-2.5">
-						<span className="text-xs font-semibold text-foreground">
-							Free Drink
-						</span>
-						<Switch checked={isFreeDrink} onCheckedChange={setIsFreeDrink} />
-					</div>
+					<form.AppField name="isFreeDrink">
+						{(field) => (
+							<div className="flex items-center justify-between rounded-lg bg-muted p-2.5">
+								<span className="text-xs font-semibold text-foreground">
+									Free Drink
+								</span>
+								<Switch
+									id={field.name}
+									checked={field.state.value}
+									onCheckedChange={(checked) => {
+										field.handleChange(checked);
+										if (checked) form.setFieldValue("quantity", 1);
+									}}
+								/>
+							</div>
+						)}
+					</form.AppField>
 				) : null}
 			</div>
 
-			<div className="mt-4 flex items-center justify-between rounded-xl bg-muted px-4 py-3">
-				<span className="text-xs font-semibold text-muted-foreground">
-					Total{liveAddonsTotal > 0 && !isFreeDrink ? " (incl. add-ons)" : ""}
-				</span>
-				<span className="text-sm font-bold text-foreground">
-					{formatPeso(isFreeDrink ? 0 : basePrice + liveAddonsTotal)}
-				</span>
-			</div>
+			{/* Quantity */}
+			<form.Subscribe
+				selector={(state) => ({
+					isFreeDrink: state.values.isFreeDrink,
+					discountType: state.values.discountType,
+				})}
+			>
+				{(vals) => {
+					const quantityLocked =
+						vals.isFreeDrink || vals.discountType !== "NONE";
+					return (
+						<div className="mt-4 flex items-center justify-between">
+							<p className="text-xs font-bold tracking-wider uppercase text-muted-foreground">
+								Quantity
+							</p>
+							<form.AppField name="quantity">
+								{(field) => (
+									<div className="flex items-center gap-2">
+										<Button
+											variant="secondary"
+											size="icon-xs"
+											disabled={quantityLocked || field.state.value <= 1}
+											onClick={() =>
+												field.handleChange(Math.max(1, field.state.value - 1))
+											}
+										>
+											<MinusIcon className="size-3" />
+										</Button>
+										<span className="w-5 text-center text-xs font-bold">
+											{field.state.value}
+										</span>
+										<Button
+											variant="default"
+											size="icon-xs"
+											disabled={quantityLocked}
+											onClick={() => field.handleChange(field.state.value + 1)}
+										>
+											<PlusIcon className="size-3" />
+										</Button>
+									</div>
+								)}
+							</form.AppField>
+						</div>
+					);
+				}}
+			</form.Subscribe>
+
+			<form.Subscribe
+				selector={(state) => ({
+					isFreeDrink: state.values.isFreeDrink,
+					quantity: state.values.quantity,
+				})}
+			>
+				{(vals) => (
+					<div className="mt-4 flex items-center justify-between rounded-xl bg-muted px-4 py-3">
+						<span className="text-xs font-semibold text-muted-foreground">
+							Total
+							{liveAddonsTotal > 0 && !vals.isFreeDrink
+								? " (incl. add-ons)"
+								: ""}
+						</span>
+						<span className="text-sm font-bold text-foreground">
+							{formatPeso(
+								vals.isFreeDrink
+									? 0
+									: (basePrice + liveAddonsTotal) * vals.quantity,
+							)}
+						</span>
+					</div>
+				)}
+			</form.Subscribe>
 
 			<div className="mt-4 flex gap-2">
 				<Button variant="ghost" className="flex-1" onClick={onClose}>
 					Cancel
 				</Button>
-				<Button className="flex-1" onClick={handleConfirm}>
+				<Button className="flex-1" onClick={() => form.handleSubmit()}>
 					Add to cart
 				</Button>
 			</div>

@@ -77,6 +77,7 @@ export function PosReceiptDialog({
 
 					<div className="mb-4 space-y-3">
 						{order.items?.map((item, idx) => (
+							// biome-ignore lint/suspicious/noArrayIndexKey: Items are uniquely identified by their index
 							<div key={idx} className="text-[10px] leading-tight">
 								<div className="grid grid-cols-[40px_1fr_60px] font-bold">
 									<span>{Math.round(item.quantity)}x</span>

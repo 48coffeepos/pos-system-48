@@ -71,6 +71,7 @@ export function PosScreen() {
 		lineKey: string;
 		menu_id: string;
 		menu_name: string;
+		quantity: number;
 		cup_type: string;
 		cup_size: string;
 		unit_price: number;
@@ -86,7 +87,7 @@ export function PosScreen() {
 			quantity: number;
 		}>;
 	}) => {
-		addToCart({ ...params, quantity: 1 } as CartItem);
+		addToCart(params as CartItem);
 	};
 
 	const handleProductClick = useCallback(
@@ -227,7 +228,7 @@ export function PosScreen() {
 
 	return (
 		<div
-			className="flex h-screen flex-col overflow-x-auto"
+			className="flex h-full flex-col overflow-x-auto"
 			style={{ background: "var(--warm-beige)" }}
 		>
 			<div className="flex flex-col h-full min-w-5xl">
