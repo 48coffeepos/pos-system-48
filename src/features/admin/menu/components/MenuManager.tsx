@@ -1,12 +1,22 @@
-import { CoffeeIcon, MagnifyingGlassIcon, PlusIcon, XIcon } from "@phosphor-icons/react";
+import {
+  CoffeeIcon,
+  MagnifyingGlassIcon,
+  PlusIcon,
+  XIcon,
+} from "@phosphor-icons/react";
 import Fuse from "fuse.js";
 import { useMemo, useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { cn } from "@/lib/utils";
 
 import type { InventoryItem } from "@/features/admin/inventory/components/AddInventoryItem";
 import { Input } from "@/components/ui/input";
-import { deleteMenuMutationOptions } from "../mutationOptions";
+import { deleteMenuMutationOptions, createAddOnMutationOptions } from "../mutationOptions";
+import { getAllAddOnsQueryOptions } from "../queryOptions";
 import type { MenuListItem } from "../types";
+import type { AddOnFormInput } from "../schemas/add-on";
+import { AddOnModal } from "./AddOnModal";
+import { AddOnSection } from "./AddOnSection";
 import { MenuDeleteDialog } from "./MenuDeleteDialog";
 import { MenuGrid } from "./MenuGrid";
 import { MenuModal } from "./MenuModal";
@@ -16,15 +26,19 @@ interface MenuManagerProps {
   inventoryItems: InventoryItem[];
 }
 
+type Tab = "menu" | "add-ons";
+
 function MenuManager({ menuItems, inventoryItems }: MenuManagerProps) {
+  const [tab, setTab] = useState<Tab>("menu");
   const [menuModal, setMenuModal] = useState<
-    | { kind: "closed" }
-    | { kind: "new" }
-    | { kind: "edit"; item: MenuListItem }
+    { kind: "closed" } | { kind: "new" } | { kind: "edit"; item: MenuListItem }
   >({ kind: "closed" });
   const [deleteTarget, setDeleteTarget] = useState<MenuListItem | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [addOnModalOpen, setAddOnModalOpen] = useState(false);
   const deleteMutation = useMutation(deleteMenuMutationOptions);
+  const createAddOnMutation = useMutation(createAddOnMutationOptions);
+  const { data: addOns, isLoading, isError, error, refetch } = useQuery(getAllAddOnsQueryOptions);
 
   const fuseIndex = useMemo(
     () =>
@@ -53,6 +67,14 @@ function MenuManager({ menuItems, inventoryItems }: MenuManagerProps) {
 
   const hasSearchResults = filteredItems.length > 0;
   const isSearching = searchQuery.trim().length > 0;
+
+  const handleSaveAddOn = async (data: AddOnFormInput) => {
+    await createAddOnMutation.mutateAsync({
+      name: data.name.trim(),
+      amount: data.amount,
+    });
+    setAddOnModalOpen(false);
+  };
 
   return (
     <div className="min-h-screen">
@@ -101,47 +123,86 @@ function MenuManager({ menuItems, inventoryItems }: MenuManagerProps) {
         </div>
       </div>
 
-      {menuItems.length > 0 ? (
-        hasSearchResults ? (
-          <MenuGrid
-            items={filteredItems}
-            onEdit={(item) => setMenuModal({ kind: "edit", item })}
-            onDelete={(item) => setDeleteTarget(item)}
-          />
-        ) : isSearching ? (
+      <div className="mb-6 flex gap-1.5 rounded-full bg-(--light-gray)/30 p-1 w-fit">
+        <button
+          type="button"
+          onClick={() => setTab("menu")}
+          className={cn(
+            "rounded-full px-5 py-2 text-sm font-medium transition-colors",
+            tab === "menu"
+              ? "bg-(--deep-forest) text-(--pure-white)"
+              : "text-(--medium-gray) hover:bg-(--light-gray)/50",
+          )}
+        >
+          Menu Items
+        </button>
+        <button
+          type="button"
+          onClick={() => setTab("add-ons")}
+          className={cn(
+            "rounded-full px-5 py-2 text-sm font-medium transition-colors",
+            tab === "add-ons"
+              ? "bg-(--deep-forest) text-(--pure-white)"
+              : "text-(--medium-gray) hover:bg-(--light-gray)/50",
+          )}
+        >
+          Add-ons
+        </button>
+      </div>
+
+      {tab === "add-ons" && (
+        <AddOnSection
+          addOns={addOns ?? []}
+          isLoading={isLoading}
+          isError={isError}
+          error={error}
+          onRetry={() => refetch()}
+          onAddClick={() => setAddOnModalOpen(true)}
+        />
+      )}
+
+      {tab === "menu" &&
+        (menuItems.length > 0 ? (
+          hasSearchResults ? (
+            <MenuGrid
+              items={filteredItems}
+              onEdit={(item) => setMenuModal({ kind: "edit", item })}
+              onDelete={(item) => setDeleteTarget(item)}
+            />
+          ) : isSearching ? (
+            <div className="flex h-64 flex-col items-center justify-center">
+              <MagnifyingGlassIcon
+                weight="bold"
+                className="mb-3 h-12 w-12 text-(--medium-gray)"
+              />
+              <p className="text-sm text-(--medium-gray)">
+                No results for "{searchQuery}"
+              </p>
+              <button
+                type="button"
+                onClick={() => setSearchQuery("")}
+                className="mt-4 rounded-xl border border-(--light-gray) px-5 py-2.5 text-sm font-semibold text-(--deep-forest) transition-colors hover:bg-(--off-white)"
+              >
+                Clear search
+              </button>
+            </div>
+          ) : null
+        ) : (
           <div className="flex h-64 flex-col items-center justify-center">
-            <MagnifyingGlassIcon
+            <CoffeeIcon
               weight="bold"
               className="mb-3 h-12 w-12 text-(--medium-gray)"
             />
-            <p className="text-sm text-(--medium-gray)">
-              No results for "{searchQuery}"
-            </p>
+            <p className="text-sm text-(--medium-gray)">No menu items yet</p>
             <button
               type="button"
-              onClick={() => setSearchQuery("")}
+              onClick={() => setMenuModal({ kind: "new" })}
               className="mt-4 rounded-xl border border-(--light-gray) px-5 py-2.5 text-sm font-semibold text-(--deep-forest) transition-colors hover:bg-(--off-white)"
             >
-              Clear search
+              Add your first item
             </button>
           </div>
-        ) : null
-      ) : (
-        <div className="flex h-64 flex-col items-center justify-center">
-          <CoffeeIcon
-            weight="bold"
-            className="mb-3 h-12 w-12 text-(--medium-gray)"
-          />
-          <p className="text-sm text-(--medium-gray)">No menu items yet</p>
-          <button
-            type="button"
-            onClick={() => setMenuModal({ kind: "new" })}
-            className="mt-4 rounded-xl border border-(--light-gray) px-5 py-2.5 text-sm font-semibold text-(--deep-forest) transition-colors hover:bg-(--off-white)"
-          >
-            Add your first item
-          </button>
-        </div>
-      )}
+        ))}
 
       <MenuModal
         key={
@@ -152,6 +213,12 @@ function MenuManager({ menuItems, inventoryItems }: MenuManagerProps) {
         inventoryItems={inventoryItems}
         modal={menuModal}
         onClose={() => setMenuModal({ kind: "closed" })}
+      />
+
+      <AddOnModal
+        open={addOnModalOpen}
+        onClose={() => setAddOnModalOpen(false)}
+        onSave={handleSaveAddOn}
       />
 
       <MenuDeleteDialog

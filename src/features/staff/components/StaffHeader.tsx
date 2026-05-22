@@ -19,7 +19,7 @@ import { cn } from "@/lib/utils";
 const navLinks = [
 	{ label: "POS", path: "/staff/pos", icon: ShoppingCartIcon },
 	{ label: "Inventory", path: "/staff/inventory", icon: PackageIcon },
-	{ label: "Expenses", path: "/staff/expenses", icon: CurrencyDollarIcon },
+	{ label: "Cash Logs", path: "/staff/expenses", icon: CurrencyDollarIcon },
 	{ label: "Orders", path: "/staff/orders", icon: ClipboardTextIcon },
 	{ label: "X-Reading", path: "/staff/xreading", icon: CalculatorIcon },
 ];

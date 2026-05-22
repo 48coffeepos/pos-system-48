@@ -6,12 +6,13 @@ import {
   RoutePendingBoundary,
 } from "@/components/route-boundaries";
 import { MenuManager } from "@/features/admin/menu/components/MenuManager";
-import { getAllMenuQueryOptions } from "@/features/admin/menu/queryOptions";
+import { getAllMenuQueryOptions, getAllAddOnsQueryOptions } from "@/features/admin/menu/queryOptions";
 import { getAllInventoryQueryOptions } from "@/features/admin/inventory/queryOptions";
 
 export const Route = createFileRoute("/admin/menu")({
   loader: async ({ context: { queryClient } }) => {
     await queryClient.ensureQueryData(getAllMenuQueryOptions);
+    await queryClient.ensureQueryData(getAllAddOnsQueryOptions);
     await queryClient.ensureQueryData(getAllInventoryQueryOptions);
   },
   pendingComponent: RoutePendingBoundary,
