@@ -77,12 +77,16 @@ export function AddExpenseForm() {
       <form.AppField name="description">
         {(field) => (
           <div className="mb-4">
+
             <label htmlFor={field.name} className="mb-1.5 block text-sm font-medium text-(--deep-forest)">
-              Description
-            </label>
+              Description 
+              </label>
+              {field.state.value.trim().length === 0 && (
+                <span className="text-red-500 text-[10px]">Required</span>
+              )}
             <input
               id={field.name}
-              placeholder="What is this for?"
+              placeholder="What is this for?" 
               value={field.state.value}
               onChange={(e) => {
                 if (e.target.value.length <= 50) field.handleChange(e.target.value);
@@ -106,8 +110,11 @@ export function AddExpenseForm() {
         {(field) => (
           <div className="mb-6">
             <label htmlFor={field.name} className="mb-1.5 block text-sm font-medium text-(--deep-forest)">
-              Amount
+              Amount 
             </label>
+              {field.state.value.trim().length === 0 && (
+                <span className="text-red-500 text-[10px]">Required</span>
+              )}
             <input
               id={field.name}
               type="text"
@@ -128,20 +135,24 @@ export function AddExpenseForm() {
       <form.AppForm>
         <form.Subscribe
           selector={(state) => ({
-            canSubmit: state.canSubmit,
             isSubmitting: state.isSubmitting,
             type: state.values.type,
+            description: state.values.description,
+            amount: state.values.amount,
           })}
         >
-          {({ canSubmit, isSubmitting, type }) => (
-            <Button type="submit" disabled={!canSubmit} className="w-full">
-              {isSubmitting
-                ? "Saving..."
-                : type === "CASH_IN"
-                  ? "Record Cash In"
-                  : "Record Cash Out"}
-            </Button>
-          )}
+          {({ isSubmitting, type, description, amount }) => {
+            const canSubmit = description.trim().length > 0 && amount.length > 0 && Number(amount) > 0;
+            return (
+              <Button type="submit" disabled={!canSubmit || isSubmitting} className="w-full">
+                {isSubmitting
+                  ? "Saving..."
+                  : type === "CASH_IN"
+                    ? "Record Cash In"
+                    : "Record Cash Out"}
+              </Button>
+            );
+          }}
         </form.Subscribe>
       </form.AppForm>
     </form>
