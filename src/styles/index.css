@@ -114,13 +114,9 @@ select {
   color: var(--coral);
 }
 
-/* Scrollbar */
-.scrollbar-none {
-  scrollbar-width: none;
-}
-
-.scrollbar-none::-webkit-scrollbar {
-  display: none;
+/* Scrollbar - always visible to prevent layout shift */
+html {
+  overflow-y: scroll;
 }
 
 ::-webkit-scrollbar {

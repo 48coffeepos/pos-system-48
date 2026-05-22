@@ -17,7 +17,7 @@ export const Route = createFileRoute("/staff")({
 
 function StaffLayout() {
 	return (
-		<main className="min-h-screen">
+		<main className="h-screen flex flex-col">
 			<StaffHeader />
 			<Outlet />
 		</main>

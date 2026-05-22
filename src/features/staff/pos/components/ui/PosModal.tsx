@@ -1,5 +1,7 @@
+import { XIcon } from "@phosphor-icons/react";
 import type { ReactNode } from "react";
-import { X } from "@phosphor-icons/react";
+import { AlertDialog, AlertDialogContent } from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 interface PosModalProps {
@@ -19,36 +21,27 @@ export function PosModal({
 	showClose = false,
 	overlayClassName,
 }: PosModalProps) {
-	if (!open) return null;
-
 	return (
-		<div
-			className={cn(
-				"fixed inset-0 z-50 flex items-center justify-center p-4 transition-opacity duration-200",
-				overlayClassName,
-			)}
-			style={{ background: "rgba(0,0,0,0.4)" }}
-			onClick={onClose}
+		<AlertDialog
+			open={open}
+			onOpenChange={(isOpen) => {
+				if (!isOpen) onClose();
+			}}
 		>
-			<div
-				onClick={(e) => e.stopPropagation()}
-				className={cn(
-					"relative w-full max-w-sm rounded-3xl bg-(--pure-white) p-6 transition-all duration-200",
-					className,
-				)}
-			>
+			<AlertDialogContent className={cn(overlayClassName, className)}>
 				{showClose ? (
-					<button
-						type="button"
+					<Button
+						variant="ghost"
+						size="icon"
 						onClick={onClose}
-						className="absolute top-4 right-4 rounded-full p-2 text-(--medium-gray) transition-colors hover:bg-(--off-white)"
+						className="absolute top-4 right-4 rounded-full"
 						aria-label="Close"
 					>
-						<X className="size-5" />
-					</button>
+						<XIcon className="size-5" />
+					</Button>
 				) : null}
 				{children}
-			</div>
-		</div>
+			</AlertDialogContent>
+		</AlertDialog>
 	);
 }

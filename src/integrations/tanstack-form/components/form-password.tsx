@@ -22,7 +22,7 @@ function FormPassword({ label, description, placeholder }: FormPasswordProps) {
 
   return (
     <FormField label={label} description={description}>
-      <InputGroup>
+      <InputGroup className='border-(--deep-forest)'>
         <InputGroupInput
           id={field.name}
           type={showPassword ? 'text' : 'password'}
