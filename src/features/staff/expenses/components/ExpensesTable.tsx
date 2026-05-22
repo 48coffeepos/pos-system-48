@@ -1,11 +1,13 @@
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { type ColumnDef, createColumnHelper } from "@tanstack/react-table";
 import {
   ArrowDownRightIcon,
   ArrowUpRightIcon,
   CurrencyDollarIcon,
+  WarningCircleIcon,
 } from "@phosphor-icons/react";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/ui/data-table";
 import { cn } from "@/lib/utils";
 import { getExpensesQueryOptions } from "../queryOptions";
@@ -93,9 +95,28 @@ const columns = [
 
 export function ExpensesTable() {
   const [timeframe, setTimeframe] = useState<Timeframe>("today");
-  const { data: expenses } = useSuspenseQuery(
+  const { data: expenses, isLoading, isError, error, refetch } = useQuery(
     getExpensesQueryOptions(timeframe),
   );
+
+  if (isError) {
+    return (
+      <div className="rounded-2xl border border-(--light-gray) bg-(--pure-white) p-12">
+        <div className="flex flex-col items-center justify-center gap-4 text-center">
+          <WarningCircleIcon weight="fill" className="size-10 text-(--error)" />
+          <div>
+            <p className="text-base font-semibold text-(--deep-forest)">Failed to load expenses</p>
+            <p className="mt-1 text-sm text-(--medium-gray)">
+              {error instanceof Error ? error.message : "Something went wrong"}
+            </p>
+          </div>
+          <Button onClick={() => refetch()} variant="outline" size="sm">
+            Retry
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="rounded-2xl border border-(--light-gray) bg-(--pure-white)">
@@ -111,9 +132,13 @@ export function ExpensesTable() {
             <h2 className="text-base font-semibold text-(--deep-forest)">
               Cash Records
             </h2>
-            <p className="text-xs text-(--medium-gray)">
-              {expenses.length} {expenses.length === 1 ? "entry" : "entries"}
-            </p>
+            {isLoading ? (
+              <p className="text-xs text-(--medium-gray)">Loading...</p>
+            ) : (
+              <p className="text-xs text-(--medium-gray)">
+                {expenses?.length ?? 0} {(expenses?.length ?? 0) === 1 ? "entry" : "entries"}
+              </p>
+            )}
           </div>
         </div>
         <div className="flex gap-1.5 rounded-full bg-(--light-gray)/30 p-1">
@@ -144,7 +169,13 @@ export function ExpensesTable() {
         </div>
       </div>
       <div className="p-2">
-        <DataTable<ExpenseRow, string | number> columns={columns} data={expenses} />
+        {isLoading ? (
+          <div className="flex items-center justify-center py-16">
+            <span className="h-5 w-5 animate-spin rounded-full border-2 border-(--deep-forest) border-t-transparent" />
+          </div>
+        ) : (
+          <DataTable<ExpenseRow, string | number> columns={columns} data={expenses ?? []} />
+        )}
       </div>
     </div>
   );
