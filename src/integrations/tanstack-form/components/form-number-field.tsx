@@ -4,23 +4,30 @@ import { Input } from "@/components/ui/input";
 import { useFieldContext } from "../index";
 import { FormField } from "./form-field";
 
-interface FormInputProps {
+interface FormNumberFieldProps {
 	label: string;
 	description?: string;
 	placeholder?: string;
-	type?: string;
+	step?: string;
+	min?: string;
+	max?: string;
 }
 
-function FormInput({ label, description, ...props }: FormInputProps) {
-	const field = useFieldContext<string>();
+function FormNumberField({
+	label,
+	description,
+	...props
+}: FormNumberFieldProps) {
+	const field = useFieldContext<number>();
 	const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
 
 	return (
 		<FormField label={label} description={description}>
 			<Input
 				id={field.name}
+				type="number"
 				value={field.state.value}
-				onChange={(e) => field.handleChange(e.target.value)}
+				onChange={(e) => field.handleChange(e.target.valueAsNumber)}
 				onBlur={field.handleBlur}
 				aria-invalid={isInvalid}
 				{...props}
@@ -29,5 +36,5 @@ function FormInput({ label, description, ...props }: FormInputProps) {
 	);
 }
 
-export type { FormInputProps };
-export { FormInput };
+export type { FormNumberFieldProps };
+export { FormNumberField };

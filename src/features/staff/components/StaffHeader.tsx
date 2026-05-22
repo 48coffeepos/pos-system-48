@@ -23,7 +23,7 @@ interface StaffHeaderProps {
 const navLinks = [
   { label: "POS", path: "/staff/pos", icon: ShoppingCart },
   { label: "Inventory", path: "/staff/inventory", icon: Package },
-  { label: "Expenses", path: "/staff/expenses", icon: CurrencyDollar },
+  { label: "Cash Logs", path: "/staff/expenses", icon: CurrencyDollar },
   { label: "Orders", path: "/staff/orders", icon: ClipboardText },
   { label: "X-Reading", path: "/staff/xreading", icon: Calculator },
 ];
