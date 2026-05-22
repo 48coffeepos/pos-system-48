@@ -89,37 +89,37 @@ export function XReadingReceiptDialog({
 
 						<div className="text-[11px] font-bold space-y-1">
 							<div className="flex justify-between">
-								<span>TOTAL CASH IN</span>
+								<span>TOTAL CASH IN:</span>
 								<span>{totalCashIn.toFixed(2)}</span>
 							</div>
 							<div className="flex justify-between">
-								<span>TOTAL SALES</span>
+								<span>TOTAL SALES:</span>
 								<span>{totalCashSales.toFixed(2)}</span>
 							</div>
 						</div>
 
 						<div className="mt-4 border-t border-dashed border-black pt-4 text-[11px] font-bold space-y-1">
 							<div className="flex justify-between">
-								<span>GROSS SALES</span>
+								<span>GROSS SALES:</span>
 								<span>{grossSales.toFixed(2)}</span>
 							</div>
 							<div className="flex justify-between">
-								<span>TOTAL PICKUP</span>
+								<span>TOTAL PICKUP:</span>
 								<span>{totalCashOut.toFixed(2)}</span>
 							</div>
 						</div>
 
 						<div className="mt-4 border-t-2 border-dashed border-black pt-4 text-[11px] font-bold space-y-1">
 							<div className="flex justify-between">
-								<span>NET SALES</span>
+								<span>NET SALES:</span>
 								<span>{netSales.toFixed(2)}</span>
 							</div>
 							<div className="flex justify-between mt-2">
-								<span>CASH COUNT</span>
+								<span>CASH COUNT:</span>
 								<span>{totalCashCounted.toFixed(2)}</span>
 							</div>
 							<div className="flex justify-between mt-2">
-								<span>OVER / SHORT</span>
+								<span>OVER / SHORT:</span>
 								<span>
 									{overShort > 0 ? "+" : ""}
 									{overShort.toFixed(2)}
