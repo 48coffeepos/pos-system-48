@@ -55,13 +55,15 @@ function AdminHeader() {
 					to={adminTo("/admin")}
 					className="flex shrink-0 items-center gap-2 no-underline"
 				>
-					<div className="flex size-9 items-center justify-center rounded-xl bg-(--deep-forest)">
-						<CoffeeIcon weight="fill" className="size-5 text-(--pale-yellow)" />
+					<div className="flex size-16 items-center justify-center overflow-hidden">
+						<img src="/logo.png" alt="48 Coffee Co. Logo" className="size-16 object-contain" />
 					</div>
-					<span className="hidden text-lg font-bold tracking-tight text-(--deep-forest) sm:inline">
-						48° Coffee
-					</span>
 				</Link>
+
+				<Separator
+						  orientation="vertical"
+						  className="hidden h-16 bg-(--light-gray) sm:block"
+						/>
 
 				<nav className="hidden items-center gap-1 lg:flex">
 					{navLinks.map((link) => {

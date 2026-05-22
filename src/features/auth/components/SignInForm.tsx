@@ -28,7 +28,7 @@ export function SignInForm() {
 
 				{/* Submit Button */}
 				<form.AppForm>
-					<form.SubmitButton label="Sign In" />
+					<form.SubmitButton label="Log In" />
 				</form.AppForm>
 			</form>
 		</div>

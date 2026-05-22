@@ -1,4 +1,3 @@
-import { CurrencyDollarIcon } from "@phosphor-icons/react";
 import { createFileRoute } from "@tanstack/react-router";
 import { AddExpenseForm } from "@/features/staff/expenses/components/AddExpenseForm";
 import { ExpensesTable } from "@/features/staff/expenses/components/ExpensesTable";
