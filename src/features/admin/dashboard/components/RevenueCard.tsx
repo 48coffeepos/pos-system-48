@@ -1,4 +1,4 @@
-import { DownloadIcon } from "@phosphor-icons/react";
+import { Printer } from "@phosphor-icons/react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { PAYMENTS, type PaymentMethodFilter } from "../constants";
@@ -50,10 +50,10 @@ export function RevenueCard({
 							variant="ghost"
 							size="icon"
 							onClick={onExportClick}
-							title="Export Options"
+							title="Print Receipt"
 							className="rounded-xl border border-(--light-gray) hover:bg-gray-100"
 						>
-							<DownloadIcon className="w-4 h-4 text-(--deep-forest)" />
+							<Printer className="w-4 h-4 text-(--deep-forest)" />
 						</Button>
 					</div>
 					<p className="text-xs mt-2 text-(--medium-gray)">

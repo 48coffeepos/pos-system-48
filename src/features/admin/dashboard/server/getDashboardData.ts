@@ -65,21 +65,21 @@ export const getDashboardData = createServerFn({ method: "GET" }).handler(
       });
     }
 
-    const cupOrderItems = await prisma.orderItem.findMany({
-      where: {
-        order: { created_at: { gte: start, lt: end } },
-        inventory: { type: "CUP" },
-      },
-      select: {
-        quantity: true,
-        inventory: { select: { name: true } },
-        order: { select: { method: true } },
-      },
-    });
+	const cupOrderItems = await prisma.orderItem.findMany({
+		where: {
+			order: { created_at: { gte: start, lt: end } },
+			menu: { type: "CUP" },
+		},
+		select: {
+			quantity: true,
+			snapshot_inventory: true,
+			order: { select: { method: true } },
+		},
+	});
 
-    for (const item of cupOrderItems) {
-      const cupName = item.inventory?.name;
-      if (!cupName) continue;
+	for (const item of cupOrderItems) {
+		const cupName = item.snapshot_inventory;
+		if (!cupName) continue;
       const method = item.order?.method;
       if (!method) continue;
 
