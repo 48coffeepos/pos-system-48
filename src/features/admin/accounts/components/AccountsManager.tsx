@@ -36,7 +36,7 @@ export function AccountsManager({ users }: AccountsManagerProps) {
 			setAccountPendingDelete(null);
 		} catch (error) {
 			toast.error(
-				error instanceof Error ? error.message : "Failed to delete account",
+				(error as Error)?.message ?? "Failed to delete account",
 			);
 		}
 	};

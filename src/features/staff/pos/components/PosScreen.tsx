@@ -212,7 +212,7 @@ export function PosScreen() {
 			toast.success(`Order #${order.order_id} placed successfully!`);
 		} catch (err: unknown) {
 			console.error("Order placement failed:", err);
-			const msg = err instanceof Error ? err.message : "Unknown error";
+    const msg = (err as Error)?.message ?? "Unknown error";
 			toast.error(`Failed to place order: ${msg}`);
 		}
 	}, [

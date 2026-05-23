@@ -95,7 +95,7 @@ function AddOnSection({ addOns, isLoading, isError, error, onRetry, onAddClick, 
             <div>
               <p className="text-sm font-semibold text-(--deep-forest)">Failed to load add-ons</p>
               <p className="mt-1 text-xs text-(--medium-gray)">
-                {error instanceof Error ? error.message : "Something went wrong"}
+                {error?.message ?? "Something went wrong"}
               </p>
             </div>
             <Button onClick={onRetry} variant="outline" size="sm">

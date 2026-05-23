@@ -77,7 +77,7 @@ export function useAccountForm({
 				onCompleted();
 			} catch (error) {
 				toast.error(
-					error instanceof Error ? error.message : "Failed to save account",
+					(error as Error)?.message ?? "Failed to save account",
 				);
 			}
 		},

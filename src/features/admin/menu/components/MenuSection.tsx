@@ -1,5 +1,6 @@
-import { CoffeeIcon, MagnifyingGlassIcon, PlusIcon, XIcon } from "@phosphor-icons/react";
+import { CoffeeIcon, MagnifyingGlassIcon, PlusIcon, WarningCircleIcon, XIcon } from "@phosphor-icons/react";
 
+import { Button } from "@/components/ui/button";
 import type { MenuListItem } from "../types";
 import { MenuGrid } from "./MenuGrid";
 
@@ -7,6 +8,10 @@ interface MenuSectionProps {
   items: MenuListItem[];
   searchQuery: string;
   isSearching: boolean;
+  isLoading: boolean;
+  isError: boolean;
+  error: Error | null;
+  onRetry: () => void;
   onSearchChange: (query: string) => void;
   onClearSearch: () => void;
   onAddClick: () => void;
@@ -18,6 +23,10 @@ function MenuSection({
   items,
   searchQuery,
   isSearching,
+  isLoading,
+  isError,
+  error,
+  onRetry,
   onSearchChange,
   onClearSearch,
   onAddClick,
@@ -76,7 +85,24 @@ function MenuSection({
       </div>
 
       <div className="px-6 py-5">
-        {items.length > 0 ? (
+        {isError ? (
+          <div className="flex flex-col items-center justify-center gap-4 py-8 text-center">
+            <WarningCircleIcon weight="fill" className="size-10 text-(--error)" />
+            <div>
+              <p className="text-sm font-semibold text-(--deep-forest)">Failed to load menu items</p>
+              <p className="mt-1 text-xs text-(--medium-gray)">
+                {error?.message ?? "Something went wrong"}
+              </p>
+            </div>
+            <Button onClick={onRetry} variant="outline" size="sm">
+              Retry
+            </Button>
+          </div>
+        ) : isLoading ? (
+          <div className="flex items-center justify-center py-12">
+            <span className="h-5 w-5 animate-spin rounded-full border-2 border-(--deep-forest) border-t-transparent" />
+          </div>
+        ) : items.length > 0 ? (
           <MenuGrid items={items} onEdit={onEdit} onDelete={onDelete} />
         ) : isSearching ? (
           <div className="flex flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-(--light-gray) px-6 py-8 text-center">

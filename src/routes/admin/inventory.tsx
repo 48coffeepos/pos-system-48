@@ -8,13 +8,17 @@ import type { InventoryItem } from "@/features/admin/inventory/components/AddInv
 import { AddInventoryItem } from "@/features/admin/inventory/components/AddInventoryItem";
 import { InventoryList } from "@/features/admin/inventory/components/InventoryList";
 import { getAllInventoryQueryOptions } from "@/features/admin/inventory/queryOptions";
-import { RoutePendingBoundary } from "@/components/route-boundaries";
+import {
+  RouteErrorBoundary,
+  RoutePendingBoundary,
+} from "@/components/route-boundaries";
 
 export const Route = createFileRoute("/admin/inventory")({
 	loader: async ({ context: { queryClient } }) => {
 		await queryClient.ensureQueryData(getAllInventoryQueryOptions);
 	},
 	pendingComponent: RoutePendingBoundary,
+	errorComponent: RouteErrorBoundary,
 	component: AdminInventory,
 });
 
@@ -35,7 +39,7 @@ function AdminInventory() {
 								<div>
 									<p className="text-base font-semibold text-(--deep-forest)">Failed to load inventory</p>
 									<p className="mt-1 text-sm text-(--medium-gray)">
-										{error instanceof Error ? error.message : "Something went wrong"}
+										{error?.message ?? "Something went wrong"}
 									</p>
 								</div>
 								<Button onClick={() => refetch()} variant="outline" size="sm">

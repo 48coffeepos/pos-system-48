@@ -26,7 +26,7 @@ export const saveMenuMutationOptions = mutationOptions({
   },
   onError: (error) => {
     toast.error("Failed to save menu item", {
-      description: error instanceof Error ? error.message : "Unknown error",
+      description: error?.message ?? "Unknown error",
     });
   },
 });
@@ -39,7 +39,7 @@ export const deleteMenuMutationOptions = mutationOptions({
   },
   onError: (error) => {
     toast.error("Failed to delete menu item", {
-      description: error instanceof Error ? error.message : "Unknown error",
+      description: error?.message ?? "Unknown error",
     });
   },
 });
@@ -54,7 +54,7 @@ export const createAddOnMutationOptions = mutationOptions({
   },
   onError: (error) => {
     toast.error("Failed to create add-on", {
-      description: error instanceof Error ? error.message : "Unknown error",
+      description: error?.message ?? "Unknown error",
     });
   },
 });
@@ -67,7 +67,7 @@ export const deleteAddOnMutationOptions = mutationOptions({
   },
   onError: (error) => {
     toast.error("Failed to delete add-on", {
-      description: error instanceof Error ? error.message : "Unknown error",
+      description: error?.message ?? "Unknown error",
     });
   },
 });
@@ -82,7 +82,7 @@ export const updateAddOnMutationOptions = mutationOptions({
   },
   onError: (error) => {
     toast.error("Failed to update add-on", {
-      description: error instanceof Error ? error.message : "Unknown error",
+      description: error?.message ?? "Unknown error",
     });
   },
 });

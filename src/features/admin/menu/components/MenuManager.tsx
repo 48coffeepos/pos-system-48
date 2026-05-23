@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 
 import type { InventoryItem } from "@/features/admin/inventory/components/AddInventoryItem";
 import { deleteMenuMutationOptions, createAddOnMutationOptions, deleteAddOnMutationOptions, updateAddOnMutationOptions } from "../mutationOptions";
-import { getAllAddOnsQueryOptions } from "../queryOptions";
+import { getAllMenuQueryOptions, getAllAddOnsQueryOptions } from "../queryOptions";
 import type { MenuListItem } from "../types";
 import type { AddOnFormInput } from "../schemas/add-on";
 import type { AddOnItem } from "../types";
@@ -17,13 +17,12 @@ import { MenuModal } from "./MenuModal";
 import { MenuSection } from "./MenuSection";
 
 interface MenuManagerProps {
-  menuItems: MenuListItem[];
   inventoryItems: InventoryItem[];
 }
 
 type Tab = "menu" | "add-ons";
 
-function MenuManager({ menuItems, inventoryItems }: MenuManagerProps) {
+function MenuManager({ inventoryItems }: MenuManagerProps) {
   const [tab, setTab] = useState<Tab>("menu");
   const [menuModal, setMenuModal] = useState<
     { kind: "closed" } | { kind: "new" } | { kind: "edit"; item: MenuListItem }
@@ -38,21 +37,25 @@ function MenuManager({ menuItems, inventoryItems }: MenuManagerProps) {
   const createAddOnMutation = useMutation(createAddOnMutationOptions);
   const deleteAddOnMutation = useMutation(deleteAddOnMutationOptions);
   const updateAddOnMutation = useMutation(updateAddOnMutationOptions);
-  const { data: addOns, isLoading, isError, error, refetch } = useQuery(getAllAddOnsQueryOptions);
+  const { data: menuItems, isLoading: menuLoading, isError: menuIsError, error: menuError, refetch: menuRefetch } = useQuery(getAllMenuQueryOptions);
+  const { data: addOns, isLoading: addOnLoading, isError: addOnIsError, error: addOnError, refetch: addOnRefetch } = useQuery(getAllAddOnsQueryOptions);
+
+  const safeMenuItems = menuItems ?? [];
+  const safeAddOns = addOns ?? [];
 
   const fuseIndex = useMemo(
     () =>
-      new Fuse(menuItems, {
+      new Fuse(safeMenuItems, {
         keys: ["name", "menuInventories.inventoryName"],
         threshold: 0.3,
       }),
-    [menuItems],
+    [safeMenuItems],
   );
 
   const filteredItems = useMemo(() => {
-    if (!searchQuery.trim()) return menuItems;
+    if (!searchQuery.trim()) return safeMenuItems;
     return fuseIndex.search(searchQuery).map((result) => result.item);
-  }, [searchQuery, menuItems, fuseIndex]);
+  }, [searchQuery, safeMenuItems, fuseIndex]);
 
   const handleDelete = async () => {
     if (!deleteTarget) return;
@@ -128,6 +131,10 @@ function MenuManager({ menuItems, inventoryItems }: MenuManagerProps) {
           items={filteredItems}
           searchQuery={searchQuery}
           isSearching={isSearching}
+          isLoading={menuLoading}
+          isError={menuIsError}
+          error={menuError}
+          onRetry={() => menuRefetch()}
           onSearchChange={setSearchQuery}
           onClearSearch={() => setSearchQuery("")}
           onAddClick={() => setMenuModal({ kind: "new" })}
@@ -138,11 +145,11 @@ function MenuManager({ menuItems, inventoryItems }: MenuManagerProps) {
 
       {tab === "add-ons" && (
         <AddOnSection
-          addOns={addOns ?? []}
-          isLoading={isLoading}
-          isError={isError}
-          error={error}
-          onRetry={() => refetch()}
+          addOns={safeAddOns}
+          isLoading={addOnLoading}
+          isError={addOnIsError}
+          error={addOnError}
+          onRetry={() => addOnRefetch()}
           onAddClick={() => setAddOnModal({ kind: "new" })}
           onEdit={(item) => setAddOnModal({ kind: "edit", item })}
           onDelete={(item) => setAddOnDeleteTarget(item)}

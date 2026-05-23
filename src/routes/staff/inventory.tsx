@@ -29,7 +29,7 @@ function StaffInventory() {
 							<div>
 								<p className="text-base font-semibold text-(--deep-forest)">Failed to load inventory</p>
 								<p className="mt-1 text-sm text-(--medium-gray)">
-									{error instanceof Error ? error.message : "Something went wrong"}
+									{error?.message ?? "Something went wrong"}
 								</p>
 							</div>
 							<Button onClick={() => refetch()} variant="outline" size="sm">

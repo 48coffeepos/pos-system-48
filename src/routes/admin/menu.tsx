@@ -21,10 +21,9 @@ export const Route = createFileRoute("/admin/menu")({
 });
 
 function RouteComponent() {
-  const { data: menuItems } = useSuspenseQuery(getAllMenuQueryOptions);
   const { data: inventoryItems } = useSuspenseQuery(
     getAllInventoryQueryOptions,
   );
 
-  return <MenuManager menuItems={menuItems} inventoryItems={inventoryItems} />;
+  return <MenuManager inventoryItems={inventoryItems} />;
 }
