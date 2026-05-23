@@ -1,18 +1,16 @@
+import { useEffect } from "react";
 import { toast } from "sonner";
 import { useAppForm } from "@/integrations/tanstack-form";
 import { formatPeso } from "@/lib/format-currency";
-import { PosFormSchema, type PosFormValues } from "../schemas/posFormSchema";
+import { PosFormSchema } from "../schemas/posFormSchema";
 import { usePosStore } from "../stores/usePosStore";
 
 export function usePosForm() {
-	const defaultValues: PosFormValues = {
-		note: "",
-		paymentMethod: "CASH" as const,
-		amountPaid: "",
-		referenceNumber: "",
-	};
+	const formValues = usePosStore((state) => state.formValues);
+	const setFormValues = usePosStore((state) => state.setFormValues);
+
 	const form = useAppForm({
-		defaultValues,
+		defaultValues: formValues,
 		validators: {
 			onChange: PosFormSchema,
 		},
@@ -40,6 +38,25 @@ export function usePosForm() {
 			state.setShowPlaceOrderConfirm(true);
 		},
 	});
+
+	useEffect(() => {
+		const subscription = form.store.subscribe(() => {
+			setFormValues(form.state.values);
+		});
+		return () => subscription.unsubscribe();
+	}, [form, setFormValues]);
+
+	useEffect(() => {
+		const syncFormFromStore = () => {
+			form.reset(usePosStore.getState().formValues);
+		};
+
+		if (usePosStore.persist.hasHydrated()) {
+			syncFormFromStore();
+		}
+
+		return usePosStore.persist.onFinishHydration(syncFormFromStore);
+	}, [form]);
 
 	return form;
 }

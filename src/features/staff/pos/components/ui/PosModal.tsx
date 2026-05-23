@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { AlertDialog, AlertDialogContent } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { posBtnGhost } from "../../pos-ui";
 
 interface PosModalProps {
 	open: boolean;
@@ -28,13 +29,19 @@ export function PosModal({
 				if (!isOpen) onClose();
 			}}
 		>
-			<AlertDialogContent className={cn(overlayClassName, className)}>
+			<AlertDialogContent
+				className={cn(
+					"border-(--light-gray) bg-(--pure-white)",
+					overlayClassName,
+					className,
+				)}
+			>
 				{showClose ? (
 					<Button
 						variant="ghost"
 						size="icon"
 						onClick={onClose}
-						className="absolute top-4 right-4 rounded-full"
+						className={cn("absolute top-4 right-4 rounded-full", posBtnGhost)}
 						aria-label="Close"
 					>
 						<XIcon className="size-5" />

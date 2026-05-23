@@ -30,6 +30,7 @@ export function PosScreen() {
 		removeFromCart,
 		updateQuantity,
 		clearCart,
+		resetCheckout,
 	} = usePosStore();
 
 	const queryClient = useQueryClient();
@@ -80,6 +81,7 @@ export function PosScreen() {
 		discount_name?: string;
 		discount_id?: string;
 		is_free_drink?: boolean;
+		selected_inventory_id?: string;
 		addon_items?: Array<{
 			addon_id: string;
 			name: string;
@@ -108,6 +110,7 @@ export function PosScreen() {
 					cup_size: "NONE",
 					unit_price: price,
 					total_price: price,
+					selected_inventory_id: hasInventory ? item.inventory_items[0].inventory.inventory_id : undefined,
 				};
 				addToCart(newItem);
 			} else {
@@ -155,6 +158,7 @@ export function PosScreen() {
 					line_total: c.total_price,
 					cup_type: c.cup_type,
 					cup_size: c.cup_size,
+					selected_inventory_id: c.selected_inventory_id,
 					addon_items: c.addon_items?.map((a) => ({
 						addon_id: a.addon_id,
 						addon_name_snapshot: a.name,
@@ -202,8 +206,8 @@ export function PosScreen() {
 
 			setLastOrder(order);
 			setShowReceipt(true);
-			clearCart();
-			form.reset();
+			resetCheckout();
+			form.reset(usePosStore.getState().formValues);
 			setShowPlaceOrderConfirm(false);
 			toast.success(`Order #${order.order_id} placed successfully!`);
 		} catch (err: unknown) {
@@ -214,17 +218,13 @@ export function PosScreen() {
 	}, [
 		cart,
 		cartTotal,
-		clearCart,
+		resetCheckout,
 		createOrderMutation,
 		form,
 		setLastOrder,
 		setShowReceipt,
 		setShowPlaceOrderConfirm,
 	]);
-
-	const handlePrint = useCallback(() => {
-		window.print();
-	}, []);
 
 	return (
 		<div
@@ -271,7 +271,6 @@ export function PosScreen() {
 				order={lastOrder}
 				open={showReceipt}
 				onClose={() => setShowReceipt(false)}
-				onPrint={handlePrint}
 				cashierName={session?.user?.name || "Cashier"}
 			/>
 		</div>

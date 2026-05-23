@@ -38,6 +38,7 @@ export interface CartItem {
 	discount_name?: string;
 	discount_id?: string;
 	is_free_drink?: boolean;
+	selected_inventory_id?: string;
 }
 
 export interface PosOrder {
