@@ -1,0 +1,1 @@
+var e={admin:`admin`,staff:`staff`},t=Object.values(e);export{t as n,e as t};

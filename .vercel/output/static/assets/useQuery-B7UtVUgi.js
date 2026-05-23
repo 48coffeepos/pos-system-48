@@ -1,0 +1,1 @@
+import{r as e,t}from"./useBaseQuery-DD88U-kU.js";function n(n,r){return t(n,e,r)}export{n as t};
