@@ -1,40 +1,28 @@
-import { CurrencyDollarIcon } from "@phosphor-icons/react";
 import { createFileRoute } from "@tanstack/react-router";
+import { AddExpenseForm } from "@/features/staff/expenses/components/AddExpenseForm";
+import { ExpensesTable } from "@/features/staff/expenses/components/ExpensesTable";
+import { getExpensesQueryOptions } from "@/features/staff/expenses/queryOptions";
 
 export const Route = createFileRoute("/staff/expenses")({
-	component: StaffExpenses,
+  loader: async ({ context }) => {
+    await context.queryClient.ensureQueryData(getExpensesQueryOptions("today"));
+  },
+  component: StaffExpenses,
 });
 
 function StaffExpenses() {
-	return (
-		<div className="min-h-screen">
-			<main className="mx-auto max-w-screen-2xl px-4 py-8 sm:px-6 lg:px-8">
-				<div className="mb-8 flex items-center gap-3">
-					<div className="flex size-10 items-center justify-center rounded-xl bg-(--deep-forest)">
-						<CurrencyDollarIcon
-							weight="fill"
-							className="size-5 text-(--pale-yellow)"
-						/>
-					</div>
-					<div>
-						<h1 className="text-2xl font-bold text-(--deep-forest)">
-							Expenses
-						</h1>
-						<p className="mt-0.5 text-sm text-(--medium-gray)">
-							Record and monitor daily expenses.
-						</p>
-					</div>
-				</div>
-				<div className="rounded-2xl border border-(--light-gray) bg-(--pure-white) p-8 text-center">
-					<CurrencyDollarIcon className="mx-auto size-12 text-(--medium-gray)/40" />
-					<h2 className="mt-4 text-lg font-semibold text-(--deep-forest)">
-						No expenses recorded yet
-					</h2>
-					<p className="mt-1 text-sm text-(--medium-gray)">
-						Expense tracking coming soon.
-					</p>
-				</div>
-			</main>
-		</div>
-	);
+  return (
+    <div className="min-h-screen">
+      <main className="mx-auto max-w-screen-2xl px-4 py-8 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+          <div className="lg:col-span-2">
+            <ExpensesTable />
+          </div>
+          <div>
+            <AddExpenseForm />
+          </div>
+        </div>
+      </main>
+    </div>
+  );
 }

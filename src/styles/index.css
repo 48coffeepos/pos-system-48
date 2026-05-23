@@ -114,7 +114,11 @@ select {
   color: var(--coral);
 }
 
-/* Scrollbar */
+/* Scrollbar - always visible to prevent layout shift */
+html {
+  overflow-y: scroll;
+}
+
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
