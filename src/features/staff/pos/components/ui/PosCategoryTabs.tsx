@@ -1,4 +1,6 @@
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { posBtnOutline, posBtnPrimary } from "../../pos-ui";
 
 interface PosCategoryTabsProps {
 	activeCategory: string;
@@ -16,7 +18,10 @@ export function PosCategoryTabs({
 			<Button
 				variant={activeCategory === "all" ? "default" : "outline"}
 				size="sm"
-				className="rounded-full text-xs font-semibold"
+				className={cn(
+					"rounded-full text-xs font-semibold",
+					activeCategory === "all" ? posBtnPrimary : posBtnOutline,
+				)}
 				onClick={() => onCategoryChange("all")}
 			>
 				All
@@ -26,7 +31,10 @@ export function PosCategoryTabs({
 					key={cat.key}
 					variant={activeCategory === cat.key ? "default" : "outline"}
 					size="sm"
-					className="rounded-full text-xs font-semibold"
+					className={cn(
+						"rounded-full text-xs font-semibold",
+						activeCategory === cat.key ? posBtnPrimary : posBtnOutline,
+					)}
 					onClick={() => onCategoryChange(cat.key)}
 				>
 					{cat.label}

@@ -43,7 +43,7 @@ function StaffInventory() {
 	}
 
 	return (
-		<div className="min-h-screen">
+		<div className="min-h-screen" style={{ background: "var(--warm-beige)" }}>
 			<main className="mx-auto max-w-screen-2xl px-4 py-8 sm:px-6 lg:px-8">
 				{isLoading ? (
 					<div className="flex items-center justify-center py-24">

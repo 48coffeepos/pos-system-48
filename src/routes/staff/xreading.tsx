@@ -20,7 +20,7 @@ function StaffXReading() {
 
 	return (
 		<div className="min-h-screen bg-(--pale-yellow)/30">
-			<main className="mx-auto max-w-screen-2xl p-4 sm:p-6 lg:p-8">
+			<main className="mx-auto max-w-screen-2xl p-2 sm:p-3 lg:p-4">
 				<XReadingScreen data={reconciliationData} />
 			</main>
 		</div>

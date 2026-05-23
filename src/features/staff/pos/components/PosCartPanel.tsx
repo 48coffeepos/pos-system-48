@@ -8,8 +8,16 @@ import {
 } from "@phosphor-icons/react";
 import { useStore } from "@tanstack/react-form";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { formatPeso } from "@/lib/format-currency";
 import type { usePosForm } from "../hooks/usePosForm";
+import {
+	posBadgeDiscount,
+	posBadgeFree,
+	posBtnGhost,
+	posBtnPrimary,
+	posBtnSecondary,
+} from "../pos-ui";
 import type { CartItem } from "../types";
 import { formatCupLine } from "../utils";
 
@@ -51,7 +59,7 @@ export function PosCartPanel({
 				e.stopPropagation();
 				form.handleSubmit();
 			}}
-			className="flex w-96 flex-col overflow-hidden p-5 h-full bg-white"
+			className="flex h-full w-96 flex-col overflow-hidden border-l border-(--light-gray) bg-(--pure-white) p-5"
 		>
 				<div className="mb-4 flex items-center justify-between">
 					<div>
@@ -69,7 +77,12 @@ export function PosCartPanel({
 						</p>
 					</div>
 					{cart.length > 0 ? (
-						<Button variant="ghost" size="icon" onClick={onClearCart}>
+						<Button
+							variant="ghost"
+							size="icon"
+							className={posBtnGhost}
+							onClick={onClearCart}
+						>
 							<TrashIcon className="size-4" style={{ color: "var(--coral)" }} />
 						</Button>
 					) : null}
@@ -102,12 +115,10 @@ export function PosCartPanel({
 									</h4>
 									<div className="mt-0.5 flex flex-wrap gap-1">
 										{item.is_free_drink ? (
-											<span className="rounded-full bg-green-100 px-2 py-0.5 text-[8px] font-bold text-green-700">
-												Free
-											</span>
+											<span className={posBadgeFree}>Free</span>
 										) : null}
 										{item.discount ? (
-											<span className="rounded-full bg-blue-100 px-2 py-0.5 text-[8px] font-bold text-blue-700">
+											<span className={posBadgeDiscount}>
 												{item.discount === "SENIOR" ? "Senior" : "PWD"} 5%
 											</span>
 										) : null}
@@ -142,6 +153,7 @@ export function PosCartPanel({
 									<Button
 										variant="secondary"
 										size="icon-xs"
+										className={posBtnSecondary}
 										onClick={() =>
 											item.quantity === 1
 												? onRemoveFromCart(item.lineKey)
@@ -160,6 +172,7 @@ export function PosCartPanel({
 									<Button
 										variant="default"
 										size="icon-xs"
+										className={posBtnPrimary}
 										disabled={
 											Boolean(item.discount) || Boolean(item.is_free_drink)
 										}
@@ -218,10 +231,12 @@ export function PosCartPanel({
 							{paymentMethod !== "GRAB" ? (
 								<form.AppField name="amountPaid">
 									{(field) => (
-										<field.NumberField
+										<field.Input
 											label="Amount Paid"
 											placeholder="0.00"
+											type="number"
 											step="0.01"
+											min="0"
 										/>
 									)}
 								</form.AppField>
@@ -281,7 +296,11 @@ export function PosCartPanel({
 				) : null}
 
 				<form.AppForm>
-					<Button type="submit" disabled={cart.length === 0} className="w-full">
+					<Button
+						type="submit"
+						disabled={cart.length === 0}
+						className={cn("w-full", posBtnPrimary)}
+					>
 						Place Order <ArrowRightIcon className="size-4" />
 					</Button>
 				</form.AppForm>
