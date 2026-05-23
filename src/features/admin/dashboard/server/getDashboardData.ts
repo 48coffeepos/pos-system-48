@@ -1,20 +1,15 @@
 import { createServerFn } from "@tanstack/react-start";
 
 import { prisma } from "@/integrations/prisma/db";
-
-function getTodayRange() {
-  const now = new Date();
-  const start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const end = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
-  return { start, end };
-}
+import { parseCupInfoKey } from "@/lib/cup-utils";
+import { getTodayBounds } from "@/lib/day-bounds";
 
 export const getDashboardData = createServerFn({ method: "GET" }).handler(
   async () => {
-    const { start, end } = getTodayRange();
+    const { start, end } = getTodayBounds();
 
     const orders = await prisma.order.findMany({
-      where: { created_at: { gte: start, lt: end } },
+      where: { created_at: { gte: start, lte: end } },
       select: { method: true, grand_total: true },
     });
 
@@ -58,28 +53,36 @@ export const getDashboardData = createServerFn({ method: "GET" }).handler(
     >();
 
     for (const cup of allCups) {
-      cupSalesMap.set(cup.name, {
+      const key = parseCupInfoKey(cup.name);
+      if (cupSalesMap.has(key)) continue;
+      cupSalesMap.set(key, {
         name: cup.name,
         total: 0,
         byMethod: { ...emptyByMethod },
       });
     }
 
-	const cupOrderItems = await prisma.orderItem.findMany({
-		where: {
-			order: { created_at: { gte: start, lt: end } },
-			menu: { type: "CUP" },
-		},
-		select: {
-			quantity: true,
-			snapshot_inventory: true,
-			order: { select: { method: true } },
-		},
-	});
+    // Approach 1: OrderItems with a menu that is typed CUP — menu is the authority.
+    // Approach 2: OrderItems where menu_id is null (orphaned) — fall back to
+    //             snapshot_inventory matching via parseCupInfoKey.
+    const cupOrderItems = await prisma.orderItem.findMany({
+      where: {
+        order: { created_at: { gte: start, lte: end } },
+        OR: [
+          { menu: { type: "CUP" } },
+          { menu_id: null },
+        ],
+      },
+      select: {
+        quantity: true,
+        snapshot_inventory: true,
+        order: { select: { method: true } },
+      },
+    });
 
-	for (const item of cupOrderItems) {
-		const cupName = item.snapshot_inventory;
-		if (!cupName) continue;
+    for (const item of cupOrderItems) {
+      const cupName = item.snapshot_inventory;
+      if (!cupName) continue;
       const method = item.order?.method;
       if (!method) continue;
 

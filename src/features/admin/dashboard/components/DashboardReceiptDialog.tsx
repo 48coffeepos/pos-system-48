@@ -1,8 +1,14 @@
-import { Printer } from "@phosphor-icons/react";
-import { useRef } from "react";
+import { PrinterIcon } from "@phosphor-icons/react";
+import { useEffect, useRef, useState } from "react";
 import { useReactToPrint } from "react-to-print";
 import { AlertDialog, AlertDialogContent } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import {
+	loadBixolonSDK,
+	printCupsSales,
+	printRevenue,
+	THERMAL_PAGE_STYLE,
+} from "@/integrations/bixolon";
 
 interface CupSale {
 	name: string;
@@ -44,17 +50,48 @@ export function DashboardReceiptDialog({
 	revenueByMethod,
 }: DashboardReceiptDialogProps) {
 	const receiptRef = useRef<HTMLDivElement>(null);
+	const [bixolonReady, setBixolonReady] = useState(false);
+	const [bixolonLoading, setBixolonLoading] = useState(false);
 
 	const handlePrint = useReactToPrint({
 		contentRef: receiptRef,
-		documentTitle: mode === "cups" ? "Cups Sales Receipt" : "Revenue Receipt",
+		pageStyle: THERMAL_PAGE_STYLE,
+		onAfterPrint: onClose,
 	});
 
-	if (!mode) return null;
+	useEffect(() => {
+		if (!open) return;
+		setBixolonLoading(true);
+		loadBixolonSDK()
+			.then((loaded) => setBixolonReady(loaded))
+			.catch(() => setBixolonReady(false))
+			.finally(() => setBixolonLoading(false));
+	}, [open]);
 
 	const cashRevenue = revenueByMethod.CASH ?? 0;
 	const gcashRevenue = revenueByMethod.GCASH ?? 0;
 	const totalRevenue = cashRevenue + gcashRevenue;
+
+	const handleDirectPrint = () => {
+		try {
+			if (mode === "cups") {
+				printCupsSales(staffName, cupSales, periodLabel);
+			} else if (mode === "revenue") {
+				printRevenue(
+					staffName,
+					cashRevenue,
+					gcashRevenue,
+					totalRevenue,
+					periodLabel,
+				);
+			}
+			onClose();
+		} catch (err) {
+			console.error("BIXOLON direct print failed:", err);
+		}
+	};
+
+	if (!mode) return null;
 
 	return (
 		<AlertDialog
@@ -67,14 +104,12 @@ export function DashboardReceiptDialog({
 				<div
 					ref={receiptRef}
 					id="receipt-content"
-					className="receipt-thermal font-mono text-[#1a1a1a] select-none"
+					className="receipt-thermal font-mono text-[#1a1a1a] select-none p-2"
 				>
 					{mode === "cups" && (
 						<div id="cups-sales-receipt">
 							<div className="mb-3 text-center">
-								<h2 className="text-xl font-black tracking-tight">
-									48 COFFEE
-								</h2>
+								<h2 className="text-xl font-black tracking-tight">48 COFFEE</h2>
 								<h3 className="mt-0.5 text-xs font-bold uppercase">
 									CUPS SALES
 								</h3>
@@ -88,10 +123,6 @@ export function DashboardReceiptDialog({
 								<div className="flex justify-between">
 									<span>Time :</span>
 									<span>{formatDateTime(new Date())}</span>
-								</div>
-								<div className="flex justify-between">
-									<span>Cashier :</span>
-									<span className="uppercase">{staffName}</span>
 								</div>
 							</div>
 
@@ -108,15 +139,9 @@ export function DashboardReceiptDialog({
 												<span>{cup.total} cups</span>
 											</div>
 											<div className="mt-0.5 flex gap-2 text-[9px]">
-												<span>
-													CASH : {cup.byMethod.CASH ?? 0}
-												</span>
-												<span>
-													GCASH : {cup.byMethod.GCASH ?? 0}
-												</span>
-												<span>
-													GRAB : {cup.byMethod.GRAB ?? 0}
-												</span>
+												<span>CASH : {cup.byMethod.CASH ?? 0}</span>
+												<span>GCASH : {cup.byMethod.GCASH ?? 0}</span>
+												<span>GRAB : {cup.byMethod.GRAB ?? 0}</span>
 											</div>
 										</div>
 									))}
@@ -159,9 +184,7 @@ export function DashboardReceiptDialog({
 					{mode === "revenue" && (
 						<div id="revenue-receipt">
 							<div className="mb-3 text-center">
-								<h2 className="text-xl font-black tracking-tight">
-									48 COFFEE
-								</h2>
+								<h2 className="text-xl font-black tracking-tight">48 COFFEE</h2>
 								<h3 className="mt-0.5 text-xs font-bold uppercase">
 									DAILY REVENUE
 								</h3>
@@ -175,10 +198,6 @@ export function DashboardReceiptDialog({
 								<div className="flex justify-between">
 									<span>Time :</span>
 									<span>{formatDateTime(new Date())}</span>
-								</div>
-								<div className="flex justify-between">
-									<span>Cashier :</span>
-									<span className="uppercase">{staffName}</span>
 								</div>
 							</div>
 
@@ -210,41 +229,38 @@ export function DashboardReceiptDialog({
 
 					<div className="mt-4 text-center">
 						<p className="text-[10px] font-black uppercase">{staffName}</p>
-						<p className="text-[8px] font-bold opacity-60">
-							Cashier&apos;s Name
-						</p>
+						<p className="text-[8px] font-bold opacity-60">Admin&apos;s Name</p>
 					</div>
 				</div>
 
-				<div className="no-print mt-6 flex gap-3">
-					<Button variant="outline" onClick={onClose} className="flex-1 h-12">
-						Save
-					</Button>
-					<Button
-						onClick={() => handlePrint()}
-						className="flex flex-1 h-12 gap-2"
-					>
-						<Printer className="size-4" /> Print
-					</Button>
+				<div className="no-print mt-6 flex flex-col gap-3">
+					<div className="flex gap-3">
+						<Button variant="outline" onClick={onClose} className="flex-1 h-12">
+							Save
+						</Button>
+						<Button
+							onClick={() => handlePrint()}
+							className="flex flex-1 h-12 gap-2"
+						>
+							<PrinterIcon className="size-4" /> Print
+						</Button>
+					</div>
+					{bixolonReady ? (
+						<Button
+							onClick={handleDirectPrint}
+							variant="outline"
+							className="flex h-12 gap-2"
+						>
+							<PrinterIcon className="size-4" /> Direct Print (BIXOLON)
+						</Button>
+					) : bixolonLoading ? (
+						<Button disabled variant="outline" className="h-12">
+							Detecting printer...
+						</Button>
+					) : null}
 				</div>
 
 				<style>{`
-					@media print {
-						@page {
-							margin: 4mm;
-						}
-						body * { visibility: hidden !important; }
-						#receipt-content, #receipt-content * { visibility: visible !important; }
-						#receipt-content {
-							position: absolute !important;
-							left: 0 !important;
-							top: 0 !important;
-							width: 80mm !important;
-							padding: 3mm !important;
-							margin: 0 !important;
-						}
-						.no-print { display: none !important; }
-					}
 					.receipt-thermal {
 						font-family: 'Courier New', Courier, monospace;
 						line-height: 1.2;

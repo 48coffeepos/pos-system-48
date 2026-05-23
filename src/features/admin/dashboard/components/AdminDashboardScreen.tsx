@@ -1,15 +1,18 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { sessionQueryOptions } from "@/features/auth/queryOptions";
+import { getTodayOrdersQueryOptions } from "@/features/admin/orders/queryOptions";
 import type { PaymentMethodFilter } from "../constants";
 import { getDashboardDataQueryOptions } from "../queryOptions";
 import { CupSalesBreakdown } from "./CupSalesBreakdown";
 import { DashboardReceiptDialog } from "./DashboardReceiptDialog";
 import { RevenueCard } from "./RevenueCard";
+import { TodayOrdersTable } from "@/features/admin/orders/components/TodayOrdersTable";
 
 export function AdminDashboardScreen() {
 	const { data } = useSuspenseQuery(getDashboardDataQueryOptions);
 	const { data: session } = useSuspenseQuery(sessionQueryOptions);
+	const { data: todayOrders } = useSuspenseQuery(getTodayOrdersQueryOptions);
 	const [selectedPayment, setSelectedPayment] =
 		useState<PaymentMethodFilter>("all");
 	const [receiptMode, setReceiptMode] = useState<
@@ -36,6 +39,8 @@ export function AdminDashboardScreen() {
 				cupSales={cupSales}
 				selectedPayment={selectedPayment}
 			/>
+
+			<TodayOrdersTable data={todayOrders} />
 
 			{receiptMode === "select" && (
 				<div
