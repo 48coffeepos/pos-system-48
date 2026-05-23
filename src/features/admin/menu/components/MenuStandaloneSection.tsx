@@ -108,35 +108,48 @@ function MenuStandaloneSection({
 								</div>
 							)}
 						</form.Subscribe>
-					) : standaloneMode === "new" ? (
-						<div className="space-y-3">
-							<form.Subscribe
-								selector={(state) => state.values.newInventoryName}
-							>
-								{(newInventoryName) => (
-									<div>
-										<Label className="mb-1.5 block text-xs font-medium text-(--medium-gray)">
-											New Inventory Item Name
-										</Label>
-										<Input
-											type="text"
-											value={newInventoryName}
-											onChange={(e) =>
-												form.setFieldValue("newInventoryName", e.target.value)
-											}
-											placeholder="e.g. Coke, Sprite"
-										/>
-									</div>
-								)}
-							</form.Subscribe>
-						</div>
-					) : null
+					) : (
+						standaloneMode === "new" && (
+							<div className="space-y-3">
+								<form.Subscribe
+									selector={(state) => state.values.newInventoryName}
+								>
+									{(newInventoryName) => (
+										<div className="space-y-2">
+											<Label className="mb-1.5 block text-xs font-medium text-(--medium-gray)">
+												New Inventory Item Name
+											</Label>
+											<Input
+												type="text"
+												value={newInventoryName}
+												onChange={(e) =>
+													form.setFieldValue("newInventoryName", e.target.value)
+												}
+												placeholder="e.g. Coke, Sprite"
+											/>
+											<Button
+												size={"sm"}
+												onClick={() =>
+													form.setFieldValue(
+														"newInventoryName",
+														form.state.values.name,
+													)
+												}
+											>
+												Use Same Name
+											</Button>
+										</div>
+									)}
+								</form.Subscribe>
+							</div>
+						)
+					)
 				}
 			</form.Subscribe>
 
 			<form.Subscribe selector={(state) => state.values.standaloneMode}>
 				{(standaloneMode) =>
-					standaloneMode ? (
+					standaloneMode && (
 						<form.Subscribe selector={(state) => state.values.standalonePrice}>
 							{(standalonePrice) => (
 								<div>
@@ -157,12 +170,14 @@ function MenuStandaloneSection({
 											)
 										}
 										placeholder="0"
-										onWheel={(e) => (e.currentTarget as HTMLInputElement).blur()}
+										onWheel={(e) =>
+											(e.currentTarget as HTMLInputElement).blur()
+										}
 									/>
 								</div>
 							)}
 						</form.Subscribe>
-					) : null
+					)
 				}
 			</form.Subscribe>
 		</div>

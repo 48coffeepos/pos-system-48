@@ -15,3 +15,9 @@ export interface MenuListItem {
   type: Inventory_Type | null;
   menuInventories: MenuInventoryLink[];
 }
+
+export interface AddOnItem {
+  id: string;
+  name: string;
+  amount: number;
+}

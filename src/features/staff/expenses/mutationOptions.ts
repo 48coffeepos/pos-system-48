@@ -24,7 +24,7 @@ export const createExpenseMutationOptions = mutationOptions({
   },
   onError: (error) => {
     toast.error("Failed to record expense", {
-      description: error instanceof Error ? error.message : "Unknown error",
+      description: error?.message ?? "Unknown error",
     });
   },
 });
