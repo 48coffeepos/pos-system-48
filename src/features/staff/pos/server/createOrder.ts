@@ -187,6 +187,7 @@ export const createOrder = createServerFn({ method: "POST" })
 			console.log("PUSHER CLIENT FOUND", pusher);
 			if (pusher) {
 				await pusher.trigger("orders", "new-order", order);
+				console.log("PUSHER EVENT TRIGGERED", order);
 			}
 		} catch (err) {
 			console.error("Failed to publish Pusher event:", err);
