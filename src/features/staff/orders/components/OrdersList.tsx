@@ -59,6 +59,8 @@ export function OrdersList({ orders = [] }: OrdersListProps) {
 	usePusherChannel("orders", "new-order", (data: unknown) => {
 		const raw = data as DBOrder;
 
+		console.log(raw);
+
 		if (pusherProcessedRef.current.has(raw.order_id)) return;
 		pusherProcessedRef.current.add(raw.order_id);
 
