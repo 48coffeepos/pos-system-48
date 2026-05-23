@@ -226,10 +226,6 @@ export function PosScreen() {
 		setShowPlaceOrderConfirm,
 	]);
 
-	const handlePrint = useCallback(() => {
-		window.print();
-	}, []);
-
 	return (
 		<div
 			className="flex h-full flex-col overflow-x-auto"
@@ -275,7 +271,6 @@ export function PosScreen() {
 				order={lastOrder}
 				open={showReceipt}
 				onClose={() => setShowReceipt(false)}
-				onPrint={handlePrint}
 				cashierName={session?.user?.name || "Cashier"}
 			/>
 		</div>

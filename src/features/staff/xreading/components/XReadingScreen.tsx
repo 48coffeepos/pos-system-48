@@ -66,14 +66,10 @@ export function XReadingScreen({ data }: XReadingScreenProps) {
 		setReceiptMode("cashcount");
 	};
 
-	const handlePrint = () => {
-		window.print();
-	};
-
 	return (
 		<>
 			{/* On-screen UI */}
-			<div className="grid grid-cols-1 gap-8 print:hidden lg:grid-cols-2">
+			<div className="grid grid-cols-1 gap-4 print:hidden lg:grid-cols-2">
 				<form.AppForm>
 					<CashCountPanel
 						form={form}
@@ -122,7 +118,6 @@ export function XReadingScreen({ data }: XReadingScreenProps) {
 			<XReadingReceiptDialog
 				open={!!receiptMode}
 				onClose={() => setReceiptMode(null)}
-				onPrint={handlePrint}
 				mode={receiptMode}
 				staffName={staffName}
 				totals={{

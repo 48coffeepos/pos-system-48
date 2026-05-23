@@ -56,7 +56,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 			<body className="font-sans antialiased wrap-anywhere selection:bg-[rgba(79,184,178,0.24)]">
 				{children}
 				<Toaster
-					position="bottom-right"
+					position="top-right"
 					richColors
 					duration={3000}
 					closeButton
