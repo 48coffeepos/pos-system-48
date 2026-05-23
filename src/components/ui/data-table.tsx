@@ -9,7 +9,6 @@ import {
 } from "@tanstack/react-table"
 import * as React from "react"
 
-import { Button } from "@/components/ui/button"
 import {
   Table,
   TableBody,
@@ -22,11 +21,13 @@ import {
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
+  pageSize?: number
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  pageSize,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([])
 
@@ -40,6 +41,9 @@ export function DataTable<TData, TValue>({
     state: {
       sorting,
     },
+    initialState: pageSize
+      ? { pagination: { pageSize } }
+      : undefined,
   })
 
   return (
@@ -89,22 +93,6 @@ export function DataTable<TData, TValue>({
         </Table>
       </div>
       <div className="flex items-center justify-end gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
-        >
-          Previous
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
-        >
-          Next
-        </Button>
       </div>
     </div>
   )

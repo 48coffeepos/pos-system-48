@@ -9,7 +9,42 @@
 * 🟢 You can import this file directly.
 */
 
+export const Inventory_Type = {
+  CUP: 'CUP',
+  STANDALONE: 'STANDALONE'
+} as const
+
+export type Inventory_Type = (typeof Inventory_Type)[keyof typeof Inventory_Type]
 
 
-// This file is empty because there are no enums in the schema.
-export {}
+export const Inventory_Status = {
+  AVAILABLE: 'AVAILABLE',
+  UNAVAILABLE: 'UNAVAILABLE'
+} as const
+
+export type Inventory_Status = (typeof Inventory_Status)[keyof typeof Inventory_Status]
+
+
+export const Expense_Type = {
+  CASH_IN: 'CASH_IN',
+  CASH_OUT: 'CASH_OUT'
+} as const
+
+export type Expense_Type = (typeof Expense_Type)[keyof typeof Expense_Type]
+
+
+export const Payment_Method = {
+  CASH: 'CASH',
+  GCASH: 'GCASH',
+  GRAB: 'GRAB'
+} as const
+
+export type Payment_Method = (typeof Payment_Method)[keyof typeof Payment_Method]
+
+
+export const Discount_Type = {
+  PWD: 'PWD',
+  SENIOR: 'SENIOR'
+} as const
+
+export type Discount_Type = (typeof Discount_Type)[keyof typeof Discount_Type]

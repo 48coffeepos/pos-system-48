@@ -9,19 +9,85 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as AboutRouteImport } from './routes/about'
+import { Route as StaffRouteRouteImport } from './routes/staff/route'
+import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as StaffIndexRouteImport } from './routes/staff/index'
+import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as StaffXreadingRouteImport } from './routes/staff/xreading'
+import { Route as StaffPosRouteImport } from './routes/staff/pos'
+import { Route as StaffOrdersRouteImport } from './routes/staff/orders'
+import { Route as StaffInventoryRouteImport } from './routes/staff/inventory'
+import { Route as StaffExpensesRouteImport } from './routes/staff/expenses'
+import { Route as AdminMenuRouteImport } from './routes/admin/menu'
+import { Route as AdminInventoryRouteImport } from './routes/admin/inventory'
+import { Route as AdminAccountsRouteImport } from './routes/admin/accounts'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
-const AboutRoute = AboutRouteImport.update({
-  id: '/about',
-  path: '/about',
+const StaffRouteRoute = StaffRouteRouteImport.update({
+  id: '/staff',
+  path: '/staff',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRouteRoute = AdminRouteRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const StaffIndexRoute = StaffIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => StaffRouteRoute,
+} as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const StaffXreadingRoute = StaffXreadingRouteImport.update({
+  id: '/xreading',
+  path: '/xreading',
+  getParentRoute: () => StaffRouteRoute,
+} as any)
+const StaffPosRoute = StaffPosRouteImport.update({
+  id: '/pos',
+  path: '/pos',
+  getParentRoute: () => StaffRouteRoute,
+} as any)
+const StaffOrdersRoute = StaffOrdersRouteImport.update({
+  id: '/orders',
+  path: '/orders',
+  getParentRoute: () => StaffRouteRoute,
+} as any)
+const StaffInventoryRoute = StaffInventoryRouteImport.update({
+  id: '/inventory',
+  path: '/inventory',
+  getParentRoute: () => StaffRouteRoute,
+} as any)
+const StaffExpensesRoute = StaffExpensesRouteImport.update({
+  id: '/expenses',
+  path: '/expenses',
+  getParentRoute: () => StaffRouteRoute,
+} as any)
+const AdminMenuRoute = AdminMenuRouteImport.update({
+  id: '/menu',
+  path: '/menu',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminInventoryRoute = AdminInventoryRouteImport.update({
+  id: '/inventory',
+  path: '/inventory',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminAccountsRoute = AdminAccountsRouteImport.update({
+  id: '/accounts',
+  path: '/accounts',
+  getParentRoute: () => AdminRouteRoute,
 } as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
@@ -31,41 +97,121 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
+  '/admin': typeof AdminRouteRouteWithChildren
+  '/staff': typeof StaffRouteRouteWithChildren
+  '/admin/accounts': typeof AdminAccountsRoute
+  '/admin/inventory': typeof AdminInventoryRoute
+  '/admin/menu': typeof AdminMenuRoute
+  '/staff/expenses': typeof StaffExpensesRoute
+  '/staff/inventory': typeof StaffInventoryRoute
+  '/staff/orders': typeof StaffOrdersRoute
+  '/staff/pos': typeof StaffPosRoute
+  '/staff/xreading': typeof StaffXreadingRoute
+  '/admin/': typeof AdminIndexRoute
+  '/staff/': typeof StaffIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
+  '/admin/accounts': typeof AdminAccountsRoute
+  '/admin/inventory': typeof AdminInventoryRoute
+  '/admin/menu': typeof AdminMenuRoute
+  '/staff/expenses': typeof StaffExpensesRoute
+  '/staff/inventory': typeof StaffInventoryRoute
+  '/staff/orders': typeof StaffOrdersRoute
+  '/staff/pos': typeof StaffPosRoute
+  '/staff/xreading': typeof StaffXreadingRoute
+  '/admin': typeof AdminIndexRoute
+  '/staff': typeof StaffIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
+  '/admin': typeof AdminRouteRouteWithChildren
+  '/staff': typeof StaffRouteRouteWithChildren
+  '/admin/accounts': typeof AdminAccountsRoute
+  '/admin/inventory': typeof AdminInventoryRoute
+  '/admin/menu': typeof AdminMenuRoute
+  '/staff/expenses': typeof StaffExpensesRoute
+  '/staff/inventory': typeof StaffInventoryRoute
+  '/staff/orders': typeof StaffOrdersRoute
+  '/staff/pos': typeof StaffPosRoute
+  '/staff/xreading': typeof StaffXreadingRoute
+  '/admin/': typeof AdminIndexRoute
+  '/staff/': typeof StaffIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/api/auth/$'
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/staff'
+    | '/admin/accounts'
+    | '/admin/inventory'
+    | '/admin/menu'
+    | '/staff/expenses'
+    | '/staff/inventory'
+    | '/staff/orders'
+    | '/staff/pos'
+    | '/staff/xreading'
+    | '/admin/'
+    | '/staff/'
+    | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/api/auth/$'
-  id: '__root__' | '/' | '/about' | '/api/auth/$'
+  to:
+    | '/'
+    | '/admin/accounts'
+    | '/admin/inventory'
+    | '/admin/menu'
+    | '/staff/expenses'
+    | '/staff/inventory'
+    | '/staff/orders'
+    | '/staff/pos'
+    | '/staff/xreading'
+    | '/admin'
+    | '/staff'
+    | '/api/auth/$'
+  id:
+    | '__root__'
+    | '/'
+    | '/admin'
+    | '/staff'
+    | '/admin/accounts'
+    | '/admin/inventory'
+    | '/admin/menu'
+    | '/staff/expenses'
+    | '/staff/inventory'
+    | '/staff/orders'
+    | '/staff/pos'
+    | '/staff/xreading'
+    | '/admin/'
+    | '/staff/'
+    | '/api/auth/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AboutRoute: typeof AboutRoute
+  AdminRouteRoute: typeof AdminRouteRouteWithChildren
+  StaffRouteRoute: typeof StaffRouteRouteWithChildren
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/about': {
-      id: '/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AboutRouteImport
+    '/staff': {
+      id: '/staff'
+      path: '/staff'
+      fullPath: '/staff'
+      preLoaderRoute: typeof StaffRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -74,6 +220,76 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/staff/': {
+      id: '/staff/'
+      path: '/'
+      fullPath: '/staff/'
+      preLoaderRoute: typeof StaffIndexRouteImport
+      parentRoute: typeof StaffRouteRoute
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/staff/xreading': {
+      id: '/staff/xreading'
+      path: '/xreading'
+      fullPath: '/staff/xreading'
+      preLoaderRoute: typeof StaffXreadingRouteImport
+      parentRoute: typeof StaffRouteRoute
+    }
+    '/staff/pos': {
+      id: '/staff/pos'
+      path: '/pos'
+      fullPath: '/staff/pos'
+      preLoaderRoute: typeof StaffPosRouteImport
+      parentRoute: typeof StaffRouteRoute
+    }
+    '/staff/orders': {
+      id: '/staff/orders'
+      path: '/orders'
+      fullPath: '/staff/orders'
+      preLoaderRoute: typeof StaffOrdersRouteImport
+      parentRoute: typeof StaffRouteRoute
+    }
+    '/staff/inventory': {
+      id: '/staff/inventory'
+      path: '/inventory'
+      fullPath: '/staff/inventory'
+      preLoaderRoute: typeof StaffInventoryRouteImport
+      parentRoute: typeof StaffRouteRoute
+    }
+    '/staff/expenses': {
+      id: '/staff/expenses'
+      path: '/expenses'
+      fullPath: '/staff/expenses'
+      preLoaderRoute: typeof StaffExpensesRouteImport
+      parentRoute: typeof StaffRouteRoute
+    }
+    '/admin/menu': {
+      id: '/admin/menu'
+      path: '/menu'
+      fullPath: '/admin/menu'
+      preLoaderRoute: typeof AdminMenuRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/inventory': {
+      id: '/admin/inventory'
+      path: '/inventory'
+      fullPath: '/admin/inventory'
+      preLoaderRoute: typeof AdminInventoryRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/accounts': {
+      id: '/admin/accounts'
+      path: '/accounts'
+      fullPath: '/admin/accounts'
+      preLoaderRoute: typeof AdminAccountsRouteImport
+      parentRoute: typeof AdminRouteRoute
     }
     '/api/auth/$': {
       id: '/api/auth/$'
@@ -85,9 +301,50 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AdminRouteRouteChildren {
+  AdminAccountsRoute: typeof AdminAccountsRoute
+  AdminInventoryRoute: typeof AdminInventoryRoute
+  AdminMenuRoute: typeof AdminMenuRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteRouteChildren: AdminRouteRouteChildren = {
+  AdminAccountsRoute: AdminAccountsRoute,
+  AdminInventoryRoute: AdminInventoryRoute,
+  AdminMenuRoute: AdminMenuRoute,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
+  AdminRouteRouteChildren,
+)
+
+interface StaffRouteRouteChildren {
+  StaffExpensesRoute: typeof StaffExpensesRoute
+  StaffInventoryRoute: typeof StaffInventoryRoute
+  StaffOrdersRoute: typeof StaffOrdersRoute
+  StaffPosRoute: typeof StaffPosRoute
+  StaffXreadingRoute: typeof StaffXreadingRoute
+  StaffIndexRoute: typeof StaffIndexRoute
+}
+
+const StaffRouteRouteChildren: StaffRouteRouteChildren = {
+  StaffExpensesRoute: StaffExpensesRoute,
+  StaffInventoryRoute: StaffInventoryRoute,
+  StaffOrdersRoute: StaffOrdersRoute,
+  StaffPosRoute: StaffPosRoute,
+  StaffXreadingRoute: StaffXreadingRoute,
+  StaffIndexRoute: StaffIndexRoute,
+}
+
+const StaffRouteRouteWithChildren = StaffRouteRoute._addFileChildren(
+  StaffRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AboutRoute: AboutRoute,
+  AdminRouteRoute: AdminRouteRouteWithChildren,
+  StaffRouteRoute: StaffRouteRouteWithChildren,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport
