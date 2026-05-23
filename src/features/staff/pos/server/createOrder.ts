@@ -27,6 +27,7 @@ const createOrderInput = z.object({
       note: z.string().optional(),
       cup_type: z.string(),
       cup_size: z.string(),
+      selected_inventory_id: z.string().optional(),
       addon_items: z
         .array(
           z.object({
@@ -131,27 +132,10 @@ export const createOrder = createServerFn({ method: "POST" })
       });
 
       for (const item of data.items) {
-        const isCupLine =
-          item.cup_type &&
-          item.cup_type !== "NONE" &&
-          item.cup_size &&
-          item.cup_size !== "NONE";
-
-        if (isCupLine) {
-          const normalizedSize = item.cup_size.toLowerCase();
-          const normalizedType =
-            item.cup_type.charAt(0).toUpperCase() +
-            item.cup_type.slice(1).toLowerCase();
-          const cupName = `${normalizedSize} ${normalizedType}`;
-
-          await tx.inventory.updateMany({
-            where: {
-              name: { equals: cupName, mode: "insensitive" },
-              type: "CUP",
-            },
-            data: {
-              stock: { decrement: item.quantity },
-            },
+        if (item.selected_inventory_id) {
+          await tx.inventory.update({
+            where: { inventory_id: item.selected_inventory_id },
+            data: { stock: { decrement: item.quantity } },
           });
           continue;
         }
