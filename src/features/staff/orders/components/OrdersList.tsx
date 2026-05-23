@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import { Receipt, CreditCard } from "@phosphor-icons/react";
 import { formatPeso } from "@/lib/format-currency";
 import { PosReceiptDialog } from "@/features/staff/pos/components/PosReceiptDialog";
@@ -49,10 +49,6 @@ interface OrdersListProps {
 export function OrdersList({ orders = [] }: OrdersListProps) {
   const [selectedOrder, setSelectedOrder] = useState<PosOrder | null>(null);
   const [timeframe, setTimeframe] = useState<"today" | "yesterday">("today");
-
-  const handlePrint = useCallback(() => {
-    window.print();
-  }, []);
 
   const filteredOrders = orders.filter((order) => {
     const orderDate = new Date(order.created_at);
@@ -246,7 +242,6 @@ export function OrdersList({ orders = [] }: OrdersListProps) {
         order={selectedOrder}
         open={!!selectedOrder}
         onClose={() => setSelectedOrder(null)}
-        onPrint={handlePrint}
         cashierName={selectedOrder?.cashier_name || "Cashier"}
       />
     </div>
