@@ -30,7 +30,7 @@ export const createInventoryItemMutationOptions = mutationOptions({
 	},
 	onError: (error) => {
 		toast.error("Failed to create item", {
-			description: error instanceof Error ? error.message : "Unknown error",
+			description: error?.message ?? "Unknown error",
 		});
 	},
 });
@@ -47,7 +47,7 @@ export const addStockMutationOptions = mutationOptions({
 	},
 	onError: (error) => {
 		toast.error("Failed to update stock", {
-			description: error instanceof Error ? error.message : "Unknown error",
+			description: error?.message ?? "Unknown error",
 		});
 	},
 });
@@ -65,7 +65,7 @@ export const updateInventoryItemMutationOptions = mutationOptions({
 	},
 	onError: (error) => {
 		toast.error("Failed to update item", {
-			description: error instanceof Error ? error.message : "Unknown error",
+			description: error?.message ?? "Unknown error",
 		});
 	},
 });
@@ -81,7 +81,7 @@ export const deleteInventoryItemMutationOptions = mutationOptions({
 	},
 	onError: (error) => {
 		toast.error("Failed to delete item", {
-			description: error instanceof Error ? error.message : "Unknown error",
+			description: error?.message ?? "Unknown error",
 		});
 	},
 });

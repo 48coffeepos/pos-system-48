@@ -9,6 +9,7 @@ interface FormInputProps {
 	description?: string;
 	placeholder?: string;
 	type?: string;
+	maxLength?: number;
 }
 
 function FormInput({ label, description, ...props }: FormInputProps) {
