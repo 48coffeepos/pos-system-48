@@ -4,10 +4,12 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
 
 import type { InventoryItem } from "@/features/admin/inventory/components/AddInventoryItem";
-import { deleteMenuMutationOptions, createAddOnMutationOptions } from "../mutationOptions";
+import { deleteMenuMutationOptions, createAddOnMutationOptions, deleteAddOnMutationOptions, updateAddOnMutationOptions } from "../mutationOptions";
 import { getAllAddOnsQueryOptions } from "../queryOptions";
 import type { MenuListItem } from "../types";
 import type { AddOnFormInput } from "../schemas/add-on";
+import type { AddOnItem } from "../types";
+import { AddOnDeleteDialog } from "./AddOnDeleteDialog";
 import { AddOnModal } from "./AddOnModal";
 import { AddOnSection } from "./AddOnSection";
 import { MenuDeleteDialog } from "./MenuDeleteDialog";
@@ -28,9 +30,14 @@ function MenuManager({ menuItems, inventoryItems }: MenuManagerProps) {
   >({ kind: "closed" });
   const [deleteTarget, setDeleteTarget] = useState<MenuListItem | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [addOnModalOpen, setAddOnModalOpen] = useState(false);
+  const [addOnModal, setAddOnModal] = useState<
+    { kind: "closed" } | { kind: "new" } | { kind: "edit"; item: AddOnItem }
+  >({ kind: "closed" });
+  const [addOnDeleteTarget, setAddOnDeleteTarget] = useState<AddOnItem | null>(null);
   const deleteMutation = useMutation(deleteMenuMutationOptions);
   const createAddOnMutation = useMutation(createAddOnMutationOptions);
+  const deleteAddOnMutation = useMutation(deleteAddOnMutationOptions);
+  const updateAddOnMutation = useMutation(updateAddOnMutationOptions);
   const { data: addOns, isLoading, isError, error, refetch } = useQuery(getAllAddOnsQueryOptions);
 
   const fuseIndex = useMemo(
@@ -61,11 +68,30 @@ function MenuManager({ menuItems, inventoryItems }: MenuManagerProps) {
   const isSearching = searchQuery.trim().length > 0;
 
   const handleSaveAddOn = async (data: AddOnFormInput) => {
-    await createAddOnMutation.mutateAsync({
-      name: data.name.trim(),
-      amount: data.amount,
-    });
-    setAddOnModalOpen(false);
+    if (addOnModal.kind === "edit") {
+      await updateAddOnMutation.mutateAsync({
+        id: addOnModal.item.id,
+        name: data.name.trim(),
+        amount: data.amount,
+      });
+    } else {
+      await createAddOnMutation.mutateAsync({
+        name: data.name.trim(),
+        amount: data.amount,
+      });
+    }
+    setAddOnModal({ kind: "closed" });
+  };
+
+  const handleDeleteAddOn = async () => {
+    if (!addOnDeleteTarget) return;
+
+    try {
+      await deleteAddOnMutation.mutateAsync({ id: addOnDeleteTarget.id });
+      setAddOnDeleteTarget(null);
+    } catch {
+      // Toasts are handled by the mutation options.
+    }
   };
 
   return (
@@ -117,7 +143,9 @@ function MenuManager({ menuItems, inventoryItems }: MenuManagerProps) {
           isError={isError}
           error={error}
           onRetry={() => refetch()}
-          onAddClick={() => setAddOnModalOpen(true)}
+          onAddClick={() => setAddOnModal({ kind: "new" })}
+          onEdit={(item) => setAddOnModal({ kind: "edit", item })}
+          onDelete={(item) => setAddOnDeleteTarget(item)}
         />
       )}
 
@@ -133,9 +161,22 @@ function MenuManager({ menuItems, inventoryItems }: MenuManagerProps) {
       />
 
       <AddOnModal
-        open={addOnModalOpen}
-        onClose={() => setAddOnModalOpen(false)}
+        open={addOnModal.kind !== "closed"}
+        item={addOnModal.kind === "edit" ? addOnModal.item : null}
+        onClose={() => setAddOnModal({ kind: "closed" })}
         onSave={handleSaveAddOn}
+      />
+
+      <AddOnDeleteDialog
+        item={addOnDeleteTarget}
+        open={Boolean(addOnDeleteTarget)}
+        isPending={deleteAddOnMutation.isPending}
+        onOpenChange={(open) => {
+          if (!open) setAddOnDeleteTarget(null);
+        }}
+        onConfirm={() => {
+          void handleDeleteAddOn();
+        }}
       />
 
       <MenuDeleteDialog

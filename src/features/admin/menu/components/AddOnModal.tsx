@@ -12,18 +12,20 @@ import {
 } from "@/components/ui/dialog";
 import { useAppForm } from "@/integrations/tanstack-form";
 import { AddOnFormSchema, type AddOnFormInput } from "../schemas/add-on";
+import type { AddOnItem } from "../types";
 
 interface AddOnModalProps {
   open: boolean;
   onClose: () => void;
   onSave: (data: AddOnFormInput) => void;
+  item?: AddOnItem | null;
 }
 
-function AddOnModal({ open, onClose, onSave }: AddOnModalProps) {
+function AddOnModal({ open, onClose, onSave, item }: AddOnModalProps) {
   const form = useAppForm({
     defaultValues: {
-      name: "",
-      amount: 0,
+      name: item?.name ?? "",
+      amount: item?.amount ?? 0,
     },
     validators: {
       onChange: AddOnFormSchema,
@@ -42,6 +44,8 @@ function AddOnModal({ open, onClose, onSave }: AddOnModalProps) {
 
   if (!open) return null;
 
+  const isEditing = Boolean(item);
+
   return (
     <Dialog
       open
@@ -57,10 +61,12 @@ function AddOnModal({ open, onClose, onSave }: AddOnModalProps) {
           <DialogHeader className="mb-6 flex-row items-start justify-between gap-4">
             <div className="space-y-2">
               <DialogTitle className="text-lg font-bold text-(--near-black)">
-                Add an add-on
+                {isEditing ? "Edit add-on" : "Add an add-on"}
               </DialogTitle>
               <DialogDescription className="text-sm text-(--medium-gray)">
-                Create a new menu add-on with a name and amount.
+                {isEditing
+                  ? "Update the add-on name and amount."
+                  : "Create a new menu add-on with a name and amount."}
               </DialogDescription>
             </div>
             <button
@@ -119,7 +125,7 @@ function AddOnModal({ open, onClose, onSave }: AddOnModalProps) {
                     className="flex flex-1 items-center justify-center gap-2"
                   >
                     <CheckIcon weight="bold" className="h-4 w-4" />
-                    Add add-on
+                    {isEditing ? "Save changes" : "Add add-on"}
                   </Button>
                 )}
               </form.Subscribe>

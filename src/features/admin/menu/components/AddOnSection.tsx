@@ -14,9 +14,11 @@ interface AddOnSectionProps {
   error: Error | null;
   onRetry: () => void;
   onAddClick: () => void;
+  onEdit?: (item: AddOnItem) => void;
+  onDelete?: (item: AddOnItem) => void;
 }
 
-function AddOnSection({ addOns, isLoading, isError, error, onRetry, onAddClick }: AddOnSectionProps) {
+function AddOnSection({ addOns, isLoading, isError, error, onRetry, onAddClick, onEdit, onDelete }: AddOnSectionProps) {
   const [searchQuery, setSearchQuery] = useState("");
 
   const fuseIndex = useMemo(
@@ -48,7 +50,7 @@ function AddOnSection({ addOns, isLoading, isError, error, onRetry, onAddClick }
           <div>
             <h2 className="text-lg font-bold text-(--deep-forest)">Add-ons</h2>
             <p className="text-sm text-(--medium-gray)">
-              Create extras like toppings, syrups, or upgrades.
+              Create extras
             </p>
           </div>
         </div>
@@ -107,7 +109,7 @@ function AddOnSection({ addOns, isLoading, isError, error, onRetry, onAddClick }
         ) : filteredAddOns.length > 0 ? (
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             {filteredAddOns.map((item) => (
-              <AddOnCard key={item.id} item={item} />
+              <AddOnCard key={item.id} item={item} onEdit={onEdit} onDelete={onDelete} />
             ))}
           </div>
         ) : isSearching ? (
