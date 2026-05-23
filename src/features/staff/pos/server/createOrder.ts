@@ -3,6 +3,7 @@ import { getRequestHeaders } from "@tanstack/react-start/server";
 import { auth } from "@/integrations/better-auth/auth";
 import { z } from "zod";
 import { prisma } from "@/integrations/prisma/db";
+import { getPusher } from "@/integrations/pusher/server";
 import { Payment_Method, Discount_Type } from "@/generated/prisma/enums.js";
 
 const createOrderInput = z.object({
@@ -43,7 +44,7 @@ const createOrderInput = z.object({
 export const createOrder = createServerFn({ method: "POST" })
   .inputValidator(createOrderInput)
   .handler(async ({ data }) => {
-    return await prisma.$transaction(async (tx) => {
+    const order = await prisma.$transaction(async (tx) => {
       const headers = getRequestHeaders();
       const session = await auth.api.getSession({ headers });
       
@@ -187,4 +188,13 @@ export const createOrder = createServerFn({ method: "POST" })
         })),
       };
     });
+
+    try {
+      const pusher = getPusher();
+      await pusher.trigger("orders", "new-order", order);
+    } catch (err) {
+      console.error("Failed to publish Pusher event:", err);
+    }
+
+    return order;
   });
