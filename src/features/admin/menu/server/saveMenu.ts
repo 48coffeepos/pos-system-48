@@ -52,32 +52,36 @@ export const saveMenu = createServerFn({ method: "POST" })
 					throw new Error("Menu item not found.");
 				}
 
-				let resolvedMenuId = menuId;
+			if (data.trackInventory && !data.itemType) {
+				throw new Error(
+					"Item type is required when tracking inventory.",
+				);
+			}
 
-				if (resolvedMenuId == null) {
-					const created = await tx.menu.create({
-						data: {
-							name: data.name,
-							price: data.trackInventory ? null : (data.price ?? null),
-							type: data.trackInventory
-								? (data.itemType ?? Inventory_Type.STANDALONE)
-								: null,
-						},
-					});
+			const menuType = data.trackInventory ? data.itemType! : null;
 
-					resolvedMenuId = created.menu_id;
-				} else {
-					await tx.menu.update({
-						where: { menu_id: resolvedMenuId },
-						data: {
-							name: data.name,
-							price: data.trackInventory ? null : (data.price ?? null),
-							type: data.trackInventory
-								? (data.itemType ?? Inventory_Type.STANDALONE)
-								: null,
-						},
-					});
-				}
+			let resolvedMenuId = menuId;
+
+			if (resolvedMenuId == null) {
+				const created = await tx.menu.create({
+					data: {
+						name: data.name,
+						price: data.trackInventory ? null : (data.price ?? null),
+						type: menuType,
+					},
+				});
+
+				resolvedMenuId = created.menu_id;
+			} else {
+				await tx.menu.update({
+					where: { menu_id: resolvedMenuId },
+					data: {
+						name: data.name,
+						price: data.trackInventory ? null : (data.price ?? null),
+						type: menuType,
+					},
+				});
+			}
 
 				await tx.menuInventory.deleteMany({
 					where: { menu_id: resolvedMenuId },

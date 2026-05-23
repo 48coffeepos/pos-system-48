@@ -22,7 +22,7 @@ function MenuCard({ item, onEdit, onDelete }: MenuCardProps) {
 			(min, entry) => Math.min(min, entry.price),
 			Infinity,
 		);
-		if (lowestPrice === Infinity) return item.price ?? null;
+		if (lowestPrice === Infinity) return `₱${item.price?.toFixed(2)}`;
 		return `₱${lowestPrice.toFixed(2)}`;
 	};
 
