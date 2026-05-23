@@ -184,10 +184,10 @@ export const createOrder = createServerFn({ method: "POST" })
 
 		try {
 			const pusher = getPusher();
-			console.log("PUSHER CLIENT FOUND", pusher);
 			if (pusher) {
 				await pusher.trigger("orders", "new-order", order);
-				console.log("PUSHER EVENT TRIGGERED", order);
+			} else {
+				throw Error("Cannot send new order to order list automatically.");
 			}
 		} catch (err) {
 			console.error("Failed to publish Pusher event:", err);
