@@ -1,37 +1,55 @@
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import Pusher from "pusher-js";
 
 let pusherClient: Pusher | null = null;
 
-function getPusherClient(): Pusher {
-  if (!pusherClient) {
-    pusherClient = new Pusher(import.meta.env.VITE_PUSHER_KEY as string, {
-      cluster: import.meta.env.VITE_PUSHER_CLUSTER as string,
-    });
-  }
-  return pusherClient;
+function hasPusherCredentials(): boolean {
+	return Boolean(
+		typeof import.meta !== "undefined" &&
+			import.meta.env?.VITE_PUSHER_KEY &&
+			import.meta.env?.VITE_PUSHER_CLUSTER,
+	);
+}
+
+function getPusherClient(): Pusher | null {
+	if (!hasPusherCredentials()) {
+		return null;
+	}
+
+	if (!pusherClient) {
+		pusherClient = new Pusher(import.meta.env.VITE_PUSHER_KEY as string, {
+			cluster: import.meta.env.VITE_PUSHER_CLUSTER as string,
+		});
+	}
+	return pusherClient;
 }
 
 export function usePusherChannel(
-  channelName: string,
-  eventName: string,
-  handler: (data: unknown) => void,
+	channelName: string,
+	eventName: string,
+	handler: (data: unknown) => void,
 ) {
-  const handlerRef = useRef(handler);
-  handlerRef.current = handler;
+	const handlerRef = useRef(handler);
+	handlerRef.current = handler;
 
-  useEffect(() => {
-    const pusher = getPusherClient();
-    const channel = pusher.subscribe(channelName);
+	const isEnabled = hasPusherCredentials();
 
-    const wrappedHandler = (data: unknown) => {
-      handlerRef.current(data);
-    };
-    channel.bind(eventName, wrappedHandler);
+	const wrappedHandler = useCallback((data: unknown) => {
+		handlerRef.current(data);
+	}, []);
 
-    return () => {
-      channel.unbind(eventName, wrappedHandler);
-      pusher.unsubscribe(channelName);
-    };
-  }, [channelName, eventName]);
+	useEffect(() => {
+		if (!isEnabled) return;
+
+		const pusher = getPusherClient();
+		if (!pusher) return;
+
+		const channel = pusher.subscribe(channelName);
+		channel.bind(eventName, wrappedHandler);
+
+		return () => {
+			channel.unbind(eventName, wrappedHandler);
+			pusher.unsubscribe(channelName);
+		};
+	}, [channelName, eventName, wrappedHandler, isEnabled]);
 }
