@@ -1,195 +1,50 @@
+import { CreditCardIcon, ReceiptIcon } from "@phosphor-icons/react";
 import { Link } from "@tanstack/react-router";
-import type { ColumnDef } from "@tanstack/react-table";
-
-import { DataTable } from "@/components/ui/data-table";
-import { formatPeso } from "@/features/admin/dashboard/utils";
+import { useState } from "react";
+import { PosReceiptDialog } from "@/features/staff/pos/components/PosReceiptDialog";
+import type { PosOrder } from "@/features/staff/pos/types";
+import { formatPeso } from "@/lib/format-currency";
 import { cn } from "@/lib/utils";
 
-export interface TodayOrderRow {
-	time: string;
-	order_id: string;
-	staff_name: string;
-	method: string;
-	note: string | null;
-	menu_name: string;
-	cup: string;
-	quantity: number;
-	unit_price: number;
-	line_total: number;
-	discount_type: string | null;
-	addons_summary: string;
+interface TodayOrdersTableProps {
+	data: PosOrder[];
+	limit?: number;
 }
 
 function methodBadge(method: string) {
 	const styles: Record<string, string> = {
-		CASH: "bg-emerald-100 text-emerald-800",
-		GCASH: "bg-blue-100 text-blue-800",
-		GRAB: "bg-purple-100 text-purple-800",
+		CASH: "bg-emerald-50 text-emerald-700 border-emerald-200/50",
+		GCASH: "bg-blue-50 text-blue-700 border-blue-200/50",
+		GRAB: "bg-orange-50 text-orange-700 border-orange-200/50",
 	};
 	return (
 		<span
 			className={cn(
-				"inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold",
-				styles[method] ?? "bg-(--off-white) text-(--dark-gray)",
+				"inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-[10px] font-bold",
+				styles[method] ?? "bg-gray-50 text-gray-700 border-gray-200/50",
 			)}
 		>
+			<CreditCardIcon className="size-3" />
 			{method}
 		</span>
 	);
 }
 
-function discountBadge(type: string | null) {
-	if (!type) return <span className="text-xs text-(--medium-gray)">—</span>;
-	const styles: Record<string, string> = {
-		PWD: "bg-amber-100 text-amber-800",
-		SENIOR: "bg-orange-100 text-orange-800",
-	};
-	return (
-		<span
-			className={cn(
-				"inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold",
-				styles[type] ?? "bg-(--off-white) text-(--dark-gray)",
-			)}
-		>
-			{type}
-		</span>
-	);
-}
-
-const columns: ColumnDef<TodayOrderRow>[] = [
-	{
-		accessorKey: "time",
-		header: "Time",
-		size: 80,
-		cell: ({ getValue }) => (
-			<span className="text-xs tabular-nums whitespace-nowrap">
-				{getValue() as string}
-			</span>
-		),
-	},
-	{
-		accessorKey: "order_id",
-		header: "Order #",
-		size: 90,
-		cell: ({ getValue }) => (
-			<span className="text-xs font-mono text-(--medium-gray)">
-				…{getValue() as string}
-			</span>
-		),
-	},
-	{
-		accessorKey: "staff_name",
-		header: "Staff",
-		size: 100,
-		cell: ({ getValue }) => (
-			<span className="text-xs whitespace-nowrap">{getValue() as string}</span>
-		),
-	},
-	{
-		accessorKey: "method",
-		header: "Method",
-		size: 80,
-		cell: ({ getValue }) => methodBadge(getValue() as string),
-	},
-	{
-		accessorKey: "menu_name",
-		header: "Menu",
-		size: 140,
-		cell: ({ getValue }) => (
-			<span className="text-sm whitespace-nowrap">{getValue() as string}</span>
-		),
-	},
-	{
-		accessorKey: "cup",
-		header: "Cup",
-		size: 100,
-		cell: ({ getValue }) => {
-			const val = getValue() as string;
-			return (
-				<span className="text-xs text-(--medium-gray) whitespace-nowrap">
-					{val}
-				</span>
-			);
-		},
-	},
-	{
-		accessorKey: "discount_type",
-		header: "Disc.",
-		size: 72,
-		cell: ({ getValue }) => discountBadge(getValue() as string | null),
-	},
-	{
-		accessorKey: "addons_summary",
-		header: "Addons",
-		size: 160,
-		cell: ({ getValue }) => {
-			const val = getValue() as string;
-			if (!val) return <span className="text-xs text-(--medium-gray)">—</span>;
-			return (
-				<span className="text-[10px] text-(--medium-gray) leading-tight block max-w-[150px] truncate">
-					{val}
-				</span>
-			);
-		},
-	},
-	{
-		accessorKey: "note",
-		header: "Note",
-		size: 120,
-		cell: ({ getValue }) => {
-			const val = getValue() as string | null;
-			if (!val) return <span className="text-xs text-(--medium-gray)">—</span>;
-			return (
-				<span className="text-[10px] text-(--medium-gray) italic truncate block max-w-[100px]">
-					{val}
-				</span>
-			);
-		},
-	},
-	{
-		accessorKey: "quantity",
-		header: "Qty",
-		size: 48,
-		cell: ({ getValue }) => (
-			<span className="text-sm tabular-nums">{getValue() as number}</span>
-		),
-	},
-	{
-		accessorKey: "unit_price",
-		header: "Unit Price",
-		size: 90,
-		cell: ({ getValue }) => (
-			<span className="text-xs tabular-nums">
-				{formatPeso(getValue() as number)}
-			</span>
-		),
-	},
-	{
-		accessorKey: "line_total",
-		header: "Line Total",
-		size: 90,
-		cell: ({ getValue }) => (
-			<span className="text-xs tabular-nums font-semibold">
-				{formatPeso(getValue() as number)}
-			</span>
-		),
-	},
-];
-
-interface TodayOrdersTableProps {
-	data: TodayOrderRow[];
-	limit?: number;
-}
-
 export function TodayOrdersTable({ data, limit }: TodayOrdersTableProps) {
+	const [selectedOrder, setSelectedOrder] = useState<PosOrder | null>(null);
 	const displayed = limit ? data.slice(0, limit) : data;
 
 	return (
-		<div className="card-white p-5">
-			<div className="flex items-center justify-between mb-4">
-				<h3 className="text-sm font-bold text-(--near-black)">
-					{limit ? "All Orders Today" : "Orders"}
-				</h3>
+		<div className="rounded-2xl border border-(--light-gray) bg-(--pure-white) p-6 shadow-sm">
+			<div className="mb-6 flex items-center justify-between">
+				<div>
+					<h3 className="text-lg font-bold text-(--deep-forest)">
+						{limit ? "All Orders Today" : "Orders"}
+					</h3>
+					<p className="mt-0.5 text-xs text-(--medium-gray)">
+						{limit ? "A summary of today's transactions" : "A list of all transactions"}
+					</p>
+				</div>
 				{limit && (
 					<Link
 						to="/admin/orders"
@@ -199,7 +54,95 @@ export function TodayOrdersTable({ data, limit }: TodayOrdersTableProps) {
 					</Link>
 				)}
 			</div>
-			<DataTable columns={columns} data={displayed} pageSize={displayed.length} />
+
+			<div className="w-full overflow-x-auto rounded-xl border border-(--light-gray)/40">
+				<table className="w-full border-collapse text-left table-fixed">
+					<thead>
+						<tr className="border-b border-(--light-gray)/40 bg-(--off-white) text-xs font-bold uppercase tracking-wider text-(--medium-gray)">
+							<th className="p-4 pl-6 w-[20%] text-center">Order No</th>
+							<th className="p-4 w-[20%] text-center">Date & Time</th>
+							<th className="p-4 w-[20%] text-center">Payment</th>
+							<th className="p-4 w-[20%] text-center">Total</th>
+							<th className="p-4 pr-6 no-print w-[20%] text-center">Receipt</th>
+						</tr>
+					</thead>
+					<tbody className="divide-y divide-(--light-gray)/40">
+						{displayed.length === 0 ? (
+							<tr>
+								<td
+									colSpan={5}
+									className="p-8 text-center text-sm font-medium text-(--medium-gray)"
+								>
+									No transactions found.
+								</td>
+							</tr>
+						) : (
+							displayed.map((order) => {
+								const dateObj = new Date(order.created_at);
+								const formattedDate = dateObj.toLocaleDateString("en-GB");
+								const formattedTime = dateObj.toLocaleTimeString("en-US", {
+									hour: "2-digit",
+									minute: "2-digit",
+									hour12: true,
+								});
+
+								return (
+									<tr
+										key={order.order_id}
+										className="group hover:bg-(--off-white)/50 transition-colors"
+									>
+										<td className="p-4 pl-6 font-mono font-bold text-sm text-(--near-black) text-center">
+											{order.order_id}
+										</td>
+
+										<td className="p-4 text-xs font-medium text-(--near-black) text-center">
+											<div className="flex flex-col gap-0.5">
+												<span>{formattedDate}</span>
+												<span className="text-(--medium-gray)">
+													{formattedTime}
+												</span>
+											</div>
+										</td>
+
+										<td className="p-4 text-center">
+											<div className="flex flex-col gap-1 items-center">
+												{methodBadge(order.method)}
+												{order.reference_number ? (
+													<span className="text-[10px] font-mono text-(--medium-gray)">
+														Ref: {order.reference_number}
+													</span>
+												) : null}
+											</div>
+										</td>
+
+										<td className="p-4 font-black text-sm text-(--near-black) text-center">
+											{formatPeso(order.grand_total)}
+										</td>
+
+										<td className="p-4 pr-6 no-print text-center">
+											<button
+												type="button"
+												onClick={() => setSelectedOrder(order)}
+												className="inline-flex items-center gap-1.5 rounded-lg border border-(--light-gray) bg-white px-3 py-1.5 text-xs font-bold text-(--near-black) transition-all hover:bg-gray-50 active:scale-95 shadow-sm"
+											>
+												<ReceiptIcon className="size-3.5" />
+												View Slip
+											</button>
+										</td>
+									</tr>
+								);
+							})
+						)}
+					</tbody>
+				</table>
+			</div>
+
+			<PosReceiptDialog
+				order={selectedOrder}
+				open={!!selectedOrder}
+				onClose={() => setSelectedOrder(null)}
+				cashierName={selectedOrder?.cashier_name || "Cashier"}
+			/>
 		</div>
 	);
 }

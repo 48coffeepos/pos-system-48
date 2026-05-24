@@ -2,111 +2,79 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 import { prisma } from "@/integrations/prisma/db";
-import { parseCupInfoKey } from "@/lib/cup-utils";
 import { DEFAULT_TIMEZONE, getTimeframeBounds } from "@/lib/day-bounds";
 
 export const getFilteredOrders = createServerFn({ method: "GET" })
-  .inputValidator(
-    z.object({
-      timeframe: z.enum(["all", "today", "yesterday"]),
-    }),
-  )
-  .handler(async ({ data }) => {
-    const tz = process.env.TIMEZONE ?? DEFAULT_TIMEZONE;
+	.inputValidator(
+		z.object({
+			timeframe: z.enum(["all", "today", "yesterday"]),
+		}),
+	)
+	.handler(async ({ data }) => {
+		const tz = process.env.TIMEZONE ?? DEFAULT_TIMEZONE;
 
-    let start: Date | undefined;
-    let end: Date | undefined;
+		let start: Date | undefined;
+		let end: Date | undefined;
 
-    if (data.timeframe !== "all") {
-      const bounds = getTimeframeBounds(data.timeframe, tz);
-      start = bounds.start;
-      end = bounds.end;
-    }
+		if (data.timeframe !== "all") {
+			const bounds = getTimeframeBounds(data.timeframe, tz);
+			start = bounds.start;
+			end = bounds.end;
+		}
 
-    const where =
-      start && end ? { created_at: { gte: start, lte: end } } : {};
+		const where =
+			start && end ? { created_at: { gte: start, lte: end } } : {};
 
-    const [orders, allCups] = await Promise.all([
-      prisma.order.findMany({
-        where,
-        include: {
-          staff: { select: { name: true } },
-          order_items: {
-            include: {
-              addon_items: {
-                select: {
-                  addon_name_snapshot: true,
-                  addon_price_snapshot: true,
-                  quantity: true,
-                },
-              },
-            },
-          },
-        },
-        orderBy: { created_at: "desc" },
-      }),
-      prisma.inventory.findMany({
-        where: { type: "CUP" },
-        select: { name: true },
-      }),
-    ]);
+		const orders = await prisma.order.findMany({
+			where,
+			include: {
+				staff: { select: { name: true } },
+				order_items: {
+					include: {
+						addon_items: {
+							select: {
+								addon_id: true,
+								addon_name_snapshot: true,
+								addon_price_snapshot: true,
+								quantity: true,
+							},
+						},
+					},
+				},
+			},
+			orderBy: { created_at: "desc" },
+		});
 
-    const cupNameByKey = new Map<string, string>();
-    for (const cup of allCups) {
-      const key = parseCupInfoKey(cup.name);
-      if (!cupNameByKey.has(key)) {
-        cupNameByKey.set(key, cup.name);
-      }
-    }
-
-    function resolveCupName(snapshotInventory: string): string {
-      const key = parseCupInfoKey(snapshotInventory);
-      return cupNameByKey.get(key) ?? snapshotInventory;
-    }
-
-    const rows: Array<{
-      time: string;
-      order_id: string;
-      staff_name: string;
-      method: string;
-      note: string | null;
-      menu_name: string;
-      cup: string;
-      quantity: number;
-      unit_price: number;
-      line_total: number;
-      discount_type: string | null;
-      addons_summary: string;
-    }> = [];
-
-    for (const order of orders) {
-      for (const item of order.order_items) {
-        const addons = item.addon_items.map(
-          (a) =>
-            `${a.addon_name_snapshot} (+${Number(a.addon_price_snapshot)})`,
-        );
-
-        rows.push({
-          time: order.created_at.toLocaleTimeString("en-US", {
-            hour: "numeric",
-            minute: "2-digit",
-            hour12: true,
-            timeZone: tz,
-          }),
-          order_id: order.order_id.slice(-6),
-          staff_name: order.staff?.name ?? "Cashier",
-          method: order.method,
-          note: order.note ?? null,
-          menu_name: item.snapshot_menu_name,
-          cup: resolveCupName(item.snapshot_inventory),
-          quantity: item.quantity,
-          unit_price: Number(item.unit_price),
-          line_total: Number(item.line_total),
-          discount_type: item.discount_type ?? null,
-          addons_summary: addons.length > 0 ? addons.join(", ") : "",
-        });
-      }
-    }
-
-    return rows;
-  });
+		return orders.map((order) => ({
+			order_id: order.order_id,
+			created_at: order.created_at.toISOString(),
+			method: order.method,
+			reference_number: order.reference_number || undefined,
+			amount_tendered: order.amount_tendered
+				? Number(order.amount_tendered)
+				: undefined,
+			change_amount: order.change_amount
+				? Number(order.change_amount)
+				: undefined,
+			grand_total: Number(order.grand_total),
+			note: order.note || undefined,
+			cashier_name: order.staff?.name ?? "Cashier",
+			items: order.order_items.map((item) => ({
+				snapshot_menu_name: item.snapshot_menu_name,
+				quantity: item.quantity,
+				unit_price: Number(item.unit_price),
+				discount_type: item.discount_type ?? undefined,
+				discount_contact: item.discount_contact ?? undefined,
+				discount_id_number: item.discount_id_number ?? undefined,
+				line_total: Number(item.line_total),
+				note: item.note ?? undefined,
+				snapshot_inventory: item.snapshot_inventory,
+				addon_items: item.addon_items.map((a) => ({
+					addon_id: a.addon_id,
+					addon_name_snapshot: a.addon_name_snapshot,
+					addon_price_snapshot: Number(a.addon_price_snapshot),
+					quantity: a.quantity,
+				})),
+			})),
+		}));
+	});
