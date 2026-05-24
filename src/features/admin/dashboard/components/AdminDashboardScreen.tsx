@@ -40,7 +40,7 @@ export function AdminDashboardScreen() {
 				selectedPayment={selectedPayment}
 			/>
 
-			<TodayOrdersTable data={todayOrders} />
+			<TodayOrdersTable data={todayOrders} limit={10} />
 
 			{receiptMode === "select" && (
 				<div

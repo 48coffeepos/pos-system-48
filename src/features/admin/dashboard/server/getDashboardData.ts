@@ -2,11 +2,12 @@ import { createServerFn } from "@tanstack/react-start";
 
 import { prisma } from "@/integrations/prisma/db";
 import { parseCupInfoKey } from "@/lib/cup-utils";
-import { getTodayBounds } from "@/lib/day-bounds";
+import { DEFAULT_TIMEZONE, getTodayBounds } from "@/lib/day-bounds";
 
 export const getDashboardData = createServerFn({ method: "GET" }).handler(
   async () => {
-    const { start, end } = getTodayBounds();
+    const tz = process.env.TIMEZONE ?? DEFAULT_TIMEZONE;
+    const { start, end } = getTodayBounds(tz);
 
     const orders = await prisma.order.findMany({
       where: { created_at: { gte: start, lte: end } },
@@ -107,6 +108,7 @@ export const getDashboardData = createServerFn({ method: "GET" }).handler(
         month: "long",
         day: "numeric",
         year: "numeric",
+        timeZone: tz,
       })}`,
     };
   },

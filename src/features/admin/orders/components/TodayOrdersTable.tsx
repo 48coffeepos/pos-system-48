@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import type { ColumnDef } from "@tanstack/react-table";
 
 import { DataTable } from "@/components/ui/data-table";
@@ -177,15 +178,28 @@ const columns: ColumnDef<TodayOrderRow>[] = [
 
 interface TodayOrdersTableProps {
 	data: TodayOrderRow[];
+	limit?: number;
 }
 
-export function TodayOrdersTable({ data }: TodayOrdersTableProps) {
+export function TodayOrdersTable({ data, limit }: TodayOrdersTableProps) {
+	const displayed = limit ? data.slice(0, limit) : data;
+
 	return (
 		<div className="card-white p-5">
-			<h3 className="text-sm font-bold text-(--near-black) mb-4">
-				All Orders Today
-			</h3>
-			<DataTable columns={columns} data={data} pageSize={data.length} />
+			<div className="flex items-center justify-between mb-4">
+				<h3 className="text-sm font-bold text-(--near-black)">
+					{limit ? "All Orders Today" : "Orders"}
+				</h3>
+				{limit && (
+					<Link
+						to="/admin/orders"
+						className="text-xs font-semibold text-(--deep-forest) hover:underline"
+					>
+						View Orders
+					</Link>
+				)}
+			</div>
+			<DataTable columns={columns} data={displayed} pageSize={displayed.length} />
 		</div>
 	);
 }

@@ -1,23 +1,59 @@
-/** Local calendar-day bounds for "today" and "yesterday" queries. */
-export function getTimeframeBounds(timeframe: "today" | "yesterday") {
-	const now = new Date();
-	const year = now.getFullYear();
-	const month = now.getMonth();
-	const date = now.getDate();
+export const DEFAULT_TIMEZONE = "Asia/Manila";
 
-	if (timeframe === "today") {
-		return {
-			start: new Date(year, month, date, 0, 0, 0, 0),
-			end: new Date(year, month, date, 23, 59, 59, 999),
-		};
-	}
-
-	return {
-		start: new Date(year, month, date - 1, 0, 0, 0, 0),
-		end: new Date(year, month, date - 1, 23, 59, 59, 999),
-	};
+function getDateStr(tz: string, date: Date): string {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: tz,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(date);
 }
 
-export function getTodayBounds() {
-	return getTimeframeBounds("today");
+function getUtcOffset(tz: string, date: Date): string {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: tz,
+    timeZoneName: "longOffset",
+  }).formatToParts(date);
+
+  const tzName = parts.find((p) => p.type === "timeZoneName")?.value ?? "";
+
+  const match = tzName.match(/(?:UTC|GMT)([+-]\d{1,2}):?(\d{2})?/);
+
+  if (!match) {
+    return "+00:00";
+  }
+
+  const absH = String(Math.abs(Number(match[1])));
+  const min = String(match[2] ?? "0").padStart(2, "0");
+  const sign = Number(match[1]) >= 0 ? "+" : "-";
+
+  return `${sign}${absH.padStart(2, "0")}:${min}`;
+}
+
+function boundsForDate(tz: string, date: Date) {
+  const dateStr = getDateStr(tz, date);
+  const offset = getUtcOffset(tz, date);
+
+  return {
+    start: new Date(`${dateStr}T00:00:00${offset}`),
+    end: new Date(`${dateStr}T23:59:59.999${offset}`),
+  };
+}
+
+export function getTimeframeBounds(
+  timeframe: "today" | "yesterday",
+  tz: string = process.env.TIMEZONE ?? DEFAULT_TIMEZONE,
+) {
+  const now = new Date();
+
+  if (timeframe === "today") {
+    return boundsForDate(tz, now);
+  }
+
+  const yesterday = new Date(now.getTime() - 86_400_000);
+  return boundsForDate(tz, yesterday);
+}
+
+export function getTodayBounds(tz?: string) {
+  return getTimeframeBounds("today", tz);
 }

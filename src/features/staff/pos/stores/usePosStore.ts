@@ -114,6 +114,8 @@ export const usePosStore = create<PosState>()(
 			partialize: (state) => ({
 				activeCategory: state.activeCategory,
 				search: state.search,
+				cart: state.cart,
+				lastOrder: state.lastOrder,
 				formValues: state.formValues,
 			}),
 		},

@@ -2,11 +2,12 @@ import { createServerFn } from "@tanstack/react-start";
 
 import { prisma } from "@/integrations/prisma/db";
 import { parseCupInfoKey } from "@/lib/cup-utils";
-import { getTodayBounds } from "@/lib/day-bounds";
+import { DEFAULT_TIMEZONE, getTodayBounds } from "@/lib/day-bounds";
 
 export const getTodayOrders = createServerFn({ method: "GET" }).handler(
 	async () => {
-		const { start, end } = getTodayBounds();
+		const tz = process.env.TIMEZONE ?? DEFAULT_TIMEZONE;
+		const { start, end } = getTodayBounds(tz);
 
 		const [orders, allCups] = await Promise.all([
 			prisma.order.findMany({
@@ -73,6 +74,7 @@ export const getTodayOrders = createServerFn({ method: "GET" }).handler(
 						hour: "numeric",
 						minute: "2-digit",
 						hour12: true,
+						timeZone: tz,
 					}),
 					order_id: order.order_id.slice(-6),
 					staff_name: order.staff?.name ?? "Cashier",
