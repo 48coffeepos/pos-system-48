@@ -25,14 +25,19 @@ export function RevenueCard({
 	periodLabel,
 	onExportClick,
 }: RevenueCardProps) {
+	const cashAndGcashRevenue =
+		(revenueByMethod["CASH"] ?? 0) + (revenueByMethod["GCASH"] ?? 0);
+	const cashAndGcashOrders =
+		(ordersByMethod["CASH"] ?? 0) + (ordersByMethod["GCASH"] ?? 0);
+
 	const displayedRevenue =
 		selectedPayment === "all"
-			? totalRevenue
+			? cashAndGcashRevenue
 			: (revenueByMethod[selectedPayment] ?? 0);
 
 	const displayedOrders =
 		selectedPayment === "all"
-			? totalOrders
+			? cashAndGcashOrders
 			: (ordersByMethod[selectedPayment] ?? 0);
 
 	return (
