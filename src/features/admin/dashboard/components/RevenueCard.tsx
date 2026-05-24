@@ -49,7 +49,7 @@ export function RevenueCard({
 					</p>
 					<div className="flex items-center gap-4">
 						<p className="text-3xl sm:text-4xl font-bold text-(--near-black)">
-							{formatPeso(displayedRevenue)}
+							{selectedPayment === "GRAB" ? "—" : formatPeso(displayedRevenue)}
 						</p>
 						<Button
 							variant="ghost"
