@@ -8,7 +8,7 @@
 		"start": "node .output/server/index.mjs",
 		"preview": "vite preview",
 		"test": "vitest run",
-		"post-cta-init": "npx -y create-db@latest --user-agent tanstack/tsrouter",
+		"postinstall": "prisma generate",
 		"db:generate": "dotenv -e .env.local -- prisma generate",
 		"db:push": "dotenv -e .env.local -- prisma db push",
 		"db:pull": "dotenv -e .env.local -- prisma db pull",
