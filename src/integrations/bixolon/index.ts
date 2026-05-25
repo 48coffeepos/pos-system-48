@@ -1,26 +1,25 @@
 export {
-  THERMAL_PAGE_STYLE,
-  BIXOLON_SRP_E302,
+	BIXOLON_SRP_E302,
+	THERMAL_PAGE_STYLE,
 } from "./printer";
-
 export {
-  loadBixolonSDK,
-  isBixolonSDKLoaded,
-  getBixolonSDK,
-  sendToPrinter,
-  resetPrinter,
-} from "./web-print-sdk";
-
-export {
-  printOrderReceipt,
-  printSalesXReading,
-  printCashCount,
+	printCashCount,
+	printCupsSales,
+	printOrderReceipt,
+	printRevenue,
+	printSalesXReading,
 } from "./receipt-builder";
-
 export type {
-  BixolonSDKInstance,
-  BixolonConnectionConfig,
-  BixolonReceiptData,
-  BixolonReceiptLine,
-  BixolonReceiptSection,
+	BixolonConnectionConfig,
+	BixolonReceiptData,
+	BixolonReceiptLine,
+	BixolonReceiptSection,
+	BixolonSDKInstance,
 } from "./types";
+export {
+	getBixolonSDK,
+	isBixolonSDKLoaded,
+	loadBixolonSDK,
+	resetPrinter,
+	sendToPrinter,
+} from "./web-print-sdk";

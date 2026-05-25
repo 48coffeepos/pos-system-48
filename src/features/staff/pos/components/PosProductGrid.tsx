@@ -33,7 +33,7 @@ export function PosProductGrid({
 
 			<div className="flex-1 overflow-y-auto pr-2">
 				{loading ? (
-					<div className="grid grid-cols-4 gap-4">
+					<div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:gap-4 xl:grid-cols-4">
 						{Array.from({ length: 8 }).map((_, i) => (
 							<div
 								// biome-ignore lint/suspicious/noArrayIndexKey: known array length
@@ -47,7 +47,7 @@ export function PosProductGrid({
 						))}
 					</div>
 				) : (
-					<div className="grid grid-cols-4 gap-4 pt-3">
+					<div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:gap-4 xl:grid-cols-4 pt-3">
 						{menuItems.map((item) => (
 							<PosProductCard
 								key={item.menu_id}

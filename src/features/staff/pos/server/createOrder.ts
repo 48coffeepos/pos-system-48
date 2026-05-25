@@ -101,30 +101,42 @@ export const createOrder = createServerFn({ method: "POST" })
 					grand_total: data.grand_total,
 					note: data.note || null,
 					order_items: {
-						create: data.items.map((item) => ({
-							menu_id: item.menu_id,
-							snapshot_menu_name: item.snapshot_menu_name,
-							snapshot_price: item.unit_price,
-							snapshot_inventory: item.snapshot_inventory,
-							unit_price: item.unit_price,
-							quantity: item.quantity,
-							line_total: item.line_total,
-							discount_amount: 5,
-							discount_type: (item.discount_type as Discount_Type) || null,
-							discount_id_number: item.discount_id_number || null,
-							discount_contact: item.discount_contact || null,
-							addon_items: item.addon_items
-								? {
-										create: item.addon_items.map((addon) => ({
-											addon_id: addon.addon_id,
-											addon_name_snapshot: addon.addon_name_snapshot,
-											addon_price_snapshot: addon.addon_price_snapshot,
-											quantity: addon.quantity,
-											total_price: addon.addon_price_snapshot * addon.quantity,
-										})),
-									}
-								: undefined,
-						})),
+						create: await Promise.all(
+							data.items.map(async (item) => {
+								let invSnapshot = item.snapshot_inventory;
+								if (item.selected_inventory_id) {
+									const inv = await tx.inventory.findUnique({
+										where: { inventory_id: item.selected_inventory_id },
+										select: { name: true },
+									});
+									if (inv) invSnapshot = inv.name;
+								}
+								return {
+									menu_id: item.menu_id,
+									snapshot_menu_name: item.snapshot_menu_name,
+									snapshot_price: item.unit_price,
+									snapshot_inventory: invSnapshot,
+									unit_price: item.unit_price,
+									quantity: item.quantity,
+									line_total: item.line_total,
+									discount_amount: 5,
+									discount_type: (item.discount_type as Discount_Type) || null,
+									discount_id_number: item.discount_id_number || null,
+									discount_contact: item.discount_contact || null,
+									addon_items: item.addon_items
+										? {
+												create: item.addon_items.map((addon) => ({
+													addon_id: addon.addon_id,
+													addon_name_snapshot: addon.addon_name_snapshot,
+													addon_price_snapshot: addon.addon_price_snapshot,
+													quantity: addon.quantity,
+													total_price: addon.addon_price_snapshot * addon.quantity,
+												})),
+											}
+										: undefined,
+								};
+							}),
+						),
 					},
 				},
 				include: {

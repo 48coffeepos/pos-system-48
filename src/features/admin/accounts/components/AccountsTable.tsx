@@ -27,7 +27,7 @@ export function AccountsTable({
 
 	return (
 		<section className="lg:col-span-2">
-			<div className="flex flex-col gap-6 rounded-2xl border bg-background p-6 shadow-xs">
+			<div className="flex flex-col gap-6 rounded-2xl border bg-card p-6 shadow-xs">
 				<div className="flex items-center justify-between gap-4">
 					<div className="flex flex-col gap-1">
 						<h2 className="text-lg font-semibold">Accounts</h2>

@@ -147,9 +147,11 @@ export function PosScreen() {
 					menu_id: c.menu_id,
 					snapshot_menu_name: c.menu_name,
 					snapshot_inventory:
-						c.cup_type && c.cup_type !== "NONE"
-							? `${c.cup_size} ${c.cup_type}`
-							: c.menu_name,
+						c.cup_size === "CUSTOM"
+							? c.cup_type
+							: c.cup_type && c.cup_type !== "NONE"
+								? `${c.cup_size} ${c.cup_type}`
+								: c.menu_name,
 					quantity: c.quantity,
 					unit_price: c.unit_price,
 					discount_type: c.discount,
@@ -192,9 +194,11 @@ export function PosScreen() {
 					discount_id_number: c.discount_id,
 					line_total: c.total_price,
 					snapshot_inventory:
-						c.cup_type && c.cup_type !== "NONE"
-							? `${c.cup_size} ${c.cup_type}`
-							: c.menu_name,
+						c.cup_size === "CUSTOM"
+							? c.cup_type
+							: c.cup_type && c.cup_type !== "NONE"
+								? `${c.cup_size} ${c.cup_type}`
+								: c.menu_name,
 					addon_items: c.addon_items?.map((a) => ({
 						addon_id: a.addon_id,
 						addon_name_snapshot: a.name,
