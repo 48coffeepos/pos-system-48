@@ -1,11 +1,17 @@
+const CUP_PATTERN = /^(\d+oz)\s+(hot|iced)$|^(hot|iced)\s+(\d+oz)$/i;
+
 export function parseCupInfo(name: string): {
   cup_type: string;
   cup_size: string;
 } {
-  const lower = name.toLowerCase();
-  const cup_type = lower.includes("iced") ? "ICED" : "HOT";
-  const cup_size = lower.includes("16oz") ? "16OZ" : "12OZ";
-  return { cup_type, cup_size };
+  const match = name.match(CUP_PATTERN);
+  if (match) {
+    return {
+      cup_type: (match[2] || match[3]).toUpperCase(),
+      cup_size: (match[1] || match[4]).toUpperCase(),
+    };
+  }
+  return { cup_type: name, cup_size: "CUSTOM" };
 }
 
 export function parseCupInfoKey(name: string): string {

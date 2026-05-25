@@ -54,45 +54,76 @@ export const getDashboardData = createServerFn({ method: "GET" }).handler(
     >();
 
     for (const cup of allCups) {
-      const key = parseCupInfoKey(cup.name);
-      if (cupSalesMap.has(key)) continue;
-      cupSalesMap.set(key, {
+      cupSalesMap.set(cup.name, {
         name: cup.name,
         total: 0,
         byMethod: { ...emptyByMethod },
       });
     }
 
-    // Approach 1: OrderItems with a menu that is typed CUP — menu is the authority.
-    // Approach 2: OrderItems where menu_id is null (orphaned) — fall back to
-    //             snapshot_inventory matching via parseCupInfoKey.
-    const cupOrderItems = await prisma.orderItem.findMany({
+    const todayOrderItems = await prisma.orderItem.findMany({
       where: {
         order: { created_at: { gte: start, lte: end } },
-        OR: [
-          { menu: { type: "CUP" } },
-          { menu_id: null },
-        ],
       },
       select: {
         quantity: true,
         snapshot_inventory: true,
+        menu_id: true,
         order: { select: { method: true } },
       },
     });
 
-    for (const item of cupOrderItems) {
-      const cupName = item.snapshot_inventory;
-      if (!cupName) continue;
+    const menuInvLinks = await prisma.menuInventory.findMany({
+      where: { inventory: { type: "CUP" } },
+      select: { menu_id: true, inventory: { select: { name: true } } },
+    });
+
+    const menuInvMap = new Map<string, string[]>();
+    for (const link of menuInvLinks) {
+      const list = menuInvMap.get(link.menu_id) ?? [];
+      list.push(link.inventory.name);
+      menuInvMap.set(link.menu_id, list);
+    }
+
+    for (const item of todayOrderItems) {
       const method = item.order?.method;
       if (!method) continue;
 
-      const entry = cupSalesMap.get(cupName);
-      if (!entry) continue;
+      let matchedInventoryName: string | null = null;
 
-      entry.total += item.quantity;
-      if (method in entry.byMethod) {
-        entry.byMethod[method] += item.quantity;
+      if (item.menu_id) {
+        const names = menuInvMap.get(item.menu_id) ?? [];
+        if (item.snapshot_inventory && names.includes(item.snapshot_inventory)) {
+          matchedInventoryName = item.snapshot_inventory;
+        } else {
+          for (const name of names) {
+            if (cupSalesMap.has(name)) {
+              matchedInventoryName = name;
+              break;
+            }
+          }
+        }
+      }
+
+      if (!matchedInventoryName && item.snapshot_inventory) {
+        if (cupSalesMap.has(item.snapshot_inventory)) {
+          matchedInventoryName = item.snapshot_inventory;
+        } else {
+          for (const invName of cupSalesMap.keys()) {
+            if (parseCupInfoKey(invName) === item.snapshot_inventory) {
+              matchedInventoryName = invName;
+              break;
+            }
+          }
+        }
+      }
+
+      if (matchedInventoryName) {
+        const entry = cupSalesMap.get(matchedInventoryName)!;
+        entry.total += item.quantity;
+        if (method in entry.byMethod) {
+          entry.byMethod[method] += item.quantity;
+        }
       }
     }
 

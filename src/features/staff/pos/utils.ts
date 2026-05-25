@@ -4,6 +4,7 @@ export function formatCupLine(
 ): string | null {
 	if (!cup_type || cup_type === "NONE" || !cup_size || cup_size === "NONE")
 		return null;
+	if (cup_size === "CUSTOM") return cup_type;
 	const t = cup_type === "HOT" ? "Hot" : "Iced";
 	return `${t} · ${cup_size}`;
 }
