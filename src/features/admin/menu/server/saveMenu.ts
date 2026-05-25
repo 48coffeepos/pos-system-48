@@ -4,20 +4,29 @@ import { z } from "zod";
 import { Inventory_Type } from "@/generated/prisma/enums";
 import { prisma } from "@/integrations/prisma/db";
 
-export const saveMenuInput = z.object({
-	mode: z.union([z.literal("create"), z.literal("edit")]),
-	menuId: z.string().optional(),
-	name: z.string().trim().min(1).max(200),
-	trackInventory: z.boolean(),
-	price: z.number().positive().optional(),
-	itemType: z.enum([Inventory_Type.CUP, Inventory_Type.STANDALONE]).optional(),
-	selectedCupIds: z.array(z.string()),
-	cupPrices: z.record(z.string(), z.number()),
-	standaloneMode: z.union([z.literal("existing"), z.literal("new")]).optional(),
-	selectedInventoryId: z.string().optional(),
-	newInventoryName: z.string().optional(),
-	standalonePrice: z.number().positive().optional(),
-});
+export const saveMenuInput = z
+	.object({
+		mode: z.union([z.literal("create"), z.literal("edit")]),
+		menuId: z.string().optional(),
+		name: z.string().trim().min(1).max(200),
+		trackInventory: z.boolean(),
+		price: z.number().positive().optional(),
+		itemType: z
+			.enum([Inventory_Type.CUP, Inventory_Type.STANDALONE])
+			.optional(),
+		selectedCupIds: z.array(z.string()),
+		cupPrices: z.record(z.string(), z.number()),
+		standaloneMode: z
+			.union([z.literal("existing"), z.literal("new")])
+			.optional(),
+		selectedInventoryId: z.string().optional(),
+		newInventoryName: z.string().optional(),
+		standalonePrice: z.number().positive().optional(),
+	})
+	.refine((data) => !data.trackInventory || data.itemType !== undefined, {
+		message: "Item type is required when tracking inventory.",
+		path: ["itemType"],
+	});
 
 export type SaveMenuInput = z.infer<typeof saveMenuInput>;
 
@@ -52,36 +61,30 @@ export const saveMenu = createServerFn({ method: "POST" })
 					throw new Error("Menu item not found.");
 				}
 
-			if (data.trackInventory && !data.itemType) {
-				throw new Error(
-					"Item type is required when tracking inventory.",
-				);
-			}
+				const menuType = data.trackInventory ? data.itemType! : null;
 
-			const menuType = data.trackInventory ? data.itemType! : null;
+				let resolvedMenuId = menuId;
 
-			let resolvedMenuId = menuId;
+				if (resolvedMenuId == null) {
+					const created = await tx.menu.create({
+						data: {
+							name: data.name,
+							price: data.trackInventory ? null : (data.price ?? null),
+							type: menuType,
+						},
+					});
 
-			if (resolvedMenuId == null) {
-				const created = await tx.menu.create({
-					data: {
-						name: data.name,
-						price: data.trackInventory ? null : (data.price ?? null),
-						type: menuType,
-					},
-				});
-
-				resolvedMenuId = created.menu_id;
-			} else {
-				await tx.menu.update({
-					where: { menu_id: resolvedMenuId },
-					data: {
-						name: data.name,
-						price: data.trackInventory ? null : (data.price ?? null),
-						type: menuType,
-					},
-				});
-			}
+					resolvedMenuId = created.menu_id;
+				} else {
+					await tx.menu.update({
+						where: { menu_id: resolvedMenuId },
+						data: {
+							name: data.name,
+							price: data.trackInventory ? null : (data.price ?? null),
+							type: menuType,
+						},
+					});
+				}
 
 				await tx.menuInventory.deleteMany({
 					where: { menu_id: resolvedMenuId },

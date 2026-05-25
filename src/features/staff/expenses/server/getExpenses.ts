@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { authMiddleware } from "@/features/auth/middlewares";
 import { prisma } from "@/integrations/prisma/db";
 
 export interface ExpenseRow {
@@ -14,6 +15,7 @@ export interface ExpenseRow {
 import { getTimeframeBounds } from "@/lib/day-bounds";
 
 export const getExpenses = createServerFn({ method: "GET" })
+  .middleware([authMiddleware])
   .inputValidator(z.object({ timeframe: z.enum(["today", "yesterday"]) }))
   .handler(async ({ data }) => {
     const { start, end } = getTimeframeBounds(data.timeframe);
