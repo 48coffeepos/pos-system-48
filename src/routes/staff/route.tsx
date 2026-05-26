@@ -17,9 +17,11 @@ export const Route = createFileRoute("/staff")({
 
 function StaffLayout() {
 	return (
-		<main className="h-screen flex flex-col">
+		<main className="h-dvh grid grid-rows-[auto_1fr]">
 			<StaffHeader />
-			<Outlet />
+			<div className="overflow-y-auto">
+				<Outlet />
+			</div>
 		</main>
 	);
 }

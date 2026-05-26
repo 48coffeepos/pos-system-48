@@ -4,6 +4,7 @@ export function formatCupLine(
 ): string | null {
 	if (!cup_type || cup_type === "NONE" || !cup_size || cup_size === "NONE")
 		return null;
+	if (cup_size === "CUSTOM") return cup_type;
 	const t = cup_type === "HOT" ? "Hot" : "Iced";
 	return `${t} · ${cup_size}`;
 }
@@ -22,12 +23,4 @@ export function cartLineKey(
 	return key;
 }
 
-export function parseCupInfo(name: string): {
-	cup_type: string;
-	cup_size: string;
-} {
-	const lower = name.toLowerCase();
-	const cup_type = lower.includes("iced") ? "ICED" : "HOT";
-	const cup_size = lower.includes("16oz") ? "16OZ" : "12OZ";
-	return { cup_type, cup_size };
-}
+export { parseCupInfo } from "@/lib/cup-utils";

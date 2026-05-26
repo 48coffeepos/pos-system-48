@@ -40,7 +40,7 @@ export function AccountForm({
 
 	return (
 		<section className="flex flex-col gap-6">
-			<div className="flex flex-col gap-6 rounded-2xl border bg-background p-6 shadow-xs">
+			<div className="flex flex-col gap-6 rounded-2xl border bg-card p-6 shadow-xs">
 				<div className="flex items-start gap-3">
 					<div className="flex size-10 items-center justify-center rounded-xl bg-muted text-primary">
 						{isEditing ? <User /> : <Plus />}

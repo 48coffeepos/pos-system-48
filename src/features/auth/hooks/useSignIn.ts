@@ -1,10 +1,45 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "@tanstack/react-router";
+import { toast } from "sonner";
 import { useAppForm } from "@/integrations/tanstack-form";
-import { signInMutationOptions } from "../mutationOptions";
+import { authClient } from "@/integrations/better-auth/auth-client";
+import authKeys from "../keys";
 import { type SignInInput, signInFormSchema } from "../schemas/auth";
 
 export const useSignIn = () => {
-	const mutation = useMutation(signInMutationOptions());
+	const router = useRouter();
+	const queryClient = useQueryClient();
+
+	const mutation = useMutation({
+		mutationFn: async (input: SignInInput) => {
+			if (input.method === "email") {
+				const { data, error } = await authClient.signIn.email({
+					email: input.email,
+					password: input.password,
+				});
+				if (error) throw new Error(error.message || "Sign in failed");
+				return data?.user;
+			}
+			const { data, error } = await authClient.signIn.username({
+				username: input.username,
+				password: input.password,
+			});
+			if (error) throw new Error(error.message || "Sign in failed");
+			return data?.user;
+		},
+		onSuccess: (user) => {
+			if (user) {
+				toast.success(
+					`Signed in successfully: ${user.username} ${"role" in user && `(${user.role})`}`,
+				);
+			}
+			queryClient.invalidateQueries({ queryKey: authKeys.all });
+			router.invalidate();
+		},
+		onError: (error) => {
+			toast.error(error.message);
+		},
+	});
 
 	const form = useAppForm({
 		defaultValues: {

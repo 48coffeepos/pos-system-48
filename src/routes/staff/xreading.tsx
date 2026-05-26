@@ -1,3 +1,4 @@
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import {
 	RouteErrorBoundary,
@@ -8,7 +9,7 @@ import { getDailyReconciliationQueryOptions } from "@/features/staff/xreading/qu
 
 export const Route = createFileRoute("/staff/xreading")({
 	loader: async ({ context: { queryClient } }) => {
-		return queryClient.ensureQueryData(getDailyReconciliationQueryOptions());
+		await queryClient.ensureQueryData(getDailyReconciliationQueryOptions());
 	},
 	pendingComponent: RoutePendingBoundary,
 	errorComponent: RouteErrorBoundary,
@@ -16,7 +17,9 @@ export const Route = createFileRoute("/staff/xreading")({
 });
 
 function StaffXReading() {
-	const reconciliationData = Route.useLoaderData();
+	const { data: reconciliationData } = useSuspenseQuery(
+		getDailyReconciliationQueryOptions(),
+	);
 
 	return (
 		<div className="min-h-screen bg-(--pale-yellow)/30">

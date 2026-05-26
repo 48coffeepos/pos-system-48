@@ -16,4 +16,5 @@ export const auth = betterAuth({
 	experimental: {
 		joins: true,
 	},
+	trustedOrigins: [process.env.BETTER_AUTH_URL!],
 });

@@ -1,6 +1,7 @@
 import { mutationOptions } from "@tanstack/react-query";
 import { toast } from "sonner";
 import expenseKeys from "./keys";
+import { xreadingKeys } from "@/features/staff/xreading/keys";
 import { createExpense } from "./server/createExpense";
 import type { CreateExpenseInput } from "./schemas/expense";
 import type { ExpenseRow } from "./server/getExpenses";
@@ -17,6 +18,7 @@ export const createExpenseMutationOptions = mutationOptions({
         },
       );
     }
+    void context.client.invalidateQueries({ queryKey: xreadingKeys.all });
     const label = variables.type === "CASH_IN" ? "Cash in" : "Cash out";
     toast.success(`${label} recorded`, {
       description: `${variables.description}`,
