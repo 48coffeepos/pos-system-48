@@ -212,6 +212,7 @@ export function PosScreen() {
 					<PosCartPanel
 						cart={cart}
 						form={form}
+						isPlacingOrder={createOrderMutation.isPending}
 						onRemoveFromCart={removeFromCart}
 						onUpdateQuantity={handleUpdateQuantity}
 						onClearCart={clearCart}

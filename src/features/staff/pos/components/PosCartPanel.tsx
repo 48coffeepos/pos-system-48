@@ -3,6 +3,7 @@ import {
 	CoffeeIcon,
 	MinusIcon,
 	PlusIcon,
+	SpinnerIcon,
 	TrashIcon,
 	XIcon,
 } from "@phosphor-icons/react";
@@ -24,6 +25,7 @@ import { formatCupLine } from "../utils";
 interface PosCartPanelProps {
 	cart: CartItem[];
 	form: ReturnType<typeof usePosForm>;
+	isPlacingOrder?: boolean;
 	onRemoveFromCart: (lineKey: string) => void;
 	onUpdateQuantity: (lineKey: string, delta: number) => void;
 	onClearCart: () => void;
@@ -38,6 +40,7 @@ const paymentOptions = [
 export function PosCartPanel({
 	cart,
 	form,
+	isPlacingOrder = false,
 	onRemoveFromCart,
 	onUpdateQuantity,
 	onClearCart,
@@ -298,10 +301,19 @@ export function PosCartPanel({
 				<form.AppForm>
 					<Button
 						type="submit"
-						disabled={cart.length === 0}
+						disabled={cart.length === 0 || isPlacingOrder}
 						className={cn("w-full", posBtnPrimary)}
 					>
-						Place Order <ArrowRightIcon className="size-4" />
+						{isPlacingOrder ? (
+							<>
+								<SpinnerIcon className="size-4 animate-spin" />
+								Placing order...
+							</>
+						) : (
+							<>
+								Place Order <ArrowRightIcon className="size-4" />
+							</>
+						)}
 					</Button>
 				</form.AppForm>
 			</form>
