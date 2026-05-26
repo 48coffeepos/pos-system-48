@@ -83,8 +83,6 @@ const createOrderInput = z
     }
   });
 
-type CreateOrderItem = z.infer<typeof createOrderItemSchema>;
-
 function isOrderIdUniqueViolation(
   error: Prisma.PrismaClientKnownRequestError,
 ): boolean {
@@ -98,89 +96,84 @@ function isOrderIdUniqueViolation(
   return false;
 }
 
-async function decrementStockForItem(
-  tx: Prisma.TransactionClient,
-  item: Pick<CreateOrderItem, "menu_id" | "quantity" | "selected_inventory_id">,
-) {
-  if (item.selected_inventory_id) {
-    await tx.inventory.update({
-      where: { inventory_id: item.selected_inventory_id },
-      data: { stock: { decrement: item.quantity } },
-    });
-    return;
-  }
-
-  const menuInventoryLinks = await tx.menuInventory.findMany({
-    where: { menu_id: item.menu_id },
-    select: { inventory_id: true },
-  });
-
-  if (menuInventoryLinks.length === 0) {
-    return;
-  }
-
-  if (menuInventoryLinks.length === 1) {
-    await tx.inventory.update({
-      where: { inventory_id: menuInventoryLinks[0].inventory_id },
-      data: { stock: { decrement: item.quantity } },
-    });
-    return;
-  }
-
-  throw new Error(
-    "Cup or size selection is required for this menu item. Please customize the item before checkout.",
-  );
-}
-
 async function createOrderInTransaction(
   data: z.infer<typeof createOrderInput>,
   userId: string,
 ) {
-  return prisma.$transaction(async (tx) => {
-    const lastOrder = await tx.order.findFirst({
-      where: { order_id: { startsWith: "100-" } },
-      orderBy: { order_id: "desc" },
-      select: { order_id: true },
-    });
+  return prisma.$transaction(
+    async (tx) => {
+      const lastOrder = await tx.order.findFirst({
+        where: { order_id: { startsWith: "100-" } },
+        orderBy: { order_id: "desc" },
+        select: { order_id: true },
+      });
 
-    let nextNumber = 1;
-    if (lastOrder) {
-      const parts = lastOrder.order_id.split("-");
-      const currentNum = parseInt(parts[1], 10);
-      if (!Number.isNaN(currentNum)) {
-        nextNumber = currentNum + 1;
+      let nextNumber = 1;
+      if (lastOrder) {
+        const parts = lastOrder.order_id.split("-");
+        const currentNum = parseInt(parts[1], 10);
+        if (!Number.isNaN(currentNum)) {
+          nextNumber = currentNum + 1;
+        }
       }
-    }
 
-    const paddedNumber = String(nextNumber).padStart(6, "0");
-    const generatedOrderId = `100-${paddedNumber}`;
+      const paddedNumber = String(nextNumber).padStart(6, "0");
+      const generatedOrderId = `100-${paddedNumber}`;
 
-    const order = await tx.order.create({
-      data: {
-        order_id: generatedOrderId,
-        staff_id: userId,
-        method: data.method as Payment_Method,
-        reference_number: data.reference_number?.trim() || null,
-        amount_tendered:
-          data.amount_tendered !== undefined ? data.amount_tendered : null,
-        change_amount:
-          data.change_amount !== undefined ? data.change_amount : null,
-        grand_total: data.grand_total,
-        note: data.note || null,
-        order_items: {
-          create: await Promise.all(
-            data.items.map(async (item) => {
+      const selectedInvIds = data.items
+        .filter((i) => i.selected_inventory_id)
+        .map((i) => i.selected_inventory_id!);
+
+      const invNameMap =
+        selectedInvIds.length > 0
+          ? await tx.inventory
+              .findMany({
+                where: { inventory_id: { in: selectedInvIds } },
+                select: { inventory_id: true, name: true },
+              })
+              .then((rows) => new Map(rows.map((r) => [r.inventory_id, r.name])))
+          : new Map<string, string>();
+
+      const menuIdsToLookup = data.items
+        .filter((i) => !i.selected_inventory_id)
+        .map((i) => i.menu_id);
+
+      const menuInvRows =
+        menuIdsToLookup.length > 0
+          ? await tx.menuInventory.findMany({
+              where: { menu_id: { in: menuIdsToLookup } },
+              select: { menu_id: true, inventory_id: true },
+            })
+          : [];
+
+      const menuToInvMap = new Map<string, string[]>();
+      for (const row of menuInvRows) {
+        const arr = menuToInvMap.get(row.menu_id) ?? [];
+        arr.push(row.inventory_id);
+        menuToInvMap.set(row.menu_id, arr);
+      }
+
+      const order = await tx.order.create({
+        data: {
+          order_id: generatedOrderId,
+          staff_id: userId,
+          method: data.method as Payment_Method,
+          reference_number: data.reference_number?.trim() || null,
+          amount_tendered:
+            data.amount_tendered !== undefined ? data.amount_tendered : null,
+          change_amount:
+            data.change_amount !== undefined ? data.change_amount : null,
+          grand_total: data.grand_total,
+          note: data.note || null,
+          order_items: {
+            create: data.items.map((item) => {
               let invSnapshot = item.snapshot_inventory;
               if (item.selected_inventory_id) {
-                const inv = await tx.inventory.findUnique({
-                  where: { inventory_id: item.selected_inventory_id },
-                  select: { name: true },
-                });
-                if (inv) invSnapshot = inv.name;
+                const name = invNameMap.get(item.selected_inventory_id);
+                if (name) invSnapshot = name;
               }
 
-              const hasDiscount = Boolean(item.discount_type);
-              const discountAmount = hasDiscount
+              const discountAmount = item.discount_type
                 ? seniorPwdDiscountAmount(item.line_total)
                 : 0;
 
@@ -211,45 +204,64 @@ async function createOrderInTransaction(
                   : undefined,
               };
             }),
-          ),
-        },
-      },
-      include: {
-        order_items: {
-          include: {
-            addon_items: true,
           },
         },
-      },
-    });
+        include: {
+          order_items: {
+            include: {
+              addon_items: true,
+            },
+          },
+        },
+      });
 
-    for (const item of data.items) {
-      await decrementStockForItem(tx, item);
-    }
+      await Promise.all(
+        data.items.map(async (item) => {
+          const invIds = item.selected_inventory_id
+            ? [item.selected_inventory_id]
+            : (menuToInvMap.get(item.menu_id) ?? []);
 
-    return {
-      ...order,
-      amount_tendered: order.amount_tendered
-        ? Number(order.amount_tendered)
-        : null,
-      change_amount: order.change_amount ? Number(order.change_amount) : null,
-      grand_total: Number(order.grand_total),
-      order_items: order.order_items.map((orderItem) => ({
-        ...orderItem,
-        snapshot_price: Number(orderItem.snapshot_price),
-        unit_price: Number(orderItem.unit_price),
-        line_total: Number(orderItem.line_total),
-        discount_amount: orderItem.discount_type
-          ? Number(orderItem.discount_amount)
+          if (invIds.length === 0) return;
+          if (invIds.length > 1) {
+            throw new Error(
+              "Cup or size selection is required for this menu item. Please customize the item before checkout.",
+            );
+          }
+
+          await tx.inventory.update({
+            where: { inventory_id: invIds[0] },
+            data: { stock: { decrement: item.quantity } },
+          });
+        }),
+      );
+
+      return {
+        ...order,
+        amount_tendered: order.amount_tendered
+          ? Number(order.amount_tendered)
           : null,
-        addon_items: orderItem.addon_items.map((addon) => ({
-          ...addon,
-          addon_price_snapshot: Number(addon.addon_price_snapshot),
-          total_price: Number(addon.total_price),
+        change_amount: order.change_amount
+          ? Number(order.change_amount)
+          : null,
+        grand_total: Number(order.grand_total),
+        order_items: order.order_items.map((orderItem) => ({
+          ...orderItem,
+          snapshot_price: Number(orderItem.snapshot_price),
+          unit_price: Number(orderItem.unit_price),
+          line_total: Number(orderItem.line_total),
+          discount_amount: orderItem.discount_type
+            ? Number(orderItem.discount_amount)
+            : null,
+          addon_items: orderItem.addon_items.map((addon) => ({
+            ...addon,
+            addon_price_snapshot: Number(addon.addon_price_snapshot),
+            total_price: Number(addon.total_price),
+          })),
         })),
-      })),
-    };
-  });
+      };
+    },
+    { timeout: 30000 },
+  );
 }
 
 export const createOrder = createServerFn({ method: "POST" })
