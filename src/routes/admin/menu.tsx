@@ -24,6 +24,8 @@ function RouteComponent() {
   const { data: inventoryItems } = useSuspenseQuery(
     getAllInventoryQueryOptions,
   );
+  const { data: menuItems } = useSuspenseQuery(getAllMenuQueryOptions);
+  const { data: addOns } = useSuspenseQuery(getAllAddOnsQueryOptions);
 
-  return <MenuManager inventoryItems={inventoryItems} />;
+  return <MenuManager inventoryItems={inventoryItems} menuItems={menuItems} addOns={addOns} />;
 }

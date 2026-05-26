@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { adminAuthMiddleware } from "@/features/auth/middlewares";
 import { Prisma } from "@/generated/prisma/client.js";
 import { prisma } from "@/integrations/prisma/db";
 
@@ -10,6 +11,7 @@ export const UpdateAddOnSchema = z.object({
 });
 
 export const updateAddOn = createServerFn({ method: "POST" })
+  .middleware([adminAuthMiddleware()])
   .inputValidator(UpdateAddOnSchema)
   .handler(async ({ data }) => {
     const existing = await prisma.addon.findUnique({

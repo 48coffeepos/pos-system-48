@@ -52,7 +52,12 @@ export function PosProductGrid({
 							<PosProductCard
 								key={item.menu_id}
 								name={item.name}
-								price={item.price ?? item.inventory_items[0]?.price ?? null}
+								price={
+									item.price ??
+									(item.inventory_items.length > 0
+										? Math.min(...item.inventory_items.map((i) => i.price))
+										: null)
+								}
 								type={item.type}
 								onSelect={() => onProductClick(item)}
 							/>

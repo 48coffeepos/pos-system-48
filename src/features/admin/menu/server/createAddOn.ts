@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { adminAuthMiddleware } from "@/features/auth/middlewares";
 import { Prisma } from "@/generated/prisma/client.js";
 import { prisma } from "@/integrations/prisma/db";
 
@@ -9,6 +10,7 @@ export const CreateAddOnSchema = z.object({
 });
 
 export const createAddOn = createServerFn({ method: "POST" })
+  .middleware([adminAuthMiddleware()])
   .inputValidator(CreateAddOnSchema)
   .handler(async ({ data }) => {
     try {

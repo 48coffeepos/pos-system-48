@@ -40,7 +40,7 @@ function StaffHeader() {
 
 	useEffect(() => {
 		setMobileMenuOpen(false);
-	}, []);
+	}, [location.pathname]);
 
 	const isActive = (path: string) => {
 		if (path === "/staff") return location.pathname === "/staff";
@@ -108,11 +108,9 @@ function StaffHeader() {
 									<span className="text-sm font-semibold text-[var(--deep-forest)]">
 										{session.user.name ?? "User"}
 									</span>
-									<span className="text-xs text-[var(--medium-gray)]">
-										{"role" in session.user
-											? (session.user as { role?: string }).role
-											: "Staff"}
-									</span>
+								<span className="text-xs text-[var(--medium-gray)]">
+									{session?.user?.role ?? "Staff"}
+								</span>
 								</div>
 							</div>
 							<Separator
@@ -196,10 +194,7 @@ function StaffHeader() {
 										{session.user.name ?? "User"}
 									</span>
 									<span className="text-xs text-[var(--medium-gray)]">
-										{"role" in session.user
-											? (session.user as { role?: string }).role
-											: "Staff"}
-										a{" "}
+										{session?.user?.role ?? "Staff"}
 									</span>
 								</div>
 							</div>

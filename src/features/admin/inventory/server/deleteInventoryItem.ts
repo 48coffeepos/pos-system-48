@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
+import { adminAuthMiddleware } from "@/features/auth/middlewares";
 import { prisma } from "@/integrations/prisma/db";
 
 export const deleteInventoryItemInput = z.object({
@@ -8,6 +9,7 @@ export const deleteInventoryItemInput = z.object({
 });
 
 export const deleteInventoryItem = createServerFn({ method: "POST" })
+  .middleware([adminAuthMiddleware()])
   .inputValidator(deleteInventoryItemInput)
   .handler(async ({ data }) => {
     const existing = await prisma.inventory.findUnique({

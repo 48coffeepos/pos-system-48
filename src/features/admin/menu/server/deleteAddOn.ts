@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
+import { adminAuthMiddleware } from "@/features/auth/middlewares";
 import { prisma } from "@/integrations/prisma/db";
 
 export const deleteAddOnInput = z.object({
@@ -8,6 +9,7 @@ export const deleteAddOnInput = z.object({
 });
 
 export const deleteAddOn = createServerFn({ method: "POST" })
+  .middleware([adminAuthMiddleware()])
   .inputValidator(deleteAddOnInput)
   .handler(async ({ data }) => {
     const existing = await prisma.addon.findUnique({
