@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import {
 	loadBixolonSDK,
 	printOrderReceipt,
+	ReceiptThermalContent,
 	THERMAL_PAGE_STYLE,
 } from "@/integrations/bixolon";
 import { cn } from "@/lib/utils";
@@ -85,11 +86,7 @@ export function PosReceiptDialog({
 				>
 					<X className="size-5" />
 				</Button>
-				<div
-					ref={contentRef}
-					id="receipt-content"
-					className="receipt-thermal font-mono text-[#1a1a1a] select-none"
-				>
+				<ReceiptThermalContent ref={contentRef}>
 					<div className="mb-4 text-center">
 						<h2 className="text-2xl font-black tracking-tight">48 COFFEE</h2>
 						<h3 className="mt-0.5 text-sm font-bold tracking-widest">
@@ -254,7 +251,7 @@ export function PosReceiptDialog({
 							Cashier&apos;s Name
 						</p>
 					</div>
-				</div>
+				</ReceiptThermalContent>
 
 				<div className="no-print mt-8 flex flex-col gap-3">
 					<div className="flex gap-3">

@@ -178,3 +178,29 @@ html {
 .animate-slide-in-right {
   animation: slideInRight 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
+
+/* Thermal receipt preview (print rules in THERMAL_PAGE_STYLE) */
+.receipt-thermal {
+  font-family: "Courier New", Courier, monospace;
+  line-height: 1.2;
+  padding: 3mm;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}
+
+/* Thermal receipt preview + print (padding matches RECEIPT_PADDING_MM in printer.ts) */
+.receipt-thermal {
+  font-family: "Courier New", Courier, monospace;
+  line-height: 1.2;
+  padding: 3mm;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}

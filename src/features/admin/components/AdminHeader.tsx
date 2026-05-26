@@ -1,5 +1,4 @@
 import {
-	CoffeeIcon,
 	ListIcon,
 	PackageIcon,
 	SignOutIcon,

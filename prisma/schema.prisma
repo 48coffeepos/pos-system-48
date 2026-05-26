@@ -145,7 +145,7 @@ model OrderItem {
   quantity           Int              @default(1)
   line_total         Decimal          @db.Decimal(10, 2)
   loyalty            Boolean          @default(false)
-  discount_amount    Decimal          @default(5) @db.Decimal(10, 2)
+  discount_amount    Decimal          @default(0) @db.Decimal(10, 2)
   discount_type      Discount_Type?
   discount_id_number String?
   discount_contact   String?

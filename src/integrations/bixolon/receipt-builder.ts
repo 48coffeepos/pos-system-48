@@ -5,6 +5,11 @@ import {
 	getExpectedCashInDrawer,
 	getOverShort,
 } from "@/features/staff/xreading/utils/reconciliation";
+import {
+	BIXOLON_DEFAULT_SETTINGS,
+	RECEIPT_BIXOLON_BOTTOM_FEED,
+	RECEIPT_BIXOLON_TOP_FEED,
+} from "./printer";
 import type { BixolonConnectionConfig } from "./types";
 import { getBixolonSDK, isBixolonSDKLoaded } from "./web-print-sdk";
 
@@ -74,17 +79,34 @@ function textLine(
 	t(paddedLeft + paddedRight, opts);
 }
 
+function beginReceipt(): void {
+	const sdk = getBixolonSDK();
+	if (!sdk) return;
+	sdk.makeReinit();
+	feed(RECEIPT_BIXOLON_TOP_FEED);
+}
+
+function finishReceipt(config?: Partial<BixolonConnectionConfig>): void {
+	feed(RECEIPT_BIXOLON_BOTTOM_FEED);
+	cut();
+	const sdk = getBixolonSDK();
+	if (!sdk) return;
+	sdk.sendData(
+		config?.ipAddr ?? BIXOLON_DEFAULT_SETTINGS.ipAddr,
+		config?.shopID ?? BIXOLON_DEFAULT_SETTINGS.shopID,
+		config?.devID ?? BIXOLON_DEFAULT_SETTINGS.devID,
+	);
+}
+
 export function printOrderReceipt(
 	order: PosOrder,
 	cashierName: string,
 	config?: Partial<BixolonConnectionConfig>,
 ): void {
 	if (!isBixolonSDKLoaded()) return;
+	if (!getBixolonSDK()) return;
 
-	const sdk = getBixolonSDK();
-	if (!sdk) return;
-
-	sdk.makeReinit();
+	beginReceipt();
 
 	align("center");
 	t("48 COFFEE", { bold: true, dw: true, dh: true });
@@ -197,14 +219,7 @@ export function printOrderReceipt(
 	t(cashierName.toUpperCase(), { bold: true });
 	t("Cashier's Name");
 
-	feed(3);
-	cut();
-
-	sdk.sendData(
-		config?.ipAddr ?? "127.0.0.1",
-		config?.shopID ?? "BGATE_SAMPLE_SHOP",
-		config?.devID ?? "local_printer",
-	);
+	finishReceipt(config);
 }
 
 export function printSalesXReading(
@@ -214,9 +229,7 @@ export function printSalesXReading(
 	config?: Partial<BixolonConnectionConfig>,
 ): void {
 	if (!isBixolonSDKLoaded()) return;
-
-	const sdk = getBixolonSDK();
-	if (!sdk) return;
+	if (!getBixolonSDK()) return;
 
 	const { totalCashSales, totalCashOut, totalCashIn } = totals;
 	const grossSales = totalCashSales + totalCashIn;
@@ -229,7 +242,7 @@ export function printSalesXReading(
 		year: "numeric",
 	});
 
-	sdk.makeReinit();
+	beginReceipt();
 
 	align("center");
 	t("48 COFFEE", { bold: true, dw: true, dh: true });
@@ -270,14 +283,7 @@ export function printSalesXReading(
 	divider();
 	t("Signature of Cashier");
 
-	feed(3);
-	cut();
-
-	sdk.sendData(
-		config?.ipAddr ?? "127.0.0.1",
-		config?.shopID ?? "BGATE_SAMPLE_SHOP",
-		config?.devID ?? "local_printer",
-	);
+	finishReceipt(config);
 }
 
 export function printCashCount(
@@ -287,9 +293,7 @@ export function printCashCount(
 	config?: Partial<BixolonConnectionConfig>,
 ): void {
 	if (!isBixolonSDKLoaded()) return;
-
-	const sdk = getBixolonSDK();
-	if (!sdk) return;
+	if (!getBixolonSDK()) return;
 
 	const now = new Date();
 	const displayDateTime = now.toLocaleString("en-US", {
@@ -300,7 +304,7 @@ export function printCashCount(
 		minute: "2-digit",
 	});
 
-	sdk.makeReinit();
+	beginReceipt();
 
 	align("center");
 	t("48 COFFEE", { bold: true, dw: true, dh: true });
@@ -328,14 +332,7 @@ export function printCashCount(
 	divider();
 	t("Signature of Cashier");
 
-	feed(3);
-	cut();
-
-	sdk.sendData(
-		config?.ipAddr ?? "127.0.0.1",
-		config?.shopID ?? "BGATE_SAMPLE_SHOP",
-		config?.devID ?? "local_printer",
-	);
+	finishReceipt(config);
 }
 
 export interface CupSale {
@@ -351,9 +348,7 @@ export function printCupsSales(
 	config?: Partial<BixolonConnectionConfig>,
 ): void {
 	if (!isBixolonSDKLoaded()) return;
-
-	const sdk = getBixolonSDK();
-	if (!sdk) return;
+	if (!getBixolonSDK()) return;
 
 	const now = new Date();
 	const displayTime = now.toLocaleString("en-US", {
@@ -379,7 +374,7 @@ export function printCupsSales(
 		0,
 	);
 
-	sdk.makeReinit();
+	beginReceipt();
 
 	align("center");
 	t("48 COFFEE", { bold: true, dw: true, dh: true });
@@ -412,14 +407,7 @@ export function printCupsSales(
 	divider();
 	t("Signature of Admin");
 
-	feed(3);
-	cut();
-
-	sdk.sendData(
-		config?.ipAddr ?? "127.0.0.1",
-		config?.shopID ?? "BGATE_SAMPLE_SHOP",
-		config?.devID ?? "local_printer",
-	);
+	finishReceipt(config);
 }
 
 export function printRevenue(
@@ -431,9 +419,7 @@ export function printRevenue(
 	config?: Partial<BixolonConnectionConfig>,
 ): void {
 	if (!isBixolonSDKLoaded()) return;
-
-	const sdk = getBixolonSDK();
-	if (!sdk) return;
+	if (!getBixolonSDK()) return;
 
 	const now = new Date();
 	const displayTime = now.toLocaleString("en-US", {
@@ -444,7 +430,7 @@ export function printRevenue(
 		minute: "2-digit",
 	});
 
-	sdk.makeReinit();
+	beginReceipt();
 
 	align("center");
 	t("48 COFFEE", { bold: true, dw: true, dh: true });
@@ -476,12 +462,5 @@ export function printRevenue(
 	divider();
 	t("Signature of Admin");
 
-	feed(3);
-	cut();
-
-	sdk.sendData(
-		config?.ipAddr ?? "127.0.0.1",
-		config?.shopID ?? "BGATE_SAMPLE_SHOP",
-		config?.devID ?? "local_printer",
-	);
+	finishReceipt(config);
 }

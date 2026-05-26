@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { adminAuthMiddleware } from "@/features/auth/middlewares";
 import { prisma } from "@/integrations/prisma/db";
 
 export interface AddOnRow {
@@ -7,7 +8,9 @@ export interface AddOnRow {
   amount: number;
 }
 
-export const getAllAddOns = createServerFn({ method: "GET" }).handler(async () => {
+export const getAllAddOns = createServerFn({ method: "GET" })
+	.middleware([adminAuthMiddleware()])
+	.handler(async () => {
   const addOns = await prisma.addon.findMany({
     orderBy: { name: "asc" },
   });

@@ -1,10 +1,12 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
+import { adminAuthMiddleware } from "@/features/auth/middlewares";
 import { prisma } from "@/integrations/prisma/db";
 import { DEFAULT_TIMEZONE, getTimeframeBounds } from "@/lib/day-bounds";
 
 export const getFilteredOrders = createServerFn({ method: "GET" })
+  .middleware([adminAuthMiddleware()])
   .inputValidator(
     z.object({
       timeframe: z.enum(["all", "today", "yesterday"]).optional(),
@@ -81,7 +83,6 @@ export const getFilteredOrders = createServerFn({ method: "GET" })
           discount_contact: item.discount_contact ?? undefined,
           discount_id_number: item.discount_id_number ?? undefined,
           line_total: Number(item.line_total),
-          note: item.note ?? undefined,
           snapshot_inventory: item.snapshot_inventory,
           addon_items: item.addon_items.map((a) => ({
             addon_id: a.addon_id,

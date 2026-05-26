@@ -7,6 +7,10 @@ import { createOrderMutationOptions } from "../mutationOptions";
 import { posPageDataQueryOptions } from "../queryOptions";
 import { usePosStore } from "../stores/usePosStore";
 import type { CartItem, MenuItem, PosOrder } from "../types";
+import {
+	cartItemToCreateOrderItem,
+	cartItemToPosOrderItem,
+} from "../utils";
 import { PosCartPanel } from "./PosCartPanel";
 import { PosItemCustomizeDialog } from "./PosItemCustomizeDialog";
 import { PosOrderConfirmDialog } from "./PosOrderConfirmDialog";
@@ -143,31 +147,7 @@ export function PosScreen() {
 				change_amount: values.paymentMethod === "GRAB" ? undefined : changeAmt,
 				grand_total: cartTotal,
 				note: values.note || undefined,
-				items: cart.map((c) => ({
-					menu_id: c.menu_id,
-					snapshot_menu_name: c.menu_name,
-					snapshot_inventory:
-						c.cup_size === "CUSTOM"
-							? c.cup_type
-							: c.cup_type && c.cup_type !== "NONE"
-								? `${c.cup_size} ${c.cup_type}`
-								: c.menu_name,
-					quantity: c.quantity,
-					unit_price: c.unit_price,
-					discount_type: c.discount,
-					discount_contact: c.discount_name,
-					discount_id_number: c.discount_id,
-					line_total: c.total_price,
-					cup_type: c.cup_type,
-					cup_size: c.cup_size,
-					selected_inventory_id: c.selected_inventory_id,
-					addon_items: c.addon_items?.map((a) => ({
-						addon_id: a.addon_id,
-						addon_name_snapshot: a.name,
-						addon_price_snapshot: a.price,
-						quantity: a.quantity,
-					})),
-				})),
+				items: cart.map(cartItemToCreateOrderItem),
 			});
 
 			const order: PosOrder = {
@@ -185,27 +165,7 @@ export function PosScreen() {
 						: undefined,
 				grand_total: Number(placedOrder.grand_total),
 				note: values.note || undefined,
-				items: cart.map((c) => ({
-					snapshot_menu_name: c.menu_name,
-					quantity: c.quantity,
-					unit_price: c.unit_price,
-					discount_type: c.discount,
-					discount_contact: c.discount_name,
-					discount_id_number: c.discount_id,
-					line_total: c.total_price,
-					snapshot_inventory:
-						c.cup_size === "CUSTOM"
-							? c.cup_type
-							: c.cup_type && c.cup_type !== "NONE"
-								? `${c.cup_size} ${c.cup_type}`
-								: c.menu_name,
-					addon_items: c.addon_items?.map((a) => ({
-						addon_id: a.addon_id,
-						addon_name_snapshot: a.name,
-						addon_price_snapshot: a.price,
-						quantity: a.quantity,
-					})),
-				})),
+				items: cart.map(cartItemToPosOrderItem),
 			};
 
 			setLastOrder(order);
@@ -214,9 +174,14 @@ export function PosScreen() {
 			form.reset(usePosStore.getState().formValues);
 			setShowPlaceOrderConfirm(false);
 			toast.success(`Order #${order.order_id} placed successfully!`);
+			if (placedOrder.pusherPublished === false) {
+				toast.warning(
+					"Order saved, but the orders list may not update automatically. Refresh if needed.",
+				);
+			}
 		} catch (err: unknown) {
 			console.error("Order placement failed:", err);
-    const msg = (err as Error)?.message ?? "Unknown error";
+			const msg = (err as Error)?.message ?? "Unknown error";
 			toast.error(`Failed to place order: ${msg}`);
 		}
 	}, [

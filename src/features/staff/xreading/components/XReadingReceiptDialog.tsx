@@ -1,20 +1,18 @@
+import { PrinterIcon } from "@phosphor-icons/react";
 import { useEffect, useRef, useState } from "react";
 import { useReactToPrint } from "react-to-print";
-import { Printer } from "@phosphor-icons/react";
 import { PosModal } from "@/features/staff/pos/components/ui/PosModal";
-import type { DailyReconciliationTotals } from "../utils/reconciliation";
-import {
-  getExpectedCashInDrawer,
-  getOverShort,
-} from "../utils/reconciliation";
-import type { Denomination } from "./CashCountPanel";
-import type { CashCountValues } from "../stores/useXReadingStore";
 import {
   loadBixolonSDK,
-  printSalesXReading,
   printCashCount,
+  printSalesXReading,
+  ReceiptThermalContent,
   THERMAL_PAGE_STYLE,
 } from "@/integrations/bixolon";
+import type { CashCountValues } from "../stores/useXReadingStore";
+import type { DailyReconciliationTotals } from "../utils/reconciliation";
+import { getExpectedCashInDrawer, getOverShort } from "../utils/reconciliation";
+import type { Denomination } from "./CashCountPanel";
 
 interface XReadingReceiptDialogProps {
   open: boolean;
@@ -26,9 +24,7 @@ interface XReadingReceiptDialogProps {
   cashCount: CashCountValues;
 }
 
-const denominations: Denomination[] = [
-  1000, 500, 200, 100, 50, 20, 10, 5, 1,
-];
+const denominations: Denomination[] = [1000, 500, 200, 100, 50, 20, 10, 5, 1];
 
 export function XReadingReceiptDialog({
   open,
@@ -108,11 +104,7 @@ export function XReadingReceiptDialog({
       className="max-w-[380px] p-4 sm:p-8"
       overlayClassName="overflow-y-auto no-print"
     >
-      <div
-        ref={contentRef}
-        id="receipt-content"
-        className="receipt-thermal font-mono text-[#1a1a1a] select-none"
-      >
+      <ReceiptThermalContent ref={contentRef}>
         {mode === "sales" && (
           <div id="sales-xreading-receipt">
             <div className="mb-4 text-center">
@@ -187,9 +179,7 @@ export function XReadingReceiptDialog({
           <div id="cash-count-receipt">
             <div className="mb-4 text-center">
               <h2 className="text-2xl font-black tracking-tight">48 COFFEE</h2>
-              <h3 className="mt-0.5 text-lg font-bold uppercase">
-                CASH COUNT
-              </h3>
+              <h3 className="mt-0.5 text-lg font-bold uppercase">CASH COUNT</h3>
               <p className="text-sm mt-2">Date: {displayDateTime}</p>
               <p className="text-sm">Cashier: {staffName}</p>
             </div>
@@ -228,7 +218,7 @@ export function XReadingReceiptDialog({
             </div>
           </div>
         )}
-      </div>
+      </ReceiptThermalContent>
 
       <div className="no-print mt-8 flex flex-col gap-3">
         <div className="flex gap-3">
@@ -249,7 +239,7 @@ export function XReadingReceiptDialog({
             className="flex h-12 flex-1 items-center justify-center gap-2 rounded-xl text-sm font-bold text-white transition-all hover:opacity-90 active:scale-95"
             style={{ background: "var(--near-black)" }}
           >
-            <Printer className="size-4" /> Print
+            <PrinterIcon className="size-4" /> Print
           </button>
         </div>
         {bixolonReady ? (
@@ -262,7 +252,7 @@ export function XReadingReceiptDialog({
               color: "var(--near-black)",
             }}
           >
-            <Printer className="size-3.5" /> Direct Print (BIXOLON)
+            <PrinterIcon className="size-3.5" /> Direct Print (BIXOLON)
           </button>
         ) : bixolonLoading ? (
           <button
@@ -278,13 +268,6 @@ export function XReadingReceiptDialog({
           </button>
         ) : null}
       </div>
-
-      <style>{`
-				.receipt-thermal {
-					font-family: 'Courier New', Courier, monospace;
-					line-height: 1.2;
-				}
-			`}</style>
     </PosModal>
   );
 }

@@ -1,11 +1,13 @@
 import { createServerFn } from "@tanstack/react-start";
 
+import { adminAuthMiddleware } from "@/features/auth/middlewares";
 import { prisma } from "@/integrations/prisma/db";
 import { parseCupInfoKey } from "@/lib/cup-utils";
 import { DEFAULT_TIMEZONE, getTodayBounds } from "@/lib/day-bounds";
 
-export const getDashboardData = createServerFn({ method: "GET" }).handler(
-  async () => {
+export const getDashboardData = createServerFn({ method: "GET" })
+  .middleware([adminAuthMiddleware()])
+  .handler(async () => {
     const tz = process.env.TIMEZONE ?? DEFAULT_TIMEZONE;
     const { start, end } = getTodayBounds(tz);
 
@@ -93,7 +95,10 @@ export const getDashboardData = createServerFn({ method: "GET" }).handler(
 
       if (item.menu_id) {
         const names = menuInvMap.get(item.menu_id) ?? [];
-        if (item.snapshot_inventory && names.includes(item.snapshot_inventory)) {
+        if (
+          item.snapshot_inventory &&
+          names.includes(item.snapshot_inventory)
+        ) {
           matchedInventoryName = item.snapshot_inventory;
         } else {
           for (const name of names) {
@@ -142,5 +147,4 @@ export const getDashboardData = createServerFn({ method: "GET" }).handler(
         timeZone: tz,
       })}`,
     };
-  },
-);
+  });

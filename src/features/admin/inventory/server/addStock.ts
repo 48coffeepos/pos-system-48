@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
+import { adminAuthMiddleware } from "@/features/auth/middlewares";
 import { prisma } from "@/integrations/prisma/db";
 
 export const addStockInput = z.object({
@@ -9,6 +10,7 @@ export const addStockInput = z.object({
 });
 
 export const addStock = createServerFn({ method: "POST" })
+  .middleware([adminAuthMiddleware()])
   .inputValidator(addStockInput)
   .handler(async ({ data }) => {
     const existing = await prisma.inventory.findUnique({
