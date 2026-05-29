@@ -141,7 +141,7 @@ function StaffHeader() {
 				{/* Mobile Menu Toggle */}
 				<button
 					onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-					className="ml-auto flex size-7 items-center justify-center rounded-lg text-[var(--medium-gray)] hover:bg-[var(--pale-yellow)] hover:text-[var(--deep-forest)] lg:size-9 lg:rounded-xl"
+					className="ml-auto flex size-7 items-center justify-center rounded-lg text-[var(--medium-gray)] hover:bg-[var(--pale-yellow)] hover:text-[var(--deep-forest)] lg:hidden lg:size-9 lg:rounded-xl"
 					aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
 				>
 					{mobileMenuOpen ? (
