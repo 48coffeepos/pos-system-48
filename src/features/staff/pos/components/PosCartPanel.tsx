@@ -62,18 +62,18 @@ export function PosCartPanel({
 				e.stopPropagation();
 				form.handleSubmit();
 			}}
-			className="flex h-full w-96 flex-col overflow-hidden border-l border-(--light-gray) bg-(--pure-white) p-5"
+			className="flex h-full w-64 shrink-0 flex-col overflow-hidden border-l border-(--light-gray) bg-(--pure-white) p-1.5 lg:w-96 lg:p-5"
 		>
-				<div className="mb-4 flex items-center justify-between">
+				<div className="mb-0.5 flex items-center justify-between lg:mb-4">
 					<div>
 						<h2
-							className="text-lg font-bold"
+							className="text-[10px] font-bold lg:text-lg"
 							style={{ color: "var(--near-black)" }}
 						>
 							Current Order
 						</h2>
 						<p
-							className="mt-0.5 text-[10px] font-semibold tracking-wide uppercase"
+							className="mt-0.5 text-[7px] font-semibold tracking-wide uppercase lg:text-[10px]"
 							style={{ color: "var(--deep-forest)" }}
 						>
 							Walk-in · All orders
@@ -86,7 +86,7 @@ export function PosCartPanel({
 							className={posBtnGhost}
 							onClick={onClearCart}
 						>
-							<TrashIcon className="size-4" style={{ color: "var(--coral)" }} />
+							<TrashIcon className="size-2 lg:size-4" style={{ color: "var(--coral)" }} />
 						</Button>
 					) : null}
 				</div>
@@ -97,21 +97,21 @@ export function PosCartPanel({
 						return (
 							<div
 								key={item.lineKey}
-								className="mb-2 flex items-center gap-3 rounded-xl p-3"
+								className="mb-0.5 flex items-center gap-1 rounded-[5px] p-1 lg:mb-2 lg:gap-3 lg:rounded-xl lg:p-3"
 								style={{ background: "var(--off-white)" }}
 							>
 								<div
-									className="flex size-12 shrink-0 items-center justify-center rounded-lg"
+									className="flex size-6 shrink-0 items-center justify-center rounded-[5px] lg:size-12 lg:rounded-lg"
 									style={{ background: "var(--light-gray)" }}
 								>
 									<CoffeeIcon
-										className="size-6"
+										className="size-3.5 lg:size-6"
 										style={{ color: "var(--medium-gray)" }}
 									/>
 								</div>
 								<div className="min-w-0 flex-1">
 									<h4
-										className="truncate text-sm font-semibold"
+										className="truncate text-[9px] font-semibold lg:text-sm"
 										style={{ color: "var(--dark-gray)" }}
 									>
 										{item.menu_name}
@@ -128,7 +128,7 @@ export function PosCartPanel({
 									</div>
 									{cupLine ? (
 										<p
-											className="mt-0.5 text-[10px] font-medium"
+											className="mt-0.5 text-[7px] font-medium lg:text-[10px]"
 											style={{ color: "var(--medium-gray)" }}
 										>
 											{cupLine}
@@ -136,7 +136,7 @@ export function PosCartPanel({
 									) : null}
 									{item.addon_items && item.addon_items.length > 0 ? (
 										<p
-											className="text-[9px] font-semibold italic"
+											className="text-[7px] font-semibold italic lg:text-[9px]"
 											style={{ color: "var(--coral)" }}
 										>
 											+{" "}
@@ -146,17 +146,16 @@ export function PosCartPanel({
 										</p>
 									) : null}
 									<p
-										className="text-sm font-bold"
+										className="text-[9px] font-bold lg:text-sm"
 										style={{ color: "var(--deep-forest)" }}
 									>
 										{formatPeso(item.total_price)}
 									</p>
 								</div>
-								<div className="flex items-center gap-1.5">
+								<div className="flex items-center gap-px lg:gap-1.5">
 									<Button
 										variant="secondary"
-										size="icon-xs"
-										className={posBtnSecondary}
+										className={cn("h-3.5 w-3.5 min-w-0 p-0 rounded-[3px] lg:size-6", posBtnSecondary)}
 										onClick={() =>
 											item.quantity === 1
 												? onRemoveFromCart(item.lineKey)
@@ -164,24 +163,23 @@ export function PosCartPanel({
 										}
 									>
 										{item.quantity === 1 ? (
-											<XIcon className="size-3" />
+											<XIcon className="size-1 lg:size-3" />
 										) : (
-											<MinusIcon className="size-3" />
+											<MinusIcon className="size-1 lg:size-3" />
 										)}
 									</Button>
-									<span className="w-5 text-center text-xs font-bold">
+									<span className="w-2 text-center text-[6px] font-bold lg:w-5 lg:text-xs">
 										{item.quantity}
 									</span>
 									<Button
 										variant="default"
-										size="icon-xs"
-										className={posBtnPrimary}
+										className={cn("h-3.5 w-3.5 min-w-0 p-0 rounded-[3px] lg:size-6", posBtnPrimary)}
 										disabled={
 											Boolean(item.discount) || Boolean(item.is_free_drink)
 										}
 										onClick={() => onUpdateQuantity(item.lineKey, 1)}
 									>
-										<PlusIcon className="size-3" />
+										<PlusIcon className="size-1 lg:size-3" />
 									</Button>
 								</div>
 							</div>
@@ -189,12 +187,12 @@ export function PosCartPanel({
 					})}
 
 					{cart.length === 0 ? (
-						<div className="flex h-32 flex-col items-center justify-center">
+						<div className="flex h-12 flex-col items-center justify-center lg:h-32">
 							<CoffeeIcon
-								className="mb-2 size-8"
+								className="mb-1 size-4 lg:mb-2 lg:size-8"
 								style={{ color: "var(--light-gray)" }}
 							/>
-							<p className="text-xs" style={{ color: "var(--medium-gray)" }}>
+							<p className="text-[7px] lg:text-xs" style={{ color: "var(--medium-gray)" }}>
 								Cart is empty
 							</p>
 						</div>
@@ -202,10 +200,10 @@ export function PosCartPanel({
 				</div>
 
 				{cart.length > 0 ? (
-					<div className="mb-4 space-y-4">
+					<div className="mb-0.5 space-y-0.5 lg:mb-4 lg:space-y-4 [&_[data-slot=field]]:gap-0.5 lg:[&_[data-slot=field]]:gap-3 [&_[data-slot=field-label]]:text-[7px] lg:[&_[data-slot=field-label]]:text-sm">
 						<form.AppField name="note">
 							{(field) => (
-								<field.Input label="Note" placeholder="Add a note..." />
+								<field.Input label="Note" placeholder="Add a note..." className="h-5 lg:h-9 rounded-[5px] lg:rounded-md text-[8px] md:text-[8px] lg:text-sm" />
 							)}
 						</form.AppField>
 
@@ -226,11 +224,12 @@ export function PosCartPanel({
 									label="Payment Method"
 									options={paymentOptions}
 									placeholder="Select..."
+									className="!h-5 lg:!h-9 rounded-[5px] lg:rounded-md text-[8px] lg:text-sm w-full py-0 lg:py-2"
 								/>
 							)}
 						</form.AppField>
 
-						<div className="space-y-3">
+						<div className="space-y-0.5 lg:space-y-3">
 							{paymentMethod !== "GRAB" ? (
 								<form.AppField name="amountPaid">
 									{(field) => (
@@ -240,6 +239,7 @@ export function PosCartPanel({
 											type="number"
 											step="0.01"
 											min="0"
+											className="h-5 lg:h-9 rounded-[5px] lg:rounded-md text-[8px] md:text-[8px] lg:text-sm"
 										/>
 									)}
 								</form.AppField>
@@ -250,16 +250,16 @@ export function PosCartPanel({
 							amountPaid &&
 							paidNum >= cartTotal ? (
 								<div
-									className="flex items-center justify-between rounded-xl p-3"
+									className="mt-0.5 flex items-center justify-between rounded-[5px] p-1 lg:mt-2 lg:rounded-xl lg:p-3"
 									style={{
 										background: "var(--deep-forest)",
 										color: "white",
 									}}
 								>
-									<span className="text-xs font-medium opacity-80">
+									<span className="text-[7px] font-medium opacity-80 lg:text-xs">
 										Change to give
 									</span>
-									<span className="text-lg font-black">
+									<span className="text-[8px] font-black lg:text-lg">
 										{formatPeso(paidNum - cartTotal)}
 									</span>
 								</div>
@@ -268,7 +268,7 @@ export function PosCartPanel({
 							{paymentMethod === "GCASH" || paymentMethod === "GRAB" ? (
 								<form.AppField name="referenceNumber">
 									{(field) => (
-										<field.Input label="Reference Number" placeholder="Ref #" />
+										<field.Input label="Reference Number" placeholder="Ref #" className="h-5 lg:h-9 rounded-[5px] lg:rounded-md text-[8px] md:text-[8px] lg:text-sm" />
 									)}
 								</form.AppField>
 							) : null}
@@ -278,18 +278,18 @@ export function PosCartPanel({
 
 				{cart.length > 0 && !isGrab ? (
 					<div
-						className="mb-3 pt-3"
+						className="mb-0.5 pt-0.5 lg:mb-3 lg:pt-3"
 						style={{ borderTop: "1px solid var(--light-gray)" }}
 					>
 						<div className="flex justify-between">
 							<span
-								className="text-sm font-bold"
+								className="text-[7px] font-bold lg:text-sm"
 								style={{ color: "var(--near-black)" }}
 							>
 								Total
 							</span>
 							<span
-								className="text-lg font-bold"
+								className="text-[8px] font-bold lg:text-lg"
 								style={{ color: "var(--deep-forest)" }}
 							>
 								{formatPeso(cartTotal)}
@@ -302,16 +302,16 @@ export function PosCartPanel({
 					<Button
 						type="submit"
 						disabled={cart.length === 0 || isPlacingOrder}
-						className={cn("w-full", posBtnPrimary)}
+						className={cn("w-full h-6 rounded-[5px] text-[8px] lg:h-10 lg:rounded-xl lg:text-sm", posBtnPrimary)}
 					>
 						{isPlacingOrder ? (
 							<>
-								<SpinnerIcon className="size-4 animate-spin" />
+								<SpinnerIcon className="size-2 animate-spin lg:size-4" />
 								Placing order...
 							</>
 						) : (
 							<>
-								Place Order <ArrowRightIcon className="size-4" />
+								Place Order <ArrowRightIcon className="size-2 lg:size-4" />
 							</>
 						)}
 					</Button>

@@ -49,24 +49,24 @@ function StaffHeader() {
 
 	return (
 		<header className="top-0 z-50 w-full border-b border-(--light-gray) bg-(--pure-white)/95 backdrop-blur-sm">
-			<div className="mx-auto flex h-16 max-w-screen-2xl items-center gap-4 px-4 sm:px-6 lg:px-8">
+			<div className="mx-auto flex h-12 max-w-screen-2xl items-center gap-2 px-3 lg:h-16 lg:gap-4 lg:px-8">
 				{/* Logo */}
 				<Link
 					to={staffTo("/staff/pos")}
-					className="flex shrink-0 items-center gap-2.5 no-underline"
+					className="flex shrink-0 items-center gap-1.5 no-underline lg:gap-2.5"
 				>
-					<div className="flex size-16 items-center justify-center overflow-hidden">
+					<div className="flex size-10 items-center justify-center overflow-hidden lg:size-16">
 						<img
 							src="/logo.png"
 							alt="48 Coffee Co. Logo"
-							className="size-16 object-contain"
+							className="size-10 object-contain lg:size-16"
 						/>
 					</div>
 				</Link>
 
 				<Separator
 					orientation="vertical"
-					className="hidden h-16 bg-(--light-gray) sm:block"
+					className="hidden h-10 bg-(--light-gray) sm:block lg:h-16"
 				/>
 
 				{/* Desktop Navigation */}
@@ -141,13 +141,13 @@ function StaffHeader() {
 				{/* Mobile Menu Toggle */}
 				<button
 					onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-					className="ml-auto flex size-9 items-center justify-center rounded-xl text-[var(--medium-gray)] hover:bg-[var(--pale-yellow)] hover:text-[var(--deep-forest)] lg:hidden"
+					className="ml-auto flex size-7 items-center justify-center rounded-lg text-[var(--medium-gray)] hover:bg-[var(--pale-yellow)] hover:text-[var(--deep-forest)] lg:size-9 lg:rounded-xl"
 					aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
 				>
 					{mobileMenuOpen ? (
-						<XIcon className="size-5" />
+						<XIcon className="size-3.5 lg:size-5" />
 					) : (
-						<ListIcon className="size-5" />
+						<ListIcon className="size-3.5 lg:size-5" />
 					)}
 				</button>
 			</div>

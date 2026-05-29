@@ -152,13 +152,13 @@ export function PosItemCustomizeDialog({
 				if (!isOpen) onClose();
 			}}
 		>
-			<DialogContent>
-				<DialogHeader className="flex-row items-start justify-between gap-4">
-					<div className="space-y-2">
-						<DialogTitle className="text-lg font-bold text-(--near-black)">
+			<DialogContent className="max-h-[85dvh] flex flex-col p-3 lg:p-6">
+				<DialogHeader className="flex-row items-start justify-between gap-1 lg:gap-4 shrink-0">
+					<div className="space-y-0.5 lg:space-y-2">
+						<DialogTitle className="text-[10px] font-bold text-(--near-black) lg:text-lg">
 							{item.name}
 						</DialogTitle>
-						<DialogDescription className="text-sm text-(--medium-gray)">
+						<DialogDescription className="text-[8px] text-(--medium-gray) lg:text-sm">
 							Customize your order
 						</DialogDescription>
 					</div>
@@ -169,13 +169,14 @@ export function PosItemCustomizeDialog({
 						e.preventDefault();
 						form.handleSubmit();
 					}}
+					className="flex min-h-0 flex-1 flex-col"
 				>
-					<div className="overflow-y-auto space-y-5 max-h-120 px-2 pb-2 overflow-x-hidden">
+					<div className="flex-1 min-h-0 overflow-y-auto space-y-2 px-0.5 pb-0.5 overflow-x-hidden lg:space-y-5 lg:px-2 lg:pb-2">
 						{/* Cup options */}
 						{cupItems.length > 0 ? (
-							<div className="space-y-2">
-								<p className={posMutedLabel}>Cup size</p>
-								<div className="flex flex-wrap gap-2">
+							<div className="space-y-0.5 lg:space-y-2">
+								<p className={cn(posMutedLabel, "text-[8px] lg:text-xs")}>Cup size</p>
+								<div className="flex flex-wrap gap-0.5 lg:gap-2">
 									{cupItems.map((ci) => {
 										const isSelected =
 											selectedInvItem === ci.inventory.inventory_id;
@@ -184,7 +185,7 @@ export function PosItemCustomizeDialog({
 												key={ci.inventory.inventory_id}
 												variant={isSelected ? "default" : "outline"}
 												className={cn(
-													"flex h-auto flex-1 flex-col items-center gap-0.5 rounded-xl py-2 text-xs font-semibold",
+													"flex h-auto flex-1 flex-col items-center gap-0.5 rounded-[5px] py-1 text-[8px] font-semibold lg:rounded-xl lg:py-2 lg:text-xs",
 													isSelected ? posBtnPrimary : posBtnSecondary,
 												)}
 												onClick={() =>
@@ -192,7 +193,7 @@ export function PosItemCustomizeDialog({
 												}
 											>
 												<span>{ci.inventory.name}</span>
-												<span className="text-[9px] opacity-70">
+												<span className="text-[6px] opacity-70 lg:text-[9px]">
 													{formatPeso(Number(ci.price))}
 												</span>
 											</Button>
@@ -200,7 +201,7 @@ export function PosItemCustomizeDialog({
 									})}
 								</div>
 								{selectedCup && selectedCup.inventory.stock <= 0 && (
-									<p className="rounded-lg border border-(--soft-peach) bg-(--pale-yellow) px-3 py-2 text-xs font-medium text-(--coral)">
+									<p className="rounded-[5px] border border-(--soft-peach) bg-(--pale-yellow) px-1.5 py-1 text-[8px] font-medium text-(--coral) lg:rounded-lg lg:px-3 lg:py-2 lg:text-xs">
 										Out of stock &mdash; you can still add this item
 									</p>
 								)}
@@ -208,13 +209,13 @@ export function PosItemCustomizeDialog({
 						) : null}
 
 						{/* Add-ons */}
-						<div className="space-y-2">
+						<div className="space-y-0.5 lg:space-y-2">
 							<div className="flex items-center justify-between">
-								<p className={posMutedLabel}>Add-ons</p>
+								<p className={cn(posMutedLabel, "text-[8px] lg:text-xs")}>Add-ons</p>
 								{addOns.length > 0 ? (
 									<Button
 										variant={showAddons ? "default" : "secondary"}
-										className={showAddons ? posBtnPrimary : posBtnSecondary}
+										className={cn(showAddons ? posBtnPrimary : posBtnSecondary, "text-[8px] lg:text-xs h-6 lg:h-9")}
 										onClick={() => setShowAddons(!showAddons)}
 									>
 										{showAddons ? "Active" : "Add?"}
@@ -222,21 +223,21 @@ export function PosItemCustomizeDialog({
 								) : null}
 							</div>
 							{showAddons && addOns.length > 0 ? (
-								<div className="space-y-2">
+								<div className="space-y-0.5 lg:space-y-2">
 									{addOns.map((addon) => {
 										const qty = selectedAddons[addon.addon_id]?.quantity ?? 0;
 										return (
 											<div
 												key={addon.addon_id}
 												className={cn(
-													"flex items-center justify-between rounded-xl border p-2.5 transition-all",
+													"flex items-center justify-between rounded-[5px] border p-1 transition-all lg:rounded-xl lg:p-2.5",
 													qty > 0 ? posAddonSelected : posAddonDefault,
 												)}
 											>
 												<div className="flex flex-col gap-0.5">
 													<span
 														className={cn(
-															"text-[10px] font-bold",
+															"text-[8px] font-bold lg:text-[10px]",
 															qty > 0
 																? "text-(--deep-forest)"
 																: "text-(--medium-gray)",
@@ -244,11 +245,11 @@ export function PosItemCustomizeDialog({
 													>
 														{addon.name}
 													</span>
-													<span className="text-[8px] opacity-60">
+													<span className="text-[6px] opacity-60 lg:text-[8px]">
 														+{formatPeso(addon.price)}
 													</span>
 												</div>
-												<div className="flex items-center gap-1.5">
+												<div className="flex items-center gap-0.5 lg:gap-1.5">
 													<Button
 														variant="secondary"
 														size="icon-xs"
@@ -256,9 +257,9 @@ export function PosItemCustomizeDialog({
 														onClick={() => decrementAddon(addon)}
 														disabled={qty === 0}
 													>
-														<MinusIcon className="size-3" />
+														<MinusIcon className="size-2 lg:size-3" />
 													</Button>
-													<span className="w-4 text-center text-xs font-bold">
+													<span className="w-2.5 text-center text-[8px] font-bold lg:w-4 lg:text-xs">
 														{qty}
 													</span>
 													<Button
@@ -267,7 +268,7 @@ export function PosItemCustomizeDialog({
 														className={posBtnPrimary}
 														onClick={() => incrementAddon(addon)}
 													>
-														<PlusIcon className="size-3" />
+														<PlusIcon className="size-2 lg:size-3" />
 													</Button>
 												</div>
 											</div>
@@ -278,9 +279,9 @@ export function PosItemCustomizeDialog({
 						</div>
 
 						{/* Discount & Free Drink */}
-						<div className="space-y-3">
+						<div className="space-y-1 lg:space-y-3">
 							{canDiscount ? (
-								<div className="space-y-3">
+								<div className="space-y-1 lg:space-y-3">
 									<form.AppField
 										name="discountType"
 										listeners={{
@@ -292,14 +293,14 @@ export function PosItemCustomizeDialog({
 									>
 										{(field) => (
 											<div className="flex items-center justify-between">
-												<p className={posMutedLabel}>Discount</p>
+												<p className={cn(posMutedLabel, "text-[8px] lg:text-xs")}>Discount</p>
 												<Select
 													value={field.state.value}
 													onValueChange={(v) =>
 														field.handleChange(v ?? "NONE")
 													}
 												>
-													<SelectTrigger className="h-8 w-auto rounded-full border-(--light-gray) bg-(--off-white) px-3 py-1 text-[10px] font-semibold text-(--deep-forest)">
+													<SelectTrigger className="h-6 w-auto rounded-full border-(--light-gray) bg-(--off-white) px-1.5 py-0.5 text-[8px] font-semibold text-(--deep-forest) lg:h-8 lg:px-3 lg:text-[10px]">
 														<SelectValue placeholder="None" />
 													</SelectTrigger>
 													<SelectContent>
@@ -317,12 +318,13 @@ export function PosItemCustomizeDialog({
 									>
 										{(discountType) =>
 											discountType !== "NONE" ? (
-												<div className="space-y-2">
+												<div className="space-y-0.5 lg:space-y-2 [&_[data-slot=field]]:gap-0.5 lg:[&_[data-slot=field]]:gap-3">
 													<form.AppField name="discountName">
 														{(field) => (
 															<field.Input
 																label="Name"
 																placeholder="Full name"
+																className="h-3 lg:h-9 text-[7px] md:text-[7px] lg:text-sm rounded-[5px] lg:rounded-md"
 															/>
 														)}
 													</form.AppField>
@@ -331,6 +333,7 @@ export function PosItemCustomizeDialog({
 															<field.Input
 																label="ID Number"
 																placeholder="ID #"
+																className="h-3 lg:h-9 text-[7px] md:text-[7px] lg:text-sm rounded-[5px] lg:rounded-md"
 															/>
 														)}
 													</form.AppField>
@@ -346,11 +349,11 @@ export function PosItemCustomizeDialog({
 									{(field) => (
 										<div
 											className={cn(
-												"flex items-center justify-between rounded-lg p-2.5",
+												"flex items-center justify-between rounded-[5px] p-1 lg:rounded-lg lg:p-2.5",
 												posSectionMuted,
 											)}
 										>
-											<span className="text-xs font-semibold text-(--deep-forest)">
+											<span className="text-[8px] font-semibold text-(--deep-forest) lg:text-xs">
 												Free Drink
 											</span>
 											<Switch
@@ -360,6 +363,7 @@ export function PosItemCustomizeDialog({
 													field.handleChange(checked);
 													if (checked) form.setFieldValue("quantity", 1);
 												}}
+												size="sm"
 											/>
 										</div>
 									)}
@@ -379,10 +383,10 @@ export function PosItemCustomizeDialog({
 									vals.isFreeDrink || vals.discountType !== "NONE";
 								return (
 									<div className="flex items-center justify-between">
-										<p className={posMutedLabel}>Quantity</p>
+										<p className={cn(posMutedLabel, "text-[8px] lg:text-xs")}>Quantity</p>
 										<form.AppField name="quantity">
 											{(field) => (
-												<div className="flex items-center gap-2">
+												<div className="flex items-center gap-0.5 lg:gap-2">
 													<Button
 														variant="secondary"
 														size="icon-xs"
@@ -396,9 +400,9 @@ export function PosItemCustomizeDialog({
 															)
 														}
 													>
-														<MinusIcon className="size-3" />
+														<MinusIcon className="size-2 lg:size-3" />
 													</Button>
-													<span className="w-5 text-center text-xs font-bold text-(--deep-forest)">
+													<span className="w-3 text-center text-[8px] font-bold text-(--deep-forest) lg:w-5 lg:text-xs">
 														{field.state.value}
 													</span>
 													<Button
@@ -410,7 +414,7 @@ export function PosItemCustomizeDialog({
 															field.handleChange(field.state.value + 1)
 														}
 													>
-														<PlusIcon className="size-3" />
+														<PlusIcon className="size-2 lg:size-3" />
 													</Button>
 												</div>
 											)}
@@ -430,17 +434,17 @@ export function PosItemCustomizeDialog({
 							{(vals) => (
 								<div
 									className={cn(
-										"flex items-center justify-between rounded-xl px-4 py-3",
+										"flex items-center justify-between rounded-[5px] px-1.5 py-1.5 lg:rounded-xl lg:px-4 lg:py-3",
 										posSectionMuted,
 									)}
 								>
-									<span className="text-xs font-semibold text-(--medium-gray)">
+									<span className="text-[8px] font-semibold text-(--medium-gray) lg:text-xs">
 										Total
 										{liveAddonsTotal > 0 && !vals.isFreeDrink
 											? " (incl. add-ons)"
 											: ""}
 									</span>
-									<span className="text-sm font-bold text-(--deep-forest)">
+									<span className="text-[9px] font-bold text-(--deep-forest) lg:text-sm">
 										{formatPeso(
 											vals.isFreeDrink
 												? 0
@@ -452,18 +456,18 @@ export function PosItemCustomizeDialog({
 						</form.Subscribe>
 					</div>
 
-					<DialogFooter className="pt-2">
+					<DialogFooter className="gap-1 pt-1 lg:gap-2 lg:pt-4 shrink-0">
 						<Button
 							type="button"
 							onClick={onClose}
 							variant="outline"
-							className="flex-1"
+							className="flex-1 text-[8px] lg:text-sm h-6 lg:h-10"
 						>
 							Cancel
 						</Button>
 						<Button
 							type="submit"
-							className="flex flex-1 items-center justify-center gap-2"
+							className="flex flex-1 items-center justify-center gap-0.5 text-[8px] lg:gap-2 lg:text-sm h-6 lg:h-10"
 						>
 							Add to cart
 						</Button>

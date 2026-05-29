@@ -20,9 +20,10 @@ interface FormSelectProps {
   description?: string
   placeholder?: string
   options: SelectOption[]
+  className?: string
 }
 
-function FormSelect({ label, description, placeholder, options }: FormSelectProps) {
+function FormSelect({ label, description, placeholder, options, className }: FormSelectProps) {
   const field = useFieldContext<string>()
   const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
 
@@ -35,7 +36,7 @@ function FormSelect({ label, description, placeholder, options }: FormSelectProp
         <SelectTrigger
           id={field.name}
           aria-invalid={isInvalid}
-          className="w-full"
+          className={className ?? "w-full"}
         >
           <SelectValue placeholder={placeholder ?? 'Select...'} />
         </SelectTrigger>
