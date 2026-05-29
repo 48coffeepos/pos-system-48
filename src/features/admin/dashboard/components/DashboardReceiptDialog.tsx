@@ -1,15 +1,17 @@
-import { PrinterIcon } from "@phosphor-icons/react";
+import { PrinterIcon, SpinnerIcon } from "@phosphor-icons/react";
 import { useEffect, useRef, useState } from "react";
 import { useReactToPrint } from "react-to-print";
 import { AlertDialog, AlertDialogContent } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import {
-  loadBixolonSDK,
-  printCupsSales,
-  printRevenue,
   ReceiptThermalContent,
   THERMAL_PAGE_STYLE,
 } from "@/integrations/bixolon";
+import {
+  connectQZ,
+  printCupsSalesQZ,
+  printRevenueQZ,
+} from "@/integrations/qz-tray";
 
 interface CupSale {
   name: string;
@@ -51,8 +53,9 @@ export function DashboardReceiptDialog({
   revenueByMethod,
 }: DashboardReceiptDialogProps) {
   const receiptRef = useRef<HTMLDivElement>(null);
-  const [bixolonReady, setBixolonReady] = useState(false);
-  const [bixolonLoading, setBixolonLoading] = useState(false);
+  const [qzReady, setQzReady] = useState(false);
+  const [qzLoading, setQzLoading] = useState(false);
+  const [qzPrinting, setQzPrinting] = useState(false);
 
   const handlePrint = useReactToPrint({
     contentRef: receiptRef,
@@ -62,23 +65,24 @@ export function DashboardReceiptDialog({
 
   useEffect(() => {
     if (!open) return;
-    setBixolonLoading(true);
-    loadBixolonSDK()
-      .then((loaded) => setBixolonReady(loaded))
-      .catch(() => setBixolonReady(false))
-      .finally(() => setBixolonLoading(false));
+    setQzLoading(true);
+    connectQZ()
+      .then((connected) => setQzReady(connected))
+      .catch(() => setQzReady(false))
+      .finally(() => setQzLoading(false));
   }, [open]);
 
   const cashRevenue = revenueByMethod.CASH ?? 0;
   const gcashRevenue = revenueByMethod.GCASH ?? 0;
   const totalRevenue = cashRevenue + gcashRevenue;
 
-  const handleDirectPrint = () => {
+  const handleQzPrint = async () => {
+    setQzPrinting(true);
     try {
       if (mode === "cups") {
-        printCupsSales(staffName, cupSales, periodLabel);
+        await printCupsSalesQZ(staffName, cupSales, periodLabel);
       } else if (mode === "revenue") {
-        printRevenue(
+        await printRevenueQZ(
           staffName,
           cashRevenue,
           gcashRevenue,
@@ -88,7 +92,9 @@ export function DashboardReceiptDialog({
       }
       onClose();
     } catch (err) {
-      console.error("BIXOLON direct print failed:", err);
+      console.error("QZ Tray print failed:", err);
+    } finally {
+      setQzPrinting(false);
     }
   };
 
@@ -226,7 +232,7 @@ export function DashboardReceiptDialog({
 
           <div className="mt-4 text-center">
             <p className="text-[10px] font-black uppercase">{staffName}</p>
-            <p className="text-[8px] font-bold opacity-60">Admin&apos;s Name</p>
+            <p className="text-[8px] font-bold opacity-80">Admin&apos;s Name</p>
           </div>
         </ReceiptThermalContent>
 
@@ -239,20 +245,25 @@ export function DashboardReceiptDialog({
               onClick={() => handlePrint()}
               className="flex flex-1 h-12 gap-2"
             >
-              <PrinterIcon className="size-4" /> Print
+<PrinterIcon className="size-4" /> Browser Print
             </Button>
           </div>
-          {bixolonReady ? (
+          {qzReady ? (
             <Button
-              onClick={handleDirectPrint}
+              onClick={handleQzPrint}
+              disabled={qzPrinting}
               variant="outline"
               className="flex h-12 gap-2"
             >
-              <PrinterIcon className="size-4" /> Direct Print (BIXOLON)
+              {qzPrinting ? (
+                <><SpinnerIcon className="size-4 animate-spin" /> Printing...</>
+              ) : (
+                <><PrinterIcon className="size-4" /> Print via QZ Tray</>
+              )}
             </Button>
-          ) : bixolonLoading ? (
+          ) : qzLoading ? (
             <Button disabled variant="outline" className="h-12">
-              Detecting printer...
+              Connecting to QZ Tray...
             </Button>
           ) : null}
         </div>

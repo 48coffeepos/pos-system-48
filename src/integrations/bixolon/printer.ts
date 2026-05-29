@@ -8,12 +8,12 @@ export const BIXOLON_SRP_E302 = {
 export const RECEIPT_CONTENT_ID = "receipt-content";
 
 export const RECEIPT_THERMAL_CLASS =
-	"receipt-thermal font-mono text-[#1a1a1a] select-none";
+	"receipt-thermal font-mono text-black select-none";
 
 export const RECEIPT_PADDING_MM = 3;
 
 export const RECEIPT_BIXOLON_TOP_FEED = 2;
-export const RECEIPT_BIXOLON_BOTTOM_FEED = 3;
+export const RECEIPT_BIXOLON_BOTTOM_FEED = 6;
 
 export const THERMAL_PAGE_STYLE = `
   @page {
@@ -29,12 +29,19 @@ export const THERMAL_PAGE_STYLE = `
     body {
       -webkit-print-color-adjust: exact;
       print-color-adjust: exact;
+      text-rendering: optimizeSpeed;
+      -webkit-font-smoothing: none;
+      -moz-osx-font-smoothing: unset;
     }
     #${RECEIPT_CONTENT_ID},
     .receipt-thermal {
       box-sizing: border-box;
       width: 80mm;
       padding: ${RECEIPT_PADDING_MM}mm;
+    }
+    .receipt-thermal {
+      font-size: 9pt !important;
+      line-height: 1.2 !important;
     }
     .no-print {
       display: none !important;

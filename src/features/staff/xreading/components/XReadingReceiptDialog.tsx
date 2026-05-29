@@ -1,14 +1,16 @@
-import { PrinterIcon } from "@phosphor-icons/react";
+import { PrinterIcon, SpinnerIcon } from "@phosphor-icons/react";
 import { useEffect, useRef, useState } from "react";
 import { useReactToPrint } from "react-to-print";
 import { PosModal } from "@/features/staff/pos/components/ui/PosModal";
 import {
-  loadBixolonSDK,
-  printCashCount,
-  printSalesXReading,
   ReceiptThermalContent,
   THERMAL_PAGE_STYLE,
 } from "@/integrations/bixolon";
+import {
+  connectQZ,
+  printCashCountQZ,
+  printSalesXReadingQZ,
+} from "@/integrations/qz-tray";
 import type { CashCountValues } from "../stores/useXReadingStore";
 import type { DailyReconciliationTotals } from "../utils/reconciliation";
 import { getExpectedCashInDrawer, getOverShort } from "../utils/reconciliation";
@@ -36,8 +38,9 @@ export function XReadingReceiptDialog({
   cashCount,
 }: XReadingReceiptDialogProps) {
   const contentRef = useRef<HTMLDivElement>(null);
-  const [bixolonReady, setBixolonReady] = useState(false);
-  const [bixolonLoading, setBixolonLoading] = useState(false);
+  const [qzReady, setQzReady] = useState(false);
+  const [qzLoading, setQzLoading] = useState(false);
+  const [qzPrinting, setQzPrinting] = useState(false);
 
   const handlePrint = useReactToPrint({
     contentRef,
@@ -48,29 +51,32 @@ export function XReadingReceiptDialog({
   useEffect(() => {
     if (!open) return;
 
-    setBixolonLoading(true);
-    loadBixolonSDK()
-      .then((loaded) => {
-        setBixolonReady(loaded);
+    setQzLoading(true);
+    connectQZ()
+      .then((connected) => {
+        setQzReady(connected);
       })
       .catch(() => {
-        setBixolonReady(false);
+        setQzReady(false);
       })
       .finally(() => {
-        setBixolonLoading(false);
+        setQzLoading(false);
       });
   }, [open]);
 
-  const handleDirectPrint = () => {
+  const handleQzPrint = async () => {
+    setQzPrinting(true);
     try {
       if (mode === "sales") {
-        printSalesXReading(staffName, totals, totalCashCounted);
+        await printSalesXReadingQZ(staffName, totals, totalCashCounted);
       } else if (mode === "cashcount") {
-        printCashCount(staffName, cashCount, totalCashCounted);
+        await printCashCountQZ(staffName, cashCount, totalCashCounted);
       }
       onClose();
     } catch (err) {
-      console.error("BIXOLON direct print failed:", err);
+      console.error("QZ Tray print failed:", err);
+    } finally {
+      setQzPrinting(false);
     }
   };
 
@@ -239,34 +245,39 @@ export function XReadingReceiptDialog({
             className="flex h-12 flex-1 items-center justify-center gap-2 rounded-xl text-sm font-bold text-white transition-all hover:opacity-90 active:scale-95"
             style={{ background: "var(--near-black)" }}
           >
-            <PrinterIcon className="size-4" /> Print
+            <PrinterIcon className="size-4" /> Browser Print
           </button>
         </div>
-        {bixolonReady ? (
-          <button
-            type="button"
-            onClick={handleDirectPrint}
-            className="flex h-10 w-full items-center justify-center gap-2 rounded-xl border-2 text-xs font-bold transition-all hover:bg-gray-50 active:scale-95"
-            style={{
-              borderColor: "var(--near-black)",
-              color: "var(--near-black)",
-            }}
-          >
-            <PrinterIcon className="size-3.5" /> Direct Print (BIXOLON)
-          </button>
-        ) : bixolonLoading ? (
-          <button
-            type="button"
-            disabled
-            className="flex h-10 w-full items-center justify-center gap-2 rounded-xl border-2 text-xs font-bold opacity-50 transition-all"
-            style={{
-              borderColor: "var(--near-black)",
-              color: "var(--near-black)",
-            }}
-          >
-            Detecting printer...
-          </button>
-        ) : null}
+        {qzReady ? (
+            <button
+              type="button"
+              onClick={handleQzPrint}
+              disabled={qzPrinting}
+              className="flex h-10 w-full items-center justify-center gap-2 rounded-xl border-2 text-xs font-bold transition-all hover:bg-gray-50 active:scale-95"
+              style={{
+                borderColor: "var(--near-black)",
+                color: "var(--near-black)",
+              }}
+            >
+              {qzPrinting ? (
+                <><SpinnerIcon className="size-3.5 animate-spin" /> Printing...</>
+              ) : (
+                <><PrinterIcon className="size-3.5" /> Print via QZ Tray</>
+              )}
+            </button>
+          ) : qzLoading ? (
+            <button
+              type="button"
+              disabled
+              className="flex h-10 w-full items-center justify-center gap-2 rounded-xl border-2 text-xs font-bold opacity-50 transition-all"
+              style={{
+                borderColor: "var(--near-black)",
+                color: "var(--near-black)",
+              }}
+            >
+              Connecting to QZ Tray...
+            </button>
+          ) : null}
       </div>
     </PosModal>
   );

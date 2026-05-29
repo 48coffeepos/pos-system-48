@@ -135,18 +135,15 @@ export function printOrderReceipt(
 
 	for (const item of order.items ?? []) {
 		const qty = String(Math.round(item.quantity));
-		const name = (item.snapshot_menu_name ?? "").slice(0, 20);
+		const name = (item.snapshot_menu_name ?? "").slice(0, 15);
 		const total = (item.line_total ?? 0).toFixed(2);
-		t(`${qty}x   ${name.padEnd(20)}          ${total.padStart(8)}`, {
-			bold: true,
-		});
-
-		if (
+		const cupInfo =
 			item.snapshot_inventory &&
 			item.snapshot_inventory !== item.snapshot_menu_name
-		) {
-			t(`     ${item.snapshot_inventory.slice(0, 22)}`);
-		}
+				? item.snapshot_inventory.slice(0, 12)
+				: "";
+
+		t(`${qty}x ${name.padEnd(15)} ${cupInfo.padEnd(12)} ${total.padStart(8)}`);
 
 		if (item.addon_items && item.addon_items.length > 0) {
 			const addonText = item.addon_items

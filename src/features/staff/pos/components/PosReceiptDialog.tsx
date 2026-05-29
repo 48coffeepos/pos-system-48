@@ -1,14 +1,23 @@
-import { Printer, X } from "@phosphor-icons/react";
+import { Printer, SpinnerIcon, X } from "@phosphor-icons/react";
 import { useEffect, useRef, useState } from "react";
 import { useReactToPrint } from "react-to-print";
 import { AlertDialog, AlertDialogContent } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import {
-	loadBixolonSDK,
-	printOrderReceipt,
 	ReceiptThermalContent,
 	THERMAL_PAGE_STYLE,
 } from "@/integrations/bixolon";
+import {
+	connectQZ,
+	printOrderReceiptQZ,
+} from "@/integrations/qz-tray";
+import {
+	usbSupported,
+	requestPrinter,
+	getPrinter,
+	printRaw,
+	buildOrderReceiptBytes,
+} from "@/integrations/webusb";
 import { cn } from "@/lib/utils";
 import { posBtnGhost, posBtnOutline, posBtnPrimary } from "../pos-ui";
 import type { PosOrder } from "../types";
@@ -27,8 +36,11 @@ export function PosReceiptDialog({
 	cashierName = "Cashier",
 }: PosReceiptDialogProps) {
 	const contentRef = useRef<HTMLDivElement>(null);
-	const [bixolonReady, setBixolonReady] = useState(false);
-	const [bixolonLoading, setBixolonLoading] = useState(false);
+	const [qzReady, setQzReady] = useState(false);
+	const [qzLoading, setQzLoading] = useState(false);
+	const [qzPrinting, setQzPrinting] = useState(false);
+	const [usbDevice, setUsbDevice] = useState<USBDevice | null>(null);
+	const [usbPrinting, setUsbPrinting] = useState(false);
 
 	const handlePrint = useReactToPrint({
 		contentRef,
@@ -39,26 +51,56 @@ export function PosReceiptDialog({
 	useEffect(() => {
 		if (!open) return;
 
-		setBixolonLoading(true);
-		loadBixolonSDK()
-			.then((loaded) => {
-				setBixolonReady(loaded);
+		setQzLoading(true);
+		connectQZ()
+			.then((connected) => {
+				setQzReady(connected);
 			})
 			.catch(() => {
-				setBixolonReady(false);
+				setQzReady(false);
 			})
 			.finally(() => {
-				setBixolonLoading(false);
+				setQzLoading(false);
 			});
 	}, [open]);
 
-	const handleDirectPrint = () => {
+	useEffect(() => {
+		if (!open || !usbSupported()) return;
+		getPrinter().then(setUsbDevice);
+	}, [open]);
+
+	const handleUsbPrint = async () => {
 		if (!order) return;
+
+		let device = usbDevice;
+		if (!device) {
+			device = await requestPrinter();
+			if (!device) return;
+			setUsbDevice(device);
+		}
+
+		setUsbPrinting(true);
 		try {
-			printOrderReceipt(order, cashierName);
+			const data = buildOrderReceiptBytes(order, cashierName);
+			await printRaw(device, data);
 			onClose();
 		} catch (err) {
-			console.error("BIXOLON direct print failed:", err);
+			console.error("USB print failed:", err);
+		} finally {
+			setUsbPrinting(false);
+		}
+	};
+
+	const handleQzPrint = async () => {
+		if (!order) return;
+		setQzPrinting(true);
+		try {
+			await printOrderReceiptQZ(order, cashierName);
+			onClose();
+		} catch (err) {
+			console.error("QZ Tray print failed:", err);
+		} finally {
+			setQzPrinting(false);
 		}
 	};
 
@@ -131,23 +173,23 @@ export function PosReceiptDialog({
 								{order.items?.map((item, idx) => (
 									// biome-ignore lint/suspicious/noArrayIndexKey: Items are uniquely identified by their index
 									<div key={idx} className="text-[8px] leading-tight lg:text-[10px]">
-										<div className="grid grid-cols-[30px_1fr_50px] font-bold lg:grid-cols-[40px_1fr_60px]">
-											<span>{Math.round(item.quantity)}x</span>
-											<span className="truncate uppercase">{item.snapshot_menu_name}</span>
-											<span className="text-right">
+										<div className="grid grid-cols-[30px_1fr_50px] lg:grid-cols-[40px_1fr_60px]">
+											<span className="font-black text-[9px] lg:text-[11px]">{Math.round(item.quantity)}x</span>
+											<span className="truncate">
+												<span className="font-bold uppercase">{item.snapshot_menu_name}</span>
+												{item.snapshot_inventory &&
+												item.snapshot_inventory !== item.snapshot_menu_name ? (
+													<span className="ml-1 font-semibold uppercase opacity-80">
+														{item.snapshot_inventory}
+													</span>
+												) : null}
+											</span>
+											<span className="text-right font-bold">
 												{(item.line_total || 0).toFixed(2)}
 											</span>
 										</div>
-										{item.snapshot_inventory &&
-										item.snapshot_inventory !== item.snapshot_menu_name ? (
-											<div className="mt-0.5 grid grid-cols-[30px_1fr_50px] text-[7px] font-bold opacity-75 lg:grid-cols-[40px_1fr_60px] lg:text-[9px]">
-												<span />
-												<span className="truncate uppercase">{item.snapshot_inventory}</span>
-												<span />
-											</div>
-										) : null}
 										{item.addon_items && item.addon_items.length > 0 ? (
-											<div className="mt-0.5 grid grid-cols-[30px_1fr_50px] text-[7px] opacity-70 lg:grid-cols-[40px_1fr_60px] lg:text-[9px]">
+											<div className="mt-0.5 grid grid-cols-[30px_1fr_50px] text-[7px] opacity-85 lg:grid-cols-[40px_1fr_60px] lg:text-[9px]">
 												<span />
 												<span className="truncate">
 													+{" "}
@@ -249,7 +291,7 @@ export function PosReceiptDialog({
 
 							<div className="mt-3 text-center lg:mt-6">
 								<p className="text-[9px] font-black uppercase lg:text-[11px]">{cashierName}</p>
-								<p className="text-[7px] font-bold opacity-60 lg:text-[9px]">
+								<p className="text-[7px] font-bold opacity-80 lg:text-[9px]">
 									Cashier&apos;s Name
 								</p>
 							</div>
@@ -269,17 +311,22 @@ export function PosReceiptDialog({
 								onClick={() => handlePrint()}
 								className={cn("flex h-8 flex-1 gap-1 text-[9px] lg:h-12 lg:gap-2 lg:text-sm", posBtnPrimary)}
 							>
-								<Printer className="size-3 lg:size-4" /> Print
+								<Printer className="size-3 lg:size-4" /> Browser Print
 							</Button>
 						</div>
-						{bixolonReady ? (
+						{qzReady ? (
 							<Button
-								onClick={handleDirectPrint}
+								onClick={handleQzPrint}
+								disabled={qzPrinting}
 								className={cn("flex h-7 w-full gap-1 text-[8px] lg:h-10 lg:gap-2 lg:text-xs", posBtnOutline)}
 							>
-								<Printer className="size-3 lg:size-3.5" /> Direct Print (BIXOLON)
+								{qzPrinting ? (
+									<><SpinnerIcon className="size-3 animate-spin lg:size-3.5" /> Printing...</>
+								) : (
+									<><Printer className="size-3 lg:size-3.5" /> Print via QZ Tray</>
+								)}
 							</Button>
-						) : bixolonLoading ? (
+						) : qzLoading ? (
 							<Button
 								disabled
 								className={cn(
@@ -287,7 +334,20 @@ export function PosReceiptDialog({
 									posBtnOutline,
 								)}
 							>
-								Detecting printer...
+								Connecting to QZ Tray...
+							</Button>
+						) : null}
+						{usbSupported() ? (
+							<Button
+								onClick={handleUsbPrint}
+								disabled={usbPrinting}
+								className={cn("flex h-7 w-full gap-1 text-[8px] lg:h-10 lg:gap-2 lg:text-xs", posBtnOutline)}
+							>
+								{usbPrinting ? (
+									<><SpinnerIcon className="size-3 animate-spin lg:size-3.5" /> Printing...</>
+								) : (
+									<><Printer className="size-3 lg:size-3.5" /> {usbDevice ? "Print via USB" : "Connect USB Printer"}</>
+								)}
 							</Button>
 						) : null}
 					</div>
