@@ -1,3 +1,5 @@
+import { MinusIcon, PlusIcon } from "@phosphor-icons/react";
+import { Button } from "@/components/ui/button";
 import type { CashCountValues } from "../stores/useXReadingStore";
 import { useXReadingStore } from "../stores/useXReadingStore";
 
@@ -40,26 +42,54 @@ export function CashCountPanel({
 								Qty
 							</span>
 							<form.AppField name={denom.toString() as any}>
-								{(field: any) => (
-									<input
-										id={field.name}
-										type="number"
-										min="0"
-										value={field.state.value === 0 ? "" : field.state.value}
-										onChange={(e) => {
-											if (e.target.value === "") {
-												field.handleChange(0);
-												setDenom(denom, 0);
-												return;
-											}
-											const val = parseInt(e.target.value, 10);
-											const qty = isNaN(val) || val < 0 ? 0 : val;
-											field.handleChange(qty);
-											setDenom(denom, qty);
-										}}
-										className="w-16 rounded-lg border border-(--light-gray) bg-white px-2 py-1 text-center text-sm font-medium focus:border-(--forest-green) focus:outline-none focus:ring-1 focus:ring-(--forest-green)"
-									/>
-								)}
+								{(field: any) => {
+									const qty = field.state.value || 0;
+									return (
+										<div className="flex items-center gap-0.5">
+											<Button
+												variant="outline"
+												className="h-7 w-7 p-0"
+												onClick={() => {
+													const newQty = Math.max(0, qty - 1);
+													field.handleChange(newQty);
+													setDenom(denom, newQty);
+												}}
+												disabled={qty === 0}
+											>
+												<MinusIcon className="size-3" />
+											</Button>
+											<input
+												id={field.name}
+												type="number"
+												min="0"
+												value={field.state.value === 0 ? "" : field.state.value}
+												onChange={(e) => {
+													if (e.target.value === "") {
+														field.handleChange(0);
+														setDenom(denom, 0);
+														return;
+													}
+													const val = parseInt(e.target.value, 10);
+													const newQty = isNaN(val) || val < 0 ? 0 : val;
+													field.handleChange(newQty);
+													setDenom(denom, newQty);
+												}}
+												className="w-14 rounded-lg border border-(--light-gray) bg-white px-1 py-1 text-center text-sm font-medium focus:border-(--forest-green) focus:outline-none focus:ring-1 focus:ring-(--forest-green) [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [-moz-appearance:textfield]"
+											/>
+											<Button
+												variant="default"
+												className="h-7 w-7 p-0"
+												onClick={() => {
+													const newQty = qty + 1;
+													field.handleChange(newQty);
+													setDenom(denom, newQty);
+												}}
+											>
+												<PlusIcon className="size-3" />
+											</Button>
+										</div>
+									);
+								}}
 							</form.AppField>
 						</div>
 						<div className="flex w-28 flex-col items-end">

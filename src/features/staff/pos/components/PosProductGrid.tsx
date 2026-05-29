@@ -1,4 +1,4 @@
-import { CoffeeIcon, MagnifyingGlassIcon } from "@phosphor-icons/react";
+import { CoffeeIcon, MagnifyingGlassIcon, XIcon } from "@phosphor-icons/react";
 import { Input } from "@/components/ui/input";
 import type { MenuItem } from "../types";
 import { PosProductCard } from "./ui/PosProductCard";
@@ -27,8 +27,19 @@ export function PosProductGrid({
 					value={search}
 					onChange={(e) => onSearchChange(e.target.value)}
 					placeholder="Search menu items..."
-					className="h-7 w-full rounded-[5px] border-(--light-gray) bg-(--pure-white) pl-8 pr-3 text-[9px] text-(--dark-gray) placeholder:text-(--medium-gray) lg:h-12 lg:rounded-xl lg:pl-12 lg:text-sm"
+					className="h-7 w-full rounded-[5px] border-(--light-gray) bg-(--pure-white) pl-8 pr-7 text-[9px] text-(--dark-gray) placeholder:text-(--medium-gray) lg:h-12 lg:rounded-xl lg:pl-12 lg:pr-12 lg:text-sm"
 				/>
+				{search ? (
+					<button
+						type="button"
+						onClick={() => onSearchChange("")}
+						className="absolute top-1/2 right-2 flex -translate-y-1/2 items-center gap-0.5 rounded-[3px] bg-(--light-gray) px-1 py-0.5 text-[7px] font-medium text-(--medium-gray) hover:text-(--dark-gray) lg:right-4 lg:gap-1 lg:rounded-md lg:px-2 lg:py-1 lg:text-xs"
+						aria-label="Clear search"
+					>
+						<XIcon className="size-2 lg:size-3" />
+						Clear
+					</button>
+				) : null}
 			</div>
 
 			<div className="flex-1 overflow-y-auto pr-2">
