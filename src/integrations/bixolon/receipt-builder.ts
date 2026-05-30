@@ -110,6 +110,8 @@ export function printOrderReceipt(
 
 	align("center");
 	t("48 COFFEE", { bold: true, dw: true, dh: true });
+	t("Ledesma St., Iloilo City Proper,");
+	t("Iloilo City, 5000");
 	t("ORDER SLIP", { bold: true, dw: true, dh: true });
 	blank();
 	align("left");
@@ -253,6 +255,8 @@ export function printSalesXReading(
 
 	align("center");
 	t("48 COFFEE", { bold: true, dw: true, dh: true });
+	t("Ledesma St., Iloilo City Proper,");
+	t("Iloilo City, 5000");
 	t("SALES X-READING", { bold: true, dw: true, dh: true });
 	blank();
 	align("left");
@@ -315,6 +319,8 @@ export function printCashCount(
 
 	align("center");
 	t("48 COFFEE", { bold: true, dw: true, dh: true });
+	t("Ledesma St., Iloilo City Proper,");
+	t("Iloilo City, 5000");
 	t("CASH COUNT", { bold: true, dw: true, dh: true });
 	t(`Date: ${displayDateTime}`);
 	t(`Cashier: ${staffName}`);
@@ -385,6 +391,8 @@ export function printCupsSales(
 
 	align("center");
 	t("48 COFFEE", { bold: true, dw: true, dh: true });
+	t("Ledesma St., Iloilo City Proper,");
+	t("Iloilo City, 5000");
 	t("CUPS SALES", { bold: true, dw: true, dh: true });
 	blank();
 	align("left");
@@ -441,6 +449,8 @@ export function printRevenue(
 
 	align("center");
 	t("48 COFFEE", { bold: true, dw: true, dh: true });
+	t("Ledesma St., Iloilo City Proper,");
+	t("Iloilo City, 5000");
 	t("DAILY REVENUE", { bold: true, dw: true, dh: true });
 	blank();
 	align("left");

@@ -91,6 +91,10 @@ export function PosReceiptDialog({
 						<ReceiptThermalContent ref={contentRef} className="overflow-x-hidden">
 							<div className="mb-2 text-center lg:mb-4">
 								<h2 className="text-xl font-black tracking-tight lg:text-3xl">48 COFFEE</h2>
+								<div className="text-[10px] font-bold leading-tight lg:text-[12px] my-1">
+									<p>Ledesma St., Iloilo City Proper,</p>
+									<p>Iloilo City, 5000</p>
+								</div>
 								<h3 className="mt-0.5 text-xs font-bold tracking-widest lg:text-base">
 									ORDER SLIP
 								</h3>

@@ -109,6 +109,10 @@ export function XReadingReceiptDialog({
           <div id="sales-xreading-receipt">
             <div className="mb-4 text-center">
               <h2 className="text-2xl font-black tracking-tight">48 COFFEE</h2>
+              <div className="text-xs font-bold leading-tight my-1">
+                <p>Ledesma St., Iloilo City Proper,</p>
+                <p>Iloilo City, 5000</p>
+              </div>
               <h3 className="text-lg font-bold uppercase tracking-widest">
                 SALES X-READING
               </h3>
@@ -179,6 +183,10 @@ export function XReadingReceiptDialog({
           <div id="cash-count-receipt">
             <div className="mb-4 text-center">
               <h2 className="text-2xl font-black tracking-tight">48 COFFEE</h2>
+              <div className="text-xs font-bold leading-tight my-1">
+                <p>Ledesma St., Iloilo City Proper,</p>
+                <p>Iloilo City, 5000</p>
+              </div>
               <h3 className="mt-0.5 text-lg font-bold uppercase">CASH COUNT</h3>
               <p className="text-sm mt-2 font-bold">Date: {displayDateTime}</p>
               <p className="text-sm font-bold">Cashier: {staffName}</p>

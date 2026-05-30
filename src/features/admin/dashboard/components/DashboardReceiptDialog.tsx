@@ -107,6 +107,10 @@ export function DashboardReceiptDialog({
             <div id="cups-sales-receipt">
               <div className="mb-3 text-center">
                 <h2 className="text-2xl font-black tracking-tight">48 COFFEE</h2>
+                <div className="text-xs font-bold leading-tight my-0.5">
+                  <p>Ledesma St., Iloilo City Proper,</p>
+                  <p>Iloilo City, 5000</p>
+                </div>
                 <h3 className="mt-0.5 text-sm font-bold uppercase">
                   CUPS SALES
                 </h3>
@@ -182,6 +186,10 @@ export function DashboardReceiptDialog({
             <div id="revenue-receipt">
               <div className="mb-3 text-center">
                 <h2 className="text-2xl font-black tracking-tight">48 COFFEE</h2>
+                <div className="text-xs font-bold leading-tight my-0.5">
+                  <p>Ledesma St., Iloilo City Proper,</p>
+                  <p>Iloilo City, 5000</p>
+                </div>
                 <h3 className="mt-0.5 text-sm font-bold uppercase">
                   DAILY REVENUE
                 </h3>
