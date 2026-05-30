@@ -110,7 +110,7 @@ export function printOrderReceipt(
 
 	align("center");
 	t("48 COFFEE", { bold: true, dw: true, dh: true });
-	t("ORDER SLIP", { bold: true });
+	t("ORDER SLIP", { bold: true, dw: true, dh: true });
 	blank();
 	align("left");
 
@@ -135,24 +135,31 @@ export function printOrderReceipt(
 
 	for (const item of order.items ?? []) {
 		const qty = String(Math.round(item.quantity));
-		const name = (item.snapshot_menu_name ?? "").slice(0, 20);
+		let combinedName = item.snapshot_menu_name ?? "";
+		if (item.snapshot_inventory && item.snapshot_inventory !== item.snapshot_menu_name) {
+			combinedName += ` ${item.snapshot_inventory}`;
+		}
+
+		const name = combinedName.slice(0, 20);
 		const total = (item.line_total ?? 0).toFixed(2);
 		t(`${qty}x   ${name.padEnd(20)}          ${total.padStart(8)}`, {
 			bold: true,
+			dh: true,
 		});
 
-		if (
-			item.snapshot_inventory &&
-			item.snapshot_inventory !== item.snapshot_menu_name
-		) {
-			t(`     ${item.snapshot_inventory.slice(0, 22)}`);
+		if (combinedName.length > 20) {
+			t(`     ${combinedName.slice(20, 42)}`, { dh: true });
 		}
 
 		if (item.addon_items && item.addon_items.length > 0) {
 			const addonText = item.addon_items
 				.map((a) => `${a.addon_name_snapshot} x${a.quantity}`)
 				.join(", ");
-			t(`  + ${addonText.slice(0, 36)}`);
+			let remaining = `+ ${addonText}`;
+			while (remaining.length > 0) {
+				t(`  ${remaining.slice(0, 36)}`);
+				remaining = remaining.slice(36);
+			}
 		}
 	}
 
@@ -246,7 +253,7 @@ export function printSalesXReading(
 
 	align("center");
 	t("48 COFFEE", { bold: true, dw: true, dh: true });
-	t("SALES X-READING", { bold: true });
+	t("SALES X-READING", { bold: true, dw: true, dh: true });
 	blank();
 	align("left");
 
@@ -308,7 +315,7 @@ export function printCashCount(
 
 	align("center");
 	t("48 COFFEE", { bold: true, dw: true, dh: true });
-	t("CASH COUNT", { bold: true });
+	t("CASH COUNT", { bold: true, dw: true, dh: true });
 	t(`Date: ${displayDateTime}`);
 	t(`Cashier: ${staffName}`);
 	blank();
@@ -378,7 +385,7 @@ export function printCupsSales(
 
 	align("center");
 	t("48 COFFEE", { bold: true, dw: true, dh: true });
-	t("CUPS SALES", { bold: true });
+	t("CUPS SALES", { bold: true, dw: true, dh: true });
 	blank();
 	align("left");
 
@@ -434,7 +441,7 @@ export function printRevenue(
 
 	align("center");
 	t("48 COFFEE", { bold: true, dw: true, dh: true });
-	t("DAILY REVENUE", { bold: true });
+	t("DAILY REVENUE", { bold: true, dw: true, dh: true });
 	blank();
 	align("left");
 
