@@ -8,6 +8,7 @@ import {
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { Toaster } from "@/components/ui/sonner";
 import { TanstackFormDevtools } from "@/integrations/tanstack-form";
+import { ServiceWorkerRegister } from "../components/ServiceWorkerRegister";
 import {
 	RouteErrorBoundary,
 	RouteNotFoundBoundary,
@@ -32,6 +33,26 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 				name: "viewport",
 				content: "width=device-width, initial-scale=1",
 			},
+			{
+				name: "theme-color",
+				content: "#4FB8B2",
+			},
+			{
+				name: "apple-mobile-web-app-capable",
+				content: "yes",
+			},
+			{
+				name: "apple-mobile-web-app-status-bar-style",
+				content: "black-translucent",
+			},
+			{
+				name: "apple-mobile-web-app-title",
+				content: "48 POS",
+			},
+			{
+				name: "application-name",
+				content: "48 Coffee POS",
+			},
 			...createSeo({
 				title: "48 Coffee POS",
 				description: "POS for 48 Coffee - Ledesma",
@@ -41,6 +62,14 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 			{
 				rel: "stylesheet",
 				href: appCss,
+			},
+			{
+				rel: "manifest",
+				href: "/manifest.json",
+			},
+			{
+				rel: "apple-touch-icon",
+				href: "/logo.png",
 			},
 		],
 	}),
@@ -55,6 +84,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 			</head>
 			<body className="font-sans antialiased wrap-anywhere selection:bg-[rgba(79,184,178,0.24)]">
 				{children}
+				<ServiceWorkerRegister />
 				<Toaster
 					position="top-right"
 					richColors

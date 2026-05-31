@@ -97,12 +97,12 @@ export function PosCartPanel({
 						return (
 							<div
 								key={item.lineKey}
-								className="mb-0.5 flex items-center gap-1 rounded-[5px] p-1 md:mb-2 md:gap-2 lg:gap-3 md:rounded-lg lg:rounded-xl md:p-2 lg:p-3"
+								className="mb-0.5 flex items-center gap-1 rounded-[5px] p-1 h-[48px] md:mb-2 md:gap-2 lg:gap-3 md:rounded-lg lg:rounded-xl md:p-2 lg:p-3 md:h-[72px]"
 								style={{ background: "var(--off-white)" }}
 							>
-								<div className="min-w-0 flex-1">
+								<div className="min-w-0 flex-1 pl-1.5 md:pl-2">
 									<h4
-										className="truncate text-[11px] font-semibold md:text-lg"
+										className="truncate text-[9px] font-bold md:text-sm"
 										style={{ color: "var(--dark-gray)" }}
 									>
 										{item.menu_name}
