@@ -226,7 +226,7 @@ export function PosCartPanel({
 							)}
 							aria-hidden={!isDetailsOpen}
 						>
-							<div className="border-t border-(--light-gray) space-y-2 md:space-y-2 lg:space-y-3 [&_[data-slot=field]]:gap-0.5 md:[&_[data-slot=field]]:gap-1 lg:[&_[data-slot=field]]:gap-2 [&_[data-slot=field-label]]:text-[7px] md:[&_[data-slot=field-label]]:text-[9px] lg:[&_[data-slot=field-label]]:text-xs">
+							<div className="border-t border-(--light-gray) pt-1.5 space-y-2 md:pt-2 md:space-y-2 lg:space-y-3 [&_[data-slot=field]]:gap-0.5 md:[&_[data-slot=field]]:gap-1 lg:[&_[data-slot=field]]:gap-2 [&_[data-slot=field-label]]:text-[7px] md:[&_[data-slot=field-label]]:text-[9px] lg:[&_[data-slot=field-label]]:text-xs">
 						<div className="grid grid-cols-2 gap-x-1 gap-y-1 md:gap-x-2 md:gap-y-1.5 lg:gap-y-2 items-start">
 							<div className="col-span-2">
 								<form.AppField name="note">
