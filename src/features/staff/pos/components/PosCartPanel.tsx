@@ -97,12 +97,12 @@ export function PosCartPanel({
 						return (
 							<div
 								key={item.lineKey}
-								className="mb-0.5 flex items-center gap-1 rounded-[5px] p-1 h-[48px] md:mb-2 md:gap-2 lg:gap-3 md:rounded-lg lg:rounded-xl md:p-2 lg:p-3 md:h-[72px]"
+								className="mb-0.5 flex items-center gap-1 rounded-[5px] p-1 md:mb-2 md:gap-2 lg:gap-3 md:rounded-lg lg:rounded-xl md:p-2 lg:p-3"
 								style={{ background: "var(--off-white)" }}
 							>
 								<div className="min-w-0 flex-1 pl-1.5 md:pl-2">
 									<h4
-										className="truncate text-[9px] font-bold md:text-sm"
+										className="truncate text-[11px] font-bold md:text-sm"
 										style={{ color: "var(--dark-gray)" }}
 									>
 										{item.menu_name}
@@ -119,7 +119,7 @@ export function PosCartPanel({
 									</div>
 									{cupLine ? (
 										<p
-											className="mt-0.5 text-[9px] font-medium md:text-[12px]"
+											className="mt-0.5 text-[10px] font-medium md:text-[12px]"
 											style={{ color: "var(--medium-gray)" }}
 										>
 											{cupLine}
@@ -137,7 +137,7 @@ export function PosCartPanel({
 										</p>
 									) : null}
 									<p
-										className="text-[10px] font-bold md:text-sm"
+										className="text-[11px] font-bold md:text-sm"
 										style={{ color: "var(--deep-forest)" }}
 									>
 										{formatPeso(item.total_price)}
@@ -146,7 +146,7 @@ export function PosCartPanel({
 								<div className="flex items-center gap-px md:gap-1.5">
 									<Button
 										variant="secondary"
-										className={cn("h-3.5 w-3.5 min-w-0 p-0 rounded-[3px] md:size-6", posBtnSecondary)}
+										className={cn("h-5 w-5 min-w-0 p-0 rounded-[3px] md:size-7", posBtnSecondary)}
 										onClick={() =>
 											item.quantity === 1
 												? onRemoveFromCart(item.lineKey)
@@ -154,9 +154,9 @@ export function PosCartPanel({
 										}
 									>
 										{item.quantity === 1 ? (
-											<XIcon className="size-1 md:size-3" />
+											<XIcon className="size-2 md:size-3.5" />
 										) : (
-											<MinusIcon className="size-1 md:size-3" />
+											<MinusIcon className="size-2 md:size-3.5" />
 										)}
 									</Button>
 									<span className="w-2 text-center text-[6px] font-bold md:w-5 md:text-xs">
@@ -164,13 +164,13 @@ export function PosCartPanel({
 									</span>
 									<Button
 										variant="default"
-										className={cn("h-3.5 w-3.5 min-w-0 p-0 rounded-[3px] md:size-6", posBtnPrimary)}
+										className={cn("h-5 w-5 min-w-0 p-0 rounded-[3px] md:size-7", posBtnPrimary)}
 										disabled={
 											Boolean(item.discount) || Boolean(item.is_free_drink)
 										}
 										onClick={() => onUpdateQuantity(item.lineKey, 1)}
 									>
-										<PlusIcon className="size-1 md:size-3" />
+										<PlusIcon className="size-2 md:size-3.5" />
 									</Button>
 								</div>
 							</div>

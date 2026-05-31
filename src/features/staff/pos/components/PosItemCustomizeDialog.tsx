@@ -185,7 +185,7 @@ export function PosItemCustomizeDialog({
 												key={ci.inventory.inventory_id}
 												variant={isSelected ? "default" : "outline"}
 												className={cn(
-													"flex h-auto flex-1 flex-col items-center gap-0.5 rounded-[5px] py-1 text-[8px] font-semibold md:rounded-xl md:py-2 md:text-xs",
+													"flex h-auto flex-1 flex-col items-center gap-0.5 rounded-[5px] py-1 text-[11px] font-semibold md:rounded-xl md:py-2 md:text-sm",
 													isSelected ? posBtnPrimary : posBtnSecondary,
 												)}
 												onClick={() =>
@@ -193,7 +193,7 @@ export function PosItemCustomizeDialog({
 												}
 											>
 												<span>{ci.inventory.name}</span>
-												<span className="text-[6px] opacity-70 md:text-[9px]">
+												<span className="text-[9px] opacity-70 md:text-[11px]">
 													{formatPeso(Number(ci.price))}
 												</span>
 											</Button>
@@ -237,7 +237,7 @@ export function PosItemCustomizeDialog({
 												<div className="flex flex-col gap-0.5">
 													<span
 														className={cn(
-															"text-[8px] font-bold md:text-[10px]",
+															"text-[11px] font-bold md:text-sm",
 															qty > 0
 																? "text-(--deep-forest)"
 																: "text-(--medium-gray)",
@@ -245,30 +245,30 @@ export function PosItemCustomizeDialog({
 													>
 														{addon.name}
 													</span>
-													<span className="text-[6px] opacity-60 md:text-[8px]">
+													<span className="text-[9px] opacity-60 md:text-[11px]">
 														+{formatPeso(addon.price)}
 													</span>
 												</div>
 												<div className="flex items-center gap-0.5 md:gap-1.5">
 													<Button
 														variant="secondary"
-														size="icon-xs"
+														size="icon-sm"
 														className={posBtnSecondary}
 														onClick={() => decrementAddon(addon)}
 														disabled={qty === 0}
 													>
-														<MinusIcon className="size-2 md:size-3" />
+														<MinusIcon className="size-3 md:size-4" />
 													</Button>
-													<span className="w-2.5 text-center text-[8px] font-bold md:w-4 md:text-xs">
+													<span className="w-3 text-center text-[11px] font-bold md:w-5 md:text-sm">
 														{qty}
 													</span>
 													<Button
 														variant="default"
-														size="icon-xs"
+														size="icon-sm"
 														className={posBtnPrimary}
 														onClick={() => incrementAddon(addon)}
 													>
-														<PlusIcon className="size-2 md:size-3" />
+														<PlusIcon className="size-3 md:size-4" />
 													</Button>
 												</div>
 											</div>
@@ -353,7 +353,7 @@ export function PosItemCustomizeDialog({
 												posSectionMuted,
 											)}
 										>
-											<span className="text-[8px] font-semibold text-(--deep-forest) md:text-xs">
+											<span className="text-[11px] font-semibold text-(--deep-forest) md:text-sm">
 												Free Drink
 											</span>
 											<Switch
@@ -363,7 +363,7 @@ export function PosItemCustomizeDialog({
 													field.handleChange(checked);
 													if (checked) form.setFieldValue("quantity", 1);
 												}}
-												size="sm"
+												size="default"
 											/>
 										</div>
 									)}
@@ -389,7 +389,7 @@ export function PosItemCustomizeDialog({
 												<div className="flex items-center gap-0.5 md:gap-2">
 													<Button
 														variant="secondary"
-														size="icon-xs"
+														size="icon-sm"
 														className={posBtnSecondary}
 														disabled={
 															quantityLocked || field.state.value <= 1
@@ -400,21 +400,21 @@ export function PosItemCustomizeDialog({
 															)
 														}
 													>
-														<MinusIcon className="size-2 md:size-3" />
+														<MinusIcon className="size-3 md:size-4" />
 													</Button>
-													<span className="w-3 text-center text-[8px] font-bold text-(--deep-forest) md:w-5 md:text-xs">
+													<span className="w-4 text-center text-[11px] font-bold text-(--deep-forest) md:w-6 md:text-sm">
 														{field.state.value}
 													</span>
 													<Button
 														variant="default"
-														size="icon-xs"
+														size="icon-sm"
 														className={posBtnPrimary}
 														disabled={quantityLocked}
 														onClick={() =>
 															field.handleChange(field.state.value + 1)
 														}
 													>
-														<PlusIcon className="size-2 md:size-3" />
+														<PlusIcon className="size-3 md:size-4" />
 													</Button>
 												</div>
 											)}
