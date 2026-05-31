@@ -100,18 +100,9 @@ export function PosCartPanel({
 								className="mb-0.5 flex items-center gap-1 rounded-[5px] p-1 md:mb-2 md:gap-2 lg:gap-3 md:rounded-lg lg:rounded-xl md:p-2 lg:p-3"
 								style={{ background: "var(--off-white)" }}
 							>
-								<div
-									className="flex size-6 shrink-0 items-center justify-center rounded-[5px] md:size-12 md:rounded-lg"
-									style={{ background: "var(--light-gray)" }}
-								>
-									<CoffeeIcon
-										className="size-3.5 md:size-6"
-										style={{ color: "var(--medium-gray)" }}
-									/>
-								</div>
 								<div className="min-w-0 flex-1">
 									<h4
-										className="truncate text-[9px] font-semibold md:text-sm"
+										className="truncate text-[11px] font-semibold md:text-lg"
 										style={{ color: "var(--dark-gray)" }}
 									>
 										{item.menu_name}
@@ -128,7 +119,7 @@ export function PosCartPanel({
 									</div>
 									{cupLine ? (
 										<p
-											className="mt-0.5 text-[7px] font-medium md:text-[10px]"
+											className="mt-0.5 text-[9px] font-medium md:text-[12px]"
 											style={{ color: "var(--medium-gray)" }}
 										>
 											{cupLine}
@@ -136,7 +127,7 @@ export function PosCartPanel({
 									) : null}
 									{item.addon_items && item.addon_items.length > 0 ? (
 										<p
-											className="text-[7px] font-semibold italic md:text-[9px]"
+											className="text-[10px] font-semibold italic md:text-[11px]"
 											style={{ color: "var(--coral)" }}
 										>
 											+{" "}
@@ -146,7 +137,7 @@ export function PosCartPanel({
 										</p>
 									) : null}
 									<p
-										className="text-[9px] font-bold md:text-sm"
+										className="text-[10px] font-bold md:text-sm"
 										style={{ color: "var(--deep-forest)" }}
 									>
 										{formatPeso(item.total_price)}
