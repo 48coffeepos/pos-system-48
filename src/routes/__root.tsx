@@ -58,10 +58,16 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 				description: "POS for 48 Coffee - Ledesma",
 			}).meta,
 		],
-		links: [
+	links: [
 			{
 				rel: "stylesheet",
 				href: appCss,
+			},
+			{
+				rel: "icon",
+				type: "image/png",
+				sizes: "48x48",
+				href: "/favicon.png?v=2",
 			},
 			{
 				rel: "manifest",
