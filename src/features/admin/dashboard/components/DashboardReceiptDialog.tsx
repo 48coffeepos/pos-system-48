@@ -106,13 +106,17 @@ export function DashboardReceiptDialog({
           {mode === "cups" && (
             <div id="cups-sales-receipt">
               <div className="mb-3 text-center">
-                <h2 className="text-xl font-black tracking-tight">48 COFFEE</h2>
-                <h3 className="mt-0.5 text-xs font-bold uppercase">
+                <h2 className="text-2xl font-black tracking-tight">48 COFFEE</h2>
+                <div className="text-xs font-bold leading-tight my-0.5">
+                  <p>Ledesma St., Iloilo City Proper,</p>
+                  <p>Iloilo City, 5000</p>
+                </div>
+                <h3 className="mt-0.5 text-sm font-bold uppercase">
                   CUPS SALES
                 </h3>
               </div>
 
-              <div className="mb-3 space-y-0.5 text-[10px] font-bold">
+              <div className="mb-3 space-y-0.5 text-xs font-bold">
                 <div className="flex justify-between">
                   <span>Date :</span>
                   <span>{periodLabel}</span>
@@ -129,13 +133,13 @@ export function DashboardReceiptDialog({
                   .map((cup) => (
                     <div
                       key={cup.name}
-                      className="mb-2 text-[10px] leading-tight"
+                      className="mb-2 text-xs leading-tight font-bold"
                     >
                       <div className="flex justify-between font-bold uppercase">
                         <span>{cup.name}</span>
                         <span>{cup.total} cups</span>
                       </div>
-                      <div className="mt-0.5 flex gap-2 text-[9px]">
+                      <div className="mt-0.5 flex gap-2 text-[10px] opacity-90">
                         <span>CASH : {cup.byMethod.CASH ?? 0}</span>
                         <span>GCASH : {cup.byMethod.GCASH ?? 0}</span>
                         <span>GRAB : {cup.byMethod.GRAB ?? 0}</span>
@@ -144,14 +148,14 @@ export function DashboardReceiptDialog({
                   ))}
               </div>
 
-              <div className="border-t border-dashed border-black pt-2 text-[10px] font-bold">
+              <div className="border-t border-dashed border-black pt-2 text-xs font-bold">
                 <div className="mb-0.5 flex justify-between">
                   <span>TOTAL CUPS SOLD :</span>
                   <span>
                     {cupSales.reduce((sum, c) => sum + c.total, 0)} cups
                   </span>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-2 text-[10px]">
                   <span>
                     CASH :{" "}
                     {cupSales.reduce(
@@ -181,13 +185,17 @@ export function DashboardReceiptDialog({
           {mode === "revenue" && (
             <div id="revenue-receipt">
               <div className="mb-3 text-center">
-                <h2 className="text-xl font-black tracking-tight">48 COFFEE</h2>
-                <h3 className="mt-0.5 text-xs font-bold uppercase">
+                <h2 className="text-2xl font-black tracking-tight">48 COFFEE</h2>
+                <div className="text-xs font-bold leading-tight my-0.5">
+                  <p>Ledesma St., Iloilo City Proper,</p>
+                  <p>Iloilo City, 5000</p>
+                </div>
+                <h3 className="mt-0.5 text-sm font-bold uppercase">
                   DAILY REVENUE
                 </h3>
               </div>
 
-              <div className="mb-3 space-y-0.5 text-[10px] font-bold">
+              <div className="mb-3 space-y-0.5 text-xs font-bold">
                 <div className="flex justify-between">
                   <span>Date :</span>
                   <span>{periodLabel}</span>
@@ -198,7 +206,7 @@ export function DashboardReceiptDialog({
                 </div>
               </div>
 
-              <div className="mb-2 border-t border-dashed border-black pt-2 text-[10px] font-bold">
+              <div className="mb-2 border-t border-dashed border-black pt-2 text-xs font-bold">
                 <div className="flex justify-between mb-1">
                   <span>CASH</span>
                   <span>₱{formatPeso(cashRevenue)}</span>
@@ -209,7 +217,7 @@ export function DashboardReceiptDialog({
                 </div>
               </div>
 
-              <div className="border-t border-black pt-2 text-[11px] font-black">
+              <div className="border-t border-black pt-2 text-sm font-black">
                 <div className="flex justify-between">
                   <span>TOTAL REVENUE</span>
                   <span>₱{formatPeso(totalRevenue)}</span>
@@ -219,14 +227,14 @@ export function DashboardReceiptDialog({
           )}
 
           <div className="mt-8 border-t border-black pt-1 text-center">
-            <span className="text-[8px] font-bold tracking-widest uppercase">
+            <span className="text-xs font-bold tracking-widest uppercase">
               Signature
             </span>
           </div>
 
           <div className="mt-4 text-center">
-            <p className="text-[10px] font-black uppercase">{staffName}</p>
-            <p className="text-[8px] font-bold opacity-60">Admin&apos;s Name</p>
+            <p className="text-xs font-black uppercase">{staffName}</p>
+            <p className="text-[9px] font-bold opacity-60">Admin&apos;s Name</p>
           </div>
         </ReceiptThermalContent>
 
@@ -242,19 +250,13 @@ export function DashboardReceiptDialog({
               <PrinterIcon className="size-4" /> Print
             </Button>
           </div>
-          {bixolonReady ? (
-            <Button
-              onClick={handleDirectPrint}
-              variant="outline"
-              className="flex h-12 gap-2"
-            >
-              <PrinterIcon className="size-4" /> Direct Print (BIXOLON)
-            </Button>
-          ) : bixolonLoading ? (
-            <Button disabled variant="outline" className="h-12">
-              Detecting printer...
-            </Button>
-          ) : null}
+          <Button
+            onClick={handleDirectPrint}
+            variant="outline"
+            className="flex h-12 gap-2"
+          >
+            <PrinterIcon className="size-4" /> Direct Print (Bixolon SDK Raw)
+          </Button>
         </div>
       </AlertDialogContent>
     </AlertDialog>

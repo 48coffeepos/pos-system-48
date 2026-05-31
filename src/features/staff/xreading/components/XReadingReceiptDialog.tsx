@@ -109,12 +109,16 @@ export function XReadingReceiptDialog({
           <div id="sales-xreading-receipt">
             <div className="mb-4 text-center">
               <h2 className="text-2xl font-black tracking-tight">48 COFFEE</h2>
+              <div className="text-xs font-bold leading-tight my-1">
+                <p>Ledesma St., Iloilo City Proper,</p>
+                <p>Iloilo City, 5000</p>
+              </div>
               <h3 className="text-lg font-bold uppercase tracking-widest">
                 SALES X-READING
               </h3>
             </div>
 
-            <div className="mb-4 text-[11px] font-bold">
+            <div className="mb-4 text-sm font-bold">
               <div className="flex justify-between">
                 <span>Sales Date :</span>
                 <span>{displayDate}</span>
@@ -127,7 +131,7 @@ export function XReadingReceiptDialog({
 
             <div className="mb-4 border-t-2 border-dashed border-black pt-4" />
 
-            <div className="text-[11px] font-bold space-y-1">
+            <div className="text-sm font-bold space-y-1">
               <div className="flex justify-between">
                 <span>TOTAL CASH IN:</span>
                 <span>{totalCashIn.toFixed(2)}</span>
@@ -138,7 +142,7 @@ export function XReadingReceiptDialog({
               </div>
             </div>
 
-            <div className="mt-4 border-t border-dashed border-black pt-4 text-[11px] font-bold space-y-1">
+            <div className="mt-4 border-t border-dashed border-black pt-4 text-sm font-bold space-y-1">
               <div className="flex justify-between">
                 <span>GROSS SALES:</span>
                 <span>{grossSales.toFixed(2)}</span>
@@ -149,7 +153,7 @@ export function XReadingReceiptDialog({
               </div>
             </div>
 
-            <div className="mt-4 border-t-2 border-dashed border-black pt-4 text-[11px] font-bold space-y-1">
+            <div className="mt-4 border-t-2 border-dashed border-black pt-4 text-sm font-bold space-y-1">
               <div className="flex justify-between">
                 <span>NET SALES:</span>
                 <span>{netSales.toFixed(2)}</span>
@@ -167,7 +171,7 @@ export function XReadingReceiptDialog({
               </div>
             </div>
 
-            <div className="mt-12 text-center text-[11px]">
+            <div className="mt-12 text-center text-sm font-bold">
               <p className="border-t-2 border-dashed border-black pt-2">
                 Signature of Cashier
               </p>
@@ -179,13 +183,17 @@ export function XReadingReceiptDialog({
           <div id="cash-count-receipt">
             <div className="mb-4 text-center">
               <h2 className="text-2xl font-black tracking-tight">48 COFFEE</h2>
+              <div className="text-xs font-bold leading-tight my-1">
+                <p>Ledesma St., Iloilo City Proper,</p>
+                <p>Iloilo City, 5000</p>
+              </div>
               <h3 className="mt-0.5 text-lg font-bold uppercase">CASH COUNT</h3>
-              <p className="text-sm mt-2">Date: {displayDateTime}</p>
-              <p className="text-sm">Cashier: {staffName}</p>
+              <p className="text-sm mt-2 font-bold">Date: {displayDateTime}</p>
+              <p className="text-sm font-bold">Cashier: {staffName}</p>
             </div>
 
             <div className="mb-4 border-t border-dashed border-black pt-4">
-              <table className="w-full text-sm">
+              <table className="w-full text-sm font-bold">
                 <tbody>
                   {denominations.map((denom) => {
                     const qty = cashCount[denom] || 0;
@@ -204,14 +212,14 @@ export function XReadingReceiptDialog({
               </table>
             </div>
 
-            <div className="border-t border-dashed border-black pt-4 text-sm">
-              <div className="flex justify-between font-bold">
+            <div className="border-t border-dashed border-black pt-4 text-base">
+              <div className="flex justify-between font-black">
                 <span>TOTAL:</span>
                 <span>{totalCashCounted.toFixed(2)}</span>
               </div>
             </div>
 
-            <div className="mt-12 text-center text-sm">
+            <div className="mt-12 text-center text-sm font-bold">
               <p className="border-t border-dashed border-black pt-2">
                 Signature of Cashier
               </p>
@@ -242,31 +250,17 @@ export function XReadingReceiptDialog({
             <PrinterIcon className="size-4" /> Print
           </button>
         </div>
-        {bixolonReady ? (
-          <button
-            type="button"
-            onClick={handleDirectPrint}
-            className="flex h-10 w-full items-center justify-center gap-2 rounded-xl border-2 text-xs font-bold transition-all hover:bg-gray-50 active:scale-95"
-            style={{
-              borderColor: "var(--near-black)",
-              color: "var(--near-black)",
-            }}
-          >
-            <PrinterIcon className="size-3.5" /> Direct Print (BIXOLON)
-          </button>
-        ) : bixolonLoading ? (
-          <button
-            type="button"
-            disabled
-            className="flex h-10 w-full items-center justify-center gap-2 rounded-xl border-2 text-xs font-bold opacity-50 transition-all"
-            style={{
-              borderColor: "var(--near-black)",
-              color: "var(--near-black)",
-            }}
-          >
-            Detecting printer...
-          </button>
-        ) : null}
+        <button
+          type="button"
+          onClick={handleDirectPrint}
+          className="flex h-10 w-full items-center justify-center gap-2 rounded-xl border-2 text-xs font-bold transition-all hover:bg-gray-50 active:scale-95"
+          style={{
+            borderColor: "var(--near-black)",
+            color: "var(--near-black)",
+          }}
+        >
+          <PrinterIcon className="size-3.5" /> Direct Print (Bixolon SDK Raw)
+        </button>
       </div>
     </PosModal>
   );

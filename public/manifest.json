@@ -1,25 +1,26 @@
 {
-  "short_name": "TanStack App",
-  "name": "Create TanStack App Sample",
-  "icons": [
-    {
-      "src": "favicon.ico",
-      "sizes": "64x64 32x32 24x24 16x16",
-      "type": "image/x-icon"
-    },
-    {
-      "src": "logo192.png",
-      "type": "image/png",
-      "sizes": "192x192"
-    },
-    {
-      "src": "logo512.png",
-      "type": "image/png",
-      "sizes": "512x512"
-    }
-  ],
-  "start_url": ".",
-  "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+	"short_name": "48 POS",
+	"name": "48 Coffee POS",
+	"description": "Point of Sale system for 48 Coffee - Ledesma",
+	"start_url": "/",
+	"scope": "/",
+	"display": "fullscreen",
+	"orientation": "any",
+	"theme_color": "#4FB8B2",
+	"background_color": "#FAFAF9",
+	"categories": ["business", "food", "productivity"],
+	"icons": [
+		{
+			"src": "logo192.png",
+			"type": "image/png",
+			"sizes": "192x192",
+			"purpose": "any maskable"
+		},
+		{
+			"src": "logo512.png",
+			"type": "image/png",
+			"sizes": "512x512",
+			"purpose": "any maskable"
+		}
+	]
 }

@@ -197,14 +197,14 @@ export function OrdersList({ orders = [] }: OrdersListProps) {
         </div>
 
         <div className="w-full overflow-x-auto rounded-xl border border-(--light-gray)/40">
-          <table className="w-full border-collapse text-left table-fixed">
+          <table className="w-full min-w-[600px] border-collapse text-left">
             <thead>
               <tr className="border-b border-(--light-gray)/40 bg-(--off-white) text-xs font-bold uppercase tracking-wider text-(--medium-gray)">
-                <th className="p-4 pl-6 w-[20%]">Order No</th>
-                <th className="p-4 w-[20%]">Date & Time</th>
-                <th className="p-4 w-[20%]">Payment</th>
-                <th className="p-4 w-[20%]">Total</th>
-                <th className="p-4 pr-6 no-print w-[20%]">Receipt</th>
+                <th className="p-4 pl-6">Order No</th>
+                <th className="p-4">Date & Time</th>
+                <th className="p-4">Payment</th>
+                <th className="p-4">Total</th>
+                <th className="p-4 pr-6 no-print">Receipt</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-(--light-gray)/40">

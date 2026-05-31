@@ -197,11 +197,11 @@ export function PosScreen() {
 
 	return (
 		<div
-			className="flex h-full flex-col"
+			className="flex flex-1 flex-col min-h-0"
 			style={{ background: "var(--warm-beige)" }}
 		>
-			<div className="flex flex-col h-full">
-				<div className="flex flex-1 overflow-hidden">
+			<div className="flex flex-col flex-1 min-h-0">
+				<div className="flex flex-1 overflow-hidden min-h-0">
 					<PosProductGrid
 						menuItems={menuItems}
 						loading={isLoading}
