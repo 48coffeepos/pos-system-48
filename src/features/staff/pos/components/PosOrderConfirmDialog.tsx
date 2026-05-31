@@ -34,24 +34,24 @@ export function PosOrderConfirmDialog({
         if (!isOpen && !isLoading) onClose();
       }}
     >
-      <AlertDialogContent className="rounded-[5px] border-(--light-gray) bg-(--pure-white) p-2 lg:rounded-xl lg:p-6">
+      <AlertDialogContent className="rounded-[5px] border-(--light-gray) bg-(--pure-white) p-2 md:rounded-xl md:p-6">
         <Button
           variant="ghost"
           onClick={onClose}
           disabled={isLoading}
-          className={cn("absolute top-1 right-1 flex size-5 items-center justify-center rounded-[3px] lg:top-4 lg:right-4 lg:size-9 lg:rounded-full", posBtnGhost)}
+          className={cn("absolute top-1 right-1 flex size-5 items-center justify-center rounded-[3px] md:top-4 md:right-4 md:size-9 md:rounded-full", posBtnGhost)}
           aria-label="Close"
         >
-          <XIcon className="size-2.5 lg:size-5" />
+          <XIcon className="size-2.5 md:size-5" />
         </Button>
-        <AlertDialogTitle className="text-[9px] text-(--deep-forest) lg:text-lg">
+        <AlertDialogTitle className="text-[9px] text-(--deep-forest) md:text-lg">
           Confirm Order
         </AlertDialogTitle>
-        <AlertDialogDescription className="text-[8px] lg:text-sm">
+        <AlertDialogDescription className="text-[8px] md:text-sm">
           Are you sure you want to place this order for {formatPeso(total)}?
         </AlertDialogDescription>
-        <AlertDialogFooter className="gap-0.5 lg:gap-4">
-          <AlertDialogCancel disabled={isLoading} className={cn(posBtnOutline, "h-5 text-[8px] lg:h-10 lg:text-sm")}>
+        <AlertDialogFooter className="gap-0.5 md:gap-4">
+          <AlertDialogCancel disabled={isLoading} className={cn(posBtnOutline, "h-5 text-[8px] md:h-10 md:text-sm")}>
             Cancel
           </AlertDialogCancel>
           <Button
@@ -59,11 +59,11 @@ export function PosOrderConfirmDialog({
               void onConfirm();
             }}
             disabled={isLoading}
-            className={cn(posBtnPrimary, "h-5 text-[8px] lg:h-10 lg:text-sm")}
+            className={cn(posBtnPrimary, "h-5 text-[8px] md:h-10 md:text-sm")}
           >
             {isLoading ? (
               <>
-                <SpinnerIcon className="size-1.5 animate-spin lg:size-4" />
+                <SpinnerIcon className="size-1.5 animate-spin md:size-4" />
                 Confirming...
               </>
             ) : (
