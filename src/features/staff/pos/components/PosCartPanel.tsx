@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
 	ArrowRightIcon,
 	CoffeeIcon,
@@ -54,6 +55,7 @@ export function PosCartPanel({
 	const isGrab = paymentMethod === "GRAB";
 	const lineSubtotal = cart.reduce((s, c) => s + c.total_price, 0);
 	const cartTotal = lineSubtotal;
+	const [isDetailsOpen, setIsDetailsOpen] = useState(true);
 
 	return (
 		<form
@@ -86,7 +88,10 @@ export function PosCartPanel({
 							className={posBtnGhost}
 							onClick={onClearCart}
 						>
-							<TrashIcon className="size-2 md:size-4" style={{ color: "var(--coral)" }} />
+							<TrashIcon
+								className="size-2 md:size-4"
+								style={{ color: "var(--coral)" }}
+							/>
 						</Button>
 					) : null}
 				</div>
@@ -192,7 +197,36 @@ export function PosCartPanel({
 				</div>
 
 				{cart.length > 0 ? (
-					<div className="shrink-0 mt-1 pt-1 border-t border-(--light-gray) pb-1 space-y-1 md:mt-2 md:pt-2 md:pb-1 md:space-y-1.5 lg:mt-3 lg:pt-3 lg:pb-2 lg:space-y-2 [&_[data-slot=field]]:gap-0.5 md:[&_[data-slot=field]]:gap-1 lg:[&_[data-slot=field]]:gap-2 [&_[data-slot=field-label]]:text-[7px] md:[&_[data-slot=field-label]]:text-[9px] lg:[&_[data-slot=field-label]]:text-xs">
+					<div className="shrink-0">
+						<div className="flex justify-end mt-3 -mb-2">
+							<Button
+								variant="ghost"
+								className={cn(
+									"h-4 px-1.5 text-[13px] md:h-6 md:px-2 md:text-[13px]",
+									posBtnGhost,
+								)}
+								aria-expanded={isDetailsOpen}
+								onClick={() => setIsDetailsOpen((open) => !open)}
+							>
+								Details
+								<ArrowRightIcon
+									className={cn(
+										"ml-1 size-2 transition-transform md:size-3",
+										isDetailsOpen ? "rotate-90" : "rotate-0",
+									)}
+								/>
+							</Button>
+						</div>
+						<div
+							className={cn(
+								"transform-gpu overflow-hidden transition-all duration-200",
+								isDetailsOpen
+									? "mt-1 max-h-[420px] translate-x-0 pb-1 pt-1 opacity-100 md:mt-2 md:pb-1 md:pt-2 lg:mt-3 lg:pb-2 lg:pt-3"
+									: "mt-0 max-h-0 translate-x-2 pb-0 pt-0 opacity-0 pointer-events-none",
+							)}
+							aria-hidden={!isDetailsOpen}
+						>
+							<div className="border-t border-(--light-gray) space-y-2 md:space-y-2 lg:space-y-3 [&_[data-slot=field]]:gap-0.5 md:[&_[data-slot=field]]:gap-1 lg:[&_[data-slot=field]]:gap-2 [&_[data-slot=field-label]]:text-[7px] md:[&_[data-slot=field-label]]:text-[9px] lg:[&_[data-slot=field-label]]:text-xs">
 						<div className="grid grid-cols-2 gap-x-1 gap-y-1 md:gap-x-2 md:gap-y-1.5 lg:gap-y-2 items-start">
 							<div className="col-span-2">
 								<form.AppField name="note">
@@ -254,22 +288,24 @@ export function PosCartPanel({
 							) : null}
 						</div>
 
-						{paymentMethod === "CASH" && !isGrab && amountPaid && paidNum >= cartTotal ? (
-							<div
-								className="mt-0.5 flex items-center justify-between rounded-[5px] p-1 md:mt-1 md:rounded-lg lg:mt-1.5 lg:rounded-xl md:p-1.5 lg:p-2"
-								style={{
-									background: "var(--deep-forest)",
-									color: "white",
-								}}
-							>
-								<span className="text-[7px] font-medium opacity-80 md:text-[9px] lg:text-xs">
-									Change
-								</span>
-								<span className="text-[8px] font-black md:text-sm lg:text-lg">
-									{formatPeso(paidNum - cartTotal)}
-								</span>
+								{paymentMethod === "CASH" && !isGrab && amountPaid && paidNum >= cartTotal ? (
+									<div
+										className="mt-0.5 flex items-center justify-between rounded-[5px] p-1 md:mt-1 md:rounded-lg lg:mt-1.5 lg:rounded-xl md:p-1.5 lg:p-2"
+										style={{
+											background: "var(--deep-forest)",
+											color: "white",
+										}}
+									>
+										<span className="text-[7px] font-medium opacity-80 md:text-[9px] lg:text-xs">
+											Change
+										</span>
+										<span className="text-[8px] font-black md:text-sm lg:text-lg">
+											{formatPeso(paidNum - cartTotal)}
+										</span>
+									</div>
+								) : null}
 							</div>
-						) : null}
+						</div>
 					</div>
 				) : null}
 
