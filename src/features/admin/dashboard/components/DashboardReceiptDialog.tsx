@@ -4,6 +4,7 @@ import { useReactToPrint } from "react-to-print";
 import { AlertDialog, AlertDialogContent } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import {
+  checkAvailableMethods,
   loadBixolonSDK,
   printCupsSales,
   printRevenue,
@@ -51,8 +52,18 @@ export function DashboardReceiptDialog({
   revenueByMethod,
 }: DashboardReceiptDialogProps) {
   const receiptRef = useRef<HTMLDivElement>(null);
-  const [bixolonReady, setBixolonReady] = useState(false);
-  const [bixolonLoading, setBixolonLoading] = useState(false);
+  const [printing, setPrinting] = useState(false);
+  const [printError, setPrintError] = useState<string | null>(null);
+  const [hasUSB, setHasUSB] = useState(false);
+  const [hasAgent, setHasAgent] = useState(false);
+
+  useEffect(() => {
+    if (!open) return;
+    checkAvailableMethods().then((m) => {
+      setHasUSB(m.webusb);
+      setHasAgent(m.agent);
+    });
+  }, [open]);
 
   const handlePrint = useReactToPrint({
     contentRef: receiptRef,
@@ -60,25 +71,19 @@ export function DashboardReceiptDialog({
     onAfterPrint: onClose,
   });
 
-  useEffect(() => {
-    if (!open) return;
-    setBixolonLoading(true);
-    loadBixolonSDK()
-      .then((loaded) => setBixolonReady(loaded))
-      .catch(() => setBixolonReady(false))
-      .finally(() => setBixolonLoading(false));
-  }, [open]);
-
   const cashRevenue = revenueByMethod.CASH ?? 0;
   const gcashRevenue = revenueByMethod.GCASH ?? 0;
   const totalRevenue = cashRevenue + gcashRevenue;
 
-  const handleDirectPrint = () => {
+  const handleDirectPrint = async () => {
+    setPrinting(true);
+    setPrintError(null);
     try {
+      await loadBixolonSDK();
       if (mode === "cups") {
-        printCupsSales(staffName, cupSales, periodLabel);
+        await printCupsSales(staffName, cupSales, periodLabel);
       } else if (mode === "revenue") {
-        printRevenue(
+        await printRevenue(
           staffName,
           cashRevenue,
           gcashRevenue,
@@ -88,7 +93,10 @@ export function DashboardReceiptDialog({
       }
       onClose();
     } catch (err) {
-      console.error("BIXOLON direct print failed:", err);
+      const message = err instanceof Error ? err.message : "Print failed";
+      setPrintError(message);
+    } finally {
+      setPrinting(false);
     }
   };
 
@@ -250,13 +258,29 @@ export function DashboardReceiptDialog({
               <PrinterIcon className="size-4" /> Print
             </Button>
           </div>
+          {printError && (
+            <p className="text-xs text-red-500 text-center whitespace-pre-line">{printError}</p>
+          )}
           <Button
             onClick={handleDirectPrint}
             variant="outline"
+            disabled={printing}
             className="flex h-12 gap-2"
           >
-            <PrinterIcon className="size-4" /> Direct Print (Bixolon SDK Raw)
+            {printing ? (
+              <span className="flex items-center gap-1">
+                <span className="inline-block size-3 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                Printing...
+              </span>
+            ) : (
+              <><PrinterIcon className="size-4" /> {hasAgent ? "Direct Print (Network)" : hasUSB ? "Direct Print (USB)" : "Direct Print"}</>
+            )}
           </Button>
+          {!hasUSB && !hasAgent && (
+            <p className="text-[10px] text-gray-500 text-center">
+              Run the local agent for network printing.
+            </p>
+          )}
         </div>
       </AlertDialogContent>
     </AlertDialog>

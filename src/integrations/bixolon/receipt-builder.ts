@@ -86,23 +86,23 @@ function beginReceipt(): void {
 	feed(RECEIPT_BIXOLON_TOP_FEED);
 }
 
-function finishReceipt(config?: Partial<BixolonConnectionConfig>): void {
+async function finishReceipt(config?: Partial<BixolonConnectionConfig>): Promise<void> {
 	feed(RECEIPT_BIXOLON_BOTTOM_FEED);
 	cut();
 	const sdk = getBixolonSDK();
 	if (!sdk) return;
-	sdk.sendData(
+	await sdk.sendData(
 		config?.ipAddr ?? BIXOLON_DEFAULT_SETTINGS.ipAddr,
 		config?.shopID ?? BIXOLON_DEFAULT_SETTINGS.shopID,
 		config?.devID ?? BIXOLON_DEFAULT_SETTINGS.devID,
 	);
 }
 
-export function printOrderReceipt(
+export async function printOrderReceipt(
 	order: PosOrder,
 	cashierName: string,
 	config?: Partial<BixolonConnectionConfig>,
-): void {
+): Promise<void> {
 	if (!isBixolonSDKLoaded()) return;
 	if (!getBixolonSDK()) return;
 
@@ -228,15 +228,15 @@ export function printOrderReceipt(
 	t(cashierName.toUpperCase(), { bold: true });
 	t("Cashier's Name");
 
-	finishReceipt(config);
+	await finishReceipt(config);
 }
 
-export function printSalesXReading(
+export async function printSalesXReading(
 	staffName: string,
 	totals: DailyReconciliationTotals,
 	totalCashCounted: number,
 	config?: Partial<BixolonConnectionConfig>,
-): void {
+): Promise<void> {
 	if (!isBixolonSDKLoaded()) return;
 	if (!getBixolonSDK()) return;
 
@@ -294,15 +294,15 @@ export function printSalesXReading(
 	divider();
 	t("Signature of Cashier");
 
-	finishReceipt(config);
+	await finishReceipt(config);
 }
 
-export function printCashCount(
+export async function printCashCount(
 	staffName: string,
 	cashCount: CashCountValues,
 	totalCashCounted: number,
 	config?: Partial<BixolonConnectionConfig>,
-): void {
+): Promise<void> {
 	if (!isBixolonSDKLoaded()) return;
 	if (!getBixolonSDK()) return;
 
@@ -345,7 +345,7 @@ export function printCashCount(
 	divider();
 	t("Signature of Cashier");
 
-	finishReceipt(config);
+	await finishReceipt(config);
 }
 
 export interface CupSale {
@@ -354,12 +354,12 @@ export interface CupSale {
 	byMethod: Record<string, number>;
 }
 
-export function printCupsSales(
+export async function printCupsSales(
 	staffName: string,
 	cupSales: CupSale[],
 	periodLabel: string,
 	config?: Partial<BixolonConnectionConfig>,
-): void {
+): Promise<void> {
 	if (!isBixolonSDKLoaded()) return;
 	if (!getBixolonSDK()) return;
 
@@ -422,17 +422,17 @@ export function printCupsSales(
 	divider();
 	t("Signature of Admin");
 
-	finishReceipt(config);
+	await finishReceipt(config);
 }
 
-export function printRevenue(
+export async function printRevenue(
 	staffName: string,
 	cashRevenue: number,
 	gcashRevenue: number,
 	totalRevenue: number,
 	periodLabel: string,
 	config?: Partial<BixolonConnectionConfig>,
-): void {
+): Promise<void> {
 	if (!isBixolonSDKLoaded()) return;
 	if (!getBixolonSDK()) return;
 
@@ -479,5 +479,5 @@ export function printRevenue(
 	divider();
 	t("Signature of Admin");
 
-	finishReceipt(config);
+	await finishReceipt(config);
 }
