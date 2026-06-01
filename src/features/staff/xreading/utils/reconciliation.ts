@@ -1,5 +1,6 @@
 export type DailyReconciliationTotals = {
 	totalCashSales: number;
+	totalGcashSales: number;
 	totalCashOut: number;
 	totalCashIn: number;
 };

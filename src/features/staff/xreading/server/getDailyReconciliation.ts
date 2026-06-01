@@ -8,11 +8,18 @@ export const getDailyReconciliation = createServerFn({ method: "GET" })
   .handler(async () => {
     const { start, end } = getTodayBounds();
 
-    const [orders, expenses] = await Promise.all([
+    const [cashOrders, gcashOrders, expenses] = await Promise.all([
       prisma.order.findMany({
         where: {
           created_at: { gte: start, lte: end },
           method: "CASH",
+        },
+        select: { grand_total: true },
+      }),
+      prisma.order.findMany({
+        where: {
+          created_at: { gte: start, lte: end },
+          method: "GCASH",
         },
         select: { grand_total: true },
       }),
@@ -24,7 +31,12 @@ export const getDailyReconciliation = createServerFn({ method: "GET" })
       }),
     ]);
 
-    const totalCashSales = orders.reduce(
+    const totalCashSales = cashOrders.reduce(
+      (sum, order) => sum + Number(order.grand_total),
+      0,
+    );
+
+    const totalGcashSales = gcashOrders.reduce(
       (sum, order) => sum + Number(order.grand_total),
       0,
     );
@@ -42,6 +54,7 @@ export const getDailyReconciliation = createServerFn({ method: "GET" })
 
     return {
       totalCashSales,
+      totalGcashSales,
       totalCashOut,
       totalCashIn,
     };

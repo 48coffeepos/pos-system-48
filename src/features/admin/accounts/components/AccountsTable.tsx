@@ -28,14 +28,14 @@ export function AccountsTable({
 	return (
 		<section className="lg:col-span-2">
 			<div className="flex flex-col gap-6 rounded-2xl border bg-card p-6 shadow-xs">
-				<div className="flex items-center justify-between gap-4">
+				<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
 					<div className="flex flex-col gap-1">
 						<h2 className="text-lg font-semibold">Accounts</h2>
 						<p className="text-sm text-muted-foreground">
 							Manage staff and administrator access.
 						</p>
 					</div>
-					<div className="inline-flex items-center gap-2 rounded-md border bg-muted px-3 py-2 text-sm font-medium text-muted-foreground">
+					<div className="inline-flex items-center gap-2 self-start sm:self-auto rounded-md border bg-muted px-3 py-2 text-sm font-medium text-muted-foreground">
 						<UsersIcon />
 						<span>{accounts.length} total</span>
 					</div>

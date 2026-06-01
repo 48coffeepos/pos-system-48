@@ -123,24 +123,24 @@ export function AdminOrdersScreen() {
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-between rounded-2xl border border-(--light-gray) bg-(--pure-white) px-5 py-3 shadow-sm">
-              <p className="text-xs font-medium text-(--medium-gray)">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-2xl border border-(--light-gray) bg-(--pure-white) px-4 py-3 sm:px-5 shadow-sm">
+              <p className="text-center sm:text-left text-xs font-medium text-(--medium-gray)">
                 Page {data?.page ?? page} of {totalPages}
                 {" — "}
                 {data?.total ?? 0} total orders
               </p>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center justify-center gap-2">
                 <button
                   type="button"
                   disabled={page <= 1}
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
-                  className="inline-flex items-center gap-1 rounded-lg border border-(--light-gray) bg-white px-3 py-1.5 text-xs font-semibold text-(--near-black) transition-all hover:bg-gray-50 active:scale-95 disabled:pointer-events-none disabled:opacity-40"
+                  className="inline-flex items-center gap-1 rounded-lg border border-(--light-gray) bg-white px-2 sm:px-3 py-1.5 text-xs font-semibold text-(--near-black) transition-all hover:bg-gray-50 active:scale-95 disabled:pointer-events-none disabled:opacity-40"
                 >
                   <CaretLeft className="size-3.5" />
-                  Prev
+                  <span className="hidden sm:inline">Prev</span>
                 </button>
                 {/* Page numbers */}
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-0.5 sm:gap-1">
                   {Array.from({ length: totalPages }, (_, i) => i + 1)
                     .filter((p) => {
                       const cur = data?.page ?? page;
@@ -155,7 +155,7 @@ export function AdminOrdersScreen() {
                     }, [])
                     .map((p, i) =>
                       p === "..." ? (
-                        <span key={`ellipsis-${i}`} className="px-1 text-xs text-(--medium-gray)">
+                        <span key={`ellipsis-${i}`} className="px-0.5 sm:px-1 text-xs text-(--medium-gray)">
                           ...
                         </span>
                       ) : (
@@ -164,7 +164,7 @@ export function AdminOrdersScreen() {
                           type="button"
                           onClick={() => setPage(p)}
                           className={cn(
-                            "size-8 rounded-lg text-xs font-semibold transition-all",
+                            "size-7 sm:size-8 rounded-lg text-xs font-semibold transition-all",
                             (data?.page ?? page) === p
                               ? "bg-(--deep-forest) text-white shadow-sm"
                               : "text-(--medium-gray) hover:bg-(--light-gray)/50",
@@ -179,9 +179,9 @@ export function AdminOrdersScreen() {
                   type="button"
                   disabled={page >= totalPages}
                   onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                  className="inline-flex items-center gap-1 rounded-lg border border-(--light-gray) bg-white px-3 py-1.5 text-xs font-semibold text-(--near-black) transition-all hover:bg-gray-50 active:scale-95 disabled:pointer-events-none disabled:opacity-40"
+                  className="inline-flex items-center gap-1 rounded-lg border border-(--light-gray) bg-white px-2 sm:px-3 py-1.5 text-xs font-semibold text-(--near-black) transition-all hover:bg-gray-50 active:scale-95 disabled:pointer-events-none disabled:opacity-40"
                 >
-                  Next
+                  <span className="hidden sm:inline">Next</span>
                   <CaretRight className="size-3.5" />
                 </button>
               </div>

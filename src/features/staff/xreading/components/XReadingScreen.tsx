@@ -22,6 +22,7 @@ import {
 interface XReadingScreenProps {
 	data: {
 		totalCashSales: number;
+		totalGcashSales: number;
 		totalCashOut: number;
 		totalCashIn: number;
 	};
@@ -35,9 +36,9 @@ export function XReadingScreen({ data }: XReadingScreenProps) {
 	const resetCashCount = useXReadingStore((state) => state.resetCashCount);
 
 	const [showResetModal, setShowResetModal] = useState(false);
-	const [receiptMode, setReceiptMode] = useState<"sales" | "cashcount" | null>(
-		null,
-	);
+	const [receiptMode, setReceiptMode] = useState<
+		"sales" | "cashcount" | "revenue" | null
+	>(null);
 
 	const form = useAppForm({
 		defaultValues: cashCount,
@@ -66,6 +67,10 @@ export function XReadingScreen({ data }: XReadingScreenProps) {
 		setReceiptMode("cashcount");
 	};
 
+	const handleExportRevenue = () => {
+		setReceiptMode("revenue");
+	};
+
 	return (
 		<>
 			{/* On-screen UI */}
@@ -81,12 +86,14 @@ export function XReadingScreen({ data }: XReadingScreenProps) {
 				<ReconciliationPanel
 					totals={{
 						totalCashSales: data.totalCashSales,
+						totalGcashSales: data.totalGcashSales,
 						totalCashOut: data.totalCashOut,
 						totalCashIn: data.totalCashIn,
 					}}
 					totalCashCounted={totalCashCounted}
 					onExportSales={handleExportSales}
 					onExportCashCount={handleExportCashCount}
+					onExportRevenue={handleExportRevenue}
 				/>
 			</div>
 
@@ -122,6 +129,7 @@ export function XReadingScreen({ data }: XReadingScreenProps) {
 				staffName={staffName}
 				totals={{
 					totalCashSales: data.totalCashSales,
+					totalGcashSales: data.totalGcashSales,
 					totalCashOut: data.totalCashOut,
 					totalCashIn: data.totalCashIn,
 				}}

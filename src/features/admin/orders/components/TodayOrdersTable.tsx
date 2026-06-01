@@ -56,14 +56,14 @@ export function TodayOrdersTable({ data, limit }: TodayOrdersTableProps) {
 			</div>
 
 			<div className="w-full overflow-x-auto rounded-xl border border-(--light-gray)/40">
-				<table className="w-full border-collapse text-left table-fixed">
+				<table className="hidden sm:table w-full border-collapse text-left">
 					<thead>
 						<tr className="border-b border-(--light-gray)/40 bg-(--off-white) text-xs font-bold uppercase tracking-wider text-(--medium-gray)">
-							<th className="p-4 pl-6 w-[20%] text-center">Order No</th>
-							<th className="p-4 w-[20%] text-center">Date & Time</th>
-							<th className="p-4 w-[20%] text-center">Payment</th>
-							<th className="p-4 w-[20%] text-center">Total</th>
-							<th className="p-4 pr-6 no-print w-[20%] text-center">Receipt</th>
+							<th className="p-4 pl-6 text-center">Order No</th>
+							<th className="p-4 text-center">Date & Time</th>
+							<th className="p-4 text-center">Payment</th>
+							<th className="p-4 text-center">Total</th>
+							<th className="p-4 pr-6 no-print text-center">Receipt</th>
 						</tr>
 					</thead>
 					<tbody className="divide-y divide-(--light-gray)/40">
@@ -135,6 +135,78 @@ export function TodayOrdersTable({ data, limit }: TodayOrdersTableProps) {
 						)}
 					</tbody>
 				</table>
+
+				<div className="sm:hidden flex flex-col divide-y divide-(--light-gray)/40">
+					{displayed.length === 0 ? (
+						<div className="p-8 text-center text-sm font-medium text-(--medium-gray)">
+							No transactions found.
+						</div>
+					) : (
+						displayed.map((order) => {
+							const dateObj = new Date(order.created_at);
+							const formattedDate = dateObj.toLocaleDateString("en-GB");
+							const formattedTime = dateObj.toLocaleTimeString("en-US", {
+								hour: "2-digit",
+								minute: "2-digit",
+								hour12: true,
+							});
+
+							return (
+								<div
+									key={order.order_id}
+									className="p-4 space-y-2 hover:bg-(--off-white)/50 transition-colors"
+								>
+									<div className="flex items-center justify-between">
+										<span className="text-[11px] font-bold uppercase tracking-wider text-(--medium-gray)">
+											Order No
+										</span>
+										<span className="font-mono font-bold text-sm text-(--near-black)">
+											{order.order_id}
+										</span>
+									</div>
+
+									<div className="flex items-center justify-between">
+										<span className="text-[11px] font-bold uppercase tracking-wider text-(--medium-gray)">
+											Date & Time
+										</span>
+										<span className="text-xs font-medium text-(--near-black)">
+											{formattedDate} {formattedTime}
+										</span>
+									</div>
+
+									<div className="flex items-center justify-between">
+										<span className="text-[11px] font-bold uppercase tracking-wider text-(--medium-gray)">
+											Payment
+										</span>
+										<div className="flex items-center gap-1">
+											{methodBadge(order.method)}
+										</div>
+									</div>
+
+									<div className="flex items-center justify-between">
+										<span className="text-[11px] font-bold uppercase tracking-wider text-(--medium-gray)">
+											Total
+										</span>
+										<span className="font-black text-sm text-(--near-black)">
+											{formatPeso(order.grand_total)}
+										</span>
+									</div>
+
+									<div className="flex justify-end pt-1">
+										<button
+											type="button"
+											onClick={() => setSelectedOrder(order)}
+											className="inline-flex items-center gap-1.5 rounded-lg border border-(--light-gray) bg-white px-3 py-1.5 text-xs font-bold text-(--near-black) transition-all hover:bg-gray-50 active:scale-95 shadow-sm"
+										>
+											<ReceiptIcon className="size-3.5" />
+											View Slip
+										</button>
+									</div>
+								</div>
+							);
+						})
+					)}
+				</div>
 			</div>
 
 			<PosReceiptDialog
