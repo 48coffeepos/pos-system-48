@@ -92,7 +92,7 @@ export interface BixolonSDKInstance {
   makeBuzzer: () => void;
   makeReinit: () => void;
   makeBarcode12: (opts: BixolonBarcodeOptions) => void;
-  sendData: (ipAddr: string, shopID: string, devID: string) => void;
+  sendData: (ipAddr: string, shopID: string, devID: string) => void | Promise<void>;
   getDeviceList: (
     ipAddr: string,
     shopID: string,

@@ -4,6 +4,7 @@ import { useReactToPrint } from "react-to-print";
 import { AlertDialog, AlertDialogContent } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import {
+	checkAvailableMethods,
 	loadBixolonSDK,
 	printOrderReceipt,
 	ReceiptThermalContent,
@@ -27,8 +28,18 @@ export function PosReceiptDialog({
 	cashierName = "Cashier",
 }: PosReceiptDialogProps) {
 	const contentRef = useRef<HTMLDivElement>(null);
-	const [bixolonReady, setBixolonReady] = useState(false);
-	const [bixolonLoading, setBixolonLoading] = useState(false);
+	const [printing, setPrinting] = useState(false);
+	const [printError, setPrintError] = useState<string | null>(null);
+	const [hasUSB, setHasUSB] = useState(false);
+	const [hasAgent, setHasAgent] = useState(false);
+
+	useEffect(() => {
+		if (!open) return;
+		checkAvailableMethods().then((m) => {
+			setHasUSB(m.webusb);
+			setHasAgent(m.agent);
+		});
+	}, [open]);
 
 	const handlePrint = useReactToPrint({
 		contentRef,
@@ -36,31 +47,27 @@ export function PosReceiptDialog({
 		onAfterPrint: onClose,
 	});
 
-	useEffect(() => {
-		if (!open) return;
-
-		setBixolonLoading(true);
-		loadBixolonSDK()
-			.then((loaded) => {
-				setBixolonReady(loaded);
-			})
-			.catch(() => {
-				setBixolonReady(false);
-			})
-			.finally(() => {
-				setBixolonLoading(false);
-			});
-	}, [open]);
-
-	const handleDirectPrint = () => {
+	const handleDirectPrint = async () => {
 		if (!order) return;
+		setPrinting(true);
+		setPrintError(null);
 		try {
-			printOrderReceipt(order, cashierName);
+			await loadBixolonSDK();
+			await printOrderReceipt(order, cashierName);
 			onClose();
 		} catch (err) {
-			console.error("BIXOLON direct print failed:", err);
+			const message = err instanceof Error ? err.message : "Print failed";
+			setPrintError(message);
+		} finally {
+			setPrinting(false);
 		}
 	};
+
+	const directPrintLabel = hasAgent
+		? "Direct Print (Network)"
+		: hasUSB
+			? "Direct Print (USB)"
+			: "Direct Print";
 
 	if (!order) return null;
 
@@ -273,12 +280,29 @@ export function PosReceiptDialog({
 								<Printer className="size-3 md:size-4" /> Print
 							</Button>
 						</div>
+						{printError && (
+							<p className="text-[9px] text-red-500 text-center whitespace-pre-line md:text-[11px]">{printError}</p>
+						)}
 						<Button
 							onClick={handleDirectPrint}
+							disabled={printing}
 							className={cn("flex h-7 w-full gap-1 text-[8px] md:h-10 md:gap-2 md:text-xs", posBtnOutline)}
 						>
-							<Printer className="size-3 md:size-3.5" /> Direct Print (Bixolon SDK Raw)
+							{printing ? (
+								<span className="flex items-center gap-1">
+									<span className="inline-block size-3 animate-spin rounded-full border-2 border-(--medium-gray) border-t-transparent" />
+									Printing...
+								</span>
+							) : (
+								<><Printer className="size-3 md:size-3.5" /> {directPrintLabel}</>
+							)}
 						</Button>
+						{!hasUSB && !hasAgent && (
+							<p className="text-[8px] text-(--medium-gray) text-center md:text-[10px]">
+								No USB printer or local agent detected.{" "}
+								Run the agent locally for network printing.
+							</p>
+						)}
 					</div>
 				</div>
 			</AlertDialogContent>
