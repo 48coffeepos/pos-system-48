@@ -11,7 +11,7 @@ export const RECEIPT_CONTENT_ID = "receipt-content";
 export const RECEIPT_THERMAL_CLASS =
 	"receipt-thermal font-mono text-black select-none";
 
-export const RECEIPT_PADDING_MM = 3;
+export const RECEIPT_PADDING_MM = 4;
 
 export const RECEIPT_BIXOLON_TOP_FEED = 2;
 export const RECEIPT_BIXOLON_BOTTOM_FEED = 5;
