@@ -1,15 +1,54 @@
 import { EscposBuffer } from "./escpos-buffer";
 
-const AGENT_URL = "http://127.0.0.1:3001/print";
+const AGENT_URL = "http://127.0.0.1:3001";
 const USB_PRINTER_CLASS = 7;
+const DEFAULT_PRINTER_IP = "192.168.1.100";
+const DEFAULT_PRINTER_PORT = 9100;
+
+type Platform = "mac" | "windows" | "linux" | "ios" | "android" | "unknown";
+
+function detectPlatform(): Platform {
+	try {
+		const ua = navigator.userAgent;
+		if (/iPhone|iPad|iPod/.test(ua) || (ua.includes("Mac") && "ontouchend" in document))
+			return "ios";
+		if (/Android/.test(ua)) return "android";
+		if (/Mac/.test(ua)) return "mac";
+		if (/Win/.test(ua)) return "windows";
+		if (/Linux/.test(ua)) return "linux";
+		return "unknown";
+	} catch {
+		return "unknown";
+	}
+}
+
+function isMacOS(): boolean {
+	return detectPlatform() === "mac";
+}
+
+function getConfigIP(): string {
+	try {
+		return localStorage.getItem("48coffee-printer-ip") || DEFAULT_PRINTER_IP;
+	} catch {
+		return DEFAULT_PRINTER_IP;
+	}
+}
+
+function getConfigPort(): number {
+	try {
+		const raw = localStorage.getItem("48coffee-printer-port");
+		return raw ? Number(raw) || DEFAULT_PRINTER_PORT : DEFAULT_PRINTER_PORT;
+	} catch {
+		return DEFAULT_PRINTER_PORT;
+	}
+}
 
 function isWebUSBSupported(): boolean {
-	return (
-		typeof navigator !== "undefined" &&
-		"usb" in navigator &&
-		typeof navigator.usb === "object" &&
-		navigator.usb !== null
-	);
+	try {
+		return "usb" in navigator && typeof navigator.usb === "object" && navigator.usb !== null;
+	} catch {
+		return false;
+	}
 }
 
 async function getUSBDevice(): Promise<USBDevice | null> {
@@ -41,7 +80,7 @@ async function getUSBDevice(): Promise<USBDevice | null> {
 
 async function sendViaWebUSB(data: Uint8Array): Promise<void> {
 	if (!isWebUSBSupported()) {
-		throw new Error("WebUSB not available. Use Chrome/Edge.");
+		throw new Error("WebUSB not available in this browser.");
 	}
 
 	const device = await getUSBDevice();
@@ -60,7 +99,7 @@ async function sendViaWebUSB(data: Uint8Array): Promise<void> {
 		);
 		if (!iface) {
 			await device.close();
-			throw new Error("Printer interface not found on the selected device.");
+			throw new Error("Printer interface not found.");
 		}
 
 		await device.claimInterface(iface.interfaceNumber);
@@ -70,47 +109,87 @@ async function sendViaWebUSB(data: Uint8Array): Promise<void> {
 		);
 		if (!endpoint) {
 			await device.close();
-			throw new Error("No output endpoint found on the printer.");
+			throw new Error("No output endpoint found.");
 		}
 
-		await device.transferOut(endpoint.endpointNumber, data.buffer as ArrayBuffer);
+		await device.transferOut(
+			endpoint.endpointNumber,
+			data.buffer as ArrayBuffer,
+		);
 		await device.close();
 	} catch (err) {
 		try {
 			await device.close();
 		} catch {
-			// ignore close errors
+			// ignore
 		}
-		throw err;
+		const message = err instanceof Error ? err.message : String(err);
+
+		if (message.toLowerCase().includes("access denied")) {
+			if (isMacOS()) {
+				throw new Error(
+					"macOS doesn't allow direct USB printing from browsers.\n" +
+						"Use the 'Print' button instead (uses the system printer driver).",
+				);
+			}
+			throw new Error(
+				"USB printer is in use by another program.\n" +
+					"Close any printer software and try again, or use the 'Print' button.",
+			);
+		}
+		throw new Error(`USB print failed: ${message}`);
 	}
 }
 
 async function sendViaAgent(data: Uint8Array): Promise<void> {
-	const res = await fetch(AGENT_URL, {
-		method: "POST",
-		headers: { "Content-Type": "application/json" },
-		body: JSON.stringify({ bytes: Array.from(data) }),
-		signal: AbortSignal.timeout(5000),
-	});
+	const ip = getConfigIP();
+	const port = getConfigPort();
+	const ac = new AbortController();
+	const timer = setTimeout(() => ac.abort(), 5000);
 
-	if (!res.ok) {
-		throw new Error(`Agent returned status ${res.status}`);
-	}
+	try {
+		const res = await fetch(`${AGENT_URL}/print`, {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({
+				bytes: Array.from(data),
+				printerIP: ip,
+				printerPort: port,
+			}),
+			signal: ac.signal,
+		});
 
-	const result = await res.json();
-	if (!result.success) {
-		throw new Error(result.error ?? "Agent print failed");
+		if (!res.ok) {
+			throw new Error(`Agent error (status ${res.status})`);
+		}
+
+		const result = await res.json();
+		if (!result.success) {
+			throw new Error(result.error || "Agent print failed");
+		}
+	} catch (err) {
+		if (err instanceof Error && err.name === "AbortError") {
+			throw new Error("Agent not responding (timeout)");
+		}
+		if (err instanceof TypeError && err.message.includes("fetch")) {
+			throw new Error("Agent not running");
+		}
+		throw err;
+	} finally {
+		clearTimeout(timer);
 	}
 }
 
 async function checkAgentAvailable(): Promise<boolean> {
+	const ac = new AbortController();
+	const timer = setTimeout(() => ac.abort(), 1000);
 	try {
-		const res = await fetch("http://127.0.0.1:3001/health", {
-			signal: AbortSignal.timeout(1000),
-		});
+		const res = await fetch(`${AGENT_URL}/health`, { signal: ac.signal });
 		return res.ok;
 	} catch {
 		return false;
+	} finally {
+		clearTimeout(timer);
 	}
 }
 
@@ -118,9 +197,12 @@ export async function checkAvailableMethods(): Promise<{
 	webusb: boolean;
 	agent: boolean;
 }> {
-	const webusb = isWebUSBSupported();
-	const agent = await checkAgentAvailable();
-	return { webusb, agent };
+	const platform = detectPlatform();
+	const webusb = isWebUSBSupported() && platform !== "mac" && platform !== "ios";
+	return {
+		webusb,
+		agent: await checkAgentAvailable(),
+	};
 }
 
 export interface RawPrintResult {
@@ -132,31 +214,47 @@ export async function sendBufferToPrinter(
 	buffer: EscposBuffer,
 ): Promise<RawPrintResult> {
 	const data = buffer.toUint8Array();
-	const errors: string[] = [];
 
+	// 1. Try local agent (fastest, any browser)
+	const agentRunning = await checkAgentAvailable();
+	if (agentRunning) {
+		try {
+			await sendViaAgent(data);
+			return { success: true, method: "agent" };
+		} catch (err) {
+			throw new Error(err instanceof Error ? err.message : "Agent print failed");
+		}
+	}
+
+	// 2. Try WebUSB (USB printers on Chrome/Edge, Windows/Linux/ChromeOS)
 	if (isWebUSBSupported()) {
+		if (isMacOS()) {
+			throw new Error(
+				"Direct USB printing isn't supported on macOS.\n" +
+					"Use the 'Print' button above — it works with your USB printer via the system driver.",
+			);
+		}
 		try {
 			await sendViaWebUSB(data);
 			return { success: true, method: "webusb" };
 		} catch (err) {
-			errors.push(
-				`USB: ${err instanceof Error ? err.message : "unknown error"}`,
-			);
+			throw err;
 		}
 	}
 
-	try {
-		await sendViaAgent(data);
-		return { success: true, method: "agent" };
-	} catch (err) {
-		errors.push(
-			`Agent: ${err instanceof Error ? err.message : "connection failed"}`,
-		);
-	}
-
-	throw new Error(errors.join("\n"));
-}
-
-export function canUseDirectPrint(): boolean {
-	return isWebUSBSupported();
+	// 3. Nothing available — give per-platform guidance
+	const platform = detectPlatform();
+	const msgs: Record<Platform, string> = {
+		mac: "Use the 'Print' button above — it works via the system printer driver.",
+		windows:
+			"Use Chrome/Edge for direct USB printing, or the 'Print' button above.",
+		linux:
+			"Use Chrome/Edge for direct USB printing, or the 'Print' button above.",
+		ios: "Use the 'Print' button above (AirPrint / Share sheet).",
+		android:
+			"Use Chrome for direct USB printing, or the 'Print' button above.",
+		unknown:
+			"Use the 'Print' button above — it works on every browser and OS.",
+	};
+	throw new Error(msgs[platform]);
 }

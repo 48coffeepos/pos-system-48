@@ -21,6 +21,10 @@ interface PosReceiptDialogProps {
 	cashierName?: string;
 }
 
+function getSavedIP(): string {
+	try { return localStorage.getItem("48coffee-printer-ip") || "192.168.1.100"; } catch { return "192.168.1.100"; }
+}
+
 export function PosReceiptDialog({
 	order,
 	open,
@@ -32,9 +36,11 @@ export function PosReceiptDialog({
 	const [printError, setPrintError] = useState<string | null>(null);
 	const [hasUSB, setHasUSB] = useState(false);
 	const [hasAgent, setHasAgent] = useState(false);
+	const [printerIP, setPrinterIP] = useState(getSavedIP());
 
 	useEffect(() => {
 		if (!open) return;
+		setPrinterIP(getSavedIP());
 		checkAvailableMethods().then((m) => {
 			setHasUSB(m.webusb);
 			setHasAgent(m.agent);
@@ -297,11 +303,49 @@ export function PosReceiptDialog({
 								<><Printer className="size-3 md:size-3.5" /> {directPrintLabel}</>
 							)}
 						</Button>
-						{!hasUSB && !hasAgent && (
-							<p className="text-[8px] text-(--medium-gray) text-center md:text-[10px]">
-								No USB printer or local agent detected.{" "}
-								Run the agent locally for network printing.
-							</p>
+						{!hasUSB && !hasAgent && !printing && !printError && (
+							<details className="text-[8px] text-(--medium-gray) md:text-[10px]">
+								<summary className="cursor-pointer text-center hover:text-(--deep-forest)">
+									Direct print not available?
+								</summary>
+								<div className="mt-1 space-y-1 text-center">
+									<p>
+										The <strong>"Print"</strong> button above works on all browsers
+										via your system's printer driver — use that.
+									</p>
+									<p>
+										For USB printers on Windows/Linux, the Direct Print button
+										uses WebUSB (Chrome/Edge only).
+									</p>
+									<p className="pt-1 border-t border-(--light-gray)">
+										If your printer is on the network, enter its IP and run the agent:
+									</p>
+									<div className="flex gap-1">
+										<input
+											type="text"
+											value={printerIP}
+											onChange={(e) => {
+												setPrinterIP(e.target.value);
+												try { localStorage.setItem("48coffee-printer-ip", e.target.value); } catch {}
+											}}
+											placeholder="Printer IP"
+											className="flex-1 min-w-0 rounded border border-(--light-gray) px-2 py-1 text-[9px] md:text-[11px]"
+										/>
+										<input
+											type="number"
+											defaultValue="9100"
+											onChange={(e) => {
+												try { localStorage.setItem("48coffee-printer-port", e.target.value); } catch {}
+											}}
+											placeholder="Port"
+											className="w-16 rounded border border-(--light-gray) px-2 py-1 text-[9px] md:text-[11px]"
+										/>
+									</div>
+									<p>
+										Run: <code className="bg-gray-100 px-1 rounded">npm run printer:agent</code>
+									</p>
+								</div>
+							</details>
 						)}
 					</div>
 				</div>

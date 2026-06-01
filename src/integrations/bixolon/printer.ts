@@ -18,15 +18,14 @@ export const RECEIPT_BIXOLON_BOTTOM_FEED = 5;
 
 export const THERMAL_PAGE_STYLE = `
   @page {
-    size: 80mm auto;
-    margin: 0 !important;
+    margin: 0mm;
   }
   @media print {
     html, body {
       height: auto !important;
       min-height: 0 !important;
-      margin: 0 !important;
-      padding: 0 !important;
+      margin: 0mm !important;
+      padding: 0mm !important;
     }
     body {
       -webkit-print-color-adjust: exact;
@@ -37,12 +36,12 @@ export const THERMAL_PAGE_STYLE = `
     #${RECEIPT_CONTENT_ID},
     .receipt-thermal {
       box-sizing: border-box;
-      width: 80mm;
+      max-width: 72mm;
       padding: ${RECEIPT_PADDING_MM}mm;
-      padding-bottom: 12mm !important; /* Extra space at the bottom to prevent cutter from slicing text */
+      padding-bottom: 12mm !important;
       color: #000000 !important;
+      margin: 0mm auto !important;
     }
-    /* Force high-contrast pure black and 100% opacity to prevent fuzzy dithering on thermal heads */
     * {
       color: #000000 !important;
       opacity: 1 !important;
@@ -50,7 +49,7 @@ export const THERMAL_PAGE_STYLE = `
       text-shadow: none !important;
       box-shadow: none !important;
     }
-    .no-print {
+    .no-print, button, [role="dialog"] {
       display: none !important;
     }
   }
