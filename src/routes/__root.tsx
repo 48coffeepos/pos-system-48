@@ -8,12 +8,12 @@ import {
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { Toaster } from "@/components/ui/sonner";
 import { TanstackFormDevtools } from "@/integrations/tanstack-form";
-import { ServiceWorkerRegister } from "../components/ServiceWorkerRegister";
 import {
 	RouteErrorBoundary,
 	RouteNotFoundBoundary,
 	RoutePendingBoundary,
 } from "../components/route-boundaries";
+import { ServiceWorkerRegister } from "../components/ServiceWorkerRegister";
 import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
 import { createSeo } from "../lib/seo";
 import appCss from "../styles.css?url";
@@ -58,7 +58,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 				description: "POS for 48 Coffee - Ledesma",
 			}).meta,
 		],
-	links: [
+		links: [
 			{
 				rel: "stylesheet",
 				href: appCss,
@@ -67,7 +67,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 				rel: "icon",
 				type: "image/png",
 				sizes: "48x48",
-				href: "/favicon.png?v=3",
+				href: "/favicon.png?v=4",
 			},
 			{
 				rel: "manifest",
@@ -75,7 +75,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 			},
 			{
 				rel: "apple-touch-icon",
-				href: "/logo.png",
+				href: "/logo.png?v=2",
 			},
 		],
 	}),
@@ -91,12 +91,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 			<body className="font-sans antialiased wrap-anywhere selection:bg-[rgba(79,184,178,0.24)]">
 				{children}
 				<ServiceWorkerRegister />
-				<Toaster
-					position="top-right"
-					richColors
-					duration={3000}
-					closeButton
-				/>
+				<Toaster position="top-right" richColors duration={3000} closeButton />
 				<TanStackDevtools
 					config={{
 						position: "bottom-right",
