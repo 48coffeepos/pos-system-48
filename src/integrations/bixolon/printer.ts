@@ -3,7 +3,7 @@ export const RECEIPT_CONTENT_ID = "receipt-content";
 export const RECEIPT_THERMAL_CLASS =
 	"receipt-thermal font-mono text-black select-none";
 
-export const RECEIPT_PADDING_MM = 3;
+export const RECEIPT_PADDING_MM = 4;
 
 export const THERMAL_PAGE_STYLE = `
   @page {
@@ -25,7 +25,7 @@ export const THERMAL_PAGE_STYLE = `
     #${RECEIPT_CONTENT_ID},
     .receipt-thermal {
       box-sizing: border-box;
-      max-width: 72mm;
+      max-width: 80mm;
       padding: ${RECEIPT_PADDING_MM}mm;
       padding-bottom: 12mm !important;
       color: #000000 !important;
