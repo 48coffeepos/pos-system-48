@@ -1,12 +1,8 @@
 import { PrinterIcon } from "@phosphor-icons/react";
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import { useReactToPrint } from "react-to-print";
 import { PosModal } from "@/features/staff/pos/components/ui/PosModal";
 import {
-  checkAvailableMethods,
-  loadBixolonSDK,
-  printCashCount,
-  printSalesXReading,
   ReceiptThermalContent,
   THERMAL_PAGE_STYLE,
 } from "@/integrations/bixolon";
@@ -37,43 +33,12 @@ export function XReadingReceiptDialog({
   cashCount,
 }: XReadingReceiptDialogProps) {
   const contentRef = useRef<HTMLDivElement>(null);
-  const [printing, setPrinting] = useState(false);
-  const [printError, setPrintError] = useState<string | null>(null);
-  const [hasUSB, setHasUSB] = useState(false);
-  const [hasAgent, setHasAgent] = useState(false);
-
-  useEffect(() => {
-    if (!open) return;
-    checkAvailableMethods().then((m) => {
-      setHasUSB(m.webusb);
-      setHasAgent(m.agent);
-    });
-  }, [open]);
 
   const handlePrint = useReactToPrint({
     contentRef,
     pageStyle: THERMAL_PAGE_STYLE,
     onAfterPrint: onClose,
   });
-
-  const handleDirectPrint = async () => {
-    setPrinting(true);
-    setPrintError(null);
-    try {
-      await loadBixolonSDK();
-      if (mode === "sales") {
-        await printSalesXReading(staffName, totals, totalCashCounted);
-      } else if (mode === "cashcount") {
-        await printCashCount(staffName, cashCount, totalCashCounted);
-      }
-      onClose();
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "Print failed";
-      setPrintError(message);
-    } finally {
-      setPrinting(false);
-    }
-  };
 
   if (!mode) return null;
 
@@ -251,33 +216,6 @@ export function XReadingReceiptDialog({
             <PrinterIcon className="size-4" /> Print
           </button>
         </div>
-        {printError && (
-          <p className="text-xs text-red-500 text-center whitespace-pre-line">{printError}</p>
-        )}
-        <button
-          type="button"
-          onClick={handleDirectPrint}
-          disabled={printing}
-          className="flex h-10 w-full items-center justify-center gap-2 rounded-xl border-2 text-xs font-bold transition-all hover:bg-gray-50 active:scale-95 disabled:opacity-50"
-          style={{
-            borderColor: "var(--near-black)",
-            color: "var(--near-black)",
-          }}
-        >
-          {printing ? (
-            <span className="flex items-center gap-1">
-              <span className="inline-block size-3 animate-spin rounded-full border-2 border-current border-t-transparent" />
-              Printing...
-            </span>
-          ) : (
-            <><PrinterIcon className="size-3.5" /> {hasAgent ? "Direct Print (Network)" : hasUSB ? "Direct Print (USB)" : "Direct Print"}</>
-          )}
-        </button>
-        {!hasUSB && !hasAgent && (
-          <p className="text-[10px] text-gray-500 text-center">
-            Run the local agent for network printing.
-          </p>
-        )}
       </div>
     </PosModal>
   );

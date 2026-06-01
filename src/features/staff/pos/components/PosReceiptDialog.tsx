@@ -1,12 +1,9 @@
 import { Printer, X } from "@phosphor-icons/react";
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import { useReactToPrint } from "react-to-print";
 import { AlertDialog, AlertDialogContent } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import {
-	checkAvailableMethods,
-	loadBixolonSDK,
-	printOrderReceipt,
 	ReceiptThermalContent,
 	THERMAL_PAGE_STYLE,
 } from "@/integrations/bixolon";
@@ -21,10 +18,6 @@ interface PosReceiptDialogProps {
 	cashierName?: string;
 }
 
-function getSavedIP(): string {
-	try { return localStorage.getItem("48coffee-printer-ip") || "192.168.1.100"; } catch { return "192.168.1.100"; }
-}
-
 export function PosReceiptDialog({
 	order,
 	open,
@@ -32,48 +25,12 @@ export function PosReceiptDialog({
 	cashierName = "Cashier",
 }: PosReceiptDialogProps) {
 	const contentRef = useRef<HTMLDivElement>(null);
-	const [printing, setPrinting] = useState(false);
-	const [printError, setPrintError] = useState<string | null>(null);
-	const [hasUSB, setHasUSB] = useState(false);
-	const [hasAgent, setHasAgent] = useState(false);
-	const [printerIP, setPrinterIP] = useState(getSavedIP());
-
-	useEffect(() => {
-		if (!open) return;
-		setPrinterIP(getSavedIP());
-		checkAvailableMethods().then((m) => {
-			setHasUSB(m.webusb);
-			setHasAgent(m.agent);
-		});
-	}, [open]);
 
 	const handlePrint = useReactToPrint({
 		contentRef,
 		pageStyle: THERMAL_PAGE_STYLE,
 		onAfterPrint: onClose,
 	});
-
-	const handleDirectPrint = async () => {
-		if (!order) return;
-		setPrinting(true);
-		setPrintError(null);
-		try {
-			await loadBixolonSDK();
-			await printOrderReceipt(order, cashierName);
-			onClose();
-		} catch (err) {
-			const message = err instanceof Error ? err.message : "Print failed";
-			setPrintError(message);
-		} finally {
-			setPrinting(false);
-		}
-	};
-
-	const directPrintLabel = hasAgent
-		? "Direct Print (Network)"
-		: hasUSB
-			? "Direct Print (USB)"
-			: "Direct Print";
 
 	if (!order) return null;
 
@@ -270,83 +227,20 @@ export function PosReceiptDialog({
 						</ReceiptThermalContent>
 					</div>
 
-					<div className="no-print flex flex-col gap-2 pt-2 bg-(--pure-white) md:gap-3 md:pt-3">
-						<div className="flex gap-2 md:gap-3">
-							<Button
-								variant="outline"
-								onClick={onClose}
-								className={cn("h-8 flex-1 text-[9px] md:h-12 md:text-sm", posBtnOutline)}
-							>
-								Save
-							</Button>
-							<Button
-								onClick={() => handlePrint()}
-								className={cn("flex h-8 flex-1 gap-1 text-[9px] md:h-12 md:gap-2 md:text-sm", posBtnPrimary)}
-							>
-								<Printer className="size-3 md:size-4" /> Print
-							</Button>
-						</div>
-						{printError && (
-							<p className="text-[9px] text-red-500 text-center whitespace-pre-line md:text-[11px]">{printError}</p>
-						)}
+					<div className="no-print flex gap-2 pt-2 bg-(--pure-white) md:gap-3 md:pt-3">
 						<Button
-							onClick={handleDirectPrint}
-							disabled={printing}
-							className={cn("flex h-7 w-full gap-1 text-[8px] md:h-10 md:gap-2 md:text-xs", posBtnOutline)}
+							variant="outline"
+							onClick={onClose}
+							className={cn("h-8 flex-1 text-[9px] md:h-12 md:text-sm", posBtnOutline)}
 						>
-							{printing ? (
-								<span className="flex items-center gap-1">
-									<span className="inline-block size-3 animate-spin rounded-full border-2 border-(--medium-gray) border-t-transparent" />
-									Printing...
-								</span>
-							) : (
-								<><Printer className="size-3 md:size-3.5" /> {directPrintLabel}</>
-							)}
+							Save
 						</Button>
-						{!hasUSB && !hasAgent && !printing && !printError && (
-							<details className="text-[8px] text-(--medium-gray) md:text-[10px]">
-								<summary className="cursor-pointer text-center hover:text-(--deep-forest)">
-									Direct print not available?
-								</summary>
-								<div className="mt-1 space-y-1 text-center">
-									<p>
-										The <strong>"Print"</strong> button above works on all browsers
-										via your system's printer driver — use that.
-									</p>
-									<p>
-										For USB printers on Windows/Linux, the Direct Print button
-										uses WebUSB (Chrome/Edge only).
-									</p>
-									<p className="pt-1 border-t border-(--light-gray)">
-										If your printer is on the network, enter its IP and run the agent:
-									</p>
-									<div className="flex gap-1">
-										<input
-											type="text"
-											value={printerIP}
-											onChange={(e) => {
-												setPrinterIP(e.target.value);
-												try { localStorage.setItem("48coffee-printer-ip", e.target.value); } catch {}
-											}}
-											placeholder="Printer IP"
-											className="flex-1 min-w-0 rounded border border-(--light-gray) px-2 py-1 text-[9px] md:text-[11px]"
-										/>
-										<input
-											type="number"
-											defaultValue="9100"
-											onChange={(e) => {
-												try { localStorage.setItem("48coffee-printer-port", e.target.value); } catch {}
-											}}
-											placeholder="Port"
-											className="w-16 rounded border border-(--light-gray) px-2 py-1 text-[9px] md:text-[11px]"
-										/>
-									</div>
-									<p>
-										Run: <code className="bg-gray-100 px-1 rounded">npm run printer:agent</code>
-									</p>
-								</div>
-							</details>
-						)}
+						<Button
+							onClick={() => handlePrint()}
+							className={cn("flex h-8 flex-1 gap-1 text-[9px] md:h-12 md:gap-2 md:text-sm", posBtnPrimary)}
+						>
+							<Printer className="size-3 md:size-4" /> Print
+						</Button>
 					</div>
 				</div>
 			</AlertDialogContent>

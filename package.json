@@ -15,8 +15,7 @@
 		"db:migrate": "dotenv -e .env.local -- prisma migrate dev",
 		"db:studio": "dotenv -e .env.local -- prisma studio",
 		"db:seed": "dotenv -e .env.local -- prisma db seed",
-		"auth:generate": "npx auth@latest generate --config ./src/integrations/better-auth/auth.ts",
-		"printer:agent": "npx tsx local-printer-agent/index.ts"
+		"auth:generate": "npx auth@latest generate --config ./src/integrations/better-auth/auth.ts"
 	},
 	"dependencies": {
 		"@base-ui/react": "^1.4.1",
@@ -70,11 +69,11 @@
 		"@types/node": "^22.10.2",
 		"@types/react": "^19.2.0",
 		"@types/react-dom": "^19.2.0",
-		"@types/w3c-web-usb": "^1.0.14",
+
 		"@vitejs/plugin-react": "^6.0.1",
 		"dotenv-cli": "^11.0.0",
 		"jsdom": "^28.1.0",
-		"tsx": "^4.21.0",
+
 		"typescript": "^6.0.2",
 		"vite": "^8.0.0",
 		"vitest": "^4.1.5"
