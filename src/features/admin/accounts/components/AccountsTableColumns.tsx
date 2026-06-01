@@ -69,6 +69,7 @@ export function getAccountsTableColumns({
 		{
 			accessorKey: "role",
 			header: "Role",
+			meta: { className: "w-[1%] whitespace-nowrap" },
 			cell: ({ row }) => (
 				<div className="inline-flex items-center gap-2 rounded-md border px-2.5 py-1 text-xs font-medium text-muted-foreground">
 					<ShieldCheckIcon />
@@ -79,6 +80,7 @@ export function getAccountsTableColumns({
 		{
 			accessorKey: "isOnline",
 			header: "Status",
+			meta: { className: "w-[1%] whitespace-nowrap" },
 			cell: ({ row }) => {
 				const account = row.original;
 
@@ -105,6 +107,7 @@ export function getAccountsTableColumns({
 		{
 			id: "actions",
 			header: () => <div className="text-right">Actions</div>,
+			meta: { className: "w-[1%] whitespace-nowrap" },
 			cell: ({ row }) => {
 				const account = row.original;
 				const isSelf = account.id === currentUserId;

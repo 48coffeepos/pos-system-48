@@ -11,6 +11,7 @@ interface ReconciliationPanelProps {
 	totalCashCounted: number;
 	onExportSales: () => void;
 	onExportCashCount: () => void;
+	onExportRevenue: () => void;
 }
 
 function SummaryCard({
@@ -39,6 +40,7 @@ export function ReconciliationPanel({
 	totalCashCounted,
 	onExportSales,
 	onExportCashCount,
+	onExportRevenue,
 }: ReconciliationPanelProps) {
 	const { overShort } = getOverShort(totalCashCounted, totals);
 	const { isMatched, isOver } = formatReconciliationStatus(overShort);
@@ -50,11 +52,11 @@ export function ReconciliationPanel({
 				value={formatPeso(totals.totalCashIn)}
 			/>
 			<SummaryCard
-				label="Total Sales"
+				label="Total Cash Sales"
 				value={formatPeso(totals.totalCashSales)}
 			/>
 			<SummaryCard
-				label="Expenses"
+				label="Expenses / Total Cash Out"
 				value={formatPeso(totals.totalCashOut)}
 				valueClassName="text-(--coral)"
 			/>
@@ -97,23 +99,39 @@ export function ReconciliationPanel({
 				</p>
 			</div>
 
-			<div className="mt-auto grid grid-cols-2 gap-3">
+			<SummaryCard
+				label="Total Gcash Sales"
+				value={formatPeso(totals.totalGcashSales)}
+			/>
+
+			<div className="mt-auto flex flex-col gap-2">
 				<button
 					type="button"
-					onClick={onExportSales}
-					className="flex w-full items-center justify-center gap-2 rounded-xl bg-(--deep-forest) px-3 py-3 text-sm font-medium text-(--pale-yellow) transition-colors hover:bg-(--forest-green)"
+					onClick={onExportRevenue}
+					className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-(--deep-forest) bg-(--pale-yellow) px-3 py-3 text-sm font-medium text-(--deep-forest) transition-colors hover:bg-(--deep-forest) hover:text-(--pale-yellow)"
 				>
 					<Printer weight="bold" className="size-4" />
-					Print Sales X-Reading
+					Print Revenue
 				</button>
-				<button
-					type="button"
-					onClick={onExportCashCount}
-					className="flex w-full items-center justify-center gap-2 rounded-xl border border-(--deep-forest) px-3 py-3 text-sm font-medium text-(--deep-forest) transition-colors hover:bg-(--pale-yellow)"
-				>
-					<Printer weight="bold" className="size-4" />
-					Print Cash Count
-				</button>
+
+				<div className="grid grid-cols-2 gap-2">
+					<button
+						type="button"
+						onClick={onExportSales}
+						className="flex w-full items-center justify-center gap-2 rounded-xl bg-(--deep-forest) px-3 py-3 text-sm font-medium text-(--pale-yellow) transition-colors hover:bg-(--forest-green)"
+					>
+						<Printer weight="bold" className="size-4" />
+						Print Sales X-Reading
+					</button>
+					<button
+						type="button"
+						onClick={onExportCashCount}
+						className="flex w-full items-center justify-center gap-2 rounded-xl border border-(--deep-forest) px-3 py-3 text-sm font-medium text-(--deep-forest) transition-colors hover:bg-(--pale-yellow)"
+					>
+						<Printer weight="bold" className="size-4" />
+						Print Cash Count
+					</button>
+				</div>
 			</div>
 		</div>
 	);

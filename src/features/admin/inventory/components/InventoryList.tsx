@@ -76,7 +76,7 @@ function InventoryList({
 			) : (
 				<div className="rounded-2xl border border-(--light-gray) bg-(--pure-white) p-6">
 					{/* Header Controls */}
-					<div className="mb-6 flex items-center justify-between">
+					<div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
 						<div>
 							<h2 className="text-xl font-bold text-(--deep-forest)">
 								Inventory items
@@ -87,7 +87,7 @@ function InventoryList({
 						</div>
 
 						{/* Timeframe Pill Switcher */}
-						<div className="flex gap-1.5 rounded-full bg-(--light-gray)/30 p-1">
+						<div className="flex gap-1.5 rounded-full bg-(--light-gray)/30 p-1 self-start sm:self-auto">
 							<button
 								type="button"
 								onClick={() => setTimeframe("today")}
