@@ -30,5 +30,5 @@ export {
 	resetPrinter,
 	sendToPrinter,
 } from "./web-print-sdk";
-export { canUseDirectPrint, sendBufferToPrinter, checkAvailableMethods } from "./raw-printer";
+export { sendBufferToPrinter, checkAvailableMethods } from "./raw-printer";
 export type { RawPrintResult } from "./raw-printer";
