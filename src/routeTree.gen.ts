@@ -23,6 +23,7 @@ import { Route as AdminOrdersRouteImport } from './routes/admin/orders'
 import { Route as AdminMenuRouteImport } from './routes/admin/menu'
 import { Route as AdminInventoryRouteImport } from './routes/admin/inventory'
 import { Route as AdminAccountsRouteImport } from './routes/admin/accounts'
+import { Route as ApiCronUpdateYesterdayStockRouteImport } from './routes/api/cron/update-yesterday-stock'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
 const StaffRouteRoute = StaffRouteRouteImport.update({
@@ -95,6 +96,12 @@ const AdminAccountsRoute = AdminAccountsRouteImport.update({
   path: '/accounts',
   getParentRoute: () => AdminRouteRoute,
 } as any)
+const ApiCronUpdateYesterdayStockRoute =
+  ApiCronUpdateYesterdayStockRouteImport.update({
+    id: '/api/cron/update-yesterday-stock',
+    path: '/api/cron/update-yesterday-stock',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
@@ -117,6 +124,7 @@ export interface FileRoutesByFullPath {
   '/admin/': typeof AdminIndexRoute
   '/staff/': typeof StaffIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/cron/update-yesterday-stock': typeof ApiCronUpdateYesterdayStockRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -132,6 +140,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminIndexRoute
   '/staff': typeof StaffIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/cron/update-yesterday-stock': typeof ApiCronUpdateYesterdayStockRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -150,6 +159,7 @@ export interface FileRoutesById {
   '/admin/': typeof AdminIndexRoute
   '/staff/': typeof StaffIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/cron/update-yesterday-stock': typeof ApiCronUpdateYesterdayStockRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -169,6 +179,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/staff/'
     | '/api/auth/$'
+    | '/api/cron/update-yesterday-stock'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -184,6 +195,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/staff'
     | '/api/auth/$'
+    | '/api/cron/update-yesterday-stock'
   id:
     | '__root__'
     | '/'
@@ -201,6 +213,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/staff/'
     | '/api/auth/$'
+    | '/api/cron/update-yesterday-stock'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -208,6 +221,7 @@ export interface RootRouteChildren {
   AdminRouteRoute: typeof AdminRouteRouteWithChildren
   StaffRouteRoute: typeof StaffRouteRouteWithChildren
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  ApiCronUpdateYesterdayStockRoute: typeof ApiCronUpdateYesterdayStockRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -310,6 +324,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAccountsRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    '/api/cron/update-yesterday-stock': {
+      id: '/api/cron/update-yesterday-stock'
+      path: '/api/cron/update-yesterday-stock'
+      fullPath: '/api/cron/update-yesterday-stock'
+      preLoaderRoute: typeof ApiCronUpdateYesterdayStockRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
@@ -367,6 +388,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRouteRoute: AdminRouteRouteWithChildren,
   StaffRouteRoute: StaffRouteRouteWithChildren,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
+  ApiCronUpdateYesterdayStockRoute: ApiCronUpdateYesterdayStockRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
