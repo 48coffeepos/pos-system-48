@@ -31,7 +31,8 @@ export const getOrders = createServerFn({ method: "GET" })
       change_amount: order.change_amount ? Number(order.change_amount) : null,
       grand_total: Number(order.grand_total),
       note: order.note || null,
-      staff: { name: order.staff?.name || "Cashier" },
+      cashier_name: order.staff?.name?.trim() || "Cashier",
+      staff: { name: order.staff?.name?.trim() || "Cashier" },
       order_items: order.order_items.map((item) => ({
         ...item,
         snapshot_price: Number(item.snapshot_price),

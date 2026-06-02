@@ -131,7 +131,9 @@ async function createOrderInTransaction(
                 where: { inventory_id: { in: selectedInvIds } },
                 select: { inventory_id: true, name: true },
               })
-              .then((rows) => new Map(rows.map((r) => [r.inventory_id, r.name])))
+              .then(
+                (rows) => new Map(rows.map((r) => [r.inventory_id, r.name])),
+              )
           : new Map<string, string>();
 
       const menuIdsToLookup = data.items
@@ -207,6 +209,7 @@ async function createOrderInTransaction(
           },
         },
         include: {
+          staff: { select: { name: true } },
           order_items: {
             include: {
               addon_items: true,
@@ -235,14 +238,16 @@ async function createOrderInTransaction(
         }),
       );
 
+      const cashierName = order.staff?.name?.trim() || "Cashier";
+
       return {
         ...order,
+        cashier_name: cashierName,
+        staff: { name: cashierName },
         amount_tendered: order.amount_tendered
           ? Number(order.amount_tendered)
           : null,
-        change_amount: order.change_amount
-          ? Number(order.change_amount)
-          : null,
+        change_amount: order.change_amount ? Number(order.change_amount) : null,
         grand_total: Number(order.grand_total),
         order_items: order.order_items.map((orderItem) => ({
           ...orderItem,
