@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect, useMemo } from "react";
 import { createPortal } from "react-dom";
 import { useMutation } from "@tanstack/react-query";
-import { PlusIcon, MagnifyingGlassIcon, CaretDownIcon, NotePencilIcon } from "@phosphor-icons/react";
+import { PlusIcon, MagnifyingGlassIcon, CaretDownIcon, NotePencilIcon, ArrowsLeftRightIcon } from "@phosphor-icons/react";
 
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
@@ -17,6 +17,7 @@ export interface InventoryItem {
   id: string;
   name: string;
   stock: number;
+  adminStock: number;
   type: "STANDALONE" | "CUP";
 }
 
@@ -24,6 +25,7 @@ interface AddInventoryItemProps {
   items?: InventoryItem[];
   editingItem?: InventoryItem | null;
   onCancelEdit?: () => void;
+  activeTab?: "storefront" | "admin";
 }
 
 
@@ -41,7 +43,7 @@ const itemTypeOptions = [
 
 type SelectionState = "idle" | "new" | "existing" | "editing";
 
-function AddInventoryItem({ items, editingItem, onCancelEdit }: AddInventoryItemProps) {
+function AddInventoryItem({ items, editingItem, onCancelEdit, activeTab = "storefront" }: AddInventoryItemProps) {
   const inventoryItems = items ?? [];
 
   const [isOpen, setIsOpen] = useState(false);
@@ -51,6 +53,7 @@ function AddInventoryItem({ items, editingItem, onCancelEdit }: AddInventoryItem
   const [itemName, setItemName] = useState("");
   const [itemType, setItemType] = useState<"STANDALONE" | "CUP">("STANDALONE");
   const [quantity, setQuantity] = useState<number | "">("");
+  const [transactionType, setTransactionType] = useState<"add" | "transfer">("add");
   const [newItemQuantity, setNewItemQuantity] = useState<number>(0);
   const [buttonPosition, setButtonPosition] = useState<{ top: number; left: number; width: number } | null>(null);
 
@@ -111,9 +114,9 @@ function AddInventoryItem({ items, editingItem, onCancelEdit }: AddInventoryItem
       setSelectionState("editing");
       setItemName(editingItem.name);
       setItemType(editingItem.type);
-      setNewItemQuantity(editingItem.stock);
+      setNewItemQuantity(activeTab === "admin" ? editingItem.adminStock : editingItem.stock);
     }
-  }, [editingItem]);
+  }, [editingItem, activeTab]);
 
   useEffect(() => {
     if (isOpen) {
@@ -136,6 +139,7 @@ function AddInventoryItem({ items, editingItem, onCancelEdit }: AddInventoryItem
     setSelectionState("existing");
     setSelectedItem(item);
     setQuantity("");
+    setTransactionType("add");
     setIsOpen(false);
   };
 
@@ -145,6 +149,7 @@ function AddInventoryItem({ items, editingItem, onCancelEdit }: AddInventoryItem
     setItemName("");
     setItemType("STANDALONE");
     setQuantity("");
+    setTransactionType("add");
     setNewItemQuantity(0);
     onCancelEdit?.();
   };
@@ -152,7 +157,7 @@ function AddInventoryItem({ items, editingItem, onCancelEdit }: AddInventoryItem
   const getDisplayValue = () => {
     if (selectionState === "new") return "+ Add New Item";
     if (selectedItem)
-      return `${selectedItem.name} (Current: ${selectedItem.stock})`;
+      return `${selectedItem.name} (Admin: ${selectedItem.adminStock} / Store: ${selectedItem.stock})`;
     return "";
   };
 
@@ -164,7 +169,7 @@ function AddInventoryItem({ items, editingItem, onCancelEdit }: AddInventoryItem
     return false;
   };
 
-  const handleSubmit = () => {
+  const   handleSubmit = () => {
     if (selectionState === "new") {
       createMutation.mutate({
         name: itemName.trim(),
@@ -175,12 +180,15 @@ function AddInventoryItem({ items, editingItem, onCancelEdit }: AddInventoryItem
       addStockMutation.mutate({
         itemId: selectedItem.id,
         quantity: Number(quantity),
+        transactionType,
       });
     } else if (selectionState === "editing" && editingItem) {
       updateMutation.mutate({
         id: editingItem.id,
         name: itemName.trim(),
-        stock: newItemQuantity,
+        ...(activeTab === "admin"
+          ? { adminStock: newItemQuantity }
+          : { stock: newItemQuantity }),
         type: itemType,
       });
     }
@@ -331,10 +339,10 @@ function AddInventoryItem({ items, editingItem, onCancelEdit }: AddInventoryItem
                                 <span>{item.name}</span>
                                 <div className="text-right leading-tight">
                                   <p className="text-[11px] text-(--medium-gray)">
-                                    Current
+                                    Admin / Store 
                                   </p>
                                   <p className="text-sm font-medium text-(--deep-forest)">
-                                    {item.stock}
+                                    {item.adminStock} / {item.stock} 
                                   </p>
                                 </div>
                               </button>
@@ -420,31 +428,74 @@ function AddInventoryItem({ items, editingItem, onCancelEdit }: AddInventoryItem
 
         {/* State D: Adding Quantity to Existing Item */}
         {selectionState === "existing" && (
-          <div className="animate-fade-in-up space-y-1.5">
-            <div className="flex items-center justify-between gap-3">
+          <div className="animate-fade-in-up space-y-4">
+            {/* Transaction Type Toggle */}
+            <div className="space-y-1.5">
               <label className="text-sm font-medium text-(--dark-gray)">
-                Add Quantity
+                Transaction Type
               </label>
-              <p className="text-xs text-(--medium-gray)">
-                {quantity === "" ? "0" : String(quantity).length} / 5
-              </p>
+              <div className="flex gap-1.5 rounded-xl border border-(--light-gray) p-1">
+                <button
+                  type="button"
+                  onClick={() => setTransactionType("add")}
+                  className={cn(
+                    "flex flex-1 items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                    transactionType === "add"
+                      ? "bg-(--deep-forest) text-(--pure-white)"
+                      : "text-(--medium-gray) hover:bg-(--light-gray)/50",
+                  )}
+                >
+                  <PlusIcon weight="bold" className="size-4" />
+                  Add Stock
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setTransactionType("transfer")}
+                  className={cn(
+                    "flex flex-1 items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                    transactionType === "transfer"
+                      ? "bg-(--deep-forest) text-(--pure-white)"
+                      : "text-(--medium-gray) hover:bg-(--light-gray)/50",
+                  )}
+                >
+                  <ArrowsLeftRightIcon weight="bold" className="size-4" />
+                  Transfer
+                </button>
+              </div>
             </div>
-            <Input
-              type="text"
-              inputMode="numeric"
-              value={quantity}
-              onChange={(e) => {
-                let val = e.target.value.replace(/[^0-9]/g, "");
-                val = val.slice(0, 5);
-                setQuantity(val === "" ? "" : Number(val));
-              }}
-              placeholder="0"
-              maxLength={5}
-              className="h-10 w-full rounded-xl border-(--light-gray) px-3 text-sm"
-            />
-            <p className="text-xs text-(--medium-gray)">
-              This will add to the existing quantity
-            </p>
+
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between gap-3">
+                <label className="text-sm font-medium text-(--dark-gray)">
+                  Quantity
+                </label>
+                <p className="text-xs text-(--medium-gray)">
+                  {quantity === "" ? "0" : String(quantity).length} / 5
+                </p>
+              </div>
+              <Input
+                type="text"
+                inputMode="numeric"
+                value={quantity}
+                onChange={(e) => {
+                  let val = e.target.value.replace(/[^0-9]/g, "");
+                  val = val.slice(0, 5);
+                  setQuantity(val === "" ? "" : Number(val));
+                }}
+                placeholder="0"
+                maxLength={5}
+                className="h-10 w-full rounded-xl border-(--light-gray) px-3 text-sm"
+              />
+              {transactionType === "add" ? (
+                <p className="text-xs text-(--medium-gray)">
+                  Adds to admin stock only
+                </p>
+              ) : (
+                <p className="text-xs text-amber-600">
+                  Transfers from admin stock to storefront stock
+                </p>
+              )}
+            </div>
           </div>
         )}
 
@@ -489,7 +540,7 @@ function AddInventoryItem({ items, editingItem, onCancelEdit }: AddInventoryItem
             <div className="space-y-1.5">
               <div className="flex items-center justify-between gap-3">
                 <label className="text-sm font-medium text-(--dark-gray)">
-                  Stock
+                  {activeTab === "admin" ? "Admin Stock" : "Stock"}
                 </label>
                 <p className="text-xs text-(--medium-gray)">
                   {String(newItemQuantity).length} / 5
@@ -557,10 +608,12 @@ function AddInventoryItem({ items, editingItem, onCancelEdit }: AddInventoryItem
           >
             <PlusIcon weight="bold" className="size-4" />
             {isPending
-              ? `${selectionState === "new" ? "Creating" : "Adding"}...`
+              ? `${selectionState === "new" ? "Creating" : selectionState === "existing" ? (transactionType === "transfer" ? "Transferring" : "Adding") : "Saving"}...`
               : selectionState === "new"
                 ? "Create Item"
-                : "Add Quantity"}
+                : selectionState === "existing"
+                  ? transactionType === "transfer" ? "Transfer Stock" : "Add Stock"
+                  : "Save Changes"}
           </button>
         )}
       </div>

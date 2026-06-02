@@ -22,20 +22,23 @@ import {
 import { deleteInventoryItemMutationOptions } from "../mutationOptions";
 import type { InventoryItem } from "./AddInventoryItem";
 
-// Ensure your shared type includes yesterday_stock from the query context
-// If it doesn't, you can safely extend it here:
 interface ExtendedInventoryItem extends InventoryItem {
 	yesterdayStock?: number;
+	adminStock: number;
 }
 
 function InventoryList({
 	items = [],
 	onEdit,
 	hideActions = false,
+	activeTab = "admin",
+	onTabChange,
 }: {
 	items?: ExtendedInventoryItem[];
 	onEdit?: (item: ExtendedInventoryItem) => void;
 	hideActions?: boolean;
+	activeTab?: "storefront" | "admin";
+	onTabChange?: (tab: "storefront" | "admin") => void;
 }) {
 	const [timeframe, setTimeframe] = useState<"today" | "yesterday">("today");
 	const [search, setSearch] = useState("");
@@ -82,34 +85,63 @@ function InventoryList({
 								Inventory items
 							</h2>
 							<p className="text-xs text-(--medium-gray) mt-0.5">
-								Track item quantity 
+								Track item quantity
 							</p>
 						</div>
 
-						{/* Timeframe Pill Switcher */}
-						<div className="flex gap-1.5 rounded-full bg-(--light-gray)/30 p-1 self-start sm:self-auto">
-							<button
-								type="button"
-								onClick={() => setTimeframe("today")}
-								className={`rounded-full px-4 py-1.5 text-xs font-medium transition-colors ${
-									timeframe === "today"
-										? "bg-(--deep-forest) text-(--pure-white)"
-										: "text-(--medium-gray) hover:bg-(--light-gray)/50"
-								}`}
-							>
-								Today
-							</button>
-							<button
-								type="button"
-								onClick={() => setTimeframe("yesterday")}
-								className={`rounded-full px-4 py-1.5 text-xs font-medium transition-colors ${
-									timeframe === "yesterday"
-										? "bg-(--deep-forest) text-(--pure-white)"
-										: "text-(--medium-gray) hover:bg-(--light-gray)/50"
-								}`}
-							>
-								Yesterday
-							</button>
+						<div className="flex gap-2 self-start sm:self-auto">
+							{/* Timeframe Pill Switcher — only on storefront tab */}
+							{activeTab === "storefront" && (
+								<div className="flex gap-1.5 rounded-full bg-(--light-gray)/30 p-1">
+									<button
+										type="button"
+										onClick={() => setTimeframe("today")}
+										className={`rounded-full px-4 py-1.5 text-xs font-medium transition-colors ${
+											timeframe === "today"
+												? "bg-(--deep-forest) text-(--pure-white)"
+												: "text-(--medium-gray) hover:bg-(--light-gray)/50"
+										}`}
+									>
+										Today
+									</button>
+									<button
+										type="button"
+										onClick={() => setTimeframe("yesterday")}
+										className={`rounded-full px-4 py-1.5 text-xs font-medium transition-colors ${
+											timeframe === "yesterday"
+												? "bg-(--deep-forest) text-(--pure-white)"
+												: "text-(--medium-gray) hover:bg-(--light-gray)/50"
+										}`}
+									>
+										Yesterday
+									</button>
+								</div>
+							)}
+							{/* Stock View Tab Toggle */}
+							<div className="flex gap-1.5 rounded-full bg-(--light-gray)/30 p-1">
+								<button
+									type="button"
+									onClick={() => onTabChange?.("admin")}
+									className={`rounded-full px-4 py-1.5 text-xs font-medium transition-colors ${
+										activeTab === "admin"
+											? "bg-(--deep-forest) text-(--pure-white)"
+											: "text-(--medium-gray) hover:bg-(--light-gray)/50"
+									}`}
+								>
+									Admin
+								</button>
+								<button
+									type="button"
+									onClick={() => onTabChange?.("storefront")}
+									className={`rounded-full px-4 py-1.5 text-xs font-medium transition-colors ${
+										activeTab === "storefront"
+											? "bg-(--deep-forest) text-(--pure-white)"
+											: "text-(--medium-gray) hover:bg-(--light-gray)/50"
+									}`}
+								>
+									Storefront
+								</button>
+							</div>
 						</div>
 					</div>
 
@@ -135,7 +167,9 @@ function InventoryList({
 							<thead>
 								<tr className="border-b border-(--light-gray)/40 bg-(--soft-peach)/20 text-[11px] font-bold tracking-wider text-(--medium-gray)/80 uppercase">
 									<th className="rounded-l-lg p-3 pl-4">Item</th>
-									<th className="p-3 text-center">Quantity</th>
+									<th className="p-3 text-center">
+										{activeTab === "admin" ? "Admin Stock" : "Quantity"}
+									</th>
 									{!hideActions && (
 										<th className="rounded-r-lg p-3 pr-4 text-right">Actions</th>
 									)}
@@ -162,11 +196,13 @@ function InventoryList({
 												</div>
 											</td>
 
-											{/* Column 2: Selected Timeframe Quantity Counter */}
+											{/* Column 2: Stock value based on active tab */}
 											<td className="p-4 text-center font-bold text-sm text-(--deep-forest)">
-												{timeframe === "today"
-													? item.stock
-													: (item.yesterdayStock ?? 0)}
+												{activeTab === "admin"
+													? (item.adminStock ?? 0)
+													: timeframe === "today"
+														? item.stock
+														: (item.yesterdayStock ?? 0)}
 											</td>
 
 											{/* Column 3: Row Mutations (Edit Profile/Remove) */}

@@ -26,7 +26,13 @@ function AdminInventory() {
 	const { data: inventoryItems, isLoading, isError, error, refetch } = useQuery(
 		getAllInventoryQueryOptions,
 	);
+	const [activeTab, setActiveTab] = useState<"storefront" | "admin">("storefront");
 	const [editingItem, setEditingItem] = useState<InventoryItem | null>(null);
+
+	const handleTabChange = (tab: "storefront" | "admin") => {
+		setActiveTab(tab);
+		setEditingItem(null);
+	};
 
 	return (
 		<div className="min-h-screen">
@@ -52,17 +58,25 @@ function AdminInventory() {
 							<span className="h-5 w-5 animate-spin rounded-full border-2 border-(--deep-forest) border-t-transparent" />
 						</div>
 					) : (
-						<InventoryList items={inventoryItems ?? []} onEdit={setEditingItem} />
+						<InventoryList
+							items={inventoryItems ?? []}
+							onEdit={setEditingItem}
+							activeTab={activeTab}
+							onTabChange={handleTabChange}
+						/>
 					)}
 				</div>
 
-				<div className="lg:sticky lg:top-24 lg:self-start">
-					<AddInventoryItem
-						items={inventoryItems ?? []}
-						editingItem={editingItem}
-						onCancelEdit={() => setEditingItem(null)}
-					/>
-				</div>
+				{(activeTab === "admin" || editingItem) && (
+					<div className="lg:sticky lg:top-24 lg:self-start">
+						<AddInventoryItem
+							items={inventoryItems ?? []}
+							editingItem={editingItem}
+							onCancelEdit={() => setEditingItem(null)}
+							activeTab={activeTab}
+						/>
+					</div>
+				)}
 			</div>
 		</div>
 	);

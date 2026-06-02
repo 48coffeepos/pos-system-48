@@ -41,9 +41,11 @@ export const addStockMutationOptions = mutationOptions({
 		mutationContext?.client?.invalidateQueries({
 			queryKey: inventoryKeys.inventory,
 		});
-		toast.success("Stock updated", {
-			description: `Added ${variables.quantity} to ${data.name}.`,
-		});
+		const description =
+			variables.transactionType === "add"
+				? `Added ${variables.quantity} to admin stock of ${data.name}.`
+				: `Transferred ${variables.quantity} from admin to storefront stock.`;
+		toast.success("Stock updated", { description });
 	},
 	onError: (error) => {
 		toast.error("Failed to update stock", {
