@@ -82,7 +82,7 @@ function InventoryList({
 								Inventory items
 							</h2>
 							<p className="text-xs text-(--medium-gray) mt-0.5">
-								Track item quantity and category
+								Track item quantity 
 							</p>
 						</div>
 

@@ -92,6 +92,7 @@ model Inventory {
   stock           Int             @default(0)
   yesterday_stock Int?
   type            Inventory_Type
+  admin_stock     Int?            @default(0)
   menu_items      MenuInventory[]
 
   @@map("inventory")

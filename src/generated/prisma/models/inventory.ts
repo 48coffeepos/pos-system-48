@@ -29,11 +29,13 @@ export type AggregateInventory = {
 export type InventoryAvgAggregateOutputType = {
   stock: number | null
   yesterday_stock: number | null
+  admin_stock: number | null
 }
 
 export type InventorySumAggregateOutputType = {
   stock: number | null
   yesterday_stock: number | null
+  admin_stock: number | null
 }
 
 export type InventoryMinAggregateOutputType = {
@@ -42,6 +44,7 @@ export type InventoryMinAggregateOutputType = {
   stock: number | null
   yesterday_stock: number | null
   type: $Enums.Inventory_Type | null
+  admin_stock: number | null
 }
 
 export type InventoryMaxAggregateOutputType = {
@@ -50,6 +53,7 @@ export type InventoryMaxAggregateOutputType = {
   stock: number | null
   yesterday_stock: number | null
   type: $Enums.Inventory_Type | null
+  admin_stock: number | null
 }
 
 export type InventoryCountAggregateOutputType = {
@@ -58,6 +62,7 @@ export type InventoryCountAggregateOutputType = {
   stock: number
   yesterday_stock: number
   type: number
+  admin_stock: number
   _all: number
 }
 
@@ -65,11 +70,13 @@ export type InventoryCountAggregateOutputType = {
 export type InventoryAvgAggregateInputType = {
   stock?: true
   yesterday_stock?: true
+  admin_stock?: true
 }
 
 export type InventorySumAggregateInputType = {
   stock?: true
   yesterday_stock?: true
+  admin_stock?: true
 }
 
 export type InventoryMinAggregateInputType = {
@@ -78,6 +85,7 @@ export type InventoryMinAggregateInputType = {
   stock?: true
   yesterday_stock?: true
   type?: true
+  admin_stock?: true
 }
 
 export type InventoryMaxAggregateInputType = {
@@ -86,6 +94,7 @@ export type InventoryMaxAggregateInputType = {
   stock?: true
   yesterday_stock?: true
   type?: true
+  admin_stock?: true
 }
 
 export type InventoryCountAggregateInputType = {
@@ -94,6 +103,7 @@ export type InventoryCountAggregateInputType = {
   stock?: true
   yesterday_stock?: true
   type?: true
+  admin_stock?: true
   _all?: true
 }
 
@@ -189,6 +199,7 @@ export type InventoryGroupByOutputType = {
   stock: number
   yesterday_stock: number | null
   type: $Enums.Inventory_Type
+  admin_stock: number | null
   _count: InventoryCountAggregateOutputType | null
   _avg: InventoryAvgAggregateOutputType | null
   _sum: InventorySumAggregateOutputType | null
@@ -220,6 +231,7 @@ export type InventoryWhereInput = {
   stock?: Prisma.IntFilter<"Inventory"> | number
   yesterday_stock?: Prisma.IntNullableFilter<"Inventory"> | number | null
   type?: Prisma.EnumInventory_TypeFilter<"Inventory"> | $Enums.Inventory_Type
+  admin_stock?: Prisma.IntNullableFilter<"Inventory"> | number | null
   menu_items?: Prisma.MenuInventoryListRelationFilter
 }
 
@@ -229,6 +241,7 @@ export type InventoryOrderByWithRelationInput = {
   stock?: Prisma.SortOrder
   yesterday_stock?: Prisma.SortOrderInput | Prisma.SortOrder
   type?: Prisma.SortOrder
+  admin_stock?: Prisma.SortOrderInput | Prisma.SortOrder
   menu_items?: Prisma.MenuInventoryOrderByRelationAggregateInput
 }
 
@@ -241,6 +254,7 @@ export type InventoryWhereUniqueInput = Prisma.AtLeast<{
   stock?: Prisma.IntFilter<"Inventory"> | number
   yesterday_stock?: Prisma.IntNullableFilter<"Inventory"> | number | null
   type?: Prisma.EnumInventory_TypeFilter<"Inventory"> | $Enums.Inventory_Type
+  admin_stock?: Prisma.IntNullableFilter<"Inventory"> | number | null
   menu_items?: Prisma.MenuInventoryListRelationFilter
 }, "inventory_id" | "name">
 
@@ -250,6 +264,7 @@ export type InventoryOrderByWithAggregationInput = {
   stock?: Prisma.SortOrder
   yesterday_stock?: Prisma.SortOrderInput | Prisma.SortOrder
   type?: Prisma.SortOrder
+  admin_stock?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.InventoryCountOrderByAggregateInput
   _avg?: Prisma.InventoryAvgOrderByAggregateInput
   _max?: Prisma.InventoryMaxOrderByAggregateInput
@@ -266,6 +281,7 @@ export type InventoryScalarWhereWithAggregatesInput = {
   stock?: Prisma.IntWithAggregatesFilter<"Inventory"> | number
   yesterday_stock?: Prisma.IntNullableWithAggregatesFilter<"Inventory"> | number | null
   type?: Prisma.EnumInventory_TypeWithAggregatesFilter<"Inventory"> | $Enums.Inventory_Type
+  admin_stock?: Prisma.IntNullableWithAggregatesFilter<"Inventory"> | number | null
 }
 
 export type InventoryCreateInput = {
@@ -274,6 +290,7 @@ export type InventoryCreateInput = {
   stock?: number
   yesterday_stock?: number | null
   type: $Enums.Inventory_Type
+  admin_stock?: number | null
   menu_items?: Prisma.MenuInventoryCreateNestedManyWithoutInventoryInput
 }
 
@@ -283,6 +300,7 @@ export type InventoryUncheckedCreateInput = {
   stock?: number
   yesterday_stock?: number | null
   type: $Enums.Inventory_Type
+  admin_stock?: number | null
   menu_items?: Prisma.MenuInventoryUncheckedCreateNestedManyWithoutInventoryInput
 }
 
@@ -292,6 +310,7 @@ export type InventoryUpdateInput = {
   stock?: Prisma.IntFieldUpdateOperationsInput | number
   yesterday_stock?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   type?: Prisma.EnumInventory_TypeFieldUpdateOperationsInput | $Enums.Inventory_Type
+  admin_stock?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   menu_items?: Prisma.MenuInventoryUpdateManyWithoutInventoryNestedInput
 }
 
@@ -301,6 +320,7 @@ export type InventoryUncheckedUpdateInput = {
   stock?: Prisma.IntFieldUpdateOperationsInput | number
   yesterday_stock?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   type?: Prisma.EnumInventory_TypeFieldUpdateOperationsInput | $Enums.Inventory_Type
+  admin_stock?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   menu_items?: Prisma.MenuInventoryUncheckedUpdateManyWithoutInventoryNestedInput
 }
 
@@ -310,6 +330,7 @@ export type InventoryCreateManyInput = {
   stock?: number
   yesterday_stock?: number | null
   type: $Enums.Inventory_Type
+  admin_stock?: number | null
 }
 
 export type InventoryUpdateManyMutationInput = {
@@ -318,6 +339,7 @@ export type InventoryUpdateManyMutationInput = {
   stock?: Prisma.IntFieldUpdateOperationsInput | number
   yesterday_stock?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   type?: Prisma.EnumInventory_TypeFieldUpdateOperationsInput | $Enums.Inventory_Type
+  admin_stock?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 export type InventoryUncheckedUpdateManyInput = {
@@ -326,6 +348,7 @@ export type InventoryUncheckedUpdateManyInput = {
   stock?: Prisma.IntFieldUpdateOperationsInput | number
   yesterday_stock?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   type?: Prisma.EnumInventory_TypeFieldUpdateOperationsInput | $Enums.Inventory_Type
+  admin_stock?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 export type InventoryCountOrderByAggregateInput = {
@@ -334,11 +357,13 @@ export type InventoryCountOrderByAggregateInput = {
   stock?: Prisma.SortOrder
   yesterday_stock?: Prisma.SortOrder
   type?: Prisma.SortOrder
+  admin_stock?: Prisma.SortOrder
 }
 
 export type InventoryAvgOrderByAggregateInput = {
   stock?: Prisma.SortOrder
   yesterday_stock?: Prisma.SortOrder
+  admin_stock?: Prisma.SortOrder
 }
 
 export type InventoryMaxOrderByAggregateInput = {
@@ -347,6 +372,7 @@ export type InventoryMaxOrderByAggregateInput = {
   stock?: Prisma.SortOrder
   yesterday_stock?: Prisma.SortOrder
   type?: Prisma.SortOrder
+  admin_stock?: Prisma.SortOrder
 }
 
 export type InventoryMinOrderByAggregateInput = {
@@ -355,11 +381,13 @@ export type InventoryMinOrderByAggregateInput = {
   stock?: Prisma.SortOrder
   yesterday_stock?: Prisma.SortOrder
   type?: Prisma.SortOrder
+  admin_stock?: Prisma.SortOrder
 }
 
 export type InventorySumOrderByAggregateInput = {
   stock?: Prisma.SortOrder
   yesterday_stock?: Prisma.SortOrder
+  admin_stock?: Prisma.SortOrder
 }
 
 export type InventoryScalarRelationFilter = {
@@ -407,6 +435,7 @@ export type InventoryCreateWithoutMenu_itemsInput = {
   stock?: number
   yesterday_stock?: number | null
   type: $Enums.Inventory_Type
+  admin_stock?: number | null
 }
 
 export type InventoryUncheckedCreateWithoutMenu_itemsInput = {
@@ -415,6 +444,7 @@ export type InventoryUncheckedCreateWithoutMenu_itemsInput = {
   stock?: number
   yesterday_stock?: number | null
   type: $Enums.Inventory_Type
+  admin_stock?: number | null
 }
 
 export type InventoryCreateOrConnectWithoutMenu_itemsInput = {
@@ -439,6 +469,7 @@ export type InventoryUpdateWithoutMenu_itemsInput = {
   stock?: Prisma.IntFieldUpdateOperationsInput | number
   yesterday_stock?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   type?: Prisma.EnumInventory_TypeFieldUpdateOperationsInput | $Enums.Inventory_Type
+  admin_stock?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 export type InventoryUncheckedUpdateWithoutMenu_itemsInput = {
@@ -447,6 +478,7 @@ export type InventoryUncheckedUpdateWithoutMenu_itemsInput = {
   stock?: Prisma.IntFieldUpdateOperationsInput | number
   yesterday_stock?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   type?: Prisma.EnumInventory_TypeFieldUpdateOperationsInput | $Enums.Inventory_Type
+  admin_stock?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 
@@ -486,6 +518,7 @@ export type InventorySelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   stock?: boolean
   yesterday_stock?: boolean
   type?: boolean
+  admin_stock?: boolean
   menu_items?: boolean | Prisma.Inventory$menu_itemsArgs<ExtArgs>
   _count?: boolean | Prisma.InventoryCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["inventory"]>
@@ -496,6 +529,7 @@ export type InventorySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   stock?: boolean
   yesterday_stock?: boolean
   type?: boolean
+  admin_stock?: boolean
 }, ExtArgs["result"]["inventory"]>
 
 export type InventorySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -504,6 +538,7 @@ export type InventorySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   stock?: boolean
   yesterday_stock?: boolean
   type?: boolean
+  admin_stock?: boolean
 }, ExtArgs["result"]["inventory"]>
 
 export type InventorySelectScalar = {
@@ -512,9 +547,10 @@ export type InventorySelectScalar = {
   stock?: boolean
   yesterday_stock?: boolean
   type?: boolean
+  admin_stock?: boolean
 }
 
-export type InventoryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"inventory_id" | "name" | "stock" | "yesterday_stock" | "type", ExtArgs["result"]["inventory"]>
+export type InventoryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"inventory_id" | "name" | "stock" | "yesterday_stock" | "type" | "admin_stock", ExtArgs["result"]["inventory"]>
 export type InventoryInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   menu_items?: boolean | Prisma.Inventory$menu_itemsArgs<ExtArgs>
   _count?: boolean | Prisma.InventoryCountOutputTypeDefaultArgs<ExtArgs>
@@ -533,6 +569,7 @@ export type $InventoryPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     stock: number
     yesterday_stock: number | null
     type: $Enums.Inventory_Type
+    admin_stock: number | null
   }, ExtArgs["result"]["inventory"]>
   composites: {}
 }
@@ -962,6 +999,7 @@ export interface InventoryFieldRefs {
   readonly stock: Prisma.FieldRef<"Inventory", 'Int'>
   readonly yesterday_stock: Prisma.FieldRef<"Inventory", 'Int'>
   readonly type: Prisma.FieldRef<"Inventory", 'Inventory_Type'>
+  readonly admin_stock: Prisma.FieldRef<"Inventory", 'Int'>
 }
     
 
