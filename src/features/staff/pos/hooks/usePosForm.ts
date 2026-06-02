@@ -24,7 +24,7 @@ export function usePosForm() {
 				return;
 			}
 			const paidNum = parseFloat(value.amountPaid) || 0;
-			if (value.paymentMethod !== "GRAB" && paidNum < cartTotal) {
+			if (value.paymentMethod === "CASH" && paidNum < cartTotal) {
 				toast.error(`Insufficient amount. Total is ${formatPeso(cartTotal)}`);
 				return;
 			}

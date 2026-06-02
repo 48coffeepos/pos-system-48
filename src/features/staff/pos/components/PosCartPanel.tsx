@@ -260,7 +260,7 @@ export function PosCartPanel({
 								</form.AppField>
 							</div>
 
-							{paymentMethod !== "GRAB" ? (
+							{paymentMethod === "CASH" ? (
 								<div className="col-span-1">
 									<form.AppField name="amountPaid">
 										{(field) => (
@@ -288,7 +288,7 @@ export function PosCartPanel({
 							) : null}
 						</div>
 
-								{paymentMethod === "CASH" && !isGrab && amountPaid && paidNum >= cartTotal ? (
+								{paymentMethod === "CASH" && amountPaid && paidNum >= cartTotal ? (
 									<div
 										className="mt-0.5 flex items-center justify-between rounded-[5px] p-1 md:mt-1 md:rounded-lg lg:mt-1.5 lg:rounded-xl md:p-1.5 lg:p-2"
 										style={{

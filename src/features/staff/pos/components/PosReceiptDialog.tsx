@@ -16,6 +16,7 @@ interface PosReceiptDialogProps {
 	open: boolean;
 	onClose: () => void;
 	cashierName?: string;
+	extraActions?: React.ReactNode;
 }
 
 export function PosReceiptDialog({
@@ -23,6 +24,7 @@ export function PosReceiptDialog({
 	open,
 	onClose,
 	cashierName = "Cashier",
+	extraActions,
 }: PosReceiptDialogProps) {
 	const contentRef = useRef<HTMLDivElement>(null);
 
@@ -235,6 +237,7 @@ export function PosReceiptDialog({
 						>
 							Save
 						</Button>
+						{extraActions}
 						<Button
 							onClick={() => handlePrint()}
 							className={cn("flex h-8 flex-1 gap-1 text-[9px] md:h-12 md:gap-2 md:text-sm", posBtnPrimary)}

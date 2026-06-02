@@ -1,10 +1,11 @@
-import { CreditCardIcon, ReceiptIcon } from "@phosphor-icons/react";
+import { CreditCardIcon, PencilSimpleLine, ReceiptIcon } from "@phosphor-icons/react";
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { PosReceiptDialog } from "@/features/staff/pos/components/PosReceiptDialog";
 import type { PosOrder } from "@/features/staff/pos/types";
 import { formatPeso } from "@/lib/format-currency";
 import { cn } from "@/lib/utils";
+import { AdminEditOrderDialog } from "./AdminEditOrderDialog";
 
 interface TodayOrdersTableProps {
 	data: PosOrder[];
@@ -32,6 +33,7 @@ function methodBadge(method: string) {
 
 export function TodayOrdersTable({ data, limit }: TodayOrdersTableProps) {
 	const [selectedOrder, setSelectedOrder] = useState<PosOrder | null>(null);
+	const [editOrder, setEditOrder] = useState<PosOrder | null>(null);
 	const displayed = limit ? data.slice(0, limit) : data;
 
 	return (
@@ -214,6 +216,30 @@ export function TodayOrdersTable({ data, limit }: TodayOrdersTableProps) {
 				open={!!selectedOrder}
 				onClose={() => setSelectedOrder(null)}
 				cashierName={selectedOrder?.cashier_name || "Cashier"}
+				extraActions={
+					selectedOrder ? (
+						<button
+							type="button"
+							onClick={() => {
+								setEditOrder(selectedOrder);
+								setSelectedOrder(null);
+							}}
+							className={cn(
+								"inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-bold transition-all active:scale-95 shadow-sm",
+								"border-(--light-gray) bg-white text-(--near-black) hover:bg-gray-50",
+							)}
+						>
+							<PencilSimpleLine className="size-3.5" />
+							Edit
+						</button>
+					) : null
+				}
+			/>
+
+			<AdminEditOrderDialog
+				order={editOrder}
+				open={!!editOrder}
+				onClose={() => setEditOrder(null)}
 			/>
 		</div>
 	);

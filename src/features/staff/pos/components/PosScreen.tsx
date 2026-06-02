@@ -143,8 +143,8 @@ export function PosScreen() {
 			const placedOrder = await createOrderMutation.mutateAsync({
 				method: values.paymentMethod,
 				reference_number: values.referenceNumber || undefined,
-				amount_tendered: values.paymentMethod === "GRAB" ? undefined : paidNum,
-				change_amount: values.paymentMethod === "GRAB" ? undefined : changeAmt,
+				amount_tendered: values.paymentMethod === "CASH" ? paidNum : undefined,
+				change_amount: values.paymentMethod === "CASH" ? changeAmt : undefined,
 				grand_total: cartTotal,
 				note: values.note || undefined,
 				items: cart.map(cartItemToCreateOrderItem),
