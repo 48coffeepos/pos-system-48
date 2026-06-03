@@ -50,7 +50,7 @@ function StaffInventory() {
 						<span className="h-5 w-5 animate-spin rounded-full border-2 border-(--deep-forest) border-t-transparent" />
 					</div>
 				) : (
-					<InventoryList items={inventoryItems ?? []} hideActions />
+					<InventoryList items={inventoryItems ?? []} hideActions activeTab="storefront" />
 				)}
 			</main>
 		</div>

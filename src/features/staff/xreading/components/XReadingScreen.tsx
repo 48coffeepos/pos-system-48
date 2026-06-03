@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useAppForm } from "@/integrations/tanstack-form";
 import { CashCountPanel } from "./CashCountPanel";
 import { ReconciliationPanel } from "./ReconciliationPanel";
 import { XReadingReceiptDialog } from "./XReadingReceiptDialog";
+import { getCupSalesQueryOptions } from "../queryOptions";
 import { authClient } from "@/integrations/better-auth/auth-client";
 import {
 	AlertDialog,
@@ -23,6 +25,7 @@ interface XReadingScreenProps {
 	data: {
 		totalCashSales: number;
 		totalGcashSales: number;
+		totalGrabSales: number;
 		totalCashOut: number;
 		totalCashIn: number;
 	};
@@ -37,8 +40,10 @@ export function XReadingScreen({ data }: XReadingScreenProps) {
 
 	const [showResetModal, setShowResetModal] = useState(false);
 	const [receiptMode, setReceiptMode] = useState<
-		"sales" | "cashcount" | "revenue" | null
+		"sales" | "cashcount" | "revenue" | "cups" | null
 	>(null);
+
+	const { data: cupSales = [] } = useQuery(getCupSalesQueryOptions());
 
 	const form = useAppForm({
 		defaultValues: cashCount,
@@ -71,6 +76,10 @@ export function XReadingScreen({ data }: XReadingScreenProps) {
 		setReceiptMode("revenue");
 	};
 
+	const handleExportCups = () => {
+		setReceiptMode("cups");
+	};
+
 	return (
 		<>
 			{/* On-screen UI */}
@@ -87,6 +96,7 @@ export function XReadingScreen({ data }: XReadingScreenProps) {
 					totals={{
 						totalCashSales: data.totalCashSales,
 						totalGcashSales: data.totalGcashSales,
+						totalGrabSales: data.totalGrabSales,
 						totalCashOut: data.totalCashOut,
 						totalCashIn: data.totalCashIn,
 					}}
@@ -94,6 +104,7 @@ export function XReadingScreen({ data }: XReadingScreenProps) {
 					onExportSales={handleExportSales}
 					onExportCashCount={handleExportCashCount}
 					onExportRevenue={handleExportRevenue}
+					onExportCups={handleExportCups}
 				/>
 			</div>
 
@@ -130,11 +141,13 @@ export function XReadingScreen({ data }: XReadingScreenProps) {
 				totals={{
 					totalCashSales: data.totalCashSales,
 					totalGcashSales: data.totalGcashSales,
+					totalGrabSales: data.totalGrabSales,
 					totalCashOut: data.totalCashOut,
 					totalCashIn: data.totalCashIn,
 				}}
 				totalCashCounted={totalCashCounted}
 				cashCount={cashCount}
+				cupSales={cupSales}
 			/>
 		</>
 	);

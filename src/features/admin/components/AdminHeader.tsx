@@ -15,6 +15,14 @@ import { Separator } from "@/components/ui/separator";
 import { sessionQueryOptions } from "@/features/auth/queryOptions";
 import { authClient } from "@/integrations/better-auth/auth-client";
 import { cn } from "@/lib/utils";
+import {
+	defaultPosFormValues,
+	usePosStore,
+} from "@/features/staff/pos/stores/usePosStore";
+import {
+	emptyCashCountValues,
+	useXReadingStore,
+} from "@/features/staff/xreading/stores/useXReadingStore";
 
 const navLinks = [
 	{ label: "Dashboard", path: "/admin", icon: SquaresFourIcon },
@@ -32,6 +40,14 @@ function AdminHeader() {
 	const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
 	const handleLogout = async () => {
+		useXReadingStore.persist.clearStorage();
+		useXReadingStore.setState({ cashCount: emptyCashCountValues });
+		usePosStore.persist.clearStorage();
+		usePosStore.setState({
+			cart: [],
+			formValues: defaultPosFormValues,
+			lastOrder: null,
+		});
 		await authClient.signOut();
 		navigate({ to: "/" });
 	};

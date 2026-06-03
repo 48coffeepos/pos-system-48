@@ -12,6 +12,7 @@ interface ReconciliationPanelProps {
 	onExportSales: () => void;
 	onExportCashCount: () => void;
 	onExportRevenue: () => void;
+	onExportCups: () => void;
 }
 
 function SummaryCard({
@@ -41,6 +42,7 @@ export function ReconciliationPanel({
 	onExportSales,
 	onExportCashCount,
 	onExportRevenue,
+	onExportCups,
 }: ReconciliationPanelProps) {
 	const { overShort } = getOverShort(totalCashCounted, totals);
 	const { isMatched, isOver } = formatReconciliationStatus(overShort);
@@ -105,14 +107,24 @@ export function ReconciliationPanel({
 			/>
 
 			<div className="mt-auto flex flex-col gap-2">
-				<button
-					type="button"
-					onClick={onExportRevenue}
-					className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-(--deep-forest) bg-(--pale-yellow) px-3 py-3 text-sm font-medium text-(--deep-forest) transition-colors hover:bg-(--deep-forest) hover:text-(--pale-yellow)"
-				>
-					<Printer weight="bold" className="size-4" />
-					Print Revenue
-				</button>
+				<div className="grid grid-cols-2 gap-2">
+					<button
+						type="button"
+						onClick={onExportCups}
+						className="flex w-full items-center justify-center gap-2 rounded-xl border border-(--deep-forest) px-3 py-3 text-sm font-medium text-(--deep-forest) transition-colors hover:bg-(--pale-yellow)"
+					>
+						<Printer weight="bold" className="size-4" />
+						Print Cups Sales
+					</button>
+					<button
+						type="button"
+						onClick={onExportRevenue}
+						className="flex w-full items-center justify-center gap-2 rounded-xl bg-(--deep-forest) px-3 py-3 text-sm font-medium text-(--pale-yellow) transition-colors hover:bg-(--forest-green)"
+					>
+						<Printer weight="bold" className="size-4" />
+						Print Revenue
+					</button>
+				</div>
 
 				<div className="grid grid-cols-2 gap-2">
 					<button

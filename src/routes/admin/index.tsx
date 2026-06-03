@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AdminDashboardScreen } from "@/features/admin/dashboard/components/AdminDashboardScreen";
-import { getDashboardDataQueryOptions } from "@/features/admin/dashboard/queryOptions";
+import { getDashboardDataQueryOptions, getAvailableMonthsQueryOptions } from "@/features/admin/dashboard/queryOptions";
 import { getTodayOrdersQueryOptions } from "@/features/admin/orders/queryOptions";
 import {
   RoutePendingBoundary,
@@ -12,6 +12,7 @@ export const Route = createFileRoute("/admin/")({
     await Promise.all([
       queryClient.ensureQueryData(getDashboardDataQueryOptions),
       queryClient.ensureQueryData(getTodayOrdersQueryOptions),
+      queryClient.ensureQueryData(getAvailableMonthsQueryOptions),
     ]);
   },
   pendingComponent: RoutePendingBoundary,

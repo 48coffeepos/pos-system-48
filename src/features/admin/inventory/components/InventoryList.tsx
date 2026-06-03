@@ -117,31 +117,33 @@ function InventoryList({
 									</button>
 								</div>
 							)}
-							{/* Stock View Tab Toggle */}
-							<div className="flex gap-1.5 rounded-full bg-(--light-gray)/30 p-1">
-								<button
-									type="button"
-									onClick={() => onTabChange?.("admin")}
-									className={`rounded-full px-4 py-1.5 text-xs font-medium transition-colors ${
-										activeTab === "admin"
-											? "bg-(--deep-forest) text-(--pure-white)"
-											: "text-(--medium-gray) hover:bg-(--light-gray)/50"
-									}`}
-								>
-									Admin
-								</button>
-								<button
-									type="button"
-									onClick={() => onTabChange?.("storefront")}
-									className={`rounded-full px-4 py-1.5 text-xs font-medium transition-colors ${
-										activeTab === "storefront"
-											? "bg-(--deep-forest) text-(--pure-white)"
-											: "text-(--medium-gray) hover:bg-(--light-gray)/50"
-									}`}
-								>
-									Storefront
-								</button>
-							</div>
+							{/* Stock View Tab Toggle — only show when onTabChange is provided */}
+							{onTabChange && (
+								<div className="flex gap-1.5 rounded-full bg-(--light-gray)/30 p-1">
+									<button
+										type="button"
+										onClick={() => onTabChange("admin")}
+										className={`rounded-full px-4 py-1.5 text-xs font-medium transition-colors ${
+											activeTab === "admin"
+												? "bg-(--deep-forest) text-(--pure-white)"
+												: "text-(--medium-gray) hover:bg-(--light-gray)/50"
+										}`}
+									>
+										Admin
+									</button>
+									<button
+										type="button"
+										onClick={() => onTabChange("storefront")}
+										className={`rounded-full px-4 py-1.5 text-xs font-medium transition-colors ${
+											activeTab === "storefront"
+												? "bg-(--deep-forest) text-(--pure-white)"
+												: "text-(--medium-gray) hover:bg-(--light-gray)/50"
+										}`}
+									>
+										Storefront
+									</button>
+								</div>
+							)}
 						</div>
 					</div>
 

@@ -10,15 +10,17 @@ import type { CashCountValues } from "../stores/useXReadingStore";
 import type { DailyReconciliationTotals } from "../utils/reconciliation";
 import { getExpectedCashInDrawer, getOverShort } from "../utils/reconciliation";
 import type { Denomination } from "./CashCountPanel";
+import type { CupSale } from "../server/getCupSales";
 
 interface XReadingReceiptDialogProps {
   open: boolean;
   onClose: () => void;
-  mode: "sales" | "cashcount" | "revenue" | null;
+  mode: "sales" | "cashcount" | "revenue" | "cups" | null;
   staffName: string;
   totals: DailyReconciliationTotals;
   totalCashCounted: number;
   cashCount: CashCountValues;
+  cupSales: CupSale[];
 }
 
 const denominations: Denomination[] = [1000, 500, 200, 100, 50, 20, 10, 5, 1];
@@ -31,6 +33,7 @@ export function XReadingReceiptDialog({
   totals,
   totalCashCounted,
   cashCount,
+  cupSales,
 }: XReadingReceiptDialogProps) {
   const contentRef = useRef<HTMLDivElement>(null);
 
@@ -42,7 +45,7 @@ export function XReadingReceiptDialog({
 
   if (!mode) return null;
 
-  const { totalCashSales, totalGcashSales, totalCashOut, totalCashIn } = totals;
+  const { totalCashSales, totalGcashSales, totalGrabSales, totalCashOut, totalCashIn } = totals;
   const grossSales = totalCashSales + totalCashIn;
   const netSales = getExpectedCashInDrawer(totals);
   const totalRevenue = totalCashSales + totalGcashSales;
@@ -55,12 +58,10 @@ export function XReadingReceiptDialog({
     day: "2-digit",
     year: "numeric",
   });
-  const displayDateTime = targetDate.toLocaleString("en-US", {
-    month: "2-digit",
-    day: "2-digit",
-    year: "numeric",
+  const displayTime = targetDate.toLocaleString("en-US", {
     hour: "2-digit",
     minute: "2-digit",
+    hour12: true,
   });
 
   return (
@@ -105,8 +106,16 @@ export function XReadingReceiptDialog({
                 <span>{totalCashIn.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
-                <span>TOTAL SALES:</span>
+                <span>CASH SALES:</span>
                 <span>{totalCashSales.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>GCASH SALES:</span>
+                <span>{totalGcashSales.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>GRAB SALES:</span>
+                <span />
               </div>
             </div>
 
@@ -116,7 +125,7 @@ export function XReadingReceiptDialog({
                 <span>{grossSales.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
-                <span>TOTAL PICKUP:</span>
+                <span>TOTAL PICKUP / EXPENSES:</span>
                 <span>{totalCashOut.toFixed(2)}</span>
               </div>
             </div>
@@ -156,7 +165,7 @@ export function XReadingReceiptDialog({
                 <p>Iloilo City, 5000</p>
               </div>
               <h3 className="mt-0.5 text-lg font-bold uppercase">CASH COUNT</h3>
-              <p className="text-sm mt-2 font-bold">Date: {displayDateTime}</p>
+              <p className="text-sm mt-2 font-bold">Date: {displayDate}</p>
               <p className="text-sm font-bold">Cashier: {staffName}</p>
             </div>
 
@@ -215,25 +224,113 @@ export function XReadingReceiptDialog({
               </div>
               <div className="flex justify-between">
                 <span>Time :</span>
-                <span>{displayDateTime}</span>
+                <span>{displayTime}</span>
               </div>
             </div>
 
             <div className="mb-2 border-t border-dashed border-black pt-2 text-xs font-bold">
               <div className="flex justify-between mb-1">
-                <span>CASH</span>
+                <span>CASH:</span>
                 <span>₱{totalCashSales.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
-                <span>GCASH</span>
+                <span>GCASH:</span>
                 <span>₱{totalGcashSales.toFixed(2)}</span>
               </div>
             </div>
 
             <div className="border-t border-black pt-2 text-sm font-black">
               <div className="flex justify-between">
-                <span>TOTAL REVENUE</span>
+                <span>TOTAL REVENUE:</span>
                 <span>₱{totalRevenue.toFixed(2)}</span>
+              </div>
+            </div>
+
+            <div className="mt-8 border-t border-black pt-1 text-center">
+              <span className="text-xs font-bold tracking-widest uppercase">
+                Signature
+              </span>
+            </div>
+
+            <div className="mt-4 text-center">
+              <p className="text-xs font-black uppercase">{staffName}</p>
+              <p className="text-[9px] font-bold opacity-60">Staff&apos;s Name</p>
+            </div>
+          </div>
+        )}
+
+        {mode === "cups" && (
+          <div id="cups-sales-receipt">
+            <div className="mb-3 text-center">
+              <h2 className="text-2xl font-black tracking-tight">48 COFFEE</h2>
+              <div className="text-xs font-bold leading-tight my-0.5">
+                <p>Ledesma St., Iloilo City Proper,</p>
+                <p>Iloilo City, 5000</p>
+              </div>
+              <h3 className="mt-0.5 text-sm font-bold uppercase">CUPS SALES</h3>
+            </div>
+
+            <div className="mb-3 space-y-0.5 text-xs font-bold">
+              <div className="flex justify-between">
+                <span>Date :</span>
+                <span>{displayDate}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Time :</span>
+                <span>{displayTime}</span>
+              </div>
+            </div>
+
+            <div className="mb-2 border-t border-dashed border-black pt-2">
+              {cupSales
+                .filter((cup) => cup.total > 0)
+                .map((cup) => (
+                  <div
+                    key={cup.name}
+                    className="mb-2 text-xs leading-tight font-bold"
+                  >
+                    <div className="flex justify-between font-bold uppercase">
+                      <span>{cup.name}</span>
+                      <span>{cup.total} cups</span>
+                    </div>
+                    <div className="mt-0.5 flex gap-2 text-[10px] opacity-90">
+                      <span>CASH : {cup.byMethod.CASH ?? 0}</span>
+                      <span>GCASH : {cup.byMethod.GCASH ?? 0}</span>
+                      <span>GRAB : {cup.byMethod.GRAB ?? 0}</span>
+                    </div>
+                  </div>
+                ))}
+            </div>
+
+            <div className="border-t border-dashed border-black pt-2 text-xs font-bold">
+              <div className="mb-0.5 flex justify-between">
+                <span>TOTAL CUPS SOLD :</span>
+                <span>
+                  {cupSales.reduce((sum, c) => sum + c.total, 0)} cups
+                </span>
+              </div>
+              <div className="flex gap-2 text-[10px]">
+                <span>
+                  CASH :{" "}
+                  {cupSales.reduce(
+                    (sum, c) => sum + (c.byMethod.CASH ?? 0),
+                    0,
+                  )}
+                </span>
+                <span>
+                  GCASH :{" "}
+                  {cupSales.reduce(
+                    (sum, c) => sum + (c.byMethod.GCASH ?? 0),
+                    0,
+                  )}
+                </span>
+                <span>
+                  GRAB :{" "}
+                  {cupSales.reduce(
+                    (sum, c) => sum + (c.byMethod.GRAB ?? 0),
+                    0,
+                  )}
+                </span>
               </div>
             </div>
 
