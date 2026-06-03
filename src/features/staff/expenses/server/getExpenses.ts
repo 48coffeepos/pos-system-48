@@ -23,6 +23,7 @@ export const getExpenses = createServerFn({ method: "GET" })
     const expenses = await prisma.expense.findMany({
       where: {
         timestamp: { gte: start, lte: end },
+        NOT: { description: { startsWith: "Inventory:" } },
       },
       include: {
         staff: {

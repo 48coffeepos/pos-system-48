@@ -43,8 +43,8 @@ export const addStockMutationOptions = mutationOptions({
 		});
 		const description =
 			variables.transactionType === "add"
-				? `Added ${variables.quantity} to admin stock of ${data.name}.`
-				: `Transferred ${variables.quantity} from admin to storefront stock.`;
+				? `Added ${variables.quantity} pack(s) to admin stock of ${data.name}.`
+				: `Transferred ${variables.quantity} pack(s) to storefront (${variables.quantity * data.piecesPerPack} pcs).`;
 		toast.success("Stock updated", { description });
 	},
 	onError: (error) => {

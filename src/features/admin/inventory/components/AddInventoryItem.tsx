@@ -19,6 +19,9 @@ export interface InventoryItem {
   stock: number;
   adminStock: number;
   type: "STANDALONE" | "CUP";
+  price: number;
+  piecesPerPack: number;
+  isSellable: boolean;
 }
 
 interface AddInventoryItemProps {
@@ -55,6 +58,9 @@ function AddInventoryItem({ items, editingItem, onCancelEdit, activeTab = "store
   const [quantity, setQuantity] = useState<number | "">("");
   const [transactionType, setTransactionType] = useState<"add" | "transfer">("add");
   const [newItemQuantity, setNewItemQuantity] = useState<number>(0);
+  const [itemPrice, setItemPrice] = useState<number>(0);
+  const [piecesPerPack, setPiecesPerPack] = useState<number>(1);
+  const [isSellable, setIsSellable] = useState<boolean>(true);
   const [buttonPosition, setButtonPosition] = useState<{ top: number; left: number; width: number } | null>(null);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -115,6 +121,9 @@ function AddInventoryItem({ items, editingItem, onCancelEdit, activeTab = "store
       setItemName(editingItem.name);
       setItemType(editingItem.type);
       setNewItemQuantity(activeTab === "admin" ? editingItem.adminStock : editingItem.stock);
+      setItemPrice(editingItem.price);
+      setPiecesPerPack(editingItem.piecesPerPack);
+      setIsSellable(editingItem.isSellable);
     }
   }, [editingItem, activeTab]);
 
@@ -132,6 +141,9 @@ function AddInventoryItem({ items, editingItem, onCancelEdit, activeTab = "store
     setItemName("");
     setItemType("STANDALONE");
     setNewItemQuantity(0);
+    setItemPrice(0);
+    setPiecesPerPack(1);
+    setIsSellable(true);
     setIsOpen(false);
   };
 
@@ -151,6 +163,9 @@ function AddInventoryItem({ items, editingItem, onCancelEdit, activeTab = "store
     setQuantity("");
     setTransactionType("add");
     setNewItemQuantity(0);
+    setItemPrice(0);
+    setPiecesPerPack(1);
+    setIsSellable(true);
     onCancelEdit?.();
   };
 
@@ -175,6 +190,9 @@ function AddInventoryItem({ items, editingItem, onCancelEdit, activeTab = "store
         name: itemName.trim(),
         stock: newItemQuantity,
         type: itemType,
+        price: itemPrice,
+        piecesPerPack,
+        isSellable,
       });
     } else if (selectionState === "existing" && selectedItem && quantity !== "") {
       addStockMutation.mutate({
@@ -190,6 +208,9 @@ function AddInventoryItem({ items, editingItem, onCancelEdit, activeTab = "store
           ? { adminStock: newItemQuantity }
           : { stock: newItemQuantity }),
         type: itemType,
+        price: itemPrice,
+        piecesPerPack,
+        isSellable,
       });
     }
   };
@@ -401,6 +422,78 @@ function AddInventoryItem({ items, editingItem, onCancelEdit, activeTab = "store
               </select>
             </div>
             <div className="space-y-1.5">
+              <label className="text-sm font-medium text-(--dark-gray)">
+                Price per Pack (₱)
+              </label>
+              <Input
+                type="text"
+                inputMode="decimal"
+                value={itemPrice || ""}
+                onChange={(e) => {
+                  let val = e.target.value.replace(/[^0-9.]/g, "");
+                  const parts = val.split(".");
+                  if (parts.length > 2) val = parts[0] + "." + parts.slice(1).join("");
+                  if (parts.length === 2 && parts[1].length > 2) val = parts[0] + "." + parts[1].slice(0, 2);
+                  setItemPrice(val === "" ? 0 : Number(val));
+                }}
+                placeholder="0.00"
+                className="h-10 w-full rounded-xl border-(--light-gray) px-3 text-sm"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-(--dark-gray)">
+                Sellable in POS
+              </label>
+              <div className="flex gap-1.5 rounded-xl border border-(--light-gray) p-1">
+                <button
+                  type="button"
+                  onClick={() => setIsSellable(true)}
+                  className={`flex flex-1 items-center justify-center rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                    isSellable
+                      ? "bg-(--deep-forest) text-(--pure-white)"
+                      : "text-(--medium-gray) hover:bg-(--light-gray)/50"
+                  }`}
+                >
+                  Yes
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsSellable(false)}
+                  className={`flex flex-1 items-center justify-center rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                    !isSellable
+                      ? "bg-(--deep-forest) text-(--pure-white)"
+                      : "text-(--medium-gray) hover:bg-(--light-gray)/50"
+                  }`}
+                >
+                  No
+                </button>
+              </div>
+              <p className="text-xs text-(--medium-gray)">
+                Non-sellable items are expensed immediately and won&apos;t appear in the storefront.
+              </p>
+            </div>
+            {isSellable && (
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-(--dark-gray)">
+                  Pieces per Pack
+                </label>
+                <Input
+                  type="text"
+                  inputMode="numeric"
+                  value={piecesPerPack || ""}
+                  onChange={(e) => {
+                    let val = e.target.value.replace(/[^0-9]/g, "");
+                    setPiecesPerPack(val === "" ? 1 : Number(val));
+                  }}
+                  placeholder="1"
+                  className="h-10 w-full rounded-xl border-(--light-gray) px-3 text-sm"
+                />
+                <p className="text-xs text-(--medium-gray)">
+                  How many pieces in one pack. Set to 1 for single items.
+                </p>
+              </div>
+            )}
+            <div className="space-y-1.5">
               <div className="flex items-center justify-between gap-3">
                 <label className="text-sm font-medium text-(--dark-gray)">
                   Quantity
@@ -537,6 +630,72 @@ function AddInventoryItem({ items, editingItem, onCancelEdit, activeTab = "store
                 ))}
               </select>
             </div>
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-(--dark-gray)">
+                Price per Pack (₱)
+              </label>
+              <Input
+                type="text"
+                inputMode="decimal"
+                value={itemPrice || ""}
+                onChange={(e) => {
+                  let val = e.target.value.replace(/[^0-9.]/g, "");
+                  const parts = val.split(".");
+                  if (parts.length > 2) val = parts[0] + "." + parts.slice(1).join("");
+                  if (parts.length === 2 && parts[1].length > 2) val = parts[0] + "." + parts[1].slice(0, 2);
+                  setItemPrice(val === "" ? 0 : Number(val));
+                }}
+                placeholder="0.00"
+                className="h-10 w-full rounded-xl border-(--light-gray) px-3 text-sm"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-(--dark-gray)">
+                Sellable in POS
+              </label>
+              <div className="flex gap-1.5 rounded-xl border border-(--light-gray) p-1">
+                <button
+                  type="button"
+                  onClick={() => setIsSellable(true)}
+                  className={`flex flex-1 items-center justify-center rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                    isSellable
+                      ? "bg-(--deep-forest) text-(--pure-white)"
+                      : "text-(--medium-gray) hover:bg-(--light-gray)/50"
+                  }`}
+                >
+                  Yes
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsSellable(false)}
+                  className={`flex flex-1 items-center justify-center rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                    !isSellable
+                      ? "bg-(--deep-forest) text-(--pure-white)"
+                      : "text-(--medium-gray) hover:bg-(--light-gray)/50"
+                  }`}
+                >
+                  No
+                </button>
+              </div>
+            </div>
+            {isSellable && (
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-(--dark-gray)">
+                  Pieces per Pack
+                </label>
+                <Input
+                  type="text"
+                  inputMode="numeric"
+                  value={piecesPerPack || ""}
+                  onChange={(e) => {
+                    let val = e.target.value.replace(/[^0-9]/g, "");
+                    setPiecesPerPack(val === "" ? 1 : Number(val));
+                  }}
+                  placeholder="1"
+                  className="h-10 w-full rounded-xl border-(--light-gray) px-3 text-sm"
+                />
+              </div>
+            )}
             <div className="space-y-1.5">
               <div className="flex items-center justify-between gap-3">
                 <label className="text-sm font-medium text-(--dark-gray)">

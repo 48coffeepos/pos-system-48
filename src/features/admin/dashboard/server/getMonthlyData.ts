@@ -29,7 +29,7 @@ export const getMonthlyData = createServerFn({ method: "GET" })
       }),
       prisma.expense.findMany({
         where: { timestamp: { gte: start, lt: end } },
-        select: { type: true, amount: true },
+        select: { type: true, amount: true, description: true },
       }),
     ]);
 
@@ -51,6 +51,7 @@ export const getMonthlyData = createServerFn({ method: "GET" })
 
     let totalCashOut = 0;
     let totalCashIn = 0;
+    let inventoryExpenses = 0;
     let cashOutCount = 0;
 
     for (const exp of expenses) {
@@ -58,6 +59,9 @@ export const getMonthlyData = createServerFn({ method: "GET" })
       if (exp.type === "CASH_OUT") {
         totalCashOut += amount;
         cashOutCount++;
+        if (exp.description?.startsWith("Inventory:")) {
+          inventoryExpenses += amount;
+        }
       } else if (exp.type === "CASH_IN") {
         totalCashIn += amount;
       }
@@ -85,6 +89,8 @@ export const getMonthlyData = createServerFn({ method: "GET" })
       totalCashOut,
       totalCashIn,
       totalExpenses: totalCashOut,
+      inventoryExpenses,
+      staffExpenses: totalCashOut - inventoryExpenses,
       monthLabel: monthName,
       periodStart: formatDate(start),
       periodEnd: formatDate(lastDay),

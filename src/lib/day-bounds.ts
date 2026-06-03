@@ -57,3 +57,30 @@ export function getTimeframeBounds(
 export function getTodayBounds(tz?: string) {
   return getTimeframeBounds("today", tz);
 }
+
+export function getMonthBounds(
+  year: number,
+  month: number,
+  tz: string = process.env.TIMEZONE ?? DEFAULT_TIMEZONE,
+) {
+  const offset = getUtcOffset(tz, new Date());
+  const start = new Date(`${year}-${String(month).padStart(2, "0")}-01T00:00:00${offset}`);
+  const lastDay = new Date(year, month, 0).getDate();
+  const end = new Date(
+    `${year}-${String(month).padStart(2, "0")}-${String(lastDay).padStart(2, "0")}T23:59:59.999${offset}`,
+  );
+  return { start, end };
+}
+
+export function getCurrentMonthBounds(
+  tz: string = process.env.TIMEZONE ?? DEFAULT_TIMEZONE,
+) {
+  const now = new Date();
+  const year = Number(
+    new Intl.DateTimeFormat("en-US", { timeZone: tz, year: "numeric" }).format(now),
+  );
+  const month = Number(
+    new Intl.DateTimeFormat("en-US", { timeZone: tz, month: "numeric" }).format(now),
+  );
+  return getMonthBounds(year, month, tz);
+}

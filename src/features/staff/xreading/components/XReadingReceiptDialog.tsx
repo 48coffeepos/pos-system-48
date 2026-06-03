@@ -45,7 +45,7 @@ export function XReadingReceiptDialog({
 
   if (!mode) return null;
 
-  const { totalCashSales, totalGcashSales, totalGrabSales, totalCashOut, totalCashIn } = totals;
+  const { totalCashSales, totalGcashSales, totalGrabSales, totalCashOut, totalCashIn, totalInventoryExpenses } = totals;
   const grossSales = totalCashSales + totalCashIn;
   const netSales = getExpectedCashInDrawer(totals);
   const totalRevenue = totalCashSales + totalGcashSales;
@@ -119,16 +119,22 @@ export function XReadingReceiptDialog({
               </div>
             </div>
 
-            <div className="mt-4 border-t border-dashed border-black pt-4 text-sm font-bold space-y-1">
-              <div className="flex justify-between">
-                <span>GROSS SALES:</span>
-                <span>{grossSales.toFixed(2)}</span>
+              <div className="mt-4 border-t border-dashed border-black pt-4 text-sm font-bold space-y-1">
+                {totalInventoryExpenses > 0 && (
+                  <div className="flex justify-between text-amber-700">
+                    <span>INVENTORY EXPENSES:</span>
+                    <span>{totalInventoryExpenses.toFixed(2)}</span>
+                  </div>
+                )}
+                <div className="flex justify-between">
+                  <span>GROSS SALES:</span>
+                  <span>{grossSales.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>TOTAL PICKUP / EXPENSES:</span>
+                  <span>{totalCashOut.toFixed(2)}</span>
+                </div>
               </div>
-              <div className="flex justify-between">
-                <span>TOTAL PICKUP / EXPENSES:</span>
-                <span>{totalCashOut.toFixed(2)}</span>
-              </div>
-            </div>
 
             <div className="mt-4 border-t-2 border-dashed border-black pt-4 text-sm font-bold space-y-1">
               <div className="flex justify-between">

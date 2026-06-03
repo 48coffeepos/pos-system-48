@@ -25,6 +25,9 @@ import type { InventoryItem } from "./AddInventoryItem";
 interface ExtendedInventoryItem extends InventoryItem {
 	yesterdayStock?: number;
 	adminStock: number;
+	price: number;
+	piecesPerPack: number;
+	isSellable: boolean;
 }
 
 function InventoryList({
@@ -54,9 +57,14 @@ function InventoryList({
 		[items],
 	);
 
+	const visibleItems = useMemo(
+		() => (activeTab === "storefront" ? items.filter((i) => i.isSellable) : items),
+		[activeTab, items],
+	);
+
 	const filtered = useMemo(
-		() => (search ? fuse.search(search).map((r) => r.item) : items),
-		[search, fuse, items],
+		() => (search ? fuse.search(search).map((r) => r.item) : visibleItems),
+		[search, fuse, visibleItems],
 	);
 
 	const deleteMutation = useMutation({
@@ -172,6 +180,9 @@ function InventoryList({
 									<th className="p-3 text-center">
 										{activeTab === "admin" ? "Admin Stock" : "Quantity"}
 									</th>
+									{activeTab === "admin" && (
+										<th className="p-3 text-center">Price</th>
+									)}
 									{!hideActions && (
 										<th className="rounded-r-lg p-3 pr-4 text-right">Actions</th>
 									)}
@@ -201,13 +212,32 @@ function InventoryList({
 											{/* Column 2: Stock value based on active tab */}
 											<td className="p-4 text-center font-bold text-sm text-(--deep-forest)">
 												{activeTab === "admin"
-													? (item.adminStock ?? 0)
+													? `${item.adminStock ?? 0} pk(s)`
 													: timeframe === "today"
-														? item.stock
-														: (item.yesterdayStock ?? 0)}
+														? `${item.stock} pc(s)`
+														: `${item.yesterdayStock ?? 0} pc(s)`}
 											</td>
 
-											{/* Column 3: Row Mutations (Edit Profile/Remove) */}
+											{/* Column 3: Price per pack (admin tab only) */}
+											{activeTab === "admin" && (
+												<td className="p-4 text-center text-sm text-(--deep-forest)">
+													{item.price > 0 ? (
+														<>
+															<span className="font-semibold">₱{item.price.toFixed(2)}</span>
+															{!item.isSellable && (
+																<span className="ml-1 text-[10px] text-(--medium-gray)">(Supplies)</span>
+															)}
+															{item.isSellable && item.piecesPerPack > 1 && (
+																<span className="ml-1 text-[10px] text-(--medium-gray)">/ {item.piecesPerPack} pcs</span>
+															)}
+														</>
+													) : (
+														<span className="text-(--medium-gray)">—</span>
+													)}
+												</td>
+											)}
+
+											{/* Column 4: Row Mutations (Edit Profile/Remove) */}
 											{!hideActions && (
 												<td className="p-4 pr-4 text-right">
 													<div className="flex items-center justify-end gap-3 text-(--medium-gray)">
@@ -235,7 +265,7 @@ function InventoryList({
 								) : (
 									<tr>
 										<td
-											colSpan={hideActions ? 2 : 3}
+											colSpan={hideActions ? (activeTab === "admin" ? 3 : 2) : (activeTab === "admin" ? 4 : 3)}
 											className="h-24 text-center text-sm text-(--medium-gray)"
 										>
 											No items match your search.

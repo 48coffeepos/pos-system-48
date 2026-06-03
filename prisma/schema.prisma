@@ -93,6 +93,9 @@ model Inventory {
   yesterday_stock Int?
   type            Inventory_Type
   admin_stock     Int?            @default(0)
+  price           Decimal         @default(0) @db.Decimal(10, 2)
+  pieces_per_pack Int             @default(1)
+  is_sellable     Boolean         @default(true)
   menu_items      MenuInventory[]
 
   @@map("inventory")

@@ -13,7 +13,7 @@ export const addStockInput = z.object({
 export const addStock = createServerFn({ method: "POST" })
   .middleware([adminAuthMiddleware()])
   .inputValidator(addStockInput)
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
     const existing = await prisma.inventory.findUnique({
       where: { inventory_id: data.itemId },
     });
@@ -22,30 +22,62 @@ export const addStock = createServerFn({ method: "POST" })
       throw new Error("Inventory item not found.");
     }
 
-    if (data.transactionType === "transfer") {
-      const currentAdminStock = existing.admin_stock ?? 0;
-
-      // if (data.quantity > currentAdminStock) {
-      //   throw new Error("Transfer quantity exceeds available admin stock.");
-      // }
-
+    if (data.transactionType === "add") {
       const updated = await prisma.inventory.update({
         where: { inventory_id: data.itemId },
         data: {
-          stock: existing.stock + data.quantity,
-          admin_stock: currentAdminStock - data.quantity,
+          admin_stock: (existing.admin_stock ?? 0) + data.quantity,
         },
       });
 
-      return updated;
+      return {
+        id: updated.inventory_id,
+        name: updated.name,
+        stock: updated.stock,
+        adminStock: updated.admin_stock ?? 0,
+        type: updated.type,
+        price: Number(updated.price),
+        piecesPerPack: updated.pieces_per_pack,
+        isSellable: updated.is_sellable,
+      };
     }
+
+    // transfer
+    const currentAdminStock = existing.admin_stock ?? 0;
+    const piecesPerPack = existing.pieces_per_pack;
+
+    const stockIncrease = existing.is_sellable
+      ? data.quantity * piecesPerPack
+      : 0;
 
     const updated = await prisma.inventory.update({
       where: { inventory_id: data.itemId },
       data: {
-        admin_stock: (existing.admin_stock ?? 0) + data.quantity,
+        stock: existing.stock + stockIncrease,
+        admin_stock: currentAdminStock - data.quantity,
       },
     });
 
-    return updated;
+    const price = Number(existing.price);
+    if (price > 0) {
+      await prisma.expense.create({
+        data: {
+          staff_id: context.session.user.id,
+          type: "CASH_OUT",
+          description: `Inventory: ${existing.name} x${data.quantity} pack(s)`,
+          amount: data.quantity * price,
+        },
+      });
+    }
+
+    return {
+      id: updated.inventory_id,
+      name: updated.name,
+      stock: updated.stock,
+      adminStock: updated.admin_stock ?? 0,
+      type: updated.type,
+      price: Number(updated.price),
+      piecesPerPack: updated.pieces_per_pack,
+      isSellable: updated.is_sellable,
+    };
   });

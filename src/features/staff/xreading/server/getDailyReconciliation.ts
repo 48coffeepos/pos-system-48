@@ -34,7 +34,7 @@ export const getDailyReconciliation = createServerFn({ method: "GET" })
         where: {
           timestamp: { gte: start, lte: end },
         },
-        select: { amount: true, type: true },
+        select: { amount: true, type: true, description: true },
       }),
     ]);
 
@@ -55,9 +55,14 @@ export const getDailyReconciliation = createServerFn({ method: "GET" })
 
     let totalCashOut = 0;
     let totalCashIn = 0;
+    let totalInventoryExpenses = 0;
     for (const exp of expenses) {
       const amount = Number(exp.amount);
-      if (exp.type === "CASH_OUT") {
+      const isInventory = exp.description?.startsWith("Inventory:");
+      if (isInventory) {
+        totalInventoryExpenses += amount;
+      }
+      if (exp.type === "CASH_OUT" && !isInventory) {
         totalCashOut += amount;
       } else if (exp.type === "CASH_IN") {
         totalCashIn += amount;
@@ -70,5 +75,6 @@ export const getDailyReconciliation = createServerFn({ method: "GET" })
       totalGrabSales,
       totalCashOut,
       totalCashIn,
+      totalInventoryExpenses,
     };
   });

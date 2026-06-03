@@ -18,6 +18,8 @@ interface DashboardReceiptDialogProps {
     totalCashOut: number;
     totalCashIn: number;
     totalExpenses: number;
+    inventoryExpenses: number;
+    staffExpenses: number;
     monthLabel: string;
     periodStart: string;
     periodEnd: string;
@@ -119,8 +121,20 @@ export function DashboardReceiptDialog({
                 </div>
               </div>
 
-              <div className="mt-2 border-t border-dashed border-black pt-2 text-xs font-bold">
-                <div className="flex justify-between mt-0.5">
+              <div className="mt-2 border-t border-dashed border-black pt-2 text-xs font-bold space-y-1">
+                {monthlyData.staffExpenses > 0 && (
+                  <div className="flex justify-between font-medium opacity-80">
+                    <span>STAFF EXPENSES:</span>
+                    <span>₱{formatPeso(monthlyData.staffExpenses)}</span>
+                  </div>
+                )}
+                {monthlyData.inventoryExpenses > 0 && (
+                  <div className="flex justify-between font-medium opacity-80">
+                    <span>INVENTORY EXPENSES:</span>
+                    <span>₱{formatPeso(monthlyData.inventoryExpenses)}</span>
+                  </div>
+                )}
+                <div className="flex justify-between mt-1 pt-1 border-t border-dotted border-black">
                   <span>TOTAL EXPENSES:</span>
                   <span>₱{formatPeso(monthlyData.totalCashOut)}</span>
                 </div>
