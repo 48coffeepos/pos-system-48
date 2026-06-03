@@ -279,6 +279,10 @@ export function XReadingReceiptDialog({
                 <span>Time :</span>
                 <span>{displayTime}</span>
               </div>
+              <div className="flex justify-between">
+                <span>Cashier :</span>
+                <span>{staffName}</span>
+              </div>
             </div>
 
             <div className="mb-2 border-t border-dashed border-black pt-2">
