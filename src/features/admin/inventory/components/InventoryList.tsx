@@ -1,7 +1,9 @@
 import {
+	ClockCounterClockwiseIcon,
 	MagnifyingGlassIcon,
 	NotePencilIcon,
 	PackageIcon,
+	PlusCircleIcon,
 	TrashIcon,
 	WarningCircleIcon,
 } from "@phosphor-icons/react";
@@ -20,6 +22,7 @@ import {
 	AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { deleteInventoryItemMutationOptions } from "../mutationOptions";
+import { StorefrontAdd } from "./storefront/StorefrontAdd";
 import type { InventoryItem } from "./AddInventoryItem";
 
 interface ExtendedInventoryItem extends InventoryItem {
@@ -27,22 +30,39 @@ interface ExtendedInventoryItem extends InventoryItem {
 	adminStock: number;
 }
 
+interface InventoryLogEntry {
+	id: string;
+	dateTime: Date | null;
+	inventoryItem: string;
+	logBy: string;
+	type: "IN" | "OUT" | "EDIT";
+	location: "STOCKROOM" | "STOREFRONT";
+	quantity: number | null;
+	expense: number | null;
+}
+
+type Tab = "storefront" | "admin" | "logs";
+
 function InventoryList({
 	items = [],
+	inventoryLogs = [],
 	onEdit,
 	hideActions = false,
 	activeTab = "admin",
 	onTabChange,
 }: {
 	items?: ExtendedInventoryItem[];
+	inventoryLogs?: InventoryLogEntry[];
 	onEdit?: (item: ExtendedInventoryItem) => void;
 	hideActions?: boolean;
-	activeTab?: "storefront" | "admin";
-	onTabChange?: (tab: "storefront" | "admin") => void;
+	activeTab?: Tab;
+	onTabChange?: (tab: Tab) => void;
 }) {
 	const [timeframe, setTimeframe] = useState<"today" | "yesterday">("today");
 	const [search, setSearch] = useState("");
 	const [deletingItem, setDeletingItem] =
+		useState<ExtendedInventoryItem | null>(null);
+	const [addingItem, setAddingItem] =
 		useState<ExtendedInventoryItem | null>(null);
 
 	const fuse = useMemo(
@@ -59,6 +79,23 @@ function InventoryList({
 		[search, fuse, items],
 	);
 
+	const logsFuse = useMemo(
+		() =>
+			new Fuse(inventoryLogs, {
+				keys: ["inventoryItem", "logBy", "type", "location"],
+				threshold: 0.3,
+			}),
+		[inventoryLogs],
+	);
+
+	const filteredLogs = useMemo(
+		() =>
+			search
+				? logsFuse.search(search).map((r) => r.item)
+				: inventoryLogs,
+		[search, logsFuse, inventoryLogs],
+	);
+
 	const deleteMutation = useMutation({
 		...deleteInventoryItemMutationOptions,
 		onSettled: () => {
@@ -66,14 +103,35 @@ function InventoryList({
 		},
 	});
 
+	const isLogsTab = activeTab === "logs";
+	const currentItems = isLogsTab ? filteredLogs : filtered;
+	const emptyItems = isLogsTab ? inventoryLogs : items;
+	const showEmptyState = emptyItems.length === 0;
+
+	const typeBadge = (type: string) => {
+		const styles: Record<string, string> = {
+			IN: "bg-green-100 text-green-700",
+			OUT: "bg-red-100 text-red-700",
+			EDIT: "bg-blue-100 text-blue-700",
+		};
+		return styles[type] ?? "bg-gray-100 text-gray-700";
+	};
+
+	const locationBadge = (location: string) => {
+		const styles: Record<string, string> = {
+			STOCKROOM: "bg-amber-100 text-amber-700",
+			STOREFRONT: "bg-purple-100 text-purple-700",
+		};
+		return styles[location] ?? "bg-gray-100 text-gray-700";
+	};
+
 	return (
 		<div>
-			{items.length === 0 ? (
-				/* Empty State Fallback Dropzone */
+			{showEmptyState ? (
 				<div className="rounded-2xl border border-(--light-gray) bg-(--pure-white) p-8 text-center">
 					<PackageIcon className="mx-auto size-12 text-(--medium-gray)/40" />
 					<h2 className="mt-4 text-lg font-semibold text-(--deep-forest)">
-						No inventory items yet
+						{isLogsTab ? "No inventory logs yet" : "No inventory items yet"}
 					</h2>
 				</div>
 			) : (
@@ -82,10 +140,12 @@ function InventoryList({
 					<div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
 						<div>
 							<h2 className="text-xl font-bold text-(--deep-forest)">
-								Inventory items
+								{isLogsTab ? "Inventory Logs" : "Inventory items"}
 							</h2>
 							<p className="text-xs text-(--medium-gray) mt-0.5">
-								Track item quantity
+								{isLogsTab
+									? "Track stock movements and changes"
+									: "Track item quantity"}
 							</p>
 						</div>
 
@@ -117,7 +177,7 @@ function InventoryList({
 									</button>
 								</div>
 							)}
-							{/* Stock View Tab Toggle — only show when onTabChange is provided */}
+							{/* Tab Toggle — only show when onTabChange is provided */}
 							{onTabChange && (
 								<div className="flex gap-1.5 rounded-full bg-(--light-gray)/30 p-1">
 									<button
@@ -142,6 +202,18 @@ function InventoryList({
 									>
 										Storefront
 									</button>
+									<button
+										type="button"
+										onClick={() => onTabChange("logs")}
+										className={`rounded-full px-4 py-1.5 text-xs font-medium transition-colors ${
+											activeTab === "logs"
+												? "bg-(--deep-forest) text-(--pure-white)"
+												: "text-(--medium-gray) hover:bg-(--light-gray)/50"
+										}`}
+									>
+										<ClockCounterClockwiseIcon weight="bold" className="mr-1 inline-block size-3.5" />
+										Logs
+									</button>
 								</div>
 							)}
 						</div>
@@ -157,85 +229,148 @@ function InventoryList({
 							type="text"
 							value={search}
 							onChange={(e) => setSearch(e.target.value)}
-							placeholder="Search inventory items..."
+							placeholder={isLogsTab ? "Search by item, user, type, location..." : "Search inventory items..."}
 							className="h-10 w-full rounded-xl border pl-10 pr-4 text-sm outline-none transition-all"
 							style={{ background: "white", borderColor: "var(--light-gray)" }}
 						/>
 					</div>
 
-					{/* Structured Responsive Table */}
+					{/* Table */}
 					<div className="w-full overflow-x-auto">
 						<table className="w-full border-collapse text-left">
 							<thead>
 								<tr className="border-b border-(--light-gray)/40 bg-(--soft-peach)/20 text-[11px] font-bold tracking-wider text-(--medium-gray)/80 uppercase">
-									<th className="rounded-l-lg p-3 pl-4">Item</th>
-									<th className="p-3 text-center">
-										{activeTab === "admin" ? "Admin Stock" : "Quantity"}
-									</th>
-									{!hideActions && (
-										<th className="rounded-r-lg p-3 pr-4 text-right">Actions</th>
+									{isLogsTab ? (
+										<>
+											<th className="rounded-l-lg p-3 pl-4">Date & Time</th>
+											<th className="p-3">Item</th>
+											<th className="p-3">Type</th>
+											<th className="p-3">Location</th>
+											<th className="p-3">Quantity</th>
+											<th className="p-3">Logged By</th>
+											<th className="rounded-r-lg p-3 pr-4">Expense</th>
+										</>
+									) : (
+										<>
+											<th className="rounded-l-lg p-3 pl-4">Item</th>
+											<th className="p-3 text-center">
+												{activeTab === "admin" ? "Admin Stock" : "Quantity"}
+											</th>
+											{!hideActions && (
+												<th className="rounded-r-lg p-3 pr-4 text-right">Actions</th>
+											)}
+										</>
 									)}
 								</tr>
 							</thead>
 							<tbody className="divide-y divide-(--light-gray)/40">
-								{filtered.length > 0 ? (
-									filtered.map((item) => (
-										<tr
-											key={item.id}
-											className="group hover:bg-(--light-gray)/10"
-										>
-											{/* Column 1: Metadata Badge & Labels */}
-											<td className="p-4 pl-4">
-												<div className="flex items-center gap-3">
-													<div>
-														<p className="font-semibold text-sm text-(--deep-forest)">
-															{item.name}
-														</p>
-														<span className="inline-block rounded px-1.5 py-0.5 text-[10px] font-medium mt-0.5 bg-amber-100 text-amber-800">
-															{item.type === "CUP" ? "Cup Size" : "Standalone"}
-														</span>
-													</div>
-												</div>
-											</td>
-
-											{/* Column 2: Stock value based on active tab */}
-											<td className="p-4 text-center font-bold text-sm text-(--deep-forest)">
-												{activeTab === "admin"
-													? (item.adminStock ?? 0)
-													: timeframe === "today"
-														? item.stock
-														: (item.yesterdayStock ?? 0)}
-											</td>
-
-											{/* Column 3: Row Mutations (Edit Profile/Remove) */}
-											{!hideActions && (
-												<td className="p-4 pr-4 text-right">
-													<div className="flex items-center justify-end gap-3 text-(--medium-gray)">
-														<button
-															type="button"
-															onClick={() => onEdit?.(item)}
-															className="p-1 hover:text-(--deep-forest) transition-colors"
-															aria-label="Edit item"
-														>
-															<NotePencilIcon size={18} />
-														</button>
-														<button
-															type="button"
-															onClick={() => setDeletingItem(item)}
-															className="p-1 hover:text-red-600 transition-colors"
-															aria-label="Delete item record"
-														>
-															<TrashIcon size={18} />
-														</button>
+								{currentItems.length > 0 ? (
+									isLogsTab ? (
+										(filteredLogs as InventoryLogEntry[]).map((log) => (
+											<tr
+												key={log.id}
+												className="group hover:bg-(--light-gray)/10"
+											>
+												<td className="p-4 pl-4 text-sm text-(--dark-gray) whitespace-nowrap">
+													{log.dateTime
+														? new Date(log.dateTime).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })
+														: "—"}
+												</td>
+												<td className="p-4 text-sm font-semibold text-(--deep-forest)">
+													{log.inventoryItem}
+												</td>
+												<td className="p-4">
+													<span className={`inline-block rounded px-2 py-0.5 text-[11px] font-semibold ${typeBadge(log.type)}`}>
+														{log.type}
+													</span>
+												</td>
+												<td className="p-4">
+													<span className={`inline-block rounded px-2 py-0.5 text-[11px] font-semibold ${locationBadge(log.location)}`}>
+														{log.location === "STOCKROOM" ? "Stockroom" : "Storefront"}
+													</span>
+												</td>
+												<td className="p-4 text-sm font-bold text-(--deep-forest)">
+													{log.quantity ?? "—"}
+												</td>
+												<td className="p-4 text-sm text-(--dark-gray)">
+													{log.logBy}
+												</td>
+												<td className="p-4 pr-4 text-sm text-(--dark-gray)">
+													{log.expense != null
+														? `₱${Number(log.expense).toFixed(2)}`
+														: "—"}
+												</td>
+											</tr>
+										))
+									) : (
+										(filtered as ExtendedInventoryItem[]).map((item) => (
+											<tr
+												key={item.id}
+												className="group hover:bg-(--light-gray)/10"
+											>
+												<td className="p-4 pl-4">
+													<div className="flex items-center gap-3">
+														<div>
+															<p className="font-semibold text-sm text-(--deep-forest)">
+																{item.name}
+															</p>
+															<span className="inline-block rounded px-1.5 py-0.5 text-[10px] font-medium mt-0.5 bg-amber-100 text-amber-800">
+																{item.type === "CUP" ? "Cup Size" : "Standalone"}
+															</span>
+														</div>
 													</div>
 												</td>
-											)}
-										</tr>
-									))
+
+												<td className="p-4 text-center font-bold text-sm text-(--deep-forest)">
+													{activeTab === "admin"
+														? (item.adminStock ?? 0)
+														: timeframe === "today"
+															? item.stock
+															: (item.yesterdayStock ?? 0)}
+												</td>
+
+												{!hideActions && (
+													<td className="p-4 pr-4 text-right">
+														<div className="flex items-center justify-end gap-3 text-(--medium-gray)">
+															{activeTab === "storefront" && (
+																<>
+																	<button
+																		type="button"
+																		onClick={() => setAddingItem(item)}
+																		className="p-1 hover:text-(--deep-forest) transition-colors"
+																		aria-label="Add stock to storefront"
+																	>
+																		<PlusCircleIcon size={22} weight="bold" />
+																	</button>
+																	<span className="text-(--light-gray)">|</span>
+																</>
+															)}
+															<button
+																type="button"
+																onClick={() => onEdit?.(item)}
+																className="p-1 hover:text-(--deep-forest) transition-colors"
+																aria-label="Edit item"
+															>
+																<NotePencilIcon size={18} />
+															</button>
+															<button
+																type="button"
+																onClick={() => setDeletingItem(item)}
+																className="p-1 hover:text-red-600 transition-colors"
+																aria-label="Delete item record"
+															>
+																<TrashIcon size={18} />
+															</button>
+														</div>
+													</td>
+												)}
+											</tr>
+										))
+									)
 								) : (
 									<tr>
 										<td
-											colSpan={hideActions ? 2 : 3}
+											colSpan={isLogsTab ? 7 : hideActions ? 2 : 3}
 											className="h-24 text-center text-sm text-(--medium-gray)"
 										>
 											No items match your search.
@@ -246,6 +381,17 @@ function InventoryList({
 						</table>
 					</div>
 				</div>
+			)}
+
+			{/* Add Stock to Storefront Modal */}
+			{addingItem && (
+				<StorefrontAdd
+					item={{ id: addingItem.id, name: addingItem.name }}
+					open={!!addingItem}
+					onOpenChange={(open) => {
+						if (!open) setAddingItem(null);
+					}}
+				/>
 			)}
 
 			{/* Delete Confirmation Modal */}
@@ -290,3 +436,4 @@ function InventoryList({
 }
 
 export { InventoryList };
+export type { InventoryLogEntry, Tab };

@@ -185,6 +185,19 @@ model Verification {
   @@map("verification")
 }
 
+model InventoryLog {
+  inventory_log_id String    @id @default(uuid())
+  date_time        DateTime? @default(now())
+  expense          Decimal?  @db.Decimal(10, 2)
+  quantity         Int?
+  inventory_item   String
+  location         Location
+  log_by           String
+  type             Log_type
+
+  @@map("inventory_log")
+}
+
 enum Inventory_Type {
   CUP
   STANDALONE
@@ -198,6 +211,7 @@ enum Inventory_Status {
 enum Expense_Type {
   CASH_IN
   CASH_OUT
+  EXPENSE
 }
 
 enum Payment_Method {
@@ -209,4 +223,15 @@ enum Payment_Method {
 enum Discount_Type {
   PWD
   SENIOR
+}
+
+enum Log_type {
+  IN
+  OUT
+  EDIT
+}
+
+enum Location {
+  STOCKROOM
+  STOREFRONT
 }

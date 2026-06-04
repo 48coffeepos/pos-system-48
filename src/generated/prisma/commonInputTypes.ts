@@ -354,6 +354,40 @@ export type EnumPayment_MethodWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumPayment_MethodFilter<$PrismaModel>
 }
 
+export type EnumLocationFilter<$PrismaModel = never> = {
+  equals?: $Enums.Location | Prisma.EnumLocationFieldRefInput<$PrismaModel>
+  in?: $Enums.Location[] | Prisma.ListEnumLocationFieldRefInput<$PrismaModel>
+  notIn?: $Enums.Location[] | Prisma.ListEnumLocationFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLocationFilter<$PrismaModel> | $Enums.Location
+}
+
+export type EnumLog_typeFilter<$PrismaModel = never> = {
+  equals?: $Enums.Log_type | Prisma.EnumLog_typeFieldRefInput<$PrismaModel>
+  in?: $Enums.Log_type[] | Prisma.ListEnumLog_typeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.Log_type[] | Prisma.ListEnumLog_typeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLog_typeFilter<$PrismaModel> | $Enums.Log_type
+}
+
+export type EnumLocationWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.Location | Prisma.EnumLocationFieldRefInput<$PrismaModel>
+  in?: $Enums.Location[] | Prisma.ListEnumLocationFieldRefInput<$PrismaModel>
+  notIn?: $Enums.Location[] | Prisma.ListEnumLocationFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLocationWithAggregatesFilter<$PrismaModel> | $Enums.Location
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumLocationFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumLocationFilter<$PrismaModel>
+}
+
+export type EnumLog_typeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.Log_type | Prisma.EnumLog_typeFieldRefInput<$PrismaModel>
+  in?: $Enums.Log_type[] | Prisma.ListEnumLog_typeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.Log_type[] | Prisma.ListEnumLog_typeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLog_typeWithAggregatesFilter<$PrismaModel> | $Enums.Log_type
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumLog_typeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumLog_typeFilter<$PrismaModel>
+}
+
 export type NestedStringFilter<$PrismaModel = never> = {
   equals?: string | Prisma.StringFieldRefInput<$PrismaModel>
   in?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
@@ -705,6 +739,40 @@ export type NestedEnumPayment_MethodWithAggregatesFilter<$PrismaModel = never> =
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumPayment_MethodFilter<$PrismaModel>
   _max?: Prisma.NestedEnumPayment_MethodFilter<$PrismaModel>
+}
+
+export type NestedEnumLocationFilter<$PrismaModel = never> = {
+  equals?: $Enums.Location | Prisma.EnumLocationFieldRefInput<$PrismaModel>
+  in?: $Enums.Location[] | Prisma.ListEnumLocationFieldRefInput<$PrismaModel>
+  notIn?: $Enums.Location[] | Prisma.ListEnumLocationFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLocationFilter<$PrismaModel> | $Enums.Location
+}
+
+export type NestedEnumLog_typeFilter<$PrismaModel = never> = {
+  equals?: $Enums.Log_type | Prisma.EnumLog_typeFieldRefInput<$PrismaModel>
+  in?: $Enums.Log_type[] | Prisma.ListEnumLog_typeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.Log_type[] | Prisma.ListEnumLog_typeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLog_typeFilter<$PrismaModel> | $Enums.Log_type
+}
+
+export type NestedEnumLocationWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.Location | Prisma.EnumLocationFieldRefInput<$PrismaModel>
+  in?: $Enums.Location[] | Prisma.ListEnumLocationFieldRefInput<$PrismaModel>
+  notIn?: $Enums.Location[] | Prisma.ListEnumLocationFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLocationWithAggregatesFilter<$PrismaModel> | $Enums.Location
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumLocationFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumLocationFilter<$PrismaModel>
+}
+
+export type NestedEnumLog_typeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.Log_type | Prisma.EnumLog_typeFieldRefInput<$PrismaModel>
+  in?: $Enums.Log_type[] | Prisma.ListEnumLog_typeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.Log_type[] | Prisma.ListEnumLog_typeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumLog_typeWithAggregatesFilter<$PrismaModel> | $Enums.Log_type
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumLog_typeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumLog_typeFilter<$PrismaModel>
 }
 
 

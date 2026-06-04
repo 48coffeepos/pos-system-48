@@ -27,7 +27,8 @@ export type Inventory_Status = (typeof Inventory_Status)[keyof typeof Inventory_
 
 export const Expense_Type = {
   CASH_IN: 'CASH_IN',
-  CASH_OUT: 'CASH_OUT'
+  CASH_OUT: 'CASH_OUT',
+  EXPENSE: 'EXPENSE'
 } as const
 
 export type Expense_Type = (typeof Expense_Type)[keyof typeof Expense_Type]
@@ -48,3 +49,20 @@ export const Discount_Type = {
 } as const
 
 export type Discount_Type = (typeof Discount_Type)[keyof typeof Discount_Type]
+
+
+export const Log_type = {
+  IN: 'IN',
+  OUT: 'OUT',
+  EDIT: 'EDIT'
+} as const
+
+export type Log_type = (typeof Log_type)[keyof typeof Log_type]
+
+
+export const Location = {
+  STOCKROOM: 'STOCKROOM',
+  STOREFRONT: 'STOREFRONT'
+} as const
+
+export type Location = (typeof Location)[keyof typeof Location]
