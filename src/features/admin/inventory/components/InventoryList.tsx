@@ -25,6 +25,8 @@ import {
 import { deleteInventoryItemMutationOptions } from "../mutationOptions";
 import { StorefrontAdd } from "./storefront/StorefrontAdd";
 import { StorefrontDeduct } from "./storefront/StorefrontDeduct";
+import { StockroomAdd } from "./stockroom/StockroomAdd";
+import { StockroomDeduct } from "./stockroom/StockroomDeduct";
 import type { InventoryItem } from "./AddInventoryItem";
 
 interface ExtendedInventoryItem extends InventoryItem {
@@ -67,6 +69,10 @@ function InventoryList({
 	const [addingItem, setAddingItem] =
 		useState<ExtendedInventoryItem | null>(null);
 	const [deductingItem, setDeductingItem] =
+		useState<ExtendedInventoryItem | null>(null);
+	const [stockroomingItem, setStockroomingItem] =
+		useState<ExtendedInventoryItem | null>(null);
+	const [stockroomDeductingItem, setStockroomDeductingItem] =
 		useState<ExtendedInventoryItem | null>(null);
 
 	const fuse = useMemo(
@@ -357,6 +363,27 @@ function InventoryList({
 																	<span className="text-(--light-gray)">|</span>
 																</>
 															)}
+															{activeTab === "admin" && (
+																<>
+																	<button
+																		type="button"
+																		onClick={() => setStockroomingItem(item)}
+																		className="p-1 hover:text-(--deep-forest) transition-colors"
+																		aria-label="Add stock to stockroom"
+																	>
+																		<PlusCircleIcon size={22} weight="bold" />
+																	</button>
+																	<button
+																		type="button"
+																		onClick={() => setStockroomDeductingItem(item)}
+																		className="p-1 hover:text-red-600 transition-colors"
+																		aria-label="Deduct stock from stockroom"
+																	>
+																		<MinusCircleIcon size={22} weight="bold" />
+																	</button>
+																	<span className="text-(--light-gray)">|</span>
+																</>
+															)}
 															<button
 																type="button"
 																onClick={() => onEdit?.(item)}
@@ -413,6 +440,28 @@ function InventoryList({
 					open={!!deductingItem}
 					onOpenChange={(open) => {
 						if (!open) setDeductingItem(null);
+					}}
+				/>
+			)}
+
+			{/* Add Stock to Stockroom Modal */}
+			{stockroomingItem && (
+				<StockroomAdd
+					item={{ id: stockroomingItem.id, name: stockroomingItem.name }}
+					open={!!stockroomingItem}
+					onOpenChange={(open) => {
+						if (!open) setStockroomingItem(null);
+					}}
+				/>
+			)}
+
+			{/* Deduct Stock from Stockroom Modal */}
+			{stockroomDeductingItem && (
+				<StockroomDeduct
+					item={{ id: stockroomDeductingItem.id, name: stockroomDeductingItem.name }}
+					open={!!stockroomDeductingItem}
+					onOpenChange={(open) => {
+						if (!open) setStockroomDeductingItem(null);
 					}}
 				/>
 			)}

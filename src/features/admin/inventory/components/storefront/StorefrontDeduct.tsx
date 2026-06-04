@@ -32,14 +32,14 @@ function StorefrontDeduct({ item, open, onOpenChange }: StorefrontDeductProps) {
 
   const mutation = useMutation({
     ...storefrontDeductStockMutationOptions,
-    onSuccess: () => {
+    onSettled: () => {
       onOpenChange(false);
       form.reset();
     },
   });
 
   const form = useAppForm({
-    defaultValues: { quantity: 0 },
+    defaultValues: { quantity: 1 },
     validators: { onChange: formSchema },
     onSubmit: async ({ value }) => {
       if (!session?.user) return;
@@ -83,7 +83,7 @@ function StorefrontDeduct({ item, open, onOpenChange }: StorefrontDeductProps) {
             </DialogClose>
             <form.AppForm>
               <form.SubmitButton
-                label={mutation.isPending ? "Deducting..." : "Deduct"}
+                label={mutation.isPending ? "Deducting..." : "Save"}
               />
             </form.AppForm>
           </DialogFooter>

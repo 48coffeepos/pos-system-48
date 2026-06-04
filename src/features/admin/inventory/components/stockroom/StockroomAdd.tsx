@@ -15,9 +15,9 @@ import {
 } from "@/components/ui/dialog";
 import { authClient } from "@/integrations/better-auth/auth-client";
 import { useAppForm } from "@/integrations/tanstack-form";
-import { storefrontAddStockMutationOptions } from "../../mutationOptions";
+import { stockroomAddStockMutationOptions } from "../../mutationOptions";
 
-interface StorefrontAddProps {
+interface StockroomAddProps {
   item: { id: string; name: string };
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -25,13 +25,14 @@ interface StorefrontAddProps {
 
 const formSchema = z.object({
   quantity: z.number().int().min(1, "Must add at least 1 item"),
+  unitPrice: z.number().min(0, "Price cannot be negative"),
 });
 
-function StorefrontAdd({ item, open, onOpenChange }: StorefrontAddProps) {
+function StockroomAdd({ item, open, onOpenChange }: StockroomAddProps) {
   const { data: session } = authClient.useSession();
 
   const mutation = useMutation({
-    ...storefrontAddStockMutationOptions,
+    ...stockroomAddStockMutationOptions,
     onSettled: () => {
       onOpenChange(false);
       form.reset();
@@ -39,7 +40,7 @@ function StorefrontAdd({ item, open, onOpenChange }: StorefrontAddProps) {
   });
 
   const form = useAppForm({
-    defaultValues: { quantity: 1 },
+    defaultValues: { quantity: 1, unitPrice: 1 },
     validators: { onChange: formSchema },
     onSubmit: async ({ value }) => {
       if (!session?.user) return;
@@ -47,6 +48,7 @@ function StorefrontAdd({ item, open, onOpenChange }: StorefrontAddProps) {
         itemId: item.id,
         quantity: value.quantity,
         itemName: item.name,
+        unitPrice: value.unitPrice,
       });
     },
   });
@@ -57,7 +59,7 @@ function StorefrontAdd({ item, open, onOpenChange }: StorefrontAddProps) {
         <DialogHeader>
           <DialogTitle>{item.name}</DialogTitle>
           <DialogDescription>
-            Add stock to storefront inventory
+            Add stock to stockroom inventory
           </DialogDescription>
         </DialogHeader>
 
@@ -70,12 +72,43 @@ function StorefrontAdd({ item, open, onOpenChange }: StorefrontAddProps) {
           <form.AppField name="quantity">
             {(field) => (
               <field.NumberField
-                label="Added Stock"
+                label="Quantity"
                 placeholder="Enter quantity"
                 min="1"
               />
             )}
           </form.AppField>
+
+          <form.AppField name="unitPrice">
+            {(field) => (
+              <field.NumberField
+                label="Unit Price (₱)"
+                placeholder="0.00"
+                min="0"
+                step="0.01"
+              />
+            )}
+          </form.AppField>
+
+          <form.Subscribe
+            selector={(state) => ({
+              quantity: state.values.quantity,
+              unitPrice: state.values.unitPrice,
+            })}
+          >
+            {({ quantity, unitPrice }) => {
+              const qty = Number.isFinite(quantity) ? quantity : 0;
+              const price = Number.isFinite(unitPrice) ? unitPrice : 0;
+              return (
+                <div className="mt-4 flex items-center justify-between rounded-lg bg-(--soft-peach)/50 px-4 py-3 text-sm">
+                  <span className="font-medium text-(--dark-gray)">Total Expense</span>
+                  <span className="text-lg font-bold text-(--deep-forest)">
+                    ₱{(qty * price).toFixed(2)}
+                  </span>
+                </div>
+              );
+            }}
+          </form.Subscribe>
 
           <DialogFooter className="mt-6">
             <DialogClose render={<Button variant="outline" />}>
@@ -93,5 +126,5 @@ function StorefrontAdd({ item, open, onOpenChange }: StorefrontAddProps) {
   );
 }
 
-export { StorefrontAdd };
-export type { StorefrontAddProps };
+export { StockroomAdd };
+export type { StockroomAddProps };

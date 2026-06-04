@@ -15,23 +15,23 @@ import {
 } from "@/components/ui/dialog";
 import { authClient } from "@/integrations/better-auth/auth-client";
 import { useAppForm } from "@/integrations/tanstack-form";
-import { storefrontAddStockMutationOptions } from "../../mutationOptions";
+import { stockroomDeductStockMutationOptions } from "../../mutationOptions";
 
-interface StorefrontAddProps {
+interface StockroomDeductProps {
   item: { id: string; name: string };
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
 const formSchema = z.object({
-  quantity: z.number().int().min(1, "Must add at least 1 item"),
+  quantity: z.number().int().min(1, "Must deduct at least 1 item"),
 });
 
-function StorefrontAdd({ item, open, onOpenChange }: StorefrontAddProps) {
+function StockroomDeduct({ item, open, onOpenChange }: StockroomDeductProps) {
   const { data: session } = authClient.useSession();
 
   const mutation = useMutation({
-    ...storefrontAddStockMutationOptions,
+    ...stockroomDeductStockMutationOptions,
     onSettled: () => {
       onOpenChange(false);
       form.reset();
@@ -57,7 +57,7 @@ function StorefrontAdd({ item, open, onOpenChange }: StorefrontAddProps) {
         <DialogHeader>
           <DialogTitle>{item.name}</DialogTitle>
           <DialogDescription>
-            Add stock to storefront inventory
+            Deduct stock from stockroom inventory
           </DialogDescription>
         </DialogHeader>
 
@@ -70,7 +70,7 @@ function StorefrontAdd({ item, open, onOpenChange }: StorefrontAddProps) {
           <form.AppField name="quantity">
             {(field) => (
               <field.NumberField
-                label="Added Stock"
+                label="Quantity to Deduct"
                 placeholder="Enter quantity"
                 min="1"
               />
@@ -83,7 +83,7 @@ function StorefrontAdd({ item, open, onOpenChange }: StorefrontAddProps) {
             </DialogClose>
             <form.AppForm>
               <form.SubmitButton
-                label={mutation.isPending ? "Adding..." : "Save"}
+                label={mutation.isPending ? "Deducting..." : "Save"}
               />
             </form.AppForm>
           </DialogFooter>
@@ -93,5 +93,5 @@ function StorefrontAdd({ item, open, onOpenChange }: StorefrontAddProps) {
   );
 }
 
-export { StorefrontAdd };
-export type { StorefrontAddProps };
+export { StockroomDeduct };
+export type { StockroomDeductProps };

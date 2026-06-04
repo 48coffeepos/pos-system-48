@@ -41,7 +41,7 @@ export const storefrontDeductStock = createServerFn({ method: "POST" })
           log_by: logBy,
           quantity: data.quantity,
           type: "DEDUCT",
-          location: "STOCKROOM",
+          location: "STOREFRONT",
         },
       }),
     ]);
