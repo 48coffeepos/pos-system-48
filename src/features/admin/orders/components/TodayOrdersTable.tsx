@@ -118,7 +118,7 @@ export function TodayOrdersTable({ data, limit }: TodayOrdersTableProps) {
 										</td>
 
 										<td className="p-4 font-black text-sm text-(--near-black) text-center">
-											{formatPeso(order.grand_total)}
+											{order.method === "GRAB" ? "--" : formatPeso(order.grand_total)}
 										</td>
 
 										<td className="p-4 pr-6 no-print text-center">
@@ -190,7 +190,7 @@ export function TodayOrdersTable({ data, limit }: TodayOrdersTableProps) {
 											Total
 										</span>
 										<span className="font-black text-sm text-(--near-black)">
-											{formatPeso(order.grand_total)}
+											{order.method === "GRAB" ? "--" : formatPeso(order.grand_total)}
 										</span>
 									</div>
 

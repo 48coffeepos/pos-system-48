@@ -270,7 +270,7 @@ export function OrdersList({ orders = [] }: OrdersListProps) {
 
                       {/* Total Price */}
                       <td className="p-4 font-black text-sm text-(--near-black)">
-                        {formatPeso(order.grand_total)}
+                        {order.method === "GRAB" ? "--" : formatPeso(order.grand_total)}
                       </td>
 
                       {/* Action Button */}

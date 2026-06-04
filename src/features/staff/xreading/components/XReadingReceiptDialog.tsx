@@ -15,7 +15,7 @@ import type { CupSale } from "../server/getCupSales";
 interface XReadingReceiptDialogProps {
   open: boolean;
   onClose: () => void;
-  mode: "sales" | "cashcount" | "revenue" | "cups" | null;
+  mode: "sales" | "cashcount" | "cups" | null;
   staffName: string;
   totals: DailyReconciliationTotals;
   totalCashCounted: number;
@@ -45,10 +45,9 @@ export function XReadingReceiptDialog({
 
   if (!mode) return null;
 
-  const { totalCashSales, totalGcashSales, totalGrabSales, totalCashOut, totalCashIn, totalExpenses } = totals;
+  const { totalCashSales, totalGcashSales, totalCashOut, totalCashIn, totalExpenses } = totals;
   const grossSales = totalCashSales + totalCashIn;
   const netSales = getExpectedCashInDrawer(totals);
-  const totalRevenue = totalCashSales + totalGcashSales;
   const { overShort } = getOverShort(totalCashCounted, totals);
 
   const targetDate = new Date();
@@ -208,60 +207,7 @@ export function XReadingReceiptDialog({
           </div>
         )}
 
-        {mode === "revenue" && (
-          <div id="revenue-receipt">
-            <div className="mb-3 text-center">
-              <h2 className="text-2xl font-black tracking-tight">48 COFFEE</h2>
-              <div className="text-xs font-bold leading-tight my-0.5">
-                <p>Ledesma St., Iloilo City Proper,</p>
-                <p>Iloilo City, 5000</p>
-              </div>
-              <h3 className="mt-0.5 text-sm font-bold uppercase">
-                DAILY REVENUE
-              </h3>
-            </div>
 
-            <div className="mb-3 space-y-0.5 text-xs font-bold">
-              <div className="flex justify-between">
-                <span>Date :</span>
-                <span>{displayDate}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Time :</span>
-                <span>{displayTime}</span>
-              </div>
-            </div>
-
-            <div className="mb-2 border-t border-dashed border-black pt-2 text-xs font-bold">
-              <div className="flex justify-between mb-1">
-                <span>CASH:</span>
-                <span>₱{totalCashSales.toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>GCASH:</span>
-                <span>₱{totalGcashSales.toFixed(2)}</span>
-              </div>
-            </div>
-
-            <div className="border-t border-black pt-2 text-sm font-black">
-              <div className="flex justify-between">
-                <span>TOTAL REVENUE:</span>
-                <span>₱{totalRevenue.toFixed(2)}</span>
-              </div>
-            </div>
-
-            <div className="mt-8 border-t border-black pt-1 text-center">
-              <span className="text-xs font-bold tracking-widest uppercase">
-                Signature
-              </span>
-            </div>
-
-            <div className="mt-4 text-center">
-              <p className="text-xs font-black uppercase">{staffName}</p>
-              <p className="text-[9px] font-bold opacity-60">Staff&apos;s Name</p>
-            </div>
-          </div>
-        )}
 
         {mode === "cups" && (
           <div id="cups-sales-receipt">

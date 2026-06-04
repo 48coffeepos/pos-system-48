@@ -11,7 +11,6 @@ interface ReconciliationPanelProps {
 	totalCashCounted: number;
 	onExportSales: () => void;
 	onExportCashCount: () => void;
-	onExportRevenue: () => void;
 	onExportCups: () => void;
 }
 
@@ -41,7 +40,6 @@ export function ReconciliationPanel({
 	totalCashCounted,
 	onExportSales,
 	onExportCashCount,
-	onExportRevenue,
 	onExportCups,
 }: ReconciliationPanelProps) {
 	const { overShort } = getOverShort(totalCashCounted, totals);
@@ -112,24 +110,14 @@ export function ReconciliationPanel({
 			/>
 
 			<div className="mt-auto flex flex-col gap-2">
-				<div className="grid grid-cols-2 gap-2">
-					<button
-						type="button"
-						onClick={onExportCups}
-						className="flex w-full items-center justify-center gap-2 rounded-xl border border-(--deep-forest) px-3 py-3 text-sm font-medium text-(--deep-forest) transition-colors hover:bg-(--pale-yellow)"
-					>
-						<Printer weight="bold" className="size-4" />
-						Print Cups Sales
-					</button>
-					<button
-						type="button"
-						onClick={onExportRevenue}
-						className="flex w-full items-center justify-center gap-2 rounded-xl bg-(--deep-forest) px-3 py-3 text-sm font-medium text-(--pale-yellow) transition-colors hover:bg-(--forest-green)"
-					>
-						<Printer weight="bold" className="size-4" />
-						Print Revenue
-					</button>
-				</div>
+				<button
+					type="button"
+					onClick={onExportCups}
+					className="flex w-full items-center justify-center gap-2 rounded-xl bg-(--forest-green) px-3 py-3 text-sm font-medium text-(--pale-yellow) transition-colors hover:bg-(--deep-forest)"
+				>
+					<Printer weight="bold" className="size-4" />
+					Print Cups Sales
+				</button>
 
 				<div className="grid grid-cols-2 gap-2">
 					<button
@@ -143,7 +131,7 @@ export function ReconciliationPanel({
 					<button
 						type="button"
 						onClick={onExportCashCount}
-						className="flex w-full items-center justify-center gap-2 rounded-xl border border-(--deep-forest) px-3 py-3 text-sm font-medium text-(--deep-forest) transition-colors hover:bg-(--pale-yellow)"
+						className="flex w-full items-center justify-center gap-2 rounded-xl border border-(--deep-forest) px-3 py-3 text-sm font-medium text-(--deep-forest) transition-colors hover:bg-(--deep-forest) hover:text-(--pale-yellow)"
 					>
 						<Printer weight="bold" className="size-4" />
 						Print Cash Count
