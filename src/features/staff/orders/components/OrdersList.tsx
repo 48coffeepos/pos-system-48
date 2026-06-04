@@ -296,6 +296,7 @@ export function OrdersList({ orders = [] }: OrdersListProps) {
         order={selectedOrder}
         open={!!selectedOrder}
         onClose={() => setSelectedOrder(null)}
+        cashierName={selectedOrder?.cashier_name || "Cashier"}
       />
     </div>
   );
