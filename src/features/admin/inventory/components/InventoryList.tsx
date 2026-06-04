@@ -1,6 +1,7 @@
 import {
 	ClockCounterClockwiseIcon,
 	MagnifyingGlassIcon,
+	MinusCircleIcon,
 	NotePencilIcon,
 	PackageIcon,
 	PlusCircleIcon,
@@ -23,6 +24,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { deleteInventoryItemMutationOptions } from "../mutationOptions";
 import { StorefrontAdd } from "./storefront/StorefrontAdd";
+import { StorefrontDeduct } from "./storefront/StorefrontDeduct";
 import type { InventoryItem } from "./AddInventoryItem";
 
 interface ExtendedInventoryItem extends InventoryItem {
@@ -35,7 +37,7 @@ interface InventoryLogEntry {
 	dateTime: Date | null;
 	inventoryItem: string;
 	logBy: string;
-	type: "IN" | "OUT" | "EDIT";
+	type: "ADD" | "DEDUCT" | "EDIT";
 	location: "STOCKROOM" | "STOREFRONT";
 	quantity: number | null;
 	expense: number | null;
@@ -63,6 +65,8 @@ function InventoryList({
 	const [deletingItem, setDeletingItem] =
 		useState<ExtendedInventoryItem | null>(null);
 	const [addingItem, setAddingItem] =
+		useState<ExtendedInventoryItem | null>(null);
+	const [deductingItem, setDeductingItem] =
 		useState<ExtendedInventoryItem | null>(null);
 
 	const fuse = useMemo(
@@ -110,8 +114,8 @@ function InventoryList({
 
 	const typeBadge = (type: string) => {
 		const styles: Record<string, string> = {
-			IN: "bg-green-100 text-green-700",
-			OUT: "bg-red-100 text-red-700",
+			ADD: "bg-green-100 text-green-700",
+			DEDUCT: "bg-red-100 text-red-700",
 			EDIT: "bg-blue-100 text-blue-700",
 		};
 		return styles[type] ?? "bg-gray-100 text-gray-700";
@@ -342,6 +346,14 @@ function InventoryList({
 																	>
 																		<PlusCircleIcon size={22} weight="bold" />
 																	</button>
+																	<button
+																		type="button"
+																		onClick={() => setDeductingItem(item)}
+																		className="p-1 hover:text-red-600 transition-colors"
+																		aria-label="Deduct stock from storefront"
+																	>
+																		<MinusCircleIcon size={22} weight="bold" />
+																	</button>
 																	<span className="text-(--light-gray)">|</span>
 																</>
 															)}
@@ -390,6 +402,17 @@ function InventoryList({
 					open={!!addingItem}
 					onOpenChange={(open) => {
 						if (!open) setAddingItem(null);
+					}}
+				/>
+			)}
+
+			{/* Deduct Stock from Storefront Modal */}
+			{deductingItem && (
+				<StorefrontDeduct
+					item={{ id: deductingItem.id, name: deductingItem.name }}
+					open={!!deductingItem}
+					onOpenChange={(open) => {
+						if (!open) setDeductingItem(null);
 					}}
 				/>
 			)}

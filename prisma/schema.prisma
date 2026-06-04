@@ -226,8 +226,8 @@ enum Discount_Type {
 }
 
 enum Log_type {
-  IN
-  OUT
+  ADD
+  DEDUCT
   EDIT
 }
 

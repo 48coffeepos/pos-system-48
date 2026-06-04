@@ -52,8 +52,8 @@ export type Discount_Type = (typeof Discount_Type)[keyof typeof Discount_Type]
 
 
 export const Log_type = {
-  IN: 'IN',
-  OUT: 'OUT',
+  ADD: 'ADD',
+  DEDUCT: 'DEDUCT',
   EDIT: 'EDIT'
 } as const
 
