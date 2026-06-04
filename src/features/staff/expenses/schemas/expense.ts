@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const CreateExpenseSchema = z.object({
-	type: z.enum(["CASH_IN", "CASH_OUT"]),
+	type: z.enum(["CASH_IN", "CASH_OUT", "EXPENSE"]),
 	description: z.string().min(1, "Description is required").max(50, "Description must be 50 characters or less"),
 	amount: z
 		.number({ error: "Amount is required" })

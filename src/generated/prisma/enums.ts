@@ -27,7 +27,8 @@ export type Inventory_Status = (typeof Inventory_Status)[keyof typeof Inventory_
 
 export const Expense_Type = {
   CASH_IN: 'CASH_IN',
-  CASH_OUT: 'CASH_OUT'
+  CASH_OUT: 'CASH_OUT',
+  EXPENSE: 'EXPENSE'
 } as const
 
 export type Expense_Type = (typeof Expense_Type)[keyof typeof Expense_Type]

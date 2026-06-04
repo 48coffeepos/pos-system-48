@@ -28,6 +28,7 @@ interface XReadingScreenProps {
 		totalGrabSales: number;
 		totalCashOut: number;
 		totalCashIn: number;
+		totalExpenses: number;
 	};
 }
 
@@ -99,6 +100,7 @@ export function XReadingScreen({ data }: XReadingScreenProps) {
 						totalGrabSales: data.totalGrabSales,
 						totalCashOut: data.totalCashOut,
 						totalCashIn: data.totalCashIn,
+						totalExpenses: data.totalExpenses,
 					}}
 					totalCashCounted={totalCashCounted}
 					onExportSales={handleExportSales}
@@ -144,6 +146,7 @@ export function XReadingScreen({ data }: XReadingScreenProps) {
 					totalGrabSales: data.totalGrabSales,
 					totalCashOut: data.totalCashOut,
 					totalCashIn: data.totalCashIn,
+					totalExpenses: data.totalExpenses,
 				}}
 				totalCashCounted={totalCashCounted}
 				cashCount={cashCount}

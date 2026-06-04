@@ -198,6 +198,7 @@ enum Inventory_Status {
 enum Expense_Type {
   CASH_IN
   CASH_OUT
+  EXPENSE
 }
 
 enum Payment_Method {

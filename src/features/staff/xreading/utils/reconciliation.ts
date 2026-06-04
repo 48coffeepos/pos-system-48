@@ -3,18 +3,20 @@ export type DailyReconciliationTotals = {
 	totalGcashSales: number;
 	totalCashOut: number;
 	totalCashIn: number;
+	totalExpenses: number;
 };
 
 /**
- * Net sales after cash in, cash sales, and cash out.
- * Formula: Cash Sales + Cash In − Cash Out
+ * Net sales after cash in, cash sales, cash out, and expenses.
+ * Formula: Cash Sales + Cash In − Cash Out − Expenses
  */
 export function getExpectedCashInDrawer({
 	totalCashSales,
 	totalCashOut,
 	totalCashIn,
+	totalExpenses,
 }: DailyReconciliationTotals) {
-	return totalCashSales + totalCashIn - totalCashOut;
+	return totalCashSales + totalCashIn - totalCashOut - totalExpenses;
 }
 
 /** Over = counted more than expected; short = counted less. */
