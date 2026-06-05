@@ -1494,11 +1494,16 @@ export type ExpenseScalarFieldEnum = (typeof ExpenseScalarFieldEnum)[keyof typeo
 export const InventoryScalarFieldEnum = {
   inventory_id: 'inventory_id',
   name: 'name',
-  stock: 'stock',
-  yesterday_stock: 'yesterday_stock',
   type: 'type',
-  admin_stock: 'admin_stock',
-  cost_price: 'cost_price'
+  cost_price: 'cost_price',
+  beginning_admin: 'beginning_admin',
+  in_admin: 'in_admin',
+  out_admin: 'out_admin',
+  ending_admin: 'ending_admin',
+  beginning_store: 'beginning_store',
+  in_store: 'in_store',
+  out_store: 'out_store',
+  ending_store: 'ending_store'
 } as const
 
 export type InventoryScalarFieldEnum = (typeof InventoryScalarFieldEnum)[keyof typeof InventoryScalarFieldEnum]
@@ -1692,20 +1697,6 @@ export type ListEnumExpense_TypeFieldRefInput<$PrismaModel> = FieldRefInputType<
 
 
 /**
- * Reference to a field of type 'Int'
- */
-export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
-    
-
-
-/**
- * Reference to a field of type 'Int[]'
- */
-export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
-    
-
-
-/**
  * Reference to a field of type 'Inventory_Type'
  */
 export type EnumInventory_TypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Inventory_Type'>
@@ -1716,6 +1707,20 @@ export type EnumInventory_TypeFieldRefInput<$PrismaModel> = FieldRefInputType<$P
  * Reference to a field of type 'Inventory_Type[]'
  */
 export type ListEnumInventory_TypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Inventory_Type[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Int'
+ */
+export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
+    
+
+
+/**
+ * Reference to a field of type 'Int[]'
+ */
+export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
     
 
 
