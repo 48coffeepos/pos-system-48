@@ -236,6 +236,7 @@ enum Log_type {
   ADD
   DEDUCT
   EDIT
+  TRANSFER
 }
 
 enum Location {

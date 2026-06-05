@@ -55,7 +55,8 @@ export type Discount_Type = (typeof Discount_Type)[keyof typeof Discount_Type]
 export const Log_type = {
   ADD: 'ADD',
   DEDUCT: 'DEDUCT',
-  EDIT: 'EDIT'
+  EDIT: 'EDIT',
+  TRANSFER: 'TRANSFER'
 } as const
 
 export type Log_type = (typeof Log_type)[keyof typeof Log_type]

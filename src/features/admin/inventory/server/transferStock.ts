@@ -29,7 +29,7 @@ export const transferStock = createServerFn({ method: "POST" })
           inventory_item: data.itemName,
           log_by: logBy,
           quantity: data.quantity,
-          type: "DEDUCT",
+          type: "TRANSFER",
           location: "STOCKROOM",
         },
       });
@@ -39,7 +39,7 @@ export const transferStock = createServerFn({ method: "POST" })
           inventory_item: data.itemName,
           log_by: logBy,
           quantity: data.quantity,
-          type: "ADD",
+          type: "TRANSFER",
           location: "STOREFRONT",
         },
       });
