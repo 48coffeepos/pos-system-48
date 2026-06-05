@@ -41,7 +41,7 @@ export function XReadingScreen({ data }: XReadingScreenProps) {
 
 	const [showResetModal, setShowResetModal] = useState(false);
 	const [receiptMode, setReceiptMode] = useState<
-		"sales" | "cashcount" | "revenue" | "cups" | null
+		"sales" | "cashcount" | "cups" | null
 	>(null);
 
 	const { data: cupSales = [] } = useQuery(getCupSalesQueryOptions());
@@ -73,10 +73,6 @@ export function XReadingScreen({ data }: XReadingScreenProps) {
 		setReceiptMode("cashcount");
 	};
 
-	const handleExportRevenue = () => {
-		setReceiptMode("revenue");
-	};
-
 	const handleExportCups = () => {
 		setReceiptMode("cups");
 	};
@@ -97,7 +93,6 @@ export function XReadingScreen({ data }: XReadingScreenProps) {
 					totals={{
 						totalCashSales: data.totalCashSales,
 						totalGcashSales: data.totalGcashSales,
-						totalGrabSales: data.totalGrabSales,
 						totalCashOut: data.totalCashOut,
 						totalCashIn: data.totalCashIn,
 						totalExpenses: data.totalExpenses,
@@ -105,7 +100,6 @@ export function XReadingScreen({ data }: XReadingScreenProps) {
 					totalCashCounted={totalCashCounted}
 					onExportSales={handleExportSales}
 					onExportCashCount={handleExportCashCount}
-					onExportRevenue={handleExportRevenue}
 					onExportCups={handleExportCups}
 				/>
 			</div>
@@ -143,7 +137,6 @@ export function XReadingScreen({ data }: XReadingScreenProps) {
 				totals={{
 					totalCashSales: data.totalCashSales,
 					totalGcashSales: data.totalGcashSales,
-					totalGrabSales: data.totalGrabSales,
 					totalCashOut: data.totalCashOut,
 					totalCashIn: data.totalCashIn,
 					totalExpenses: data.totalExpenses,

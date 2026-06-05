@@ -74,6 +74,7 @@ function AdminInventory() {
               onEdit={setEditingItem}
               activeTab={activeTab}
               onTabChange={handleTabChange}
+              showFinancialColumns
             />
           )}
         </div>

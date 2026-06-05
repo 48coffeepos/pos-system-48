@@ -65,6 +65,7 @@ export const usePosStore = create<PosState>()(
 					);
 					if (existingIndex > -1) {
 						const updated = [...state.cart];
+
 						const newQuantity = updated[existingIndex].quantity + 1;
 						updated[existingIndex] = {
 							...updated[existingIndex],
@@ -75,6 +76,7 @@ export const usePosStore = create<PosState>()(
 						toast.success(`${item.menu_name} added to cart`);
 						return { cart: updated };
 					}
+
 					toast.success(`${item.menu_name} added to cart`);
 
 					return { cart: [...state.cart, item] };

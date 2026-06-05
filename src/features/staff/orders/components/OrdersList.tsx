@@ -75,6 +75,7 @@ export function OrdersList({ orders = [] }: OrdersListProps) {
       note: raw.note || undefined,
       cashier_name: raw.staff?.name || "Cashier",
       items: raw.order_items.map((item) => ({
+        order_item_id: item.order_item_id,
         snapshot_menu_name: item.snapshot_menu_name,
         quantity: item.quantity,
         unit_price: item.unit_price,
@@ -84,6 +85,7 @@ export function OrdersList({ orders = [] }: OrdersListProps) {
         line_total: item.line_total,
         snapshot_inventory: item.snapshot_inventory,
         addon_items: item.addon_items.map((ai) => ({
+          order_item_addon_id: ai.order_item_addon_id,
           addon_id: ai.addon_id,
           addon_name_snapshot: ai.addon_name_snapshot,
           addon_price_snapshot: ai.addon_price_snapshot,
@@ -124,6 +126,7 @@ export function OrdersList({ orders = [] }: OrdersListProps) {
       note: order.note || undefined,
       cashier_name: order.staff?.name || "Cashier",
       items: order.order_items.map((item) => ({
+        order_item_id: item.order_item_id,
         snapshot_menu_name: item.snapshot_menu_name,
         quantity: item.quantity,
         unit_price: item.unit_price,
@@ -133,6 +136,7 @@ export function OrdersList({ orders = [] }: OrdersListProps) {
         line_total: item.line_total,
         snapshot_inventory: item.snapshot_inventory,
         addon_items: item.addon_items.map((ai) => ({
+          order_item_addon_id: ai.order_item_addon_id,
           addon_id: ai.addon_id,
           addon_name_snapshot: ai.addon_name_snapshot,
           addon_price_snapshot: ai.addon_price_snapshot,
@@ -270,7 +274,7 @@ export function OrdersList({ orders = [] }: OrdersListProps) {
 
                       {/* Total Price */}
                       <td className="p-4 font-black text-sm text-(--near-black)">
-                        {formatPeso(order.grand_total)}
+                        {order.method === "GRAB" ? "--" : formatPeso(order.grand_total)}
                       </td>
 
                       {/* Action Button */}
