@@ -42,6 +42,7 @@ export type InventoryLogMinAggregateOutputType = {
   expense: runtime.Decimal | null
   quantity: number | null
   inventory_item: string | null
+  column_name: string | null
   location: $Enums.Location | null
   log_by: string | null
   type: $Enums.Log_type | null
@@ -53,6 +54,7 @@ export type InventoryLogMaxAggregateOutputType = {
   expense: runtime.Decimal | null
   quantity: number | null
   inventory_item: string | null
+  column_name: string | null
   location: $Enums.Location | null
   log_by: string | null
   type: $Enums.Log_type | null
@@ -64,6 +66,7 @@ export type InventoryLogCountAggregateOutputType = {
   expense: number
   quantity: number
   inventory_item: number
+  column_name: number
   location: number
   log_by: number
   type: number
@@ -87,6 +90,7 @@ export type InventoryLogMinAggregateInputType = {
   expense?: true
   quantity?: true
   inventory_item?: true
+  column_name?: true
   location?: true
   log_by?: true
   type?: true
@@ -98,6 +102,7 @@ export type InventoryLogMaxAggregateInputType = {
   expense?: true
   quantity?: true
   inventory_item?: true
+  column_name?: true
   location?: true
   log_by?: true
   type?: true
@@ -109,6 +114,7 @@ export type InventoryLogCountAggregateInputType = {
   expense?: true
   quantity?: true
   inventory_item?: true
+  column_name?: true
   location?: true
   log_by?: true
   type?: true
@@ -207,6 +213,7 @@ export type InventoryLogGroupByOutputType = {
   expense: runtime.Decimal | null
   quantity: number | null
   inventory_item: string
+  column_name: string | null
   location: $Enums.Location
   log_by: string
   type: $Enums.Log_type
@@ -241,6 +248,7 @@ export type InventoryLogWhereInput = {
   expense?: Prisma.DecimalNullableFilter<"InventoryLog"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   quantity?: Prisma.IntNullableFilter<"InventoryLog"> | number | null
   inventory_item?: Prisma.StringFilter<"InventoryLog"> | string
+  column_name?: Prisma.StringNullableFilter<"InventoryLog"> | string | null
   location?: Prisma.EnumLocationFilter<"InventoryLog"> | $Enums.Location
   log_by?: Prisma.StringFilter<"InventoryLog"> | string
   type?: Prisma.EnumLog_typeFilter<"InventoryLog"> | $Enums.Log_type
@@ -252,6 +260,7 @@ export type InventoryLogOrderByWithRelationInput = {
   expense?: Prisma.SortOrderInput | Prisma.SortOrder
   quantity?: Prisma.SortOrderInput | Prisma.SortOrder
   inventory_item?: Prisma.SortOrder
+  column_name?: Prisma.SortOrderInput | Prisma.SortOrder
   location?: Prisma.SortOrder
   log_by?: Prisma.SortOrder
   type?: Prisma.SortOrder
@@ -266,6 +275,7 @@ export type InventoryLogWhereUniqueInput = Prisma.AtLeast<{
   expense?: Prisma.DecimalNullableFilter<"InventoryLog"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   quantity?: Prisma.IntNullableFilter<"InventoryLog"> | number | null
   inventory_item?: Prisma.StringFilter<"InventoryLog"> | string
+  column_name?: Prisma.StringNullableFilter<"InventoryLog"> | string | null
   location?: Prisma.EnumLocationFilter<"InventoryLog"> | $Enums.Location
   log_by?: Prisma.StringFilter<"InventoryLog"> | string
   type?: Prisma.EnumLog_typeFilter<"InventoryLog"> | $Enums.Log_type
@@ -277,6 +287,7 @@ export type InventoryLogOrderByWithAggregationInput = {
   expense?: Prisma.SortOrderInput | Prisma.SortOrder
   quantity?: Prisma.SortOrderInput | Prisma.SortOrder
   inventory_item?: Prisma.SortOrder
+  column_name?: Prisma.SortOrderInput | Prisma.SortOrder
   location?: Prisma.SortOrder
   log_by?: Prisma.SortOrder
   type?: Prisma.SortOrder
@@ -296,6 +307,7 @@ export type InventoryLogScalarWhereWithAggregatesInput = {
   expense?: Prisma.DecimalNullableWithAggregatesFilter<"InventoryLog"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   quantity?: Prisma.IntNullableWithAggregatesFilter<"InventoryLog"> | number | null
   inventory_item?: Prisma.StringWithAggregatesFilter<"InventoryLog"> | string
+  column_name?: Prisma.StringNullableWithAggregatesFilter<"InventoryLog"> | string | null
   location?: Prisma.EnumLocationWithAggregatesFilter<"InventoryLog"> | $Enums.Location
   log_by?: Prisma.StringWithAggregatesFilter<"InventoryLog"> | string
   type?: Prisma.EnumLog_typeWithAggregatesFilter<"InventoryLog"> | $Enums.Log_type
@@ -307,6 +319,7 @@ export type InventoryLogCreateInput = {
   expense?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   quantity?: number | null
   inventory_item: string
+  column_name?: string | null
   location: $Enums.Location
   log_by: string
   type: $Enums.Log_type
@@ -318,6 +331,7 @@ export type InventoryLogUncheckedCreateInput = {
   expense?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   quantity?: number | null
   inventory_item: string
+  column_name?: string | null
   location: $Enums.Location
   log_by: string
   type: $Enums.Log_type
@@ -329,6 +343,7 @@ export type InventoryLogUpdateInput = {
   expense?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   quantity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   inventory_item?: Prisma.StringFieldUpdateOperationsInput | string
+  column_name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.EnumLocationFieldUpdateOperationsInput | $Enums.Location
   log_by?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumLog_typeFieldUpdateOperationsInput | $Enums.Log_type
@@ -340,6 +355,7 @@ export type InventoryLogUncheckedUpdateInput = {
   expense?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   quantity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   inventory_item?: Prisma.StringFieldUpdateOperationsInput | string
+  column_name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.EnumLocationFieldUpdateOperationsInput | $Enums.Location
   log_by?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumLog_typeFieldUpdateOperationsInput | $Enums.Log_type
@@ -351,6 +367,7 @@ export type InventoryLogCreateManyInput = {
   expense?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   quantity?: number | null
   inventory_item: string
+  column_name?: string | null
   location: $Enums.Location
   log_by: string
   type: $Enums.Log_type
@@ -362,6 +379,7 @@ export type InventoryLogUpdateManyMutationInput = {
   expense?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   quantity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   inventory_item?: Prisma.StringFieldUpdateOperationsInput | string
+  column_name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.EnumLocationFieldUpdateOperationsInput | $Enums.Location
   log_by?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumLog_typeFieldUpdateOperationsInput | $Enums.Log_type
@@ -373,6 +391,7 @@ export type InventoryLogUncheckedUpdateManyInput = {
   expense?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   quantity?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   inventory_item?: Prisma.StringFieldUpdateOperationsInput | string
+  column_name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.EnumLocationFieldUpdateOperationsInput | $Enums.Location
   log_by?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumLog_typeFieldUpdateOperationsInput | $Enums.Log_type
@@ -384,6 +403,7 @@ export type InventoryLogCountOrderByAggregateInput = {
   expense?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   inventory_item?: Prisma.SortOrder
+  column_name?: Prisma.SortOrder
   location?: Prisma.SortOrder
   log_by?: Prisma.SortOrder
   type?: Prisma.SortOrder
@@ -400,6 +420,7 @@ export type InventoryLogMaxOrderByAggregateInput = {
   expense?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   inventory_item?: Prisma.SortOrder
+  column_name?: Prisma.SortOrder
   location?: Prisma.SortOrder
   log_by?: Prisma.SortOrder
   type?: Prisma.SortOrder
@@ -411,6 +432,7 @@ export type InventoryLogMinOrderByAggregateInput = {
   expense?: Prisma.SortOrder
   quantity?: Prisma.SortOrder
   inventory_item?: Prisma.SortOrder
+  column_name?: Prisma.SortOrder
   location?: Prisma.SortOrder
   log_by?: Prisma.SortOrder
   type?: Prisma.SortOrder
@@ -445,6 +467,7 @@ export type InventoryLogSelect<ExtArgs extends runtime.Types.Extensions.Internal
   expense?: boolean
   quantity?: boolean
   inventory_item?: boolean
+  column_name?: boolean
   location?: boolean
   log_by?: boolean
   type?: boolean
@@ -456,6 +479,7 @@ export type InventoryLogSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   expense?: boolean
   quantity?: boolean
   inventory_item?: boolean
+  column_name?: boolean
   location?: boolean
   log_by?: boolean
   type?: boolean
@@ -467,6 +491,7 @@ export type InventoryLogSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   expense?: boolean
   quantity?: boolean
   inventory_item?: boolean
+  column_name?: boolean
   location?: boolean
   log_by?: boolean
   type?: boolean
@@ -478,12 +503,13 @@ export type InventoryLogSelectScalar = {
   expense?: boolean
   quantity?: boolean
   inventory_item?: boolean
+  column_name?: boolean
   location?: boolean
   log_by?: boolean
   type?: boolean
 }
 
-export type InventoryLogOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"inventory_log_id" | "date_time" | "expense" | "quantity" | "inventory_item" | "location" | "log_by" | "type", ExtArgs["result"]["inventoryLog"]>
+export type InventoryLogOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"inventory_log_id" | "date_time" | "expense" | "quantity" | "inventory_item" | "column_name" | "location" | "log_by" | "type", ExtArgs["result"]["inventoryLog"]>
 
 export type $InventoryLogPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "InventoryLog"
@@ -494,6 +520,7 @@ export type $InventoryLogPayload<ExtArgs extends runtime.Types.Extensions.Intern
     expense: runtime.Decimal | null
     quantity: number | null
     inventory_item: string
+    column_name: string | null
     location: $Enums.Location
     log_by: string
     type: $Enums.Log_type
@@ -925,6 +952,7 @@ export interface InventoryLogFieldRefs {
   readonly expense: Prisma.FieldRef<"InventoryLog", 'Decimal'>
   readonly quantity: Prisma.FieldRef<"InventoryLog", 'Int'>
   readonly inventory_item: Prisma.FieldRef<"InventoryLog", 'String'>
+  readonly column_name: Prisma.FieldRef<"InventoryLog", 'String'>
   readonly location: Prisma.FieldRef<"InventoryLog", 'Location'>
   readonly log_by: Prisma.FieldRef<"InventoryLog", 'String'>
   readonly type: Prisma.FieldRef<"InventoryLog", 'Log_type'>

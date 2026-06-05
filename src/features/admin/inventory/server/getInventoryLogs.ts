@@ -19,5 +19,6 @@ export const getInventoryLogs = createServerFn({ method: "GET" })
       location: log.location,
       quantity: log.quantity,
       expense: log.expense ? Number(log.expense) : null,
+      columnName: log.column_name,
     }));
   });

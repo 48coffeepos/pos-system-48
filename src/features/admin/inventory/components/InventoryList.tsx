@@ -36,10 +36,11 @@ interface InventoryLogEntry {
 	dateTime: Date | null;
 	inventoryItem: string;
 	logBy: string;
-	type: "ADD" | "DEDUCT" | "EDIT";
+	type: "ADD" | "DEDUCT" | "EDIT" | "TRANSFER";
 	location: "STOCKROOM" | "STOREFRONT";
 	quantity: number | null;
 	expense: number | null;
+	columnName?: string | null;
 }
 
 type Tab = "storefront" | "admin" | "logs";
@@ -332,6 +333,11 @@ function InventoryList({
 											>
 												{log.type}
 											</span>
+											{log.columnName && (
+												<span className="ml-1.5 inline-block rounded bg-(--medium-gray)/10 px-1.5 py-0.5 text-[10px] font-medium text-(--medium-gray)">
+													{log.columnName}
+												</span>
+											)}
 										</td>
 										<td className="p-4">
 											<span

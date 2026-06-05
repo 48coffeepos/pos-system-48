@@ -43,6 +43,8 @@ function AddInventoryItem({ editingItem, onCancelEdit, activeTab = "storefront" 
   const [quantity, setQuantity] = useState<number>(0);
   const [inAdmin, setInAdmin] = useState<number>(0);
   const [outAdmin, setOutAdmin] = useState<number>(0);
+  const [inStore, setInStore] = useState<number>(0);
+  const [outStore, setOutStore] = useState<number>(0);
   const [costPrice, setCostPrice] = useState<number>(0);
 
   const createMutation = useMutation({
@@ -66,17 +68,19 @@ function AddInventoryItem({ editingItem, onCancelEdit, activeTab = "storefront" 
     : 0;
   const hasPositiveDelta = isEditing && activeTab === "admin" && inAdmin > (editingItem?.inAdmin ?? 0);
 
+  const newEndingStore = isEditing && editingItem && activeTab === "storefront"
+    ? editingItem.beginningStore + inStore - outStore
+    : 0;
+  const hasPositiveStoreDelta = isEditing && activeTab === "storefront" && inStore > (editingItem?.inStore ?? 0);
+
   useEffect(() => {
     if (editingItem) {
       setItemName(editingItem.name);
       setItemType(editingItem.type);
-      setQuantity(
-        activeTab === "admin"
-          ? editingItem.endingAdmin
-          : editingItem.endingStore,
-      );
       setInAdmin(activeTab === "admin" ? editingItem.inAdmin : 0);
       setOutAdmin(activeTab === "admin" ? editingItem.outAdmin : 0);
+      setInStore(activeTab === "storefront" ? editingItem.inStore : 0);
+      setOutStore(activeTab === "storefront" ? editingItem.outStore : 0);
       setCostPrice(editingItem.costPrice);
     }
   }, [editingItem, activeTab]);
@@ -87,6 +91,8 @@ function AddInventoryItem({ editingItem, onCancelEdit, activeTab = "storefront" 
     setQuantity(0);
     setInAdmin(0);
     setOutAdmin(0);
+    setInStore(0);
+    setOutStore(0);
     setCostPrice(0);
     onCancelEdit?.();
   }
@@ -103,7 +109,7 @@ function AddInventoryItem({ editingItem, onCancelEdit, activeTab = "storefront" 
         type: itemType,
           ...(activeTab === "admin"
             ? { inAdmin, outAdmin }
-            : { stock: quantity }),
+            : { inStore, outStore }),
         costPrice,
       });
     } else {
@@ -194,7 +200,7 @@ function AddInventoryItem({ editingItem, onCancelEdit, activeTab = "storefront" 
               />
               {hasPositiveDelta && (
               <p className="text-xs font-medium text-red-600">
-                Use "Add Stock" to increase In Admin.
+                Use "Add Stock" to increase stock.
               </p>
             )}
             </div>
@@ -219,12 +225,62 @@ function AddInventoryItem({ editingItem, onCancelEdit, activeTab = "storefront" 
             </div>
 
           </>
+        ) : isEditing ? (
+          <>
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-(--dark-gray)">Store Stock (auto)</label>
+              <div className="flex h-10 items-center rounded-xl border border-(--light-gray) bg-(--light-gray)/20 px-3 text-sm text-(--medium-gray)">
+                {newEndingStore}
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between gap-3">
+                <label className="text-sm font-medium text-(--dark-gray)">In Store</label>
+                <p className="text-xs text-(--medium-gray)">{String(inStore).length} / 5</p>
+              </div>
+              <Input
+                type="number"
+                min={0}
+                max={99999}
+                step={1}
+                value={inStore}
+                onChange={(e) => {
+                  const val = e.target.valueAsNumber;
+                  setInStore(Number.isNaN(val) ? 0 : Math.min(99999, Math.max(0, Math.floor(val))));
+                }}
+                placeholder="0"
+                className="h-10 w-full rounded-xl border-(--light-gray) px-3 text-sm"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between gap-3">
+                <label className="text-sm font-medium text-(--dark-gray)">Out Store</label>
+                <p className="text-xs text-(--medium-gray)">{String(outStore).length} / 5</p>
+              </div>
+              <Input
+                type="number"
+                min={0}
+                max={99999}
+                step={1}
+                value={outStore}
+                onChange={(e) => {
+                  const val = e.target.valueAsNumber;
+                  setOutStore(Number.isNaN(val) ? 0 : Math.min(99999, Math.max(0, Math.floor(val))));
+                }}
+                placeholder="0"
+                className="h-10 w-full rounded-xl border-(--light-gray) px-3 text-sm"
+              />
+            </div>
+            {hasPositiveStoreDelta && (
+              <p className="text-xs font-medium text-red-600">
+                Use "Add Stock" to increase In Store.
+              </p>
+            )}
+          </>
         ) : (
           <div className="space-y-1.5">
             <div className="flex items-center justify-between gap-3">
-              <label className="text-sm font-medium text-(--dark-gray)">
-                {isEditing ? "Stock" : "Quantity"}
-              </label>
+              <label className="text-sm font-medium text-(--dark-gray)">Quantity</label>
               <p className="text-xs text-(--medium-gray)">{String(quantity).length} / 5</p>
             </div>
             <Input
@@ -279,10 +335,10 @@ function AddInventoryItem({ editingItem, onCancelEdit, activeTab = "storefront" 
             <button
               type="button"
               onClick={handleSubmit}
-              disabled={!isFormValid() || hasPositiveDelta || isPending}
+              disabled={!isFormValid() || hasPositiveDelta || hasPositiveStoreDelta || isPending}
               className={cn(
                 "flex h-11 flex-1 items-center justify-center gap-2 rounded-xl text-sm font-semibold transition-all",
-                isFormValid() && !hasPositiveDelta && !isPending
+                isFormValid() && !hasPositiveDelta && !hasPositiveStoreDelta && !isPending
                   ? "bg-(--deep-forest) text-(--pure-white) hover:bg-(--forest-green) active:scale-[0.98]"
                   : "cursor-not-allowed bg-(--light-gray) text-(--medium-gray)",
               )}

@@ -85,6 +85,9 @@ export const updateInventoryItemMutationOptions = mutationOptions({
 		mutationContext?.client?.invalidateQueries({
 			queryKey: inventoryKeys.inventory,
 		});
+		mutationContext?.client?.invalidateQueries({
+			queryKey: inventoryKeys.inventoryLogs,
+		});
 		toast.success("Item updated", {
 			description: `${variables.name} has been saved.`,
 		});

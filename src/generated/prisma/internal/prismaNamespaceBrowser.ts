@@ -260,6 +260,7 @@ export const InventoryLogScalarFieldEnum = {
   expense: 'expense',
   quantity: 'quantity',
   inventory_item: 'inventory_item',
+  column_name: 'column_name',
   location: 'location',
   log_by: 'log_by',
   type: 'type'

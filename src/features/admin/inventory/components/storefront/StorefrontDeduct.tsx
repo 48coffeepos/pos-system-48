@@ -70,7 +70,7 @@ function StorefrontDeduct({ item, open, onOpenChange }: StorefrontDeductProps) {
           <form.AppField name="quantity">
             {(field) => (
               <field.NumberField
-                label="Quantity to Deduct"
+                label="Quantity"
                 placeholder="Enter quantity"
                 min="1"
                 step="1"

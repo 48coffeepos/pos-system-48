@@ -8,7 +8,8 @@ import { mapInventoryItem } from "./mapInventoryItem";
 export const updateInventoryItemInput = z.object({
   id: z.string(),
   name: z.string().min(1).max(200),
-  stock: z.number().int().min(0).optional(),
+  inStore: z.number().int().min(0).optional(),
+  outStore: z.number().int().min(0).optional(),
   inAdmin: z.number().int().min(0).optional(),
   outAdmin: z.number().int().min(0).optional(),
   type: z.enum(["CUP", "STANDALONE", "SUPPLIES"]),
@@ -34,6 +35,7 @@ export const updateInventoryItem = createServerFn({ method: "POST" })
       log_by: string;
       quantity: number;
       expense?: number;
+      column_name?: string;
       type: "EDIT";
       location: "STOCKROOM" | "STOREFRONT";
     }> = [];
@@ -59,10 +61,11 @@ export const updateInventoryItem = createServerFn({ method: "POST" })
         const expense = delta * unitPrice;
 
         logs.push({
-          inventory_item: `${existing.name} (in_admin)`,
+          inventory_item: existing.name,
           log_by: logBy,
           quantity: delta,
           expense,
+          column_name: "in_admin",
           type: "EDIT",
           location: "STOCKROOM",
         });
@@ -72,9 +75,10 @@ export const updateInventoryItem = createServerFn({ method: "POST" })
         const delta = data.outAdmin - existing.out_admin;
 
         logs.push({
-          inventory_item: `${existing.name} (out_admin)`,
+          inventory_item: existing.name,
           log_by: logBy,
           quantity: delta,
+          column_name: "out_admin",
           type: "EDIT",
           location: "STOCKROOM",
         });
@@ -85,18 +89,46 @@ export const updateInventoryItem = createServerFn({ method: "POST" })
       updateData.ending_admin = newEnding;
     }
 
-    if (data.stock !== undefined && data.stock < existing.ending_store) {
-      const delta = data.stock - existing.ending_store;
+    if (data.inStore !== undefined || data.outStore !== undefined) {
+      const newIn = data.inStore ?? existing.in_store;
+      const newOut = data.outStore ?? existing.out_store;
+      const newEnding = existing.beginning_store + newIn - newOut;
 
-      logs.push({
-        inventory_item: `${existing.name} (ending_store)`,
-        log_by: logBy,
-        quantity: delta,
-        type: "EDIT",
-        location: "STOREFRONT",
-      });
+      if (data.inStore !== undefined && data.inStore > existing.in_store) {
+        throw new Error(
+          `Cannot increase In Store via edit. Use "Add Stock" to increase quantity.`,
+        );
+      }
 
-      updateData.ending_store = data.stock;
+      if (data.inStore !== undefined && data.inStore < existing.in_store) {
+        const delta = data.inStore - existing.in_store;
+
+        logs.push({
+          inventory_item: existing.name,
+          log_by: logBy,
+          quantity: delta,
+          column_name: "in_store",
+          type: "EDIT",
+          location: "STOREFRONT",
+        });
+      }
+
+      if (data.outStore !== undefined && data.outStore !== existing.out_store) {
+        const delta = data.outStore - existing.out_store;
+
+        logs.push({
+          inventory_item: existing.name,
+          log_by: logBy,
+          quantity: delta,
+          column_name: "out_store",
+          type: "EDIT",
+          location: "STOREFRONT",
+        });
+      }
+
+      updateData.in_store = newIn;
+      updateData.out_store = newOut;
+      updateData.ending_store = newEnding;
     }
 
     if (data.costPrice !== undefined) {
