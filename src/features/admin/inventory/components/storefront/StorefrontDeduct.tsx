@@ -73,6 +73,7 @@ function StorefrontDeduct({ item, open, onOpenChange }: StorefrontDeductProps) {
                 label="Quantity to Deduct"
                 placeholder="Enter quantity"
                 min="1"
+                step="1"
               />
             )}
           </form.AppField>

@@ -163,16 +163,16 @@ function AddInventoryItem({ editingItem, onCancelEdit, activeTab = "storefront" 
             <p className="text-xs text-(--medium-gray)">{String(quantity).length} / 5</p>
           </div>
           <Input
-            type="text"
-            inputMode="numeric"
+            type="number"
+            min={0}
+            max={99999}
+            step={1}
             value={quantity}
             onChange={(e) => {
-              let val = e.target.value.replace(/[^0-9]/g, "");
-              val = val.slice(0, 5);
-              setQuantity(val === "" ? 0 : Number(val));
+              const val = e.target.valueAsNumber;
+              setQuantity(Number.isNaN(val) ? 0 : Math.min(99999, Math.max(0, Math.floor(val))));
             }}
             placeholder="0"
-            maxLength={5}
             className="h-10 w-full rounded-xl border-(--light-gray) px-3 text-sm"
           />
         </div>

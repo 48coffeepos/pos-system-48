@@ -9,6 +9,7 @@ import { mapInventoryItem } from "./mapInventoryItem";
 export const stockroomAddStockInput = z.object({
   itemId: z.string(),
   quantity: z.number().int().min(1),
+  unitPrice: z.number().min(0),
   itemName: z.string(),
 });
 
@@ -17,16 +18,14 @@ export const stockroomAddStock = createServerFn({ method: "POST" })
   .inputValidator(stockroomAddStockInput)
   .handler(async ({ data, context }) => {
     const logBy = context.session.user.name;
-
-    const item = await prisma.inventory.findUnique({
-      where: { inventory_id: data.itemId },
-      select: { cost_price: true },
-    });
-
-    const unitPrice = item?.cost_price ? Number(item.cost_price) : 0;
-    const expense = data.quantity * unitPrice;
+    const expense = data.quantity * data.unitPrice;
 
     const updated = await prisma.$transaction(async (tx) => {
+      await tx.inventory.update({
+        where: { inventory_id: data.itemId },
+        data: { cost_price: data.unitPrice },
+      });
+
       const inventory = await applyInventoryMovement(tx, data.itemId, {
         kind: "admin_in",
         quantity: data.quantity,

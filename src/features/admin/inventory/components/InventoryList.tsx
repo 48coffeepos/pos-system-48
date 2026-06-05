@@ -54,7 +54,6 @@ function getLedgerForItem(item: InventoryItem, tab: InventoryLedgerTab) {
 			in: item.inAdmin,
 			out: item.outAdmin,
 			ending: item.endingAdmin,
-			expense: item.inAdmin * item.costPrice,
 		};
 	}
 	return {
@@ -62,13 +61,7 @@ function getLedgerForItem(item: InventoryItem, tab: InventoryLedgerTab) {
 		in: item.inStore,
 		out: item.outStore,
 		ending: item.endingStore,
-		expense: item.inStore * item.costPrice,
 	};
-}
-
-function formatExpense(amount: number) {
-	if (amount <= 0) return "—";
-	return `₱${amount.toFixed(2)}`;
 }
 
 function InventoryList({
@@ -158,7 +151,7 @@ function InventoryList({
 	const inventoryColCount =
 		1 +
 		4 +
-		(showStockroomFinancialColumns ? 2 : 0) +
+		(showStockroomFinancialColumns ? 1 : 0) +
 		(effectiveActions !== "none" ? 1 : 0);
 	const logsColCount = 6 + (showFinancialColumns ? 1 : 0);
 	const tableColSpan = isLogsTab ? logsColCount : inventoryColCount;
@@ -301,15 +294,14 @@ function InventoryList({
 									<th className="p-3 text-center">Out</th>
 									<th className="p-3 text-center">Ending</th>
 									{showStockroomFinancialColumns && (
-										<>
-											<th className="p-3 text-center">Unit Price</th>
-											<th className="p-3 text-center">Expenses</th>
-										</>
+										<th
+											className={`p-3 text-center ${effectiveActions === "none" ? "rounded-r-lg pr-4" : ""}`}
+										>
+											Unit Price
+										</th>
 									)}
 									{effectiveActions !== "none" && (
-										<th
-											className={`p-3 pr-4 text-right ${!showStockroomFinancialColumns ? "rounded-r-lg" : ""}`}
-										>
+										<th className="rounded-r-lg p-3 pr-4 text-right">
 											Actions
 										</th>
 									)}
@@ -409,14 +401,9 @@ function InventoryList({
 											</td>
 
 											{showStockroomFinancialColumns && (
-												<>
-													<td className="p-4 text-center text-sm text-(--dark-gray)">
-														₱{item.costPrice.toFixed(2)}
-													</td>
-													<td className="p-4 text-center text-sm text-(--dark-gray)">
-														{formatExpense(ledger.expense)}
-													</td>
-												</>
+												<td className="p-4 text-center text-sm text-(--dark-gray)">
+													₱{item.costPrice.toFixed(2)}
+												</td>
 											)}
 
 											{effectiveActions !== "none" && (
@@ -593,6 +580,7 @@ function InventoryList({
 					item={{
 						id: stockroomDeductingItem.id,
 						name: stockroomDeductingItem.name,
+						endingAdmin: stockroomDeductingItem.endingAdmin,
 					}}
 					open={!!stockroomDeductingItem}
 					onOpenChange={(open) => {
