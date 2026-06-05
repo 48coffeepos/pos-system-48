@@ -37,7 +37,14 @@ export const addStock = createServerFn({ method: "POST" })
         },
       });
 
-      return updated;
+      return {
+        id: updated.inventory_id,
+        name: updated.name,
+        stock: updated.stock,
+        adminStock: updated.admin_stock ?? 0,
+        type: updated.type,
+        costPrice: updated.cost_price ? Number(updated.cost_price) : 0,
+      };
     }
 
     const updated = await prisma.inventory.update({
@@ -47,5 +54,12 @@ export const addStock = createServerFn({ method: "POST" })
       },
     });
 
-    return updated;
+    return {
+      id: updated.inventory_id,
+      name: updated.name,
+      stock: updated.stock,
+      adminStock: updated.admin_stock ?? 0,
+      type: updated.type,
+      costPrice: updated.cost_price ? Number(updated.cost_price) : 0,
+    };
   });

@@ -62,7 +62,8 @@ export const ModelName = {
   OrderItemAddon: 'OrderItemAddon',
   OrderItem: 'OrderItem',
   Order: 'Order',
-  Verification: 'Verification'
+  Verification: 'Verification',
+  InventoryLog: 'InventoryLog'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -161,7 +162,8 @@ export const InventoryScalarFieldEnum = {
   stock: 'stock',
   yesterday_stock: 'yesterday_stock',
   type: 'type',
-  admin_stock: 'admin_stock'
+  admin_stock: 'admin_stock',
+  cost_price: 'cost_price'
 } as const
 
 export type InventoryScalarFieldEnum = (typeof InventoryScalarFieldEnum)[keyof typeof InventoryScalarFieldEnum]
@@ -245,6 +247,20 @@ export const VerificationScalarFieldEnum = {
 } as const
 
 export type VerificationScalarFieldEnum = (typeof VerificationScalarFieldEnum)[keyof typeof VerificationScalarFieldEnum]
+
+
+export const InventoryLogScalarFieldEnum = {
+  inventory_log_id: 'inventory_log_id',
+  date_time: 'date_time',
+  expense: 'expense',
+  quantity: 'quantity',
+  inventory_item: 'inventory_item',
+  location: 'location',
+  log_by: 'log_by',
+  type: 'type'
+} as const
+
+export type InventoryLogScalarFieldEnum = (typeof InventoryLogScalarFieldEnum)[keyof typeof InventoryLogScalarFieldEnum]
 
 
 export const SortOrder = {

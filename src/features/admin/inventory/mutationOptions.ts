@@ -5,6 +5,22 @@ import type { z } from "zod";
 import inventoryKeys from "./keys";
 import { addStock, type addStockInput } from "./server/addStock";
 import {
+	storefrontAddStock,
+	type storefrontAddStockInput,
+} from "./server/storefrontAddStock";
+import {
+	storefrontDeductStock,
+	type storefrontDeductStockInput,
+} from "./server/storefrontDeductStock";
+import {
+	stockroomAddStock,
+	type stockroomAddStockInput,
+} from "./server/stockroomAddStock";
+import {
+	stockroomDeductStock,
+	type stockroomDeductStockInput,
+} from "./server/stockroomDeductStock";
+import {
 	createInventoryItem,
 	type createInventoryItemInput,
 } from "./server/createInventoryItem";
@@ -83,6 +99,90 @@ export const deleteInventoryItemMutationOptions = mutationOptions({
 	},
 	onError: (error) => {
 		toast.error("Failed to delete item", {
+			description: error?.message ?? "Unknown error",
+		});
+	},
+});
+
+export const storefrontAddStockMutationOptions = mutationOptions({
+	mutationFn: async (data: z.infer<typeof storefrontAddStockInput>) =>
+		storefrontAddStock({ data }),
+	onSuccess: (_data, variables, _onMutateResult, mutationContext) => {
+		mutationContext?.client?.invalidateQueries({
+			queryKey: inventoryKeys.inventory,
+		});
+		mutationContext?.client?.invalidateQueries({
+			queryKey: inventoryKeys.inventoryLogs,
+		});
+		toast.success("Stock added to storefront", {
+			description: `${variables.quantity}x ${variables.itemName} added to storefront stock.`,
+		});
+	},
+	onError: (error) => {
+		toast.error("Failed to add stock", {
+			description: error?.message ?? "Unknown error",
+		});
+	},
+});
+
+export const storefrontDeductStockMutationOptions = mutationOptions({
+	mutationFn: async (data: z.infer<typeof storefrontDeductStockInput>) =>
+		storefrontDeductStock({ data }),
+	onSuccess: (_data, variables, _onMutateResult, mutationContext) => {
+		mutationContext?.client?.invalidateQueries({
+			queryKey: inventoryKeys.inventory,
+		});
+		mutationContext?.client?.invalidateQueries({
+			queryKey: inventoryKeys.inventoryLogs,
+		});
+		toast.success("Stock deducted from storefront", {
+			description: `${variables.quantity}x ${variables.itemName} deducted from storefront stock.`,
+		});
+	},
+	onError: (error) => {
+		toast.error("Failed to deduct stock", {
+			description: error?.message ?? "Unknown error",
+		});
+	},
+});
+
+export const stockroomAddStockMutationOptions = mutationOptions({
+	mutationFn: async (data: z.infer<typeof stockroomAddStockInput>) =>
+		stockroomAddStock({ data }),
+	onSuccess: (_data, variables, _onMutateResult, mutationContext) => {
+		mutationContext?.client?.invalidateQueries({
+			queryKey: inventoryKeys.inventory,
+		});
+		mutationContext?.client?.invalidateQueries({
+			queryKey: inventoryKeys.inventoryLogs,
+		});
+		toast.success("Stock added to stockroom", {
+			description: `Added to stockroom`,
+		});
+	},
+	onError: (error) => {
+		toast.error("Failed to add stock", {
+			description: error?.message ?? "Unknown error",
+		});
+	},
+});
+
+export const stockroomDeductStockMutationOptions = mutationOptions({
+	mutationFn: async (data: z.infer<typeof stockroomDeductStockInput>) =>
+		stockroomDeductStock({ data }),
+	onSuccess: (_data, variables, _onMutateResult, mutationContext) => {
+		mutationContext?.client?.invalidateQueries({
+			queryKey: inventoryKeys.inventory,
+		});
+		mutationContext?.client?.invalidateQueries({
+			queryKey: inventoryKeys.inventoryLogs,
+		});
+		toast.success("Stock deducted from stockroom", {
+			description: `${variables.quantity}x ${variables.itemName} deducted from stockroom stock.`,
+		});
+	},
+	onError: (error) => {
+		toast.error("Failed to deduct stock", {
 			description: error?.message ?? "Unknown error",
 		});
 	},
