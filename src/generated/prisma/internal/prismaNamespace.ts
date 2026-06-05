@@ -1497,7 +1497,8 @@ export const InventoryScalarFieldEnum = {
   stock: 'stock',
   yesterday_stock: 'yesterday_stock',
   type: 'type',
-  admin_stock: 'admin_stock'
+  admin_stock: 'admin_stock',
+  cost_price: 'cost_price'
 } as const
 
 export type InventoryScalarFieldEnum = (typeof InventoryScalarFieldEnum)[keyof typeof InventoryScalarFieldEnum]
