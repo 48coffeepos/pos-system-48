@@ -51,7 +51,8 @@ function InventoryList({
 	items = [],
 	inventoryLogs = [],
 	onEdit,
-	hideActions = false,
+	hideActions,
+	actions = "all",
 	activeTab = "admin",
 	onTabChange,
 }: {
@@ -59,9 +60,11 @@ function InventoryList({
 	inventoryLogs?: InventoryLogEntry[];
 	onEdit?: (item: ExtendedInventoryItem) => void;
 	hideActions?: boolean;
+	actions?: "none" | "stock" | "all";
 	activeTab?: Tab;
 	onTabChange?: (tab: Tab) => void;
 }) {
+	const effectiveActions = hideActions ? "none" : actions;
 	const [timeframe, setTimeframe] = useState<"today" | "yesterday">("today");
 	const [search, setSearch] = useState("");
 	const [deletingItem, setDeletingItem] =
@@ -266,7 +269,7 @@ function InventoryList({
 											<th className="p-3 text-center">
 												{activeTab === "admin" ? "Admin Stock" : "Quantity"}
 											</th>
-											{!hideActions && (
+											{effectiveActions !== "none" && (
 												<th className="rounded-r-lg p-3 pr-4 text-right">Actions</th>
 											)}
 										</>
@@ -339,7 +342,7 @@ function InventoryList({
 															: (item.yesterdayStock ?? 0)}
 												</td>
 
-												{!hideActions && (
+												{effectiveActions !== "none" && (
 													<td className="p-4 pr-4 text-right">
 														<div className="flex items-center justify-end gap-3 text-(--medium-gray)">
 															{activeTab === "storefront" && (
@@ -384,22 +387,26 @@ function InventoryList({
 																	<span className="text-(--light-gray)">|</span>
 																</>
 															)}
-															<button
-																type="button"
-																onClick={() => onEdit?.(item)}
-																className="p-1 hover:text-(--deep-forest) transition-colors"
-																aria-label="Edit item"
-															>
-																<NotePencilIcon size={18} />
-															</button>
-															<button
-																type="button"
-																onClick={() => setDeletingItem(item)}
-																className="p-1 hover:text-red-600 transition-colors"
-																aria-label="Delete item record"
-															>
-																<TrashIcon size={18} />
-															</button>
+															{effectiveActions === "all" && (
+																<>
+																	<button
+																		type="button"
+																		onClick={() => onEdit?.(item)}
+																		className="p-1 hover:text-(--deep-forest) transition-colors"
+																		aria-label="Edit item"
+																	>
+																		<NotePencilIcon size={18} />
+																	</button>
+																	<button
+																		type="button"
+																		onClick={() => setDeletingItem(item)}
+																		className="p-1 hover:text-red-600 transition-colors"
+																		aria-label="Delete item record"
+																	>
+																		<TrashIcon size={18} />
+																	</button>
+																</>
+															)}
 														</div>
 													</td>
 												)}
@@ -409,7 +416,7 @@ function InventoryList({
 								) : (
 									<tr>
 										<td
-											colSpan={isLogsTab ? 7 : hideActions ? 2 : 3}
+											colSpan={isLogsTab ? 7 : effectiveActions === "none" ? 2 : 3}
 											className="h-24 text-center text-sm text-(--medium-gray)"
 										>
 											No items match your search.

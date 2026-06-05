@@ -57,7 +57,7 @@ function StorefrontAdd({ item, open, onOpenChange }: StorefrontAddProps) {
         <DialogHeader>
           <DialogTitle>{item.name}</DialogTitle>
           <DialogDescription>
-            Add stock to storefront inventory
+            <span className="font-bold text-red-500">Add stock</span> to <span className="font-bold text-red-500">storefront</span> inventory
           </DialogDescription>
         </DialogHeader>
 
@@ -70,7 +70,7 @@ function StorefrontAdd({ item, open, onOpenChange }: StorefrontAddProps) {
           <form.AppField name="quantity">
             {(field) => (
               <field.NumberField
-                label="Added Stock"
+                label="Quantity to add"
                 placeholder="Enter quantity"
                 min="1"
               />

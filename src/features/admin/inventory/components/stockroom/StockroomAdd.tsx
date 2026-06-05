@@ -59,7 +59,7 @@ function StockroomAdd({ item, open, onOpenChange }: StockroomAddProps) {
         <DialogHeader>
           <DialogTitle>{item.name}</DialogTitle>
           <DialogDescription>
-            Add stock to stockroom inventory
+            <span className="font-bold text-red-500">Add stock</span> to <span className="font-bold text-red-500">stockroom</span> inventory
           </DialogDescription>
         </DialogHeader>
 
