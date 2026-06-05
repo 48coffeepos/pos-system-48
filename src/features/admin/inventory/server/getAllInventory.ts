@@ -17,5 +17,6 @@ export const getAllInventory = createServerFn({ method: "GET" })
     stock: item.stock,
     adminStock: item.admin_stock ?? 0,
     type: item.type,
+    costPrice: item.cost_price ? Number(item.cost_price) : 0,
   }));
 });

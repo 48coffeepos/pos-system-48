@@ -18,14 +18,13 @@ import { useAppForm } from "@/integrations/tanstack-form";
 import { stockroomAddStockMutationOptions } from "../../mutationOptions";
 
 interface StockroomAddProps {
-  item: { id: string; name: string };
+  item: { id: string; name: string; costPrice: number };
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
 const formSchema = z.object({
   quantity: z.number().int().min(1, "Must add at least 1 item"),
-  unitPrice: z.number().min(0, "Price cannot be negative"),
 });
 
 function StockroomAdd({ item, open, onOpenChange }: StockroomAddProps) {
@@ -40,7 +39,7 @@ function StockroomAdd({ item, open, onOpenChange }: StockroomAddProps) {
   });
 
   const form = useAppForm({
-    defaultValues: { quantity: 1, unitPrice: 1 },
+    defaultValues: { quantity: 1 },
     validators: { onChange: formSchema },
     onSubmit: async ({ value }) => {
       if (!session?.user) return;
@@ -48,7 +47,6 @@ function StockroomAdd({ item, open, onOpenChange }: StockroomAddProps) {
         itemId: item.id,
         quantity: value.quantity,
         itemName: item.name,
-        unitPrice: value.unitPrice,
       });
     },
   });
@@ -79,31 +77,25 @@ function StockroomAdd({ item, open, onOpenChange }: StockroomAddProps) {
             )}
           </form.AppField>
 
-          <form.AppField name="unitPrice">
-            {(field) => (
-              <field.NumberField
-                label="Unit Price (₱)"
-                placeholder="0.00"
-                min="0"
-                step="0.01"
-              />
-            )}
-          </form.AppField>
+          <div className="mt-3 flex items-center justify-between rounded-lg bg-(--pale-yellow)/50 px-4 py-2.5 text-sm">
+            <span className="font-medium text-(--dark-gray)">Cost per unit</span>
+            <span className="font-semibold text-(--deep-forest)">
+              ₱{item.costPrice.toFixed(2)}
+            </span>
+          </div>
 
           <form.Subscribe
             selector={(state) => ({
               quantity: state.values.quantity,
-              unitPrice: state.values.unitPrice,
             })}
           >
-            {({ quantity, unitPrice }) => {
+            {({ quantity }) => {
               const qty = Number.isFinite(quantity) ? quantity : 0;
-              const price = Number.isFinite(unitPrice) ? unitPrice : 0;
               return (
                 <div className="mt-4 flex items-center justify-between rounded-lg bg-(--soft-peach)/50 px-4 py-3 text-sm">
                   <span className="font-medium text-(--dark-gray)">Total Expense</span>
                   <span className="text-lg font-bold text-(--deep-forest)">
-                    ₱{(qty * price).toFixed(2)}
+                    ₱{(qty * item.costPrice).toFixed(2)}
                   </span>
                 </div>
               );

@@ -81,7 +81,6 @@ function AdminInventory() {
         {showAddPanel && (
           <div className="lg:sticky lg:top-24 lg:self-start">
             <AddInventoryItem
-              items={inventoryItems ?? []}
               editingItem={editingItem}
               onCancelEdit={() => setEditingItem(null)}
               activeTab={activeTab}

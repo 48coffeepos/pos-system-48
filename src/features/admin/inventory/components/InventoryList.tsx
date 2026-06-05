@@ -30,8 +30,9 @@ import { StockroomDeduct } from "./stockroom/StockroomDeduct";
 import type { InventoryItem } from "./AddInventoryItem";
 
 interface ExtendedInventoryItem extends InventoryItem {
-	yesterdayStock?: number;
-	adminStock: number;
+  yesterdayStock?: number;
+  adminStock: number;
+  costPrice: number;
 }
 
 interface InventoryLogEntry {
@@ -65,7 +66,6 @@ function InventoryList({
 	onTabChange?: (tab: Tab) => void;
 }) {
 	const effectiveActions = hideActions ? "none" : actions;
-	const [timeframe, setTimeframe] = useState<"today" | "yesterday">("today");
 	const [search, setSearch] = useState("");
 	const [deletingItem, setDeletingItem] =
 		useState<ExtendedInventoryItem | null>(null);
@@ -163,33 +163,6 @@ function InventoryList({
 						</div>
 
 						<div className="flex gap-2 self-start sm:self-auto">
-							{/* Timeframe Pill Switcher — only on storefront tab */}
-							{activeTab === "storefront" && (
-								<div className="flex gap-1.5 rounded-full bg-(--light-gray)/30 p-1">
-									<button
-										type="button"
-										onClick={() => setTimeframe("today")}
-										className={`rounded-full px-4 py-1.5 text-xs font-medium transition-colors ${
-											timeframe === "today"
-												? "bg-(--deep-forest) text-(--pure-white)"
-												: "text-(--medium-gray) hover:bg-(--light-gray)/50"
-										}`}
-									>
-										Today
-									</button>
-									<button
-										type="button"
-										onClick={() => setTimeframe("yesterday")}
-										className={`rounded-full px-4 py-1.5 text-xs font-medium transition-colors ${
-											timeframe === "yesterday"
-												? "bg-(--deep-forest) text-(--pure-white)"
-												: "text-(--medium-gray) hover:bg-(--light-gray)/50"
-										}`}
-									>
-										Yesterday
-									</button>
-								</div>
-							)}
 							{/* Tab Toggle — only show when onTabChange is provided */}
 							{onTabChange && (
 								<div className="flex gap-1.5 rounded-full bg-(--light-gray)/30 p-1">
@@ -269,8 +242,14 @@ function InventoryList({
 											<th className="p-3 text-center">
 												{activeTab === "admin" ? "Admin Stock" : "Quantity"}
 											</th>
+											{activeTab === "admin" && (
+												<th className="p-3 text-center">Cost Price</th>
+											)}
 											{effectiveActions !== "none" && (
-												<th className="rounded-r-lg p-3 pr-4 text-right">Actions</th>
+												<th className={`p-3 pr-4 text-right ${activeTab !== "admin" ? "rounded-r-lg" : ""}`}>Actions</th>
+											)}
+											{activeTab === "admin" && effectiveActions === "none" && (
+												<th className="rounded-r-lg p-3 pr-4" />
 											)}
 										</>
 									)}
@@ -337,10 +316,14 @@ function InventoryList({
 												<td className="p-4 text-center font-bold text-sm text-(--deep-forest)">
 													{activeTab === "admin"
 														? (item.adminStock ?? 0)
-														: timeframe === "today"
-															? item.stock
-															: (item.yesterdayStock ?? 0)}
+														: item.stock}
 												</td>
+
+												{activeTab === "admin" && (
+													<td className="p-4 text-center text-sm text-(--dark-gray)">
+														₱{item.costPrice.toFixed(2)}
+													</td>
+												)}
 
 												{effectiveActions !== "none" && (
 													<td className="p-4 pr-4 text-right">
@@ -416,7 +399,7 @@ function InventoryList({
 								) : (
 									<tr>
 										<td
-											colSpan={isLogsTab ? 7 : effectiveActions === "none" ? 2 : 3}
+											colSpan={isLogsTab ? 7 : effectiveActions === "none" ? (activeTab === "admin" ? 3 : 2) : (activeTab === "admin" ? 4 : 3)}
 											className="h-24 text-center text-sm text-(--medium-gray)"
 										>
 											No items match your search.
@@ -454,7 +437,7 @@ function InventoryList({
 			{/* Add Stock to Stockroom Modal */}
 			{stockroomingItem && (
 				<StockroomAdd
-					item={{ id: stockroomingItem.id, name: stockroomingItem.name }}
+					item={{ id: stockroomingItem.id, name: stockroomingItem.name, costPrice: stockroomingItem.costPrice }}
 					open={!!stockroomingItem}
 					onOpenChange={(open) => {
 						if (!open) setStockroomingItem(null);

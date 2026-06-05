@@ -8,7 +8,6 @@ export const stockroomAddStockInput = z.object({
   itemId: z.string(),
   quantity: z.number().int().min(1),
   itemName: z.string(),
-  unitPrice: z.number().min(0),
 });
 
 export const stockroomAddStock = createServerFn({ method: "POST" })
@@ -16,7 +15,14 @@ export const stockroomAddStock = createServerFn({ method: "POST" })
   .inputValidator(stockroomAddStockInput)
   .handler(async ({ data, context }) => {
     const logBy = context.session.user.name;
-    const expense = data.quantity * data.unitPrice;
+
+    const item = await prisma.inventory.findUnique({
+      where: { inventory_id: data.itemId },
+      select: { cost_price: true },
+    });
+
+    const unitPrice = item?.cost_price ? Number(item.cost_price) : 0;
+    const expense = data.quantity * unitPrice;
 
     const [updated] = await prisma.$transaction([
       prisma.inventory.update({
@@ -35,5 +41,12 @@ export const stockroomAddStock = createServerFn({ method: "POST" })
       }),
     ]);
 
-    return updated;
+    return {
+      id: updated.inventory_id,
+      name: updated.name,
+      stock: updated.stock,
+      adminStock: updated.admin_stock ?? 0,
+      type: updated.type,
+      costPrice: updated.cost_price ? Number(updated.cost_price) : 0,
+    };
   });
