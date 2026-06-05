@@ -9,6 +9,7 @@ export const updateInventoryItemInput = z.object({
   id: z.string(),
   name: z.string().min(1).max(200),
   stock: z.number().int().min(0).optional(),
+  inAdmin: z.number().int().min(0).optional(),
   outAdmin: z.number().int().min(0).optional(),
   type: z.enum(["CUP", "STANDALONE", "SUPPLIES"]),
   costPrice: z.number().min(0).optional(),
@@ -27,6 +28,7 @@ export const updateInventoryItem = createServerFn({ method: "POST" })
     }
 
     const logBy = context.session.user.name;
+    const unitPrice = existing.cost_price ? Number(existing.cost_price) : 0;
     const logs: Array<{
       inventory_item: string;
       log_by: string;
@@ -41,19 +43,23 @@ export const updateInventoryItem = createServerFn({ method: "POST" })
       type: data.type,
     };
 
-    if (data.outAdmin !== undefined) {
-      const syncedEnding = existing.beginning_admin + existing.in_admin - data.outAdmin;
+    if (data.inAdmin !== undefined || data.outAdmin !== undefined) {
+      const newIn = data.inAdmin ?? existing.in_admin;
+      const newOut = data.outAdmin ?? existing.out_admin;
+      const newEnding = existing.beginning_admin + newIn - newOut;
 
-      updateData.out_admin = data.outAdmin;
-      updateData.ending_admin = syncedEnding;
+      if (data.inAdmin !== undefined && data.inAdmin > existing.in_admin) {
+        throw new Error(
+          `Cannot increase In Admin via edit. Use "Add Stock" to increase quantity.`,
+        );
+      }
 
-      if (data.outAdmin !== existing.out_admin) {
-        const delta = data.outAdmin - existing.out_admin;
-        const unitPrice = existing.cost_price ? Number(existing.cost_price) : 0;
-        const expense = -(delta * unitPrice);
+      if (data.inAdmin !== undefined && data.inAdmin < existing.in_admin) {
+        const delta = data.inAdmin - existing.in_admin;
+        const expense = delta * unitPrice;
 
         logs.push({
-          inventory_item: existing.name,
+          inventory_item: `${existing.name} (in_admin)`,
           log_by: logBy,
           quantity: delta,
           expense,
@@ -61,13 +67,29 @@ export const updateInventoryItem = createServerFn({ method: "POST" })
           location: "STOCKROOM",
         });
       }
+
+      if (data.outAdmin !== undefined && data.outAdmin !== existing.out_admin) {
+        const delta = data.outAdmin - existing.out_admin;
+
+        logs.push({
+          inventory_item: `${existing.name} (out_admin)`,
+          log_by: logBy,
+          quantity: delta,
+          type: "EDIT",
+          location: "STOCKROOM",
+        });
+      }
+
+      updateData.in_admin = newIn;
+      updateData.out_admin = newOut;
+      updateData.ending_admin = newEnding;
     }
 
     if (data.stock !== undefined && data.stock < existing.ending_store) {
       const delta = data.stock - existing.ending_store;
 
       logs.push({
-        inventory_item: existing.name,
+        inventory_item: `${existing.name} (ending_store)`,
         log_by: logBy,
         quantity: delta,
         type: "EDIT",

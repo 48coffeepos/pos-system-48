@@ -57,7 +57,7 @@ function StorefrontAdd({ item, open, onOpenChange }: StorefrontAddProps) {
         <DialogHeader>
           <DialogTitle>{item.name}</DialogTitle>
           <DialogDescription>
-            <span className="font-bold text-red-500">Add stock</span> to{" "}
+            <span className="font-bold text-red-500">IN stock</span> to{" "}
             <span className="font-bold text-red-500">storefront</span> inventory
           </DialogDescription>
         </DialogHeader>

@@ -77,7 +77,7 @@ function TransferStock({ item, open, onOpenChange }: TransferStockProps) {
 				<DialogHeader>
 					<DialogTitle>Transfer {item.name}</DialogTitle>
 					<DialogDescription>
-						Move stock from admin to storefront. Available in stockroom:{" "}
+						<span className="font-bold text-red-500">Transfer stock</span> from admin to storefront. Available in stockroom:{" "}
 						<span className="font-semibold text-(--deep-forest)">
 							{item.endingAdmin}
 						</span>

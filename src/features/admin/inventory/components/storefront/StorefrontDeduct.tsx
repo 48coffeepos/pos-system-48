@@ -57,7 +57,7 @@ function StorefrontDeduct({ item, open, onOpenChange }: StorefrontDeductProps) {
         <DialogHeader>
           <DialogTitle>{item.name}</DialogTitle>
           <DialogDescription>
-            <span className="font-bold text-red-500">Deduct stock</span> from <span className="font-bold text-red-500">storefront</span> inventory
+            <span className="font-bold text-red-500">OUT stock</span> from <span className="font-bold text-red-500">storefront</span> inventory
           </DialogDescription>
         </DialogHeader>
 

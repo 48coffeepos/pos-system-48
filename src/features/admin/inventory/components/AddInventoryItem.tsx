@@ -41,6 +41,7 @@ function AddInventoryItem({ editingItem, onCancelEdit, activeTab = "storefront" 
   const [itemName, setItemName] = useState("");
   const [itemType, setItemType] = useState<InventoryItemType>("STANDALONE");
   const [quantity, setQuantity] = useState<number>(0);
+  const [inAdmin, setInAdmin] = useState<number>(0);
   const [outAdmin, setOutAdmin] = useState<number>(0);
   const [costPrice, setCostPrice] = useState<number>(0);
 
@@ -60,9 +61,10 @@ function AddInventoryItem({ editingItem, onCancelEdit, activeTab = "storefront" 
 
   const isPending = createMutation.isPending || updateMutation.isPending;
 
-  const autoEndingAdmin = isEditing && editingItem && activeTab === "admin"
-    ? editingItem.beginningAdmin + editingItem.inAdmin - outAdmin
+  const newEndingAdmin = isEditing && editingItem && activeTab === "admin"
+    ? editingItem.beginningAdmin + inAdmin - outAdmin
     : 0;
+  const hasPositiveDelta = isEditing && activeTab === "admin" && inAdmin > (editingItem?.inAdmin ?? 0);
 
   useEffect(() => {
     if (editingItem) {
@@ -73,6 +75,7 @@ function AddInventoryItem({ editingItem, onCancelEdit, activeTab = "storefront" 
           ? editingItem.endingAdmin
           : editingItem.endingStore,
       );
+      setInAdmin(activeTab === "admin" ? editingItem.inAdmin : 0);
       setOutAdmin(activeTab === "admin" ? editingItem.outAdmin : 0);
       setCostPrice(editingItem.costPrice);
     }
@@ -82,6 +85,7 @@ function AddInventoryItem({ editingItem, onCancelEdit, activeTab = "storefront" 
     setItemName("");
     setItemType("STANDALONE");
     setQuantity(0);
+    setInAdmin(0);
     setOutAdmin(0);
     setCostPrice(0);
     onCancelEdit?.();
@@ -98,7 +102,7 @@ function AddInventoryItem({ editingItem, onCancelEdit, activeTab = "storefront" 
         name: itemName.trim(),
         type: itemType,
           ...(activeTab === "admin"
-            ? { outAdmin }
+            ? { inAdmin, outAdmin }
             : { stock: quantity }),
         costPrice,
       });
@@ -167,8 +171,32 @@ function AddInventoryItem({ editingItem, onCancelEdit, activeTab = "storefront" 
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-(--dark-gray)">Admin Stock (auto)</label>
               <div className="flex h-10 items-center rounded-xl border border-(--light-gray) bg-(--light-gray)/20 px-3 text-sm text-(--medium-gray)">
-                {autoEndingAdmin}
+                {newEndingAdmin}
               </div>
+            </div>
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between gap-3">
+                <label className="text-sm font-medium text-(--dark-gray)">In Admin</label>
+                <p className="text-xs text-(--medium-gray)">{String(inAdmin).length} / 5</p>
+              </div>
+              <Input
+                type="number"
+                min={0}
+                max={99999}
+                step={1}
+                value={inAdmin}
+                onChange={(e) => {
+                  const val = e.target.valueAsNumber;
+                  setInAdmin(Number.isNaN(val) ? 0 : Math.min(99999, Math.max(0, Math.floor(val))));
+                }}
+                placeholder="0"
+                className="h-10 w-full rounded-xl border-(--light-gray) px-3 text-sm"
+              />
+              {hasPositiveDelta && (
+              <p className="text-xs font-medium text-red-600">
+                Use "Add Stock" to increase In Admin.
+              </p>
+            )}
             </div>
             <div className="space-y-1.5">
               <div className="flex items-center justify-between gap-3">
@@ -189,6 +217,7 @@ function AddInventoryItem({ editingItem, onCancelEdit, activeTab = "storefront" 
                 className="h-10 w-full rounded-xl border-(--light-gray) px-3 text-sm"
               />
             </div>
+
           </>
         ) : (
           <div className="space-y-1.5">
@@ -250,10 +279,10 @@ function AddInventoryItem({ editingItem, onCancelEdit, activeTab = "storefront" 
             <button
               type="button"
               onClick={handleSubmit}
-              disabled={!isFormValid() || isPending}
+              disabled={!isFormValid() || hasPositiveDelta || isPending}
               className={cn(
                 "flex h-11 flex-1 items-center justify-center gap-2 rounded-xl text-sm font-semibold transition-all",
-                isFormValid() && !isPending
+                isFormValid() && !hasPositiveDelta && !isPending
                   ? "bg-(--deep-forest) text-(--pure-white) hover:bg-(--forest-green) active:scale-[0.98]"
                   : "cursor-not-allowed bg-(--light-gray) text-(--medium-gray)",
               )}
