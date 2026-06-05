@@ -176,6 +176,14 @@ function InventoryList({
 		return styles[type] ?? "bg-gray-100 text-gray-700";
 	};
 
+	const typeLabel = (type: string) => {
+		const labels: Record<string, string> = {
+			ADD: "IN",
+			DEDUCT: "OUT",
+		};
+		return labels[type] ?? type;
+	};
+
 	const locationBadge = (location: string) => {
 		const styles: Record<string, string> = {
 			STOCKROOM: "bg-amber-100 text-amber-700",
@@ -331,7 +339,7 @@ function InventoryList({
 											<span
 												className={`inline-block rounded px-2 py-0.5 text-[11px] font-semibold ${typeBadge(log.type)}`}
 											>
-												{log.type}
+												{typeLabel(log.type)}
 											</span>
 											{log.columnName && (
 												<span className="ml-1.5 inline-block rounded bg-(--medium-gray)/10 px-1.5 py-0.5 text-[10px] font-medium text-(--medium-gray)">
