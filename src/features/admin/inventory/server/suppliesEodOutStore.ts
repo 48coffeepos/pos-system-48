@@ -1,34 +1,41 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
-import { adminAuthMiddleware } from "@/features/auth/middlewares";
+import { authMiddleware } from "@/features/auth/middlewares";
 import { prisma } from "@/integrations/prisma/db";
 import { applyInventoryMovement } from "./inventoryMovement";
 import { mapInventoryItem } from "./mapInventoryItem";
 
-export const stockroomAddStockInput = z.object({
+export const suppliesEodOutStoreInput = z.object({
   itemId: z.string(),
   quantity: z.number().int().min(1),
   itemName: z.string(),
 });
 
-export const stockroomAddStock = createServerFn({ method: "POST" })
-  .middleware([adminAuthMiddleware()])
-  .inputValidator(stockroomAddStockInput)
+export const suppliesEodOutStore = createServerFn({ method: "POST" })
+  .middleware([authMiddleware])
+  .inputValidator(suppliesEodOutStoreInput)
   .handler(async ({ data, context }) => {
-    const logBy = context.session.user.name;
-
-    const item = await prisma.inventory.findUnique({
+    const existing = await prisma.inventory.findUnique({
       where: { inventory_id: data.itemId },
-      select: { cost_price: true },
+      select: { type: true },
     });
 
-    const unitPrice = item?.cost_price ? Number(item.cost_price) : 0;
-    const expense = data.quantity * unitPrice;
+    if (!existing) {
+      throw new Error("Inventory item not found.");
+    }
+
+    if (existing.type !== "SUPPLIES") {
+      throw new Error(
+        "End-of-day usage can only be recorded for SUPPLIES items.",
+      );
+    }
+
+    const logBy = context.session.user.name;
 
     const updated = await prisma.$transaction(async (tx) => {
       const inventory = await applyInventoryMovement(tx, data.itemId, {
-        kind: "admin_in",
+        kind: "store_out",
         quantity: data.quantity,
       });
 
@@ -37,9 +44,8 @@ export const stockroomAddStock = createServerFn({ method: "POST" })
           inventory_item: data.itemName,
           log_by: logBy,
           quantity: data.quantity,
-          expense,
-          type: "ADD",
-          location: "STOCKROOM",
+          type: "DEDUCT",
+          location: "STOREFRONT",
         },
       });
 

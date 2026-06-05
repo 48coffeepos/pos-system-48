@@ -3,6 +3,8 @@ import { z } from "zod";
 
 import { adminAuthMiddleware } from "@/features/auth/middlewares";
 import { prisma } from "@/integrations/prisma/db";
+import { applyInventoryMovement } from "./inventoryMovement";
+import { mapInventoryItem } from "./mapInventoryItem";
 
 export const storefrontAddStockInput = z.object({
   itemId: z.string(),
@@ -16,12 +18,13 @@ export const storefrontAddStock = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const logBy = context.session.user.name;
 
-    const [updated] = await prisma.$transaction([
-      prisma.inventory.update({
-        where: { inventory_id: data.itemId },
-        data: { stock: { increment: data.quantity } },
-      }),
-      prisma.inventoryLog.create({
+    const updated = await prisma.$transaction(async (tx) => {
+      const inventory = await applyInventoryMovement(tx, data.itemId, {
+        kind: "store_in",
+        quantity: data.quantity,
+      });
+
+      await tx.inventoryLog.create({
         data: {
           inventory_item: data.itemName,
           log_by: logBy,
@@ -29,15 +32,10 @@ export const storefrontAddStock = createServerFn({ method: "POST" })
           type: "ADD",
           location: "STOREFRONT",
         },
-      }),
-    ]);
+      });
 
-    return {
-      id: updated.inventory_id,
-      name: updated.name,
-      stock: updated.stock,
-      adminStock: updated.admin_stock ?? 0,
-      type: updated.type,
-      costPrice: updated.cost_price ? Number(updated.cost_price) : 0,
-    };
+      return inventory;
+    });
+
+    return mapInventoryItem(updated);
   });
