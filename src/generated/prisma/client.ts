@@ -101,3 +101,8 @@ export type Order = Prisma.OrderModel
  * 
  */
 export type Verification = Prisma.VerificationModel
+/**
+ * Model InventoryLog
+ * 
+ */
+export type InventoryLog = Prisma.InventoryLogModel

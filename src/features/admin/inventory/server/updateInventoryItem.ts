@@ -10,6 +10,7 @@ export const updateInventoryItemInput = z.object({
   stock: z.number().int().min(0).optional(),
   adminStock: z.number().int().min(0).optional(),
   type: z.enum(["CUP", "STANDALONE"]),
+  costPrice: z.number().min(0).optional(),
 });
 
 export const updateInventoryItem = createServerFn({ method: "POST" })
@@ -31,6 +32,7 @@ export const updateInventoryItem = createServerFn({ method: "POST" })
         type: data.type,
         ...(data.stock !== undefined && { stock: data.stock }),
         ...(data.adminStock !== undefined && { admin_stock: data.adminStock }),
+        ...(data.costPrice !== undefined && { cost_price: data.costPrice }),
       },
     });
 
@@ -40,5 +42,6 @@ export const updateInventoryItem = createServerFn({ method: "POST" })
       stock: updated.stock,
       adminStock: updated.admin_stock ?? 0,
       type: updated.type,
+      costPrice: updated.cost_price ? Number(updated.cost_price) : 0,
     };
   });

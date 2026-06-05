@@ -49,3 +49,20 @@ export const Discount_Type = {
 } as const
 
 export type Discount_Type = (typeof Discount_Type)[keyof typeof Discount_Type]
+
+
+export const Log_type = {
+  ADD: 'ADD',
+  DEDUCT: 'DEDUCT',
+  EDIT: 'EDIT'
+} as const
+
+export type Log_type = (typeof Log_type)[keyof typeof Log_type]
+
+
+export const Location = {
+  STOCKROOM: 'STOCKROOM',
+  STOREFRONT: 'STOREFRONT'
+} as const
+
+export type Location = (typeof Location)[keyof typeof Location]

@@ -27,7 +27,10 @@ function FormNumberField({
 				id={field.name}
 				type="number"
 				value={field.state.value}
-				onChange={(e) => field.handleChange(e.target.valueAsNumber)}
+				onChange={(e) => {
+							const val = e.target.valueAsNumber;
+							field.handleChange(Number.isNaN(val) ? 0 : val);
+						}}
 				onBlur={field.handleBlur}
 				aria-invalid={isInvalid}
 				{...props}
