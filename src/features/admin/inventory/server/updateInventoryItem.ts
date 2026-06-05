@@ -94,13 +94,7 @@ export const updateInventoryItem = createServerFn({ method: "POST" })
       const newOut = data.outStore ?? existing.out_store;
       const newEnding = existing.beginning_store + newIn - newOut;
 
-      if (data.inStore !== undefined && data.inStore > existing.in_store) {
-        throw new Error(
-          `Cannot increase In Store via edit. Use "Add Stock" to increase quantity.`,
-        );
-      }
-
-      if (data.inStore !== undefined && data.inStore < existing.in_store) {
+      if (data.inStore !== undefined && data.inStore !== existing.in_store) {
         const delta = data.inStore - existing.in_store;
 
         logs.push({

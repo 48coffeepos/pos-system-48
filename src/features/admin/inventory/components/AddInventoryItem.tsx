@@ -71,8 +71,6 @@ function AddInventoryItem({ editingItem, onCancelEdit, activeTab = "storefront" 
   const newEndingStore = isEditing && editingItem && activeTab === "storefront"
     ? editingItem.beginningStore + inStore - outStore
     : 0;
-  const hasPositiveStoreDelta = isEditing && activeTab === "storefront" && inStore > (editingItem?.inStore ?? 0);
-
   useEffect(() => {
     if (editingItem) {
       setItemName(editingItem.name);
@@ -271,11 +269,6 @@ function AddInventoryItem({ editingItem, onCancelEdit, activeTab = "storefront" 
                 className="h-10 w-full rounded-xl border-(--light-gray) px-3 text-sm"
               />
             </div>
-            {hasPositiveStoreDelta && (
-              <p className="text-xs font-medium text-red-600">
-                Use "Add Stock" to increase In Store.
-              </p>
-            )}
           </>
         ) : (
           <div className="space-y-1.5">
@@ -335,10 +328,10 @@ function AddInventoryItem({ editingItem, onCancelEdit, activeTab = "storefront" 
             <button
               type="button"
               onClick={handleSubmit}
-              disabled={!isFormValid() || hasPositiveDelta || hasPositiveStoreDelta || isPending}
+              disabled={!isFormValid() || hasPositiveDelta || isPending}
               className={cn(
                 "flex h-11 flex-1 items-center justify-center gap-2 rounded-xl text-sm font-semibold transition-all",
-                isFormValid() && !hasPositiveDelta && !hasPositiveStoreDelta && !isPending
+                isFormValid() && !hasPositiveDelta && !isPending
                   ? "bg-(--deep-forest) text-(--pure-white) hover:bg-(--forest-green) active:scale-[0.98]"
                   : "cursor-not-allowed bg-(--light-gray) text-(--medium-gray)",
               )}
