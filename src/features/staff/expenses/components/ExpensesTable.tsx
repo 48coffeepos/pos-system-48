@@ -4,6 +4,7 @@ import {
   ArrowDownRightIcon,
   ArrowUpRightIcon,
   CurrencyDollarIcon,
+  ReceiptIcon,
   WarningCircleIcon,
 } from "@phosphor-icons/react";
 import { useState } from "react";
@@ -22,22 +23,26 @@ const columns = [
     header: "Type",
     cell: ({ getValue }) => {
       const type = getValue();
-      const isCashIn = type === "CASH_IN";
-      return (
-        <span
-          className={cn(
-            "inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold tracking-wide",
-            isCashIn
-              ? "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-600/20"
-              : "bg-rose-50 text-rose-700 ring-1 ring-rose-600/20",
-          )}
-        >
-          {isCashIn ? (
+      if (type === "CASH_IN") {
+        return (
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold tracking-wide text-emerald-700 ring-1 ring-emerald-600/20">
             <ArrowUpRightIcon weight="bold" className="size-3" />
-          ) : (
-            <ArrowDownRightIcon weight="bold" className="size-3" />
-          )}
-          {isCashIn ? "Cash In" : "Cash Out"}
+            Cash In
+          </span>
+        );
+      }
+      if (type === "EXPENSE") {
+        return (
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-semibold tracking-wide text-amber-700 ring-1 ring-amber-600/20">
+            <ReceiptIcon weight="bold" className="size-3" />
+            Expenses
+          </span>
+        );
+      }
+      return (
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-50 px-2.5 py-0.5 text-xs font-semibold tracking-wide text-rose-700 ring-1 ring-rose-600/20">
+          <ArrowDownRightIcon weight="bold" className="size-3" />
+          Cash Out
         </span>
       );
     },

@@ -58,7 +58,12 @@ export function ReconciliationPanel({
 				value={formatPeso(totals.totalCashSales)}
 			/>
 			<SummaryCard
-				label="Expenses / Total Cash Out"
+				label="Total Pickup / Expenses"
+				value={formatPeso(totals.totalExpenses)}
+				valueClassName="text-(--coral)"
+			/>
+			<SummaryCard
+				label="Total Cashout"
 				value={formatPeso(totals.totalCashOut)}
 				valueClassName="text-(--coral)"
 			/>

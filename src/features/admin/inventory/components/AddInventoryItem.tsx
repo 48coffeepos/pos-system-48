@@ -10,15 +10,9 @@ import {
   createInventoryItemMutationOptions,
   updateInventoryItemMutationOptions,
 } from "../mutationOptions";
+import type { InventoryItem, InventoryItemType } from "../types";
 
-export interface InventoryItem {
-  id: string;
-  name: string;
-  stock: number;
-  adminStock: number;
-  type: "STANDALONE" | "CUP";
-  costPrice: number;
-}
+export type { InventoryItem };
 
 interface AddInventoryItemProps {
   editingItem?: InventoryItem | null;
@@ -26,14 +20,18 @@ interface AddInventoryItemProps {
   activeTab?: "storefront" | "admin";
 }
 
-const itemTypeOptions = [
+const itemTypeOptions: Array<{ value: InventoryItemType; label: string }> = [
   {
-    value: "STANDALONE" as const,
+    value: "STANDALONE",
     label: "Standalone Item (e.g., Sprite, Coke)",
   },
   {
-    value: "CUP" as const,
+    value: "CUP",
     label: "Cup (e.g., 12oz (Hot), 16oz (Cold))",
+  },
+  {
+    value: "SUPPLIES",
+    label: "Supplies (manual daily usage, not linked to menu)",
   },
 ];
 
@@ -41,7 +39,7 @@ function AddInventoryItem({ editingItem, onCancelEdit, activeTab = "storefront" 
   const isEditing = !!editingItem;
 
   const [itemName, setItemName] = useState("");
-  const [itemType, setItemType] = useState<"STANDALONE" | "CUP">("STANDALONE");
+  const [itemType, setItemType] = useState<InventoryItemType>("STANDALONE");
   const [quantity, setQuantity] = useState<number>(0);
   const [costPrice, setCostPrice] = useState<number>(0);
 
@@ -65,7 +63,11 @@ function AddInventoryItem({ editingItem, onCancelEdit, activeTab = "storefront" 
     if (editingItem) {
       setItemName(editingItem.name);
       setItemType(editingItem.type);
-      setQuantity(activeTab === "admin" ? editingItem.adminStock : editingItem.stock);
+      setQuantity(
+        activeTab === "admin"
+          ? editingItem.endingAdmin
+          : editingItem.endingStore,
+      );
       setCostPrice(editingItem.costPrice);
     }
   }, [editingItem, activeTab]);
@@ -142,7 +144,7 @@ function AddInventoryItem({ editingItem, onCancelEdit, activeTab = "storefront" 
           <label className="text-sm font-medium text-(--dark-gray)">Item Type</label>
           <select
             value={itemType}
-            onChange={(e) => setItemType(e.target.value as "STANDALONE" | "CUP")}
+            onChange={(e) => setItemType(e.target.value as InventoryItemType)}
             className="h-10 w-full rounded-xl border border-(--light-gray) bg-(--pure-white) px-3 text-sm text-(--dark-gray) outline-none transition-[color,box-shadow] focus-visible:border-(--deep-forest) focus-visible:ring-2 focus-visible:ring-(--deep-forest)/20"
           >
             {itemTypeOptions.map((opt) => (

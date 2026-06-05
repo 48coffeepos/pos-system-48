@@ -55,12 +55,15 @@ export const getDailyReconciliation = createServerFn({ method: "GET" })
 
     let totalCashOut = 0;
     let totalCashIn = 0;
+    let totalExpenses = 0;
     for (const exp of expenses) {
       const amount = Number(exp.amount);
       if (exp.type === "CASH_OUT") {
         totalCashOut += amount;
       } else if (exp.type === "CASH_IN") {
         totalCashIn += amount;
+      } else if (exp.type === "EXPENSE") {
+        totalExpenses += amount;
       }
     }
 
@@ -70,5 +73,6 @@ export const getDailyReconciliation = createServerFn({ method: "GET" })
       totalGrabSales,
       totalCashOut,
       totalCashIn,
+      totalExpenses,
     };
   });

@@ -19,7 +19,12 @@ export const createExpenseMutationOptions = mutationOptions({
       );
     }
     void context.client.invalidateQueries({ queryKey: xreadingKeys.all });
-    const label = variables.type === "CASH_IN" ? "Cash in" : "Cash out";
+    const label =
+      variables.type === "CASH_IN"
+        ? "Cash in"
+        : variables.type === "EXPENSE"
+          ? "Expenses"
+          : "Cash out";
     toast.success(`${label} recorded`, {
       description: `${variables.description}`,
     });

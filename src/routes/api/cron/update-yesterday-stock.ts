@@ -21,7 +21,7 @@ export const Route = createFileRoute("/api/cron/update-yesterday-stock")({
 					return new Response("Unauthorized", { status: 401 });
 				}
 
-				await prisma.$executeRaw`select update_yesterday_stock();`;
+				await prisma.$executeRaw`select roll_inventory_daily_ledger();`;
 				return new Response("OK", { status: 200 });
 			},
 		},

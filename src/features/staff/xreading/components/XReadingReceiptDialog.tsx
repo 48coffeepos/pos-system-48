@@ -45,7 +45,7 @@ export function XReadingReceiptDialog({
 
   if (!mode) return null;
 
-  const { totalCashSales, totalGcashSales, totalGrabSales, totalCashOut, totalCashIn } = totals;
+  const { totalCashSales, totalGcashSales, totalGrabSales, totalCashOut, totalCashIn, totalExpenses } = totals;
   const grossSales = totalCashSales + totalCashIn;
   const netSales = getExpectedCashInDrawer(totals);
   const totalRevenue = totalCashSales + totalGcashSales;
@@ -109,14 +109,6 @@ export function XReadingReceiptDialog({
                 <span>CASH SALES:</span>
                 <span>{totalCashSales.toFixed(2)}</span>
               </div>
-              <div className="flex justify-between">
-                <span>GCASH SALES:</span>
-                <span>{totalGcashSales.toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>GRAB SALES:</span>
-                <span />
-              </div>
             </div>
 
             <div className="mt-4 border-t border-dashed border-black pt-4 text-sm font-bold space-y-1">
@@ -126,6 +118,10 @@ export function XReadingReceiptDialog({
               </div>
               <div className="flex justify-between">
                 <span>TOTAL PICKUP / EXPENSES:</span>
+                <span>{totalExpenses.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>TOTAL CASHOUT:</span>
                 <span>{totalCashOut.toFixed(2)}</span>
               </div>
             </div>
@@ -134,6 +130,14 @@ export function XReadingReceiptDialog({
               <div className="flex justify-between">
                 <span>NET SALES:</span>
                 <span>{netSales.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between mt-2">
+                <span>GCASH SALES:</span>
+                <span>{totalGcashSales.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between mt-2">
+                <span>GRAB SALES:</span>
+                <span />
               </div>
               <div className="flex justify-between mt-2">
                 <span>CASH COUNT:</span>

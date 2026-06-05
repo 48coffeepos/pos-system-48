@@ -23,9 +23,10 @@ export function PosReceiptDialog({
 	order,
 	open,
 	onClose,
-	cashierName = "Cashier",
+	cashierName: cashierNameProp,
 	extraActions,
 }: PosReceiptDialogProps) {
+	const cashierName = cashierNameProp ?? order?.cashier_name ?? "Cashier";
 	const contentRef = useRef<HTMLDivElement>(null);
 
 	const handlePrint = useReactToPrint({

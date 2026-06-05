@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { Expense_Type } from "@/generated/prisma/client.js";
 import { prisma } from "@/integrations/prisma/db";
 import { authMiddleware } from "@/features/auth/middlewares";
 import { CreateExpenseSchema } from "../schemas/expense";
@@ -10,7 +11,7 @@ export const createExpense = createServerFn({ method: "POST" })
     const expense = await prisma.expense.create({
       data: {
         staff_id: context.session.user.id,
-        type: data.type,
+        type: Expense_Type[data.type],
         description: data.description,
         amount: data.amount,
       },
