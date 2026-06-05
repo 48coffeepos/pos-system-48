@@ -66,6 +66,7 @@ function StaffInventory() {
 						actions="stock"
 						activeTab={activeTab}
 						onTabChange={setActiveTab}
+						showFinancialColumns={false}
 					/>
 				)}
 			</main>
