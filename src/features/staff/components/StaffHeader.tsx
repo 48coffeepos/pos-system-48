@@ -45,7 +45,7 @@ function StaffHeader() {
 		useXReadingStore.persist.clearStorage();
 		useXReadingStore.setState({ cashCount: emptyCashCountValues });
 		usePosStore.persist.clearStorage();
-		usePosStore.setState({ cart: [], formValues: defaultPosFormValues, lastOrder: null });
+		usePosStore.setState({ cart: [], formValues: defaultPosFormValues, lastOrder: null, search: "" });
 		await authClient.signOut();
 		navigate({ to: "/" });
 	};

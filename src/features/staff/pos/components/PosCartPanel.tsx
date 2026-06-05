@@ -52,7 +52,6 @@ export function PosCartPanel({
 	);
 	const amountPaid = useStore(form.store, (state) => state.values.amountPaid);
 	const paidNum = parseFloat(amountPaid) || 0;
-	const isGrab = paymentMethod === "GRAB";
 	const lineSubtotal = cart.reduce((s, c) => s + c.total_price, 0);
 	const cartTotal = lineSubtotal;
 	const [isDetailsOpen, setIsDetailsOpen] = useState(true);
@@ -171,7 +170,7 @@ export function PosCartPanel({
 										variant="default"
 										className={cn("h-5 w-5 min-w-0 p-0 rounded-[3px] md:size-7", posBtnPrimary)}
 										disabled={
-											Boolean(item.discount) || Boolean(item.is_free_drink)
+											Boolean(item.discount)
 										}
 										onClick={() => onUpdateQuantity(item.lineKey, 1)}
 									>
@@ -325,7 +324,7 @@ export function PosCartPanel({
 								className="text-[8px] font-black md:text-[13px] lg:text-lg leading-tight"
 								style={{ color: "var(--deep-forest)" }}
 							>
-								{formatPeso(cartTotal)}
+								{paymentMethod === "GRAB" ? "--" : formatPeso(cartTotal)}
 							</span>
 						</div>
 

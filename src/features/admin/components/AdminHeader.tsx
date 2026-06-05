@@ -47,6 +47,7 @@ function AdminHeader() {
 			cart: [],
 			formValues: defaultPosFormValues,
 			lastOrder: null,
+			search: "",
 		});
 		await authClient.signOut();
 		navigate({ to: "/" });

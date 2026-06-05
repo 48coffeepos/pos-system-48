@@ -52,16 +52,20 @@ export interface PosOrder {
 	note?: string;
 	cashier_name?: string;
 	items: Array<{
+		order_item_id: string;
 		snapshot_menu_name: string;
 		quantity: number;
 		unit_price: number;
 		discount_type?: string;
+		discount_amount?: number;
 		discount_contact?: string;
 		discount_id_number?: string;
+		loyalty?: boolean;
 		line_total: number;
 		note?: string;
 		snapshot_inventory: string;
 		addon_items?: Array<{
+			order_item_addon_id: string;
 			addon_id: string;
 			addon_name_snapshot: string;
 			addon_price_snapshot: number;

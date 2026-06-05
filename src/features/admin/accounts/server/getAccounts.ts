@@ -10,6 +10,13 @@ const getAccounts = createServerFn()
 
 		const [users, sessions] = await Promise.all([
 			prisma.user.findMany({
+				where: {
+					email: {
+						not: {
+							startsWith: "deleted_",
+						},
+					},
+				},
 				select: {
 					id: true,
 					name: true,

@@ -344,7 +344,7 @@ export function PosItemCustomizeDialog({
 								</div>
 							) : null}
 
-							{canUseFreeDrink && !hasFreeDrinkInCart ? (
+							{canUseFreeDrink ? (
 								<form.AppField name="isFreeDrink">
 									{(field) => (
 										<div
@@ -361,7 +361,6 @@ export function PosItemCustomizeDialog({
 												checked={field.state.value}
 												onCheckedChange={(checked) => {
 													field.handleChange(checked);
-													if (checked) form.setFieldValue("quantity", 1);
 												}}
 												size="default"
 											/>
@@ -380,7 +379,7 @@ export function PosItemCustomizeDialog({
 						>
 							{(vals) => {
 								const quantityLocked =
-									vals.isFreeDrink || vals.discountType !== "NONE";
+									vals.discountType !== "NONE";
 								return (
 									<div className="flex items-center justify-between">
 										<p className={cn(posMutedLabel, "text-[8px] md:text-xs")}>Quantity</p>
