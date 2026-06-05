@@ -24,7 +24,7 @@ export const getMonthlyData = createServerFn({ method: "GET" })
     const { year, month } = data;
     const { start, end } = getMonthBounds(year, month);
 
-    const [orders, expenses] = await Promise.all([
+    const [orders, expenses, inventoryLogs] = await Promise.all([
       prisma.order.findMany({
         where: { created_at: { gte: start, lt: end } },
         select: { method: true, grand_total: true },
@@ -32,6 +32,10 @@ export const getMonthlyData = createServerFn({ method: "GET" })
       prisma.expense.findMany({
         where: { timestamp: { gte: start, lt: end } },
         select: { type: true, amount: true },
+      }),
+      prisma.inventoryLog.aggregate({
+        where: { date_time: { gte: start, lt: end } },
+        _sum: { expense: true },
       }),
     ]);
 
@@ -90,6 +94,7 @@ export const getMonthlyData = createServerFn({ method: "GET" })
       totalCashOut,
       totalCashIn,
       totalExpenses: totalExpensesAmount,
+      totalSuppliesAmount: Number(inventoryLogs._sum.expense ?? 0),
       monthLabel: monthName,
       periodStart: formatDate(start),
       periodEnd: formatDate(lastDay),

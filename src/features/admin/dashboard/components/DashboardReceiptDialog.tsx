@@ -18,6 +18,7 @@ interface DashboardReceiptDialogProps {
     totalCashOut: number;
     totalCashIn: number;
     totalExpenses: number;
+    totalSuppliesAmount: number;
     monthLabel: string;
     periodStart: string;
     periodEnd: string;
@@ -54,7 +55,6 @@ export function DashboardReceiptDialog({
 }: DashboardReceiptDialogProps) {
   const receiptRef = useRef<HTMLDivElement>(null);
   const [grabAmount, setGrabAmount] = useState<string>("");
-  const [suppliesAmount, setSuppliesAmount] = useState<string>("");
   const [payrollAmount, setPayrollAmount] = useState<string>("");
   const [otherExpenses, setOtherExpenses] = useState<{ id: string; name: string; amount: string }[]>([]);
   const [step, setStep] = useState<"form" | "receipt">("form");
@@ -63,7 +63,6 @@ export function DashboardReceiptDialog({
     if (open) {
       setStep("form");
       setGrabAmount("");
-      setSuppliesAmount("");
       setPayrollAmount("");
       setOtherExpenses([]);
     }
@@ -146,26 +145,6 @@ export function DashboardReceiptDialog({
                   <div className="border-t border-(--light-gray) pt-4 pb-2">
                     <h3 className="text-sm font-bold text-(--near-black) mb-3">Additional Expenses</h3>
                     <div className="space-y-3">
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-bold tracking-wider text-(--medium-gray)">
-                          Supplies
-                        </label>
-                        <div className="relative">
-                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-bold text-(--medium-gray)">
-                            ₱
-                          </span>
-                          <input
-                            type="number"
-                            step="0.01"
-                            min="0"
-                            value={suppliesAmount}
-                            onChange={(e) => setSuppliesAmount(e.target.value)}
-                            placeholder="0.00"
-                            className="flex w-full h-10 rounded-xl border border-(--light-gray) bg-(--off-white) pl-8 pr-3 py-2 text-sm shadow-sm outline-none focus-visible:border-(--deep-forest)"
-                          />
-                        </div>
-                      </div>
-
                       <div className="space-y-1.5">
                         <label className="text-xs font-bold tracking-wider text-(--medium-gray)">
                           Payroll
@@ -301,7 +280,7 @@ export function DashboardReceiptDialog({
                     <span>
                       ₱{formatPeso(
                         monthlyData.totalExpenses +
-                        (Number.isNaN(parseFloat(suppliesAmount)) ? 0 : parseFloat(suppliesAmount || "0")) +
+                        (monthlyData.totalSuppliesAmount ?? 0) +
                         (Number.isNaN(parseFloat(payrollAmount)) ? 0 : parseFloat(payrollAmount || "0")) +
                         otherExpenses.reduce((sum, exp) => sum + (Number.isNaN(parseFloat(exp.amount)) ? 0 : parseFloat(exp.amount || "0")), 0)
                       )}
@@ -312,10 +291,10 @@ export function DashboardReceiptDialog({
                       <span className="font-bold">Pickup/Expenses:</span>
                       <span>₱{formatPeso(monthlyData.totalExpenses)}</span>
                     </div>
-                    {parseFloat(suppliesAmount) > 0 && (
+                    {(monthlyData.totalSuppliesAmount ?? 0) > 0 && (
                       <div className="flex justify-between">
                         <span className="font-bold">Supplies:</span>
-                        <span>₱{formatPeso(parseFloat(suppliesAmount))}</span>
+                        <span>₱{formatPeso(monthlyData.totalSuppliesAmount)}</span>
                       </div>
                     )}
                     {parseFloat(payrollAmount) > 0 && (
@@ -345,7 +324,7 @@ export function DashboardReceiptDialog({
                        (monthlyData.revenueByMethod?.GCASH ?? 0) +
                         (Number.isNaN(parseFloat(grabAmount)) ? 0 : parseFloat(grabAmount || "0"))) -
                       (monthlyData.totalExpenses +
-                        (Number.isNaN(parseFloat(suppliesAmount)) ? 0 : parseFloat(suppliesAmount || "0")) +
+                        (monthlyData.totalSuppliesAmount ?? 0) +
                         (Number.isNaN(parseFloat(payrollAmount)) ? 0 : parseFloat(payrollAmount || "0")) +
                         otherExpenses.reduce((sum, exp) => sum + (Number.isNaN(parseFloat(exp.amount)) ? 0 : parseFloat(exp.amount || "0")), 0))
                     )}
