@@ -53,7 +53,7 @@ export const getPosPageData = createServerFn({ method: "GET" })
         inventory: {
           inventory_id: ii.inventory.inventory_id,
           name: ii.inventory.name,
-          stock: ii.inventory.stock,
+          stock: ii.inventory.ending_store,
           type: ii.inventory.type,
         },
       })),

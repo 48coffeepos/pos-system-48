@@ -6,6 +6,7 @@ import type {
   Discount_Type,
   Payment_Method,
 } from "@/generated/prisma/enums.js";
+import { applyInventoryMovement } from "@/features/admin/inventory/server/inventoryMovement";
 import { prisma } from "@/integrations/prisma/db";
 import { getPusher } from "@/integrations/pusher/server";
 import { seniorPwdDiscountAmount } from "../utils/order-discount";
@@ -231,9 +232,9 @@ async function createOrderInTransaction(
             );
           }
 
-          await tx.inventory.update({
-            where: { inventory_id: invIds[0] },
-            data: { stock: { decrement: item.quantity } },
+          await applyInventoryMovement(tx, invIds[0], {
+            kind: "sale",
+            quantity: item.quantity,
           });
         }),
       );

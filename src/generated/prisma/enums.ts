@@ -12,7 +12,7 @@
 export const Inventory_Type = {
   CUP: 'CUP',
   STANDALONE: 'STANDALONE',
-  NORMAL: 'NORMAL'
+  SUPPLIES: 'SUPPLIES'
 } as const
 
 export type Inventory_Type = (typeof Inventory_Type)[keyof typeof Inventory_Type]

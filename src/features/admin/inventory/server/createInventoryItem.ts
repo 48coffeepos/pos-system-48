@@ -3,11 +3,12 @@ import { z } from "zod";
 
 import { adminAuthMiddleware } from "@/features/auth/middlewares";
 import { prisma } from "@/integrations/prisma/db";
+import { mapInventoryItem } from "./mapInventoryItem";
 
 export const createInventoryItemInput = z.object({
   name: z.string().min(1).max(200),
   stock: z.number().int(),
-  type: z.enum(["CUP", "STANDALONE"]),
+  type: z.enum(["CUP", "STANDALONE", "SUPPLIES"]),
   costPrice: z.number().min(0).default(0),
 });
 
@@ -18,19 +19,12 @@ export const createInventoryItem = createServerFn({ method: "POST" })
     const inventoryItem = await prisma.inventory.create({
       data: {
         name: data.name,
-        stock: data.stock,
-        admin_stock: data.stock,
         type: data.type,
         cost_price: data.costPrice,
+        ending_admin: data.stock,
+        ending_store: data.stock,
       },
     });
 
-    return {
-      id: inventoryItem.inventory_id,
-      name: inventoryItem.name,
-      stock: inventoryItem.stock,
-      adminStock: inventoryItem.admin_stock ?? 0,
-      type: inventoryItem.type,
-      costPrice: inventoryItem.cost_price ? Number(inventoryItem.cost_price) : 0,
-    };
+    return mapInventoryItem(inventoryItem);
   });

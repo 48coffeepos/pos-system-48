@@ -29,6 +29,14 @@ import {
 	type deleteInventoryItemInput,
 } from "./server/deleteInventoryItem";
 import {
+	suppliesEodOutStore,
+	type suppliesEodOutStoreInput,
+} from "./server/suppliesEodOutStore";
+import {
+	transferStock,
+	type transferStockInput,
+} from "./server/transferStock";
+import {
 	updateInventoryItem,
 	type updateInventoryItemInput,
 } from "./server/updateInventoryItem";
@@ -162,6 +170,48 @@ export const stockroomAddStockMutationOptions = mutationOptions({
 	},
 	onError: (error) => {
 		toast.error("Failed to add stock", {
+			description: error?.message ?? "Unknown error",
+		});
+	},
+});
+
+export const transferStockMutationOptions = mutationOptions({
+	mutationFn: async (data: z.infer<typeof transferStockInput>) =>
+		transferStock({ data }),
+	onSuccess: (_data, variables, _onMutateResult, mutationContext) => {
+		mutationContext?.client?.invalidateQueries({
+			queryKey: inventoryKeys.inventory,
+		});
+		mutationContext?.client?.invalidateQueries({
+			queryKey: inventoryKeys.inventoryLogs,
+		});
+		toast.success("Stock transferred", {
+			description: `${variables.quantity}x ${variables.itemName} moved from admin to storefront.`,
+		});
+	},
+	onError: (error) => {
+		toast.error("Failed to transfer stock", {
+			description: error?.message ?? "Unknown error",
+		});
+	},
+});
+
+export const suppliesEodOutStoreMutationOptions = mutationOptions({
+	mutationFn: async (data: z.infer<typeof suppliesEodOutStoreInput>) =>
+		suppliesEodOutStore({ data }),
+	onSuccess: (_data, variables, _onMutateResult, mutationContext) => {
+		mutationContext?.client?.invalidateQueries({
+			queryKey: inventoryKeys.inventory,
+		});
+		mutationContext?.client?.invalidateQueries({
+			queryKey: inventoryKeys.inventoryLogs,
+		});
+		toast.success("Usage recorded", {
+			description: `${variables.quantity}x ${variables.itemName} recorded for today.`,
+		});
+	},
+	onError: (error) => {
+		toast.error("Failed to record usage", {
 			description: error?.message ?? "Unknown error",
 		});
 	},

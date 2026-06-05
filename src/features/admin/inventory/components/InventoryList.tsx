@@ -1,4 +1,5 @@
 import {
+	ArrowsLeftRightIcon,
 	ClockCounterClockwiseIcon,
 	MagnifyingGlassIcon,
 	MinusCircleIcon,
@@ -23,17 +24,13 @@ import {
 	AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { deleteInventoryItemMutationOptions } from "../mutationOptions";
+import { SuppliesEodOutStore } from "./storefront/SuppliesEodOutStore";
 import { StorefrontAdd } from "./storefront/StorefrontAdd";
 import { StorefrontDeduct } from "./storefront/StorefrontDeduct";
 import { StockroomAdd } from "./stockroom/StockroomAdd";
 import { StockroomDeduct } from "./stockroom/StockroomDeduct";
-import type { InventoryItem } from "./AddInventoryItem";
-
-interface ExtendedInventoryItem extends InventoryItem {
-  yesterdayStock?: number;
-  adminStock: number;
-  costPrice: number;
-}
+import { TransferStock } from "./transfer/TransferStock";
+import type { InventoryItem } from "../types";
 
 interface InventoryLogEntry {
 	id: string;
@@ -57,9 +54,9 @@ function InventoryList({
 	activeTab = "admin",
 	onTabChange,
 }: {
-	items?: ExtendedInventoryItem[];
+	items?: InventoryItem[];
 	inventoryLogs?: InventoryLogEntry[];
-	onEdit?: (item: ExtendedInventoryItem) => void;
+	onEdit?: (item: InventoryItem) => void;
 	hideActions?: boolean;
 	actions?: "none" | "stock" | "all";
 	activeTab?: Tab;
@@ -68,15 +65,19 @@ function InventoryList({
 	const effectiveActions = hideActions ? "none" : actions;
 	const [search, setSearch] = useState("");
 	const [deletingItem, setDeletingItem] =
-		useState<ExtendedInventoryItem | null>(null);
+		useState<InventoryItem | null>(null);
 	const [addingItem, setAddingItem] =
-		useState<ExtendedInventoryItem | null>(null);
+		useState<InventoryItem | null>(null);
 	const [deductingItem, setDeductingItem] =
-		useState<ExtendedInventoryItem | null>(null);
+		useState<InventoryItem | null>(null);
 	const [stockroomingItem, setStockroomingItem] =
-		useState<ExtendedInventoryItem | null>(null);
+		useState<InventoryItem | null>(null);
 	const [stockroomDeductingItem, setStockroomDeductingItem] =
-		useState<ExtendedInventoryItem | null>(null);
+		useState<InventoryItem | null>(null);
+	const [transferringItem, setTransferringItem] =
+		useState<InventoryItem | null>(null);
+	const [suppliesEodItem, setSuppliesEodItem] =
+		useState<InventoryItem | null>(null);
 
 	const fuse = useMemo(
 		() =>
@@ -295,7 +296,7 @@ function InventoryList({
 											</tr>
 										))
 									) : (
-										(filtered as ExtendedInventoryItem[]).map((item) => (
+										(filtered as InventoryItem[]).map((item) => (
 											<tr
 												key={item.id}
 												className="group hover:bg-(--light-gray)/10"
@@ -307,7 +308,11 @@ function InventoryList({
 																{item.name}
 															</p>
 															<span className="inline-block rounded px-1.5 py-0.5 text-[10px] font-medium mt-0.5 bg-amber-100 text-amber-800">
-																{item.type === "CUP" ? "Cup Size" : "Standalone"}
+																{item.type === "CUP"
+																	? "Cup Size"
+																	: item.type === "SUPPLIES"
+																		? "Supplies"
+																		: "Standalone"}
 															</span>
 														</div>
 													</div>
@@ -315,8 +320,8 @@ function InventoryList({
 
 												<td className="p-4 text-center font-bold text-sm text-(--deep-forest)">
 													{activeTab === "admin"
-														? (item.adminStock ?? 0)
-														: item.stock}
+														? item.endingAdmin
+														: item.endingStore}
 												</td>
 
 												{activeTab === "admin" && (
@@ -330,22 +335,35 @@ function InventoryList({
 														<div className="flex items-center justify-end gap-3 text-(--medium-gray)">
 															{activeTab === "storefront" && (
 																<>
-																	<button
-																		type="button"
-																		onClick={() => setAddingItem(item)}
-																		className="p-1 hover:text-(--deep-forest) transition-colors"
-																		aria-label="Add stock to storefront"
-																	>
-																		<PlusCircleIcon size={22} weight="bold" />
-																	</button>
-																	<button
-																		type="button"
-																		onClick={() => setDeductingItem(item)}
-																		className="p-1 hover:text-red-600 transition-colors"
-																		aria-label="Deduct stock from storefront"
-																	>
-																		<MinusCircleIcon size={22} weight="bold" />
-																	</button>
+																	{item.type === "SUPPLIES" ? (
+																		<button
+																			type="button"
+																			onClick={() => setSuppliesEodItem(item)}
+																			className="p-1 hover:text-(--deep-forest) transition-colors"
+																			aria-label="Record daily usage"
+																		>
+																			<ClockCounterClockwiseIcon size={22} weight="bold" />
+																		</button>
+																	) : (
+																		<>
+																			<button
+																				type="button"
+																				onClick={() => setAddingItem(item)}
+																				className="p-1 hover:text-(--deep-forest) transition-colors"
+																				aria-label="Add stock to storefront"
+																			>
+																				<PlusCircleIcon size={22} weight="bold" />
+																			</button>
+																			<button
+																				type="button"
+																				onClick={() => setDeductingItem(item)}
+																				className="p-1 hover:text-red-600 transition-colors"
+																				aria-label="Deduct stock from storefront"
+																			>
+																				<MinusCircleIcon size={22} weight="bold" />
+																			</button>
+																		</>
+																	)}
 																	<span className="text-(--light-gray)">|</span>
 																</>
 															)}
@@ -366,6 +384,14 @@ function InventoryList({
 																		aria-label="Deduct stock from stockroom"
 																	>
 																		<MinusCircleIcon size={22} weight="bold" />
+																	</button>
+																	<button
+																		type="button"
+																		onClick={() => setTransferringItem(item)}
+																		className="p-1 hover:text-(--deep-forest) transition-colors"
+																		aria-label="Transfer stock to storefront"
+																	>
+																		<ArrowsLeftRightIcon size={22} weight="bold" />
 																	</button>
 																	<span className="text-(--light-gray)">|</span>
 																</>
@@ -452,6 +478,36 @@ function InventoryList({
 					open={!!stockroomDeductingItem}
 					onOpenChange={(open) => {
 						if (!open) setStockroomDeductingItem(null);
+					}}
+				/>
+			)}
+
+			{/* Transfer Stock Modal */}
+			{transferringItem && (
+				<TransferStock
+					item={{
+						id: transferringItem.id,
+						name: transferringItem.name,
+						endingAdmin: transferringItem.endingAdmin,
+					}}
+					open={!!transferringItem}
+					onOpenChange={(open) => {
+						if (!open) setTransferringItem(null);
+					}}
+				/>
+			)}
+
+			{/* SUPPLIES end-of-day usage Modal */}
+			{suppliesEodItem && (
+				<SuppliesEodOutStore
+					item={{
+						id: suppliesEodItem.id,
+						name: suppliesEodItem.name,
+						endingStore: suppliesEodItem.endingStore,
+					}}
+					open={!!suppliesEodItem}
+					onOpenChange={(open) => {
+						if (!open) setSuppliesEodItem(null);
 					}}
 				/>
 			)}

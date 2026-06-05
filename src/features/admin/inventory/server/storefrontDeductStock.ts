@@ -3,6 +3,8 @@ import { z } from "zod";
 
 import { adminAuthMiddleware } from "@/features/auth/middlewares";
 import { prisma } from "@/integrations/prisma/db";
+import { applyInventoryMovement } from "./inventoryMovement";
+import { mapInventoryItem } from "./mapInventoryItem";
 
 export const storefrontDeductStockInput = z.object({
   itemId: z.string(),
@@ -16,26 +18,13 @@ export const storefrontDeductStock = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const logBy = context.session.user.name;
 
-    const existing = await prisma.inventory.findUnique({
-      where: { inventory_id: data.itemId },
-    });
+    const updated = await prisma.$transaction(async (tx) => {
+      const inventory = await applyInventoryMovement(tx, data.itemId, {
+        kind: "store_out",
+        quantity: data.quantity,
+      });
 
-    if (!existing) {
-      throw new Error("Inventory item not found.");
-    }
-
-    if (existing.stock < data.quantity) {
-      throw new Error(
-        `Cannot deduct ${data.quantity} — only ${existing.stock} available.`
-      );
-    }
-
-    const [updated] = await prisma.$transaction([
-      prisma.inventory.update({
-        where: { inventory_id: data.itemId },
-        data: { stock: { decrement: data.quantity } },
-      }),
-      prisma.inventoryLog.create({
+      await tx.inventoryLog.create({
         data: {
           inventory_item: data.itemName,
           log_by: logBy,
@@ -43,15 +32,10 @@ export const storefrontDeductStock = createServerFn({ method: "POST" })
           type: "DEDUCT",
           location: "STOREFRONT",
         },
-      }),
-    ]);
+      });
 
-    return {
-      id: updated.inventory_id,
-      name: updated.name,
-      stock: updated.stock,
-      adminStock: updated.admin_stock ?? 0,
-      type: updated.type,
-      costPrice: updated.cost_price ? Number(updated.cost_price) : 0,
-    };
+      return inventory;
+    });
+
+    return mapInventoryItem(updated);
   });
