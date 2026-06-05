@@ -80,6 +80,7 @@ function SuppliesEodOutStore({
                 label="Units used today"
                 placeholder="Enter quantity"
                 min="1"
+                step="1"
               />
             )}
           </form.AppField>
