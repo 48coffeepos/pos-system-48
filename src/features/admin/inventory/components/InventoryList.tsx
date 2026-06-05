@@ -342,8 +342,8 @@ function InventoryList({
 												{typeLabel(log.type)}
 											</span>
 											{log.columnName && (
-												<span className="ml-1.5 inline-block rounded bg-(--medium-gray)/10 px-1.5 py-0.5 text-[10px] font-medium text-(--medium-gray)">
-													{log.columnName}
+												<span className="ml-1.5 inline-block rounded bg-(--medium-gray)/10 px-1.5 py-0.5 text-[12px] font-medium text-(--medium-gray)">
+													{(log.columnName).split("_")[0].toUpperCase()}
 												</span>
 											)}
 										</td>
