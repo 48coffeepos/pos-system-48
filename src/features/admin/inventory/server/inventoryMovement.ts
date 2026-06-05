@@ -32,68 +32,71 @@ export async function applyInventoryMovement(
     throw new Error("Quantity must be at least 1.");
   }
 
+  const adminEnding = item.beginning_admin + item.in_admin - item.out_admin;
+  const storeEnding = item.beginning_store + item.in_store - item.out_store;
+
   let data: Prisma.InventoryUpdateInput;
 
   switch (movement.kind) {
     case "admin_in":
       data = {
         in_admin: { increment: quantity },
-        ending_admin: { increment: quantity },
+        ending_admin: adminEnding + quantity,
       };
       break;
     case "admin_out":
-      if (item.ending_admin < quantity) {
+      if (adminEnding < quantity) {
         throw new Error(
-          `Cannot deduct ${quantity} — only ${item.ending_admin} available in stockroom.`,
+          `Cannot deduct ${quantity} — only ${adminEnding} available in stockroom.`,
         );
       }
       data = {
         out_admin: { increment: quantity },
-        ending_admin: { decrement: quantity },
+        ending_admin: adminEnding - quantity,
       };
       break;
     case "store_in":
       data = {
         in_store: { increment: quantity },
-        ending_store: { increment: quantity },
+        ending_store: storeEnding + quantity,
       };
       break;
     case "store_out":
-      if (item.ending_store < quantity) {
+      if (storeEnding < quantity) {
         throw new Error(
-          `Cannot deduct ${quantity} — only ${item.ending_store} available.`,
+          `Cannot deduct ${quantity} — only ${storeEnding} available.`,
         );
       }
       data = {
         out_store: { increment: quantity },
-        ending_store: { decrement: quantity },
+        ending_store: storeEnding - quantity,
       };
       break;
     case "transfer":
-      if (item.ending_admin < quantity) {
+      if (adminEnding < quantity) {
         throw new Error(
-          `Cannot transfer ${quantity} — only ${item.ending_admin} available in stockroom.`,
+          `Cannot transfer ${quantity} — only ${adminEnding} available in stockroom.`,
         );
       }
       data = {
         out_admin: { increment: quantity },
-        ending_admin: { decrement: quantity },
+        ending_admin: adminEnding - quantity,
         in_store: { increment: quantity },
-        ending_store: { increment: quantity },
+        ending_store: storeEnding + quantity,
       };
       break;
     case "sale":
       if (item.type === "SUPPLIES") {
         throw new Error("SUPPLIES inventory items are not deducted via sales.");
       }
-      if (item.ending_store < quantity) {
+      if (storeEnding < quantity) {
         throw new Error(
-          `Cannot sell ${quantity} — only ${item.ending_store} available in storefront.`,
+          `Cannot sell ${quantity} — only ${storeEnding} available in storefront.`,
         );
       }
       data = {
         out_store: { increment: quantity },
-        ending_store: { decrement: quantity },
+        ending_store: storeEnding - quantity,
       };
       break;
     default: {

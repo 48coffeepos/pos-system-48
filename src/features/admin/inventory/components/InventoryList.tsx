@@ -28,7 +28,6 @@ import { SuppliesEodOutStore } from "./storefront/SuppliesEodOutStore";
 import { StorefrontAdd } from "./storefront/StorefrontAdd";
 import { StorefrontDeduct } from "./storefront/StorefrontDeduct";
 import { StockroomAdd } from "./stockroom/StockroomAdd";
-import { StockroomDeduct } from "./stockroom/StockroomDeduct";
 import { TransferStock } from "./transfer/TransferStock";
 import type { InventoryItem } from "../types";
 
@@ -92,8 +91,6 @@ function InventoryList({
 	const [deductingItem, setDeductingItem] =
 		useState<InventoryItem | null>(null);
 	const [stockroomingItem, setStockroomingItem] =
-		useState<InventoryItem | null>(null);
-	const [stockroomDeductingItem, setStockroomDeductingItem] =
 		useState<InventoryItem | null>(null);
 	const [transferringItem, setTransferringItem] =
 		useState<InventoryItem | null>(null);
@@ -458,16 +455,6 @@ function InventoryList({
 																</button>
 																<button
 																	type="button"
-																	onClick={() =>
-																		setStockroomDeductingItem(item)
-																	}
-																	className="p-1 hover:text-red-600 transition-colors"
-																	aria-label="Deduct stock from stockroom"
-																>
-																	<MinusCircleIcon size={22} weight="bold" />
-																</button>
-																<button
-																	type="button"
 																	onClick={() => setTransferringItem(item)}
 																	className="p-1 hover:text-(--deep-forest) transition-colors"
 																	aria-label="Transfer stock to storefront"
@@ -571,20 +558,6 @@ function InventoryList({
 					open={!!stockroomingItem}
 					onOpenChange={(open) => {
 						if (!open) setStockroomingItem(null);
-					}}
-				/>
-			)}
-
-			{stockroomDeductingItem && (
-				<StockroomDeduct
-					item={{
-						id: stockroomDeductingItem.id,
-						name: stockroomDeductingItem.name,
-						endingAdmin: stockroomDeductingItem.endingAdmin,
-					}}
-					open={!!stockroomDeductingItem}
-					onOpenChange={(open) => {
-						if (!open) setStockroomDeductingItem(null);
 					}}
 				/>
 			)}

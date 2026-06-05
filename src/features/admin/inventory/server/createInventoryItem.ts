@@ -21,7 +21,9 @@ export const createInventoryItem = createServerFn({ method: "POST" })
         name: data.name,
         type: data.type,
         cost_price: data.costPrice,
+        in_admin: data.stock,
         ending_admin: data.stock,
+        in_store: data.stock,
         ending_store: data.stock,
       },
     });
