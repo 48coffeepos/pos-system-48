@@ -366,9 +366,16 @@ function InventoryList({
 										</td>
 										{showFinancialColumns && (
 											<td className="p-4 pr-4 text-sm text-(--dark-gray)">
-												{log.expense != null
-													? `₱${Number(log.expense).toFixed(2)}`
-													: "—"}
+											{log.expense != null ? (
+												(() => {
+												const expense = Number(log.expense);
+												return expense < 0
+													? `-₱${Math.abs(expense).toFixed(2)}`
+													: `₱${expense.toFixed(2)}`;
+												})()
+											) : (
+												"—"
+											)}
 											</td>
 										)}
 									</tr>
