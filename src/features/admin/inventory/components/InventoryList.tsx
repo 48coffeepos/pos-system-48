@@ -85,6 +85,8 @@ function InventoryList({
 }) {
 	const effectiveActions = hideActions ? "none" : actions;
 	const [search, setSearch] = useState("");
+	const [fromDate, setFromDate] = useState("");
+	const [toDate, setToDate] = useState("");
 	const [deletingItem, setDeletingItem] =
 		useState<InventoryItem | null>(null);
 	const [addingItem, setAddingItem] =
@@ -129,6 +131,22 @@ function InventoryList({
 		[search, logsFuse, inventoryLogs],
 	);
 
+	const dateFilteredLogs = useMemo(() => {
+		if (!fromDate && !toDate) return filteredLogs;
+		return filteredLogs.filter((log) => {
+			if (!log.dateTime) return true;
+			const logDate = new Date(log.dateTime);
+			logDate.setHours(0, 0, 0, 0);
+			if (fromDate && logDate < new Date(fromDate)) return false;
+			if (toDate) {
+				const end = new Date(toDate);
+				end.setHours(23, 59, 59, 999);
+				if (logDate > end) return false;
+			}
+			return true;
+		});
+	}, [filteredLogs, fromDate, toDate]);
+
 	const deleteMutation = useMutation({
 		...deleteInventoryItemMutationOptions,
 		onSettled: () => {
@@ -141,7 +159,7 @@ function InventoryList({
 		activeTab === "admin" ? "admin" : "storefront";
 	const showStockroomFinancialColumns =
 		showFinancialColumns && activeTab === "admin";
-	const currentItems = isLogsTab ? filteredLogs : filtered;
+	const currentItems = isLogsTab ? dateFilteredLogs : filtered;
 	const hasTabShell = !!onTabChange;
 	const showLegacyEmptyState =
 		!hasTabShell && (isLogsTab ? inventoryLogs.length === 0 : items.length === 0);
@@ -164,7 +182,7 @@ function InventoryList({
 	};
 
 	const subtitle = isLogsTab
-		? `${inventoryLogs.length} ${inventoryLogs.length === 1 ? "log entry" : "log entries"}`
+		? `${inventoryLogs.length} ${inventoryLogs.length === 1 ? "log entry" : "log entries"}${fromDate || toDate ? ` · ${dateFilteredLogs.length} shown` : ""}`
 		: `${items.length} ${items.length === 1 ? "item" : "items"}`;
 
 	const typeBadge = (type: string) => {
@@ -264,13 +282,45 @@ function InventoryList({
 					onChange={(e) => setSearch(e.target.value)}
 					placeholder={
 						isLogsTab
-							? "Search by item, user, type, location..."
+							? "Search by item, user, location..."
 							: "Search inventory items..."
 					}
 					className="h-10 w-full rounded-xl border pl-10 pr-4 text-sm outline-none transition-all"
 					style={{ background: "white", borderColor: "var(--light-gray)" }}
 				/>
 			</div>
+
+			{isLogsTab && (
+				<div className="mb-4 flex flex-wrap items-center gap-3">
+					<div className="flex items-center gap-2">
+						<label className="text-xs font-medium text-(--medium-gray)">From</label>
+						<input
+							type="date"
+							value={fromDate}
+							onChange={(e) => setFromDate(e.target.value)}
+							className="h-9 rounded-xl border border-(--light-gray) px-3 text-sm outline-none transition-all"
+						/>
+					</div>
+					<div className="flex items-center gap-2">
+						<label className="text-xs font-medium text-(--medium-gray)">To</label>
+						<input
+							type="date"
+							value={toDate}
+							onChange={(e) => setToDate(e.target.value)}
+							className="h-9 rounded-xl border border-(--light-gray) px-3 text-sm outline-none transition-all"
+						/>
+					</div>
+					{(fromDate || toDate) && (
+						<button
+							type="button"
+							onClick={() => { setFromDate(""); setToDate(""); }}
+							className="text-xs font-medium text-(--medium-gray) hover:text-red-500 transition-colors"
+						>
+							Clear
+						</button>
+					)}
+				</div>
+			)}
 
 			<div className="w-full overflow-x-auto">
 				<table className="w-full border-collapse text-left">
