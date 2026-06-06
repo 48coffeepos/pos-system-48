@@ -328,7 +328,7 @@ function InventoryList({
 						<tr className="border-b border-(--light-gray)/40 bg-(--soft-peach)/20 text-[11px] font-bold tracking-wider text-(--medium-gray)/80 uppercase">
 							{isLogsTab ? (
 								<>
-									<th className="rounded-l-lg p-3 pl-4">Date & Time</th>
+									<th className="rounded-l-lg p-3 pl-4">Date</th>
 									<th className="p-3">Item</th>
 									<th className="p-3">Type</th>
 									<th className="p-3">Location</th>
