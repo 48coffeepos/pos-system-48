@@ -483,7 +483,7 @@ function InventoryList({
 																		className="p-1 hover:text-(--deep-forest) transition-colors"
 																		aria-label="Record daily usage"
 																	>
-																		<ClockCounterClockwiseIcon
+																		<MinusCircleIcon
 																			size={22}
 																			weight="bold"
 																		/>

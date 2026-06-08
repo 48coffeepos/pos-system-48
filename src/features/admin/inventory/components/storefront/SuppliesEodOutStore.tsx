@@ -59,12 +59,9 @@ function SuppliesEodOutStore({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Record daily usage — {item.name}</DialogTitle>
+          <DialogTitle>{item.name}</DialogTitle>
           <DialogDescription>
-            Enter how many units were used today. Current storefront stock:{" "}
-            <span className="font-semibold text-(--deep-forest)">
-              {item.endingStore}
-            </span>
+            <span className="font-bold text-red-500">OUT stock</span> from <span className="font-bold text-red-500">storefront</span> inventory
           </DialogDescription>
         </DialogHeader>
 
@@ -77,7 +74,7 @@ function SuppliesEodOutStore({
           <form.AppField name="quantity">
             {(field) => (
               <field.NumberField
-                label="Units used today"
+                label="Quantity"
                 placeholder="Enter quantity"
                 min="1"
                 step="1"
@@ -91,7 +88,7 @@ function SuppliesEodOutStore({
             </DialogClose>
             <form.AppForm>
               <form.SubmitButton
-                label={mutation.isPending ? "Saving..." : "Record usage"}
+                label={mutation.isPending ? "Saving..." : "Save"}
               />
             </form.AppForm>
           </DialogFooter>
