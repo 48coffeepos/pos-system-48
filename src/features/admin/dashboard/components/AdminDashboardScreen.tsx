@@ -30,7 +30,7 @@ export function AdminDashboardScreen() {
   const [selectedPayment, setSelectedPayment] =
     useState<PaymentMethodFilter>("all");
   const [receiptMode, setReceiptMode] = useState<
-    "select" | "monthly" | "monthPicker" | null
+    "select" | "monthly" | "monthPicker" | "dailyRevenue" | null
   >(null);
 
   const latest = availableMonths[0];
@@ -96,6 +96,14 @@ export function AdminDashboardScreen() {
               className="h-auto w-full rounded-xl border-(--light-gray) bg-(--off-white) px-4 py-2 text-xs font-semibold text-(--dark-gray) hover:bg-(--off-white)"
             >
               Monthly Summary Receipt
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setReceiptMode("dailyRevenue")}
+              className="h-auto w-full rounded-xl border-(--light-gray) bg-(--off-white) px-4 py-2 text-xs font-semibold text-(--dark-gray) hover:bg-(--off-white)"
+            >
+              Daily Sales Receipt
             </Button>
           </div>
           <DialogFooter>
@@ -165,11 +173,16 @@ export function AdminDashboardScreen() {
       </Dialog>
 
       <DashboardReceiptDialog
-        open={receiptMode === "monthly"}
+        open={receiptMode === "monthly" || receiptMode === "dailyRevenue"}
         onClose={() => setReceiptMode(null)}
-        mode={receiptMode === "monthPicker" ? null : receiptMode}
+        mode={receiptMode === "monthPicker" ? null : receiptMode === "select" ? null : receiptMode}
         staffName={staffName}
         monthlyData={monthlyData}
+        dailyData={{
+          totalCashSales: data.revenue.byMethod.CASH ?? 0,
+          totalGcashSales: data.revenue.byMethod.GCASH ?? 0,
+          totalRevenue: (data.revenue.byMethod.CASH ?? 0) + (data.revenue.byMethod.GCASH ?? 0),
+        }}
       />
     </div>
   );

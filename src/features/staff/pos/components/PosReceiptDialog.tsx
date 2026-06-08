@@ -117,7 +117,7 @@ export function PosReceiptDialog({
 													: null}
 											</span>
 											<span className="text-right">
-												{(item.line_total || 0).toFixed(2)}
+												{order.method === "GRAB" ? "--" : (item.line_total || 0).toFixed(2)}
 											</span>
 										</div>
 										{item.addon_items && item.addon_items.length > 0 ? (
@@ -145,7 +145,7 @@ export function PosReceiptDialog({
 								</div>
 								<div className="flex justify-between pt-0.5 text-xs font-black md:pt-1 md:text-sm">
 									<span>Total Paid Sales :</span>
-									<span>{order.grand_total.toFixed(2)}</span>
+									<span>{order.method === "GRAB" ? "--" : order.grand_total.toFixed(2)}</span>
 								</div>
 							</div>
 

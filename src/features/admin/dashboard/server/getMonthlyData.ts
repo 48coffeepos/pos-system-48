@@ -1,9 +1,10 @@
+import { z } from "zod";
 import { createServerFn } from "@tanstack/react-start";
 import { adminAuthMiddleware } from "@/features/auth/middlewares";
 import { prisma } from "@/integrations/prisma/db";
 import { DEFAULT_TIMEZONE } from "@/lib/day-bounds";
 
-function getMonthBounds(tz: string, year: number, month: number) {
+function getMonthBounds(year: number, month: number) {
   const monthPadded = String(month).padStart(2, "0");
   const start = new Date(`${year}-${monthPadded}-01T00:00:00+08:00`);
   const nextMonth = month + 1;
@@ -17,12 +18,13 @@ function getMonthBounds(tz: string, year: number, month: number) {
 
 export const getMonthlyData = createServerFn({ method: "GET" })
   .middleware([adminAuthMiddleware()])
-  .handler(async ({ data }: { data: { year: number; month: number } }) => {
+  .inputValidator(z.object({ year: z.number(), month: z.number() }))
+  .handler(async ({ data }) => {
     const tz = process.env.TIMEZONE ?? DEFAULT_TIMEZONE;
     const { year, month } = data;
-    const { start, end } = getMonthBounds(tz, year, month);
+    const { start, end } = getMonthBounds(year, month);
 
-    const [orders, expenses] = await Promise.all([
+    const [orders, expenses, inventoryLogs] = await Promise.all([
       prisma.order.findMany({
         where: { created_at: { gte: start, lt: end } },
         select: { method: true, grand_total: true },
@@ -30,6 +32,10 @@ export const getMonthlyData = createServerFn({ method: "GET" })
       prisma.expense.findMany({
         where: { timestamp: { gte: start, lt: end } },
         select: { type: true, amount: true },
+      }),
+      prisma.inventoryLog.aggregate({
+        where: { date_time: { gte: start, lt: end } },
+        _sum: { expense: true },
       }),
     ]);
 
@@ -51,15 +57,18 @@ export const getMonthlyData = createServerFn({ method: "GET" })
 
     let totalCashOut = 0;
     let totalCashIn = 0;
-    let cashOutCount = 0;
+    let totalExpensesAmount = 0;
+    let expenseCount = 0;
 
     for (const exp of expenses) {
       const amount = Number(exp.amount);
       if (exp.type === "CASH_OUT") {
         totalCashOut += amount;
-        cashOutCount++;
       } else if (exp.type === "CASH_IN") {
         totalCashIn += amount;
+      } else if (exp.type === "EXPENSE") {
+        totalExpensesAmount += amount;
+        expenseCount++;
       }
     }
 
@@ -84,11 +93,12 @@ export const getMonthlyData = createServerFn({ method: "GET" })
       totalRevenue,
       totalCashOut,
       totalCashIn,
-      totalExpenses: totalCashOut,
+      totalExpenses: totalExpensesAmount,
+      totalSuppliesAmount: Number(inventoryLogs._sum.expense ?? 0),
       monthLabel: monthName,
       periodStart: formatDate(start),
       periodEnd: formatDate(lastDay),
       orderCount: orders.length,
-      expenseCount: cashOutCount,
+      expenseCount: expenseCount,
     };
   });

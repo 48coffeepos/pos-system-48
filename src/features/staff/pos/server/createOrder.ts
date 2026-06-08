@@ -6,6 +6,7 @@ import type {
   Discount_Type,
   Payment_Method,
 } from "@/generated/prisma/enums.js";
+import { applyInventoryMovement } from "@/features/admin/inventory/server/inventoryMovement";
 import { prisma } from "@/integrations/prisma/db";
 import { getPusher } from "@/integrations/pusher/server";
 import { seniorPwdDiscountAmount } from "../utils/order-discount";
@@ -165,7 +166,7 @@ async function createOrderInTransaction(
             data.amount_tendered !== undefined ? data.amount_tendered : null,
           change_amount:
             data.change_amount !== undefined ? data.change_amount : null,
-          grand_total: data.grand_total,
+          grand_total: data.method === "GRAB" ? 0 : data.grand_total,
           note: data.note || null,
           order_items: {
             create: data.items.map((item) => {
@@ -186,7 +187,7 @@ async function createOrderInTransaction(
                 snapshot_inventory: invSnapshot,
                 unit_price: item.unit_price,
                 quantity: item.quantity,
-                line_total: item.line_total,
+                line_total: data.method === "GRAB" ? 0 : item.line_total,
                 loyalty: item.is_free_drink === true,
                 discount_amount: discountAmount,
                 discount_type: (item.discount_type as Discount_Type) || null,
@@ -199,8 +200,7 @@ async function createOrderInTransaction(
                         addon_name_snapshot: addon.addon_name_snapshot,
                         addon_price_snapshot: addon.addon_price_snapshot,
                         quantity: addon.quantity,
-                        total_price:
-                          addon.addon_price_snapshot * addon.quantity,
+                        total_price: data.method === "GRAB" ? 0 : addon.addon_price_snapshot * addon.quantity,
                       })),
                     }
                   : undefined,
@@ -231,9 +231,9 @@ async function createOrderInTransaction(
             );
           }
 
-          await tx.inventory.update({
-            where: { inventory_id: invIds[0] },
-            data: { stock: { decrement: item.quantity } },
+          await applyInventoryMovement(tx, invIds[0], {
+            kind: "sale",
+            quantity: item.quantity,
           });
         }),
       );

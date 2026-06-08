@@ -89,10 +89,16 @@ model Expense {
 model Inventory {
   inventory_id    String          @id @default(uuid())
   name            String          @unique
-  stock           Int             @default(0)
-  yesterday_stock Int?
   type            Inventory_Type
-  admin_stock     Int?            @default(0)
+  cost_price      Decimal?        @db.Decimal
+  beginning_admin Int             @default(0)
+  in_admin        Int             @default(0)
+  out_admin       Int             @default(0)
+  ending_admin    Int             @default(0)
+  beginning_store Int             @default(0)
+  in_store        Int             @default(0)
+  out_store       Int             @default(0)
+  ending_store    Int             @default(0)
   menu_items      MenuInventory[]
 
   @@map("inventory")
@@ -185,9 +191,24 @@ model Verification {
   @@map("verification")
 }
 
+model InventoryLog {
+  inventory_log_id String    @id @default(uuid())
+  date_time        DateTime? @default(now())
+  expense          Decimal?  @db.Decimal(10, 2)
+  quantity         Int?
+  inventory_item   String
+  column_name      String?
+  location         Location
+  log_by           String
+  type             Log_type
+
+  @@map("inventory_log")
+}
+
 enum Inventory_Type {
   CUP
   STANDALONE
+  SUPPLIES
 }
 
 enum Inventory_Status {
@@ -210,4 +231,16 @@ enum Payment_Method {
 enum Discount_Type {
   PWD
   SENIOR
+}
+
+enum Log_type {
+  ADD
+  DEDUCT
+  EDIT
+  TRANSFER
+}
+
+enum Location {
+  STOCKROOM
+  STOREFRONT
 }
