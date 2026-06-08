@@ -41,10 +41,15 @@ function AddInventoryItem({ editingItem, onCancelEdit, activeTab = "storefront" 
   const [itemName, setItemName] = useState("");
   const [itemType, setItemType] = useState<InventoryItemType>("STANDALONE");
   const [inAdmin, setInAdmin] = useState<number>(0);
+  const [inAdminRaw, setInAdminRaw] = useState("0");
   const [outAdmin, setOutAdmin] = useState<number>(0);
+  const [outAdminRaw, setOutAdminRaw] = useState("0");
   const [inStore, setInStore] = useState<number>(0);
+  const [inStoreRaw, setInStoreRaw] = useState("0");
   const [outStore, setOutStore] = useState<number>(0);
+  const [outStoreRaw, setOutStoreRaw] = useState("0");
   const [costPrice, setCostPrice] = useState<number>(0);
+  const [costPriceRaw, setCostPriceRaw] = useState("0");
 
   const createMutation = useMutation({
     ...createInventoryItemMutationOptions,
@@ -72,13 +77,22 @@ function AddInventoryItem({ editingItem, onCancelEdit, activeTab = "storefront" 
     : 0;
   useEffect(() => {
     if (editingItem) {
+      const ia = activeTab === "admin" ? editingItem.inAdmin : 0;
+      const oa = activeTab === "admin" ? editingItem.outAdmin : 0;
+      const is_ = activeTab === "storefront" ? editingItem.inStore : 0;
+      const os_ = activeTab === "storefront" ? editingItem.outStore : 0;
       setItemName(editingItem.name);
       setItemType(editingItem.type);
-      setInAdmin(activeTab === "admin" ? editingItem.inAdmin : 0);
-      setOutAdmin(activeTab === "admin" ? editingItem.outAdmin : 0);
-      setInStore(activeTab === "storefront" ? editingItem.inStore : 0);
-      setOutStore(activeTab === "storefront" ? editingItem.outStore : 0);
+      setInAdmin(ia);
+      setInAdminRaw(String(ia));
+      setOutAdmin(oa);
+      setOutAdminRaw(String(oa));
+      setInStore(is_);
+      setInStoreRaw(String(is_));
+      setOutStore(os_);
+      setOutStoreRaw(String(os_));
       setCostPrice(editingItem.costPrice);
+      setCostPriceRaw(String(editingItem.costPrice));
     }
   }, [editingItem, activeTab]);
 
@@ -86,10 +100,15 @@ function AddInventoryItem({ editingItem, onCancelEdit, activeTab = "storefront" 
     setItemName("");
     setItemType("STANDALONE");
     setInAdmin(0);
+    setInAdminRaw("0");
     setOutAdmin(0);
+    setOutAdminRaw("0");
     setInStore(0);
+    setInStoreRaw("0");
     setOutStore(0);
+    setOutStoreRaw("0");
     setCostPrice(0);
+    setCostPriceRaw("0");
     onCancelEdit?.();
   }
 
@@ -185,10 +204,21 @@ function AddInventoryItem({ editingItem, onCancelEdit, activeTab = "storefront" 
                 min={0}
                 max={99999}
                 step={1}
-                value={inAdmin}
+                value={inAdminRaw}
                 onChange={(e) => {
-                  const val = e.target.valueAsNumber;
-                  setInAdmin(Number.isNaN(val) ? 0 : Math.min(99999, Math.max(0, Math.floor(val))));
+                  const next = e.target.value;
+                  setInAdminRaw(next);
+                  if (next === "") return;
+                  const val = parseFloat(next);
+                  if (!Number.isNaN(val)) {
+                    setInAdmin(Math.min(99999, Math.max(0, Math.floor(val))));
+                  }
+                }}
+                onBlur={() => {
+                  const parsed = parseFloat(inAdminRaw);
+                  if (inAdminRaw === "" || Number.isNaN(parsed)) {
+                    setInAdminRaw(String(inAdmin));
+                  }
                 }}
                 placeholder="0"
                 className="h-10 w-full rounded-xl border-(--light-gray) px-3 text-sm"
@@ -209,10 +239,21 @@ function AddInventoryItem({ editingItem, onCancelEdit, activeTab = "storefront" 
                 min={0}
                 max={99999}
                 step={1}
-                value={outAdmin}
+                value={outAdminRaw}
                 onChange={(e) => {
-                  const val = e.target.valueAsNumber;
-                  setOutAdmin(Number.isNaN(val) ? 0 : Math.min(99999, Math.max(0, Math.floor(val))));
+                  const next = e.target.value;
+                  setOutAdminRaw(next);
+                  if (next === "") return;
+                  const val = parseFloat(next);
+                  if (!Number.isNaN(val)) {
+                    setOutAdmin(Math.min(99999, Math.max(0, Math.floor(val))));
+                  }
+                }}
+                onBlur={() => {
+                  const parsed = parseFloat(outAdminRaw);
+                  if (outAdminRaw === "" || Number.isNaN(parsed)) {
+                    setOutAdminRaw(String(outAdmin));
+                  }
                 }}
                 placeholder="0"
                 className="h-10 w-full rounded-xl border-(--light-gray) px-3 text-sm"
@@ -238,10 +279,21 @@ function AddInventoryItem({ editingItem, onCancelEdit, activeTab = "storefront" 
                 min={0}
                 max={99999}
                 step={1}
-                value={inStore}
+                value={inStoreRaw}
                 onChange={(e) => {
-                  const val = e.target.valueAsNumber;
-                  setInStore(Number.isNaN(val) ? 0 : Math.min(99999, Math.max(0, Math.floor(val))));
+                  const next = e.target.value;
+                  setInStoreRaw(next);
+                  if (next === "") return;
+                  const val = parseFloat(next);
+                  if (!Number.isNaN(val)) {
+                    setInStore(Math.min(99999, Math.max(0, Math.floor(val))));
+                  }
+                }}
+                onBlur={() => {
+                  const parsed = parseFloat(inStoreRaw);
+                  if (inStoreRaw === "" || Number.isNaN(parsed)) {
+                    setInStoreRaw(String(inStore));
+                  }
                 }}
                 placeholder="0"
                 className="h-10 w-full rounded-xl border-(--light-gray) px-3 text-sm"
@@ -257,10 +309,21 @@ function AddInventoryItem({ editingItem, onCancelEdit, activeTab = "storefront" 
                 min={0}
                 max={99999}
                 step={1}
-                value={outStore}
+                value={outStoreRaw}
                 onChange={(e) => {
-                  const val = e.target.valueAsNumber;
-                  setOutStore(Number.isNaN(val) ? 0 : Math.min(99999, Math.max(0, Math.floor(val))));
+                  const next = e.target.value;
+                  setOutStoreRaw(next);
+                  if (next === "") return;
+                  const val = parseFloat(next);
+                  if (!Number.isNaN(val)) {
+                    setOutStore(Math.min(99999, Math.max(0, Math.floor(val))));
+                  }
+                }}
+                onBlur={() => {
+                  const parsed = parseFloat(outStoreRaw);
+                  if (outStoreRaw === "" || Number.isNaN(parsed)) {
+                    setOutStoreRaw(String(outStore));
+                  }
                 }}
                 placeholder="0"
                 className="h-10 w-full rounded-xl border-(--light-gray) px-3 text-sm"
@@ -274,13 +337,25 @@ function AddInventoryItem({ editingItem, onCancelEdit, activeTab = "storefront" 
           <Input
             type="text"
             inputMode="decimal"
-            value={costPrice || ""}
+            value={costPriceRaw}
             onChange={(e) => {
-              let val = e.target.value.replace(/[^0-9.]/g, "");
-              const parts = val.split(".");
-              if (parts.length > 2) val = parts[0] + "." + parts.slice(1).join("");
-              if (parts[1]?.length > 2) val = parts[0] + "." + parts[1].slice(0, 2);
-              setCostPrice(val === "" ? 0 : Number(val));
+              let raw = e.target.value;
+              let clean = raw.replace(/[^0-9.]/g, "");
+              const parts = clean.split(".");
+              if (parts.length > 2) clean = parts[0] + "." + parts.slice(1).join("");
+              if (parts[1]?.length > 2) clean = parts[0] + "." + parts[1].slice(0, 2);
+              setCostPriceRaw(clean);
+              if (clean === "") return;
+              const num = Number(clean);
+              if (!Number.isNaN(num)) {
+                setCostPrice(num);
+              }
+            }}
+            onBlur={() => {
+              const parsed = parseFloat(costPriceRaw);
+              if (costPriceRaw === "" || Number.isNaN(parsed)) {
+                setCostPriceRaw(String(costPrice));
+              }
             }}
             placeholder="0.00"
             className="h-10 w-full rounded-xl border-(--light-gray) px-3 text-sm"

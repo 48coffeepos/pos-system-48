@@ -3,6 +3,7 @@
 import { Input } from "@/components/ui/input";
 import { useFieldContext } from "../index";
 import { FormField } from "./form-field";
+import { useState, useEffect } from "react";
 
 interface FormNumberFieldProps {
 	label: string;
@@ -20,18 +21,33 @@ function FormNumberField({
 }: FormNumberFieldProps) {
 	const field = useFieldContext<number>();
 	const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid;
+	const [raw, setRaw] = useState(() => String(field.state.value));
+
+	useEffect(() => {
+		setRaw(String(field.state.value));
+	}, [field.state.value]);
 
 	return (
 		<FormField label={label} description={description}>
 			<Input
 				id={field.name}
 				type="number"
-				value={field.state.value}
+				value={raw}
 				onChange={(e) => {
-							const val = e.target.valueAsNumber;
-							field.handleChange(Number.isNaN(val) ? 0 : val);
-						}}
-				onBlur={field.handleBlur}
+					const next = e.target.value;
+					setRaw(next);
+					if (next === "") return;
+					const val = parseFloat(next);
+					if (!Number.isNaN(val)) {
+						field.handleChange(val);
+					}
+				}}
+				onBlur={(e) => {
+					field.handleBlur();
+					if (e.target.value === "" || Number.isNaN(parseFloat(e.target.value))) {
+						setRaw(String(field.state.value));
+					}
+				}}
 				aria-invalid={isInvalid}
 				{...props}
 			/>

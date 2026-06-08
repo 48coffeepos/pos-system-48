@@ -25,7 +25,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import { deleteInventoryItemMutationOptions } from "../mutationOptions";
 import { SuppliesEodOutStore } from "./storefront/SuppliesEodOutStore";
-import { StorefrontAdd } from "./storefront/StorefrontAdd";
 import { StorefrontDeduct } from "./storefront/StorefrontDeduct";
 import { StockroomAdd } from "./stockroom/StockroomAdd";
 import { TransferStock } from "./transfer/TransferStock";
@@ -88,8 +87,6 @@ function InventoryList({
 	const [fromDate, setFromDate] = useState("");
 	const [toDate, setToDate] = useState("");
 	const [deletingItem, setDeletingItem] =
-		useState<InventoryItem | null>(null);
-	const [addingItem, setAddingItem] =
 		useState<InventoryItem | null>(null);
 	const [deductingItem, setDeductingItem] =
 		useState<InventoryItem | null>(null);
@@ -492,24 +489,14 @@ function InventoryList({
 																		/>
 																	</button>
 																) : (
-																	<>
-																		<button
-																			type="button"
-																			onClick={() => setAddingItem(item)}
-																			className="p-1 hover:text-(--deep-forest) transition-colors"
-																			aria-label="Add stock to storefront"
-																		>
-																			<PlusCircleIcon size={22} weight="bold" />
-																		</button>
-																		<button
-																			type="button"
-																			onClick={() => setDeductingItem(item)}
-																			className="p-1 hover:text-red-600 transition-colors"
-																			aria-label="Deduct stock from storefront"
-																		>
-																			<MinusCircleIcon size={22} weight="bold" />
-																		</button>
-																	</>
+																	<button
+																		type="button"
+																		onClick={() => setDeductingItem(item)}
+																		className="p-1 hover:text-red-600 transition-colors"
+																		aria-label="Deduct stock from storefront"
+																	>
+																		<MinusCircleIcon size={22} weight="bold" />
+																	</button>
 																)}
 																<span className="text-(--light-gray)">|</span>
 															</>
@@ -597,16 +584,6 @@ function InventoryList({
 				</div>
 			) : (
 				tableContent
-			)}
-
-			{addingItem && (
-				<StorefrontAdd
-					item={{ id: addingItem.id, name: addingItem.name }}
-					open={!!addingItem}
-					onOpenChange={(open) => {
-						if (!open) setAddingItem(null);
-					}}
-				/>
 			)}
 
 			{deductingItem && (
