@@ -40,7 +40,6 @@ function AddInventoryItem({ editingItem, onCancelEdit, activeTab = "storefront" 
 
   const [itemName, setItemName] = useState("");
   const [itemType, setItemType] = useState<InventoryItemType>("STANDALONE");
-  const [quantity, setQuantity] = useState<number>(0);
   const [inAdmin, setInAdmin] = useState<number>(0);
   const [outAdmin, setOutAdmin] = useState<number>(0);
   const [inStore, setInStore] = useState<number>(0);
@@ -86,7 +85,6 @@ function AddInventoryItem({ editingItem, onCancelEdit, activeTab = "storefront" 
   function resetForm() {
     setItemName("");
     setItemType("STANDALONE");
-    setQuantity(0);
     setInAdmin(0);
     setOutAdmin(0);
     setInStore(0);
@@ -113,7 +111,6 @@ function AddInventoryItem({ editingItem, onCancelEdit, activeTab = "storefront" 
     } else {
       createMutation.mutate({
         name: itemName.trim(),
-        stock: quantity,
         type: itemType,
         costPrice,
       });
@@ -270,27 +267,7 @@ function AddInventoryItem({ editingItem, onCancelEdit, activeTab = "storefront" 
               />
             </div>
           </>
-        ) : (
-          <div className="space-y-1.5">
-            <div className="flex items-center justify-between gap-3">
-              <label className="text-sm font-medium text-(--dark-gray)">Quantity</label>
-              <p className="text-xs text-(--medium-gray)">{String(quantity).length} / 5</p>
-            </div>
-            <Input
-              type="number"
-              min={0}
-              max={99999}
-              step={1}
-              value={quantity}
-              onChange={(e) => {
-                const val = e.target.valueAsNumber;
-                setQuantity(Number.isNaN(val) ? 0 : Math.min(99999, Math.max(0, Math.floor(val))));
-              }}
-              placeholder="0"
-              className="h-10 w-full rounded-xl border-(--light-gray) px-3 text-sm"
-            />
-          </div>
-        )}
+        ) : null}
 
         <div className="space-y-1.5">
           <label className="text-sm font-medium text-(--dark-gray)">Cost Price (₱)</label>
