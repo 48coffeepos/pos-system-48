@@ -20,122 +20,124 @@ export const updateInventoryItem = createServerFn({ method: "POST" })
   .middleware([adminAuthMiddleware()])
   .inputValidator(updateInventoryItemInput)
   .handler(async ({ data, context }) => {
-    const existing = await prisma.inventory.findUnique({
-      where: { inventory_id: data.id },
-    });
+    const updated = await prisma.$transaction(async (tx) => {
+      const existing = await tx.inventory.findUnique({
+        where: { inventory_id: data.id },
+      });
 
-    if (!existing) {
-      throw new Error("Inventory item not found.");
-    }
-
-    const logBy = context.session.user.name;
-    const unitPrice = existing.cost_price ? Number(existing.cost_price) : 0;
-    const logs: Array<{
-      inventory_item: string;
-      log_by: string;
-      quantity: number;
-      expense?: number;
-      column_name?: string;
-      type: "EDIT";
-      location: "STOCKROOM" | "STOREFRONT";
-    }> = [];
-
-    const updateData: Record<string, unknown> = {
-      name: data.name,
-      type: data.type,
-    };
-
-    if (data.inAdmin !== undefined || data.outAdmin !== undefined) {
-      const newIn = data.inAdmin ?? existing.in_admin;
-      const newOut = data.outAdmin ?? existing.out_admin;
-      const newEnding = existing.beginning_admin + newIn - newOut;
-
-      if (data.inAdmin !== undefined && data.inAdmin > existing.in_admin) {
-        throw new Error(
-          `Cannot increase In Admin via edit. Use "Add Stock" to increase quantity.`,
-        );
+      if (!existing) {
+        throw new Error("Inventory item not found.");
       }
 
-      if (data.inAdmin !== undefined && data.inAdmin < existing.in_admin) {
-        const delta = data.inAdmin - existing.in_admin;
-        const expense = delta * unitPrice;
+      const logBy = context.session.user.name;
+      const unitPrice = existing.cost_price ? Number(existing.cost_price) : 0;
+      const logs: Array<{
+        inventory_item: string;
+        log_by: string;
+        quantity: number;
+        expense?: number;
+        column_name?: string;
+        type: "EDIT";
+        location: "STOCKROOM" | "STOREFRONT";
+      }> = [];
 
-        logs.push({
-          inventory_item: existing.name,
-          log_by: logBy,
-          quantity: delta,
-          expense,
-          column_name: "in_admin",
-          type: "EDIT",
-          location: "STOCKROOM",
-        });
+      const updateData: Record<string, unknown> = {
+        name: data.name,
+        type: data.type,
+      };
+
+      if (data.inAdmin !== undefined || data.outAdmin !== undefined) {
+        const newIn = data.inAdmin ?? existing.in_admin;
+        const newOut = data.outAdmin ?? existing.out_admin;
+        const newEnding = existing.beginning_admin + newIn - newOut;
+
+        if (data.inAdmin !== undefined && data.inAdmin > existing.in_admin) {
+          throw new Error(
+            `Cannot increase In Admin via edit. Use "Add Stock" to increase quantity.`,
+          );
+        }
+
+        if (data.inAdmin !== undefined && data.inAdmin < existing.in_admin) {
+          const delta = data.inAdmin - existing.in_admin;
+          const expense = delta * unitPrice;
+
+          logs.push({
+            inventory_item: existing.name,
+            log_by: logBy,
+            quantity: delta,
+            expense,
+            column_name: "in_admin",
+            type: "EDIT",
+            location: "STOCKROOM",
+          });
+        }
+
+        if (data.outAdmin !== undefined && data.outAdmin !== existing.out_admin) {
+          const delta = data.outAdmin - existing.out_admin;
+
+          logs.push({
+            inventory_item: existing.name,
+            log_by: logBy,
+            quantity: delta,
+            column_name: "out_admin",
+            type: "EDIT",
+            location: "STOCKROOM",
+          });
+        }
+
+        updateData.in_admin = newIn;
+        updateData.out_admin = newOut;
+        updateData.ending_admin = newEnding;
       }
 
-      if (data.outAdmin !== undefined && data.outAdmin !== existing.out_admin) {
-        const delta = data.outAdmin - existing.out_admin;
+      if (data.inStore !== undefined || data.outStore !== undefined) {
+        const newIn = data.inStore ?? existing.in_store;
+        const newOut = data.outStore ?? existing.out_store;
+        const newEnding = existing.beginning_store + newIn - newOut;
 
-        logs.push({
-          inventory_item: existing.name,
-          log_by: logBy,
-          quantity: delta,
-          column_name: "out_admin",
-          type: "EDIT",
-          location: "STOCKROOM",
-        });
+        if (data.inStore !== undefined && data.inStore !== existing.in_store) {
+          const delta = data.inStore - existing.in_store;
+
+          logs.push({
+            inventory_item: existing.name,
+            log_by: logBy,
+            quantity: delta,
+            column_name: "in_store",
+            type: "EDIT",
+            location: "STOREFRONT",
+          });
+        }
+
+        if (data.outStore !== undefined && data.outStore !== existing.out_store) {
+          const delta = data.outStore - existing.out_store;
+
+          logs.push({
+            inventory_item: existing.name,
+            log_by: logBy,
+            quantity: delta,
+            column_name: "out_store",
+            type: "EDIT",
+            location: "STOREFRONT",
+          });
+        }
+
+        updateData.in_store = newIn;
+        updateData.out_store = newOut;
+        updateData.ending_store = newEnding;
       }
 
-      updateData.in_admin = newIn;
-      updateData.out_admin = newOut;
-      updateData.ending_admin = newEnding;
-    }
-
-    if (data.inStore !== undefined || data.outStore !== undefined) {
-      const newIn = data.inStore ?? existing.in_store;
-      const newOut = data.outStore ?? existing.out_store;
-      const newEnding = existing.beginning_store + newIn - newOut;
-
-      if (data.inStore !== undefined && data.inStore !== existing.in_store) {
-        const delta = data.inStore - existing.in_store;
-
-        logs.push({
-          inventory_item: existing.name,
-          log_by: logBy,
-          quantity: delta,
-          column_name: "in_store",
-          type: "EDIT",
-          location: "STOREFRONT",
-        });
+      if (data.costPrice !== undefined) {
+        updateData.cost_price = data.costPrice;
       }
 
-      if (data.outStore !== undefined && data.outStore !== existing.out_store) {
-        const delta = data.outStore - existing.out_store;
-
-        logs.push({
-          inventory_item: existing.name,
-          log_by: logBy,
-          quantity: delta,
-          column_name: "out_store",
-          type: "EDIT",
-          location: "STOREFRONT",
-        });
+      if (logs.length > 0) {
+        await tx.inventoryLog.createMany({ data: logs });
       }
 
-      updateData.in_store = newIn;
-      updateData.out_store = newOut;
-      updateData.ending_store = newEnding;
-    }
-
-    if (data.costPrice !== undefined) {
-      updateData.cost_price = data.costPrice;
-    }
-
-    if (logs.length > 0) {
-      await prisma.inventoryLog.createMany({ data: logs });
-    }
-
-    const updated = await prisma.inventory.update({
-      where: { inventory_id: data.id },
-      data: updateData,
+      return tx.inventory.update({
+        where: { inventory_id: data.id },
+        data: updateData,
+      });
     });
 
     return mapInventoryItem(updated);

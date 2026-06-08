@@ -197,10 +197,10 @@ model InventoryLog {
   expense          Decimal?  @db.Decimal(10, 2)
   quantity         Int?
   inventory_item   String
-  column_name      String?
   location         Location
   log_by           String
   type             Log_type
+  column_name      String?
 
   @@map("inventory_log")
 }
