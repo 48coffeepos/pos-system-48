@@ -1,12 +1,24 @@
 import { createServerFn } from "@tanstack/react-start";
 
 import { authMiddleware } from "@/features/auth/middlewares";
+import { ROLES } from "@/features/auth/roles";
 import { prisma } from "@/integrations/prisma/db";
 
 export const getInventoryLogs = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
-  .handler(async () => {
+  .handler(async ({ context }) => {
+    const { session } = context;
+    const isAdmin = session.user.role === ROLES.admin;
+
     const logs = await prisma.inventoryLog.findMany({
+      where: isAdmin
+        ? undefined
+        : {
+            OR: [
+              { log_by: session.user.name },
+              { type: "TRANSFER", location: "STOREFRONT" },
+            ],
+          },
       orderBy: { date_time: "desc" },
     });
 

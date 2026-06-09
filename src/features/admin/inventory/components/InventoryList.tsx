@@ -539,11 +539,7 @@ function InventoryList({
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder={
-              isLogsTab
-                ? "Search by item, user, location..."
-                : "Search inventory items..."
-            }
+            placeholder={isLogsTab ? "Search..." : "Search inventory items..."}
             className="h-10 w-full rounded-xl border pl-10 pr-4 text-sm outline-none transition-all"
             style={{ background: "white", borderColor: "var(--light-gray)" }}
           />
