@@ -62,7 +62,6 @@ interface PosItemCustomizeDialogProps {
 		}>;
 	}) => void;
 	hasDiscountInCart: boolean;
-	hasFreeDrinkInCart: boolean;
 }
 
 export function PosItemCustomizeDialog({
@@ -71,7 +70,6 @@ export function PosItemCustomizeDialog({
 	onClose,
 	onConfirm,
 	hasDiscountInCart,
-	hasFreeDrinkInCart,
 }: PosItemCustomizeDialogProps) {
 	const [selectedInvItem, setSelectedInvItem] = useState<string | null>(null);
 	const [showAddons, setShowAddons] = useState(false);
@@ -208,75 +206,87 @@ export function PosItemCustomizeDialog({
 							</div>
 						) : null}
 
-						{/* Add-ons */}
-						<div className="space-y-0.5 md:space-y-2">
-							<div className="flex items-center justify-between">
-								<p className={cn(posMutedLabel, "text-[8px] md:text-xs")}>Add-ons</p>
-								{addOns.length > 0 ? (
-									<Button
-										variant={showAddons ? "default" : "secondary"}
-										className={cn(showAddons ? posBtnPrimary : posBtnSecondary, "text-[8px] md:text-xs h-6 md:h-9")}
-										onClick={() => setShowAddons(!showAddons)}
-									>
-										{showAddons ? "Active" : "Add?"}
-									</Button>
-								) : null}
-							</div>
-							{showAddons && addOns.length > 0 ? (
-								<div className="space-y-0.5 md:space-y-2">
-									{addOns.map((addon) => {
-										const qty = selectedAddons[addon.addon_id]?.quantity ?? 0;
-										return (
-											<div
-												key={addon.addon_id}
-												className={cn(
-													"flex items-center justify-between rounded-[5px] border p-1 transition-all md:rounded-xl md:p-2.5",
-													qty > 0 ? posAddonSelected : posAddonDefault,
-												)}
-											>
-												<div className="flex flex-col gap-0.5">
-													<span
-														className={cn(
-															"text-[11px] font-bold md:text-sm",
-															qty > 0
-																? "text-(--deep-forest)"
-																: "text-(--medium-gray)",
-														)}
-													>
-														{addon.name}
-													</span>
-													<span className="text-[9px] opacity-60 md:text-[11px]">
-														+{formatPeso(addon.price)}
-													</span>
-												</div>
-												<div className="flex items-center gap-0.5 md:gap-1.5">
-													<Button
-														variant="secondary"
-														size="icon-sm"
-														className={posBtnSecondary}
-														onClick={() => decrementAddon(addon)}
-														disabled={qty === 0}
-													>
-														<MinusIcon className="size-3 md:size-4" />
-													</Button>
-													<span className="w-3 text-center text-[11px] font-bold md:w-5 md:text-sm">
-														{qty}
-													</span>
-													<Button
-														variant="default"
-														size="icon-sm"
-														className={posBtnPrimary}
-														onClick={() => incrementAddon(addon)}
-													>
-														<PlusIcon className="size-3 md:size-4" />
-													</Button>
-												</div>
+						{/* Add-ons (hidden for free drinks) */}
+						<form.Subscribe selector={(state) => state.values.isFreeDrink}>
+							{(isFreeDrink) =>
+								!isFreeDrink ? (
+									<div className="space-y-0.5 md:space-y-2">
+										<div className="flex items-center justify-between">
+											<p className={cn(posMutedLabel, "text-[8px] md:text-xs")}>
+												Add-ons
+											</p>
+											{addOns.length > 0 ? (
+												<Button
+													variant={showAddons ? "default" : "secondary"}
+													className={cn(
+														showAddons ? posBtnPrimary : posBtnSecondary,
+														"text-[8px] md:text-xs h-6 md:h-9",
+													)}
+													onClick={() => setShowAddons(!showAddons)}
+												>
+													{showAddons ? "Active" : "Add?"}
+												</Button>
+											) : null}
+										</div>
+										{showAddons && addOns.length > 0 ? (
+											<div className="space-y-0.5 md:space-y-2">
+												{addOns.map((addon) => {
+													const qty =
+														selectedAddons[addon.addon_id]?.quantity ?? 0;
+													return (
+														<div
+															key={addon.addon_id}
+															className={cn(
+																"flex items-center justify-between rounded-[5px] border p-1 transition-all md:rounded-xl md:p-2.5",
+																qty > 0 ? posAddonSelected : posAddonDefault,
+															)}
+														>
+															<div className="flex flex-col gap-0.5">
+																<span
+																	className={cn(
+																		"text-[11px] font-bold md:text-sm",
+																		qty > 0
+																			? "text-(--deep-forest)"
+																			: "text-(--medium-gray)",
+																	)}
+																>
+																	{addon.name}
+																</span>
+																<span className="text-[9px] opacity-60 md:text-[11px]">
+																	+{formatPeso(addon.price)}
+																</span>
+															</div>
+															<div className="flex items-center gap-0.5 md:gap-1.5">
+																<Button
+																	variant="secondary"
+																	size="icon-sm"
+																	className={posBtnSecondary}
+																	onClick={() => decrementAddon(addon)}
+																	disabled={qty === 0}
+																>
+																	<MinusIcon className="size-3 md:size-4" />
+																</Button>
+																<span className="w-3 text-center text-[11px] font-bold md:w-5 md:text-sm">
+																	{qty}
+																</span>
+																<Button
+																	variant="default"
+																	size="icon-sm"
+																	className={posBtnPrimary}
+																	onClick={() => incrementAddon(addon)}
+																>
+																	<PlusIcon className="size-3 md:size-4" />
+																</Button>
+															</div>
+														</div>
+													);
+												})}
 											</div>
-										);
-									})}
-								</div>
-							) : null}
-						</div>
+										) : null}
+									</div>
+								) : null
+							}
+						</form.Subscribe>
 
 						{/* Discount & Free Drink */}
 						<div className="space-y-1 md:space-y-3">
@@ -286,8 +296,10 @@ export function PosItemCustomizeDialog({
 										name="discountType"
 										listeners={{
 											onChange: ({ value }) => {
-												if (value !== "NONE")
+												if (value !== "NONE") {
 													form.setFieldValue("quantity", 1);
+													form.setFieldValue("isFreeDrink", false);
+												}
 											},
 										}}
 									>
@@ -345,7 +357,20 @@ export function PosItemCustomizeDialog({
 							) : null}
 
 							{canUseFreeDrink ? (
-								<form.AppField name="isFreeDrink">
+								<form.AppField
+									name="isFreeDrink"
+									listeners={{
+										onChange: ({ value }) => {
+											if (value) {
+												form.setFieldValue("discountType", "NONE");
+												form.setFieldValue("discountName", "");
+												form.setFieldValue("discountId", "");
+												setSelectedAddons({});
+												setShowAddons(false);
+											}
+										},
+									}}
+								>
 									{(field) => (
 										<div
 											className={cn(

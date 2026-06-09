@@ -2,6 +2,11 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useMemo } from "react";
 import { toast } from "sonner";
 import { sessionQueryOptions } from "@/features/auth/queryOptions";
+import {
+	PUSHER_ORDERS_CHANNEL,
+	PUSHER_RECEIPT_DISMISSED_EVENT,
+} from "@/integrations/pusher/constants";
+import { usePusherChannel } from "@/integrations/pusher/hooks/usePusherChannel";
 import { usePosForm } from "../hooks/usePosForm";
 import { createOrderMutationOptions } from "../mutationOptions";
 import { posPageDataQueryOptions } from "../queryOptions";
@@ -44,6 +49,19 @@ export function PosScreen() {
 		createOrderMutationOptions(queryClient),
 	);
 
+	usePusherChannel(
+		PUSHER_ORDERS_CHANNEL,
+		PUSHER_RECEIPT_DISMISSED_EVENT,
+		(data: unknown) => {
+			const { order_id } = data as { order_id: string };
+			const { lastOrder, showReceipt, setShowReceipt } =
+				usePosStore.getState();
+			if (showReceipt && lastOrder?.order_id === order_id) {
+				setShowReceipt(false);
+			}
+		},
+	);
+
 	const cartTotal = cart.reduce((s, c) => s + c.total_price, 0);
 
 	const form = usePosForm();
@@ -60,7 +78,6 @@ export function PosScreen() {
 	const addOns = data?.addOns ?? [];
 
 	const hasDiscountInCart = cart.some((c) => c.discount);
-	const hasFreeDrinkInCart = cart.some((c) => c.is_free_drink);
 
 	const menuItems = useMemo(
 		() =>
@@ -226,7 +243,6 @@ export function PosScreen() {
 				onClose={() => setCustomizeItem(null)}
 				onConfirm={handleCustomizeConfirm}
 				hasDiscountInCart={hasDiscountInCart}
-				hasFreeDrinkInCart={hasFreeDrinkInCart}
 			/>
 
 			<PosOrderConfirmDialog

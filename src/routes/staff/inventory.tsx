@@ -63,6 +63,8 @@ function StaffInventory() {
 					<InventoryList
 						items={inventoryItems ?? []}
 						inventoryLogs={inventoryLogs ?? []}
+						allowedTabs={["storefront", "logs"]}
+						logsLocationFilter="STOREFRONT"
 						actions="stock"
 						activeTab={activeTab}
 						onTabChange={setActiveTab}

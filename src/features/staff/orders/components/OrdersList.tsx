@@ -1,11 +1,17 @@
 import { CreditCardIcon, ReceiptIcon } from "@phosphor-icons/react";
-import { useQueryClient } from "@tanstack/react-query";
-import { useRef, useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useCallback, useRef, useState } from "react";
+import { toast } from "sonner";
 import { PosReceiptDialog } from "@/features/staff/pos/components/PosReceiptDialog";
 import type { PosOrder } from "@/features/staff/pos/types";
+import {
+	PUSHER_NEW_ORDER_EVENT,
+	PUSHER_ORDERS_CHANNEL,
+} from "@/integrations/pusher/constants";
 import { usePusherChannel } from "@/integrations/pusher/hooks/usePusherChannel";
 import { formatPeso } from "@/lib/format-currency";
 import orderKeys from "../keys";
+import { publishReceiptDismissedMutationOptions } from "../mutationOptions";
 
 interface DBOrder {
   order_id: string;
@@ -54,8 +60,11 @@ export function OrdersList({ orders = [] }: OrdersListProps) {
 
   const queryClient = useQueryClient();
   const pusherProcessedRef = useRef<Set<string>>(new Set());
+  const publishReceiptDismissedMutation = useMutation(
+    publishReceiptDismissedMutationOptions,
+  );
 
-  usePusherChannel("orders", "new-order", (data: unknown) => {
+  usePusherChannel(PUSHER_ORDERS_CHANNEL, PUSHER_NEW_ORDER_EVENT, (data: unknown) => {
     const raw = data as DBOrder;
 
     if (pusherProcessedRef.current.has(raw.order_id)) return;
@@ -95,6 +104,25 @@ export function OrdersList({ orders = [] }: OrdersListProps) {
     };
     setSelectedOrder(mapped);
   });
+
+  const handleReceiptClose = useCallback(async () => {
+    const orderId = selectedOrder?.order_id;
+    setSelectedOrder(null);
+    if (orderId) {
+      try {
+        const result = await publishReceiptDismissedMutation.mutateAsync({
+          order_id: orderId,
+        });
+        if (result.published === false) {
+          toast.warning(
+            "Receipt closed locally, but the POS screen may not update automatically.",
+          );
+        }
+      } catch {
+        // non-blocking; local dialog already closed
+      }
+    }
+  }, [selectedOrder?.order_id, publishReceiptDismissedMutation]);
 
   const filteredOrders = orders.filter((order) => {
     const orderDate = new Date(order.created_at);
@@ -299,7 +327,7 @@ export function OrdersList({ orders = [] }: OrdersListProps) {
       <PosReceiptDialog
         order={selectedOrder}
         open={!!selectedOrder}
-        onClose={() => setSelectedOrder(null)}
+        onClose={handleReceiptClose}
         cashierName={selectedOrder?.cashier_name || "Cashier"}
       />
     </div>
