@@ -18,17 +18,20 @@ import {
   TableRow,
 } from "@/components/ui/table"
 
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[]
+interface DataTableProps<TData> {
+  // TValue is `any` because tables mix accessor value types (string, number, Date, etc.)
+  columns: ColumnDef<TData, any>[]
   data: TData[]
   pageSize?: number
+  empty?: React.ReactNode
 }
 
-export function DataTable<TData, TValue>({
+export function DataTable<TData>({
   columns,
   data,
   pageSize,
-}: DataTableProps<TData, TValue>) {
+  empty,
+}: DataTableProps<TData>) {
   const [sorting, setSorting] = React.useState<SortingState>([])
 
   const table = useReactTable({
@@ -96,7 +99,7 @@ export function DataTable<TData, TValue>({
             ) : (
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
-                  No results.
+                  {empty ?? "No results."}
                 </TableCell>
               </TableRow>
             )}
