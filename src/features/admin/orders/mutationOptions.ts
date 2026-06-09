@@ -8,6 +8,7 @@ import {
 	updateOrderItems,
 	type updateOrderItemsInput,
 } from "./server/updateOrderItems";
+import { deleteOrder } from "./server/deleteOrder";
 import { updateOrderPayment } from "./server/updateOrderPayment";
 
 async function invalidateOrderAndDashboard(
@@ -60,6 +61,21 @@ export const updateOrderItemsMutationOptions = mutationOptions({
 	},
 	onError: (error) => {
 		toast.error("Failed to update items", {
+			description: error?.message ?? "Unknown error",
+		});
+	},
+});
+
+export const deleteOrderMutationOptions = mutationOptions({
+	mutationFn: async (data: { orderId: string }) => deleteOrder({ data }),
+	onSuccess: async (_data, _variables, _onMutateResult, mutationContext) => {
+		await invalidateOrderAndDashboard(mutationContext);
+		toast.success("Order deleted", {
+			description: "The order has been successfully removed.",
+		});
+	},
+	onError: (error) => {
+		toast.error("Failed to delete order", {
 			description: error?.message ?? "Unknown error",
 		});
 	},

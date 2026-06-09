@@ -22,6 +22,7 @@ import type { PosOrder } from "@/features/staff/pos/types";
 import { getOrderEditPolicy } from "@/lib/day-bounds";
 import { formatPeso } from "@/lib/format-currency";
 import {
+	deleteOrderMutationOptions,
 	updateOrderItemsMutationOptions,
 	updateOrderPaymentMutationOptions,
 } from "../mutationOptions";
@@ -47,6 +48,7 @@ export function AdminEditOrderDialog({
 
 	const paymentMutation = useMutation(updateOrderPaymentMutationOptions);
 	const itemsMutation = useMutation(updateOrderItemsMutationOptions);
+	const deleteMutation = useMutation(deleteOrderMutationOptions);
 
 	const { data: menuData } = useQuery({
 		...posPageDataQueryOptions,
@@ -193,7 +195,23 @@ export function AdminEditOrderDialog({
 		}
 	};
 
-	const isPending = itemsMutation.isPending || paymentMutation.isPending;
+	const handleDelete = async () => {
+		if (
+			!confirm(
+				"Are you sure you want to delete this entire order? This will restore inventory items and remove the transaction permanently.",
+			)
+		) {
+			return;
+		}
+		try {
+			await deleteMutation.mutateAsync({ orderId: order.order_id });
+			onClose();
+		} catch (error) {
+			console.error("Failed to delete order", error);
+		}
+	};
+
+	const isPending = itemsMutation.isPending || paymentMutation.isPending || deleteMutation.isPending;
 
 	return (
 		<AlertDialog
@@ -403,16 +421,26 @@ export function AdminEditOrderDialog({
 					) : null}
 				</div>
 
-				<AlertDialogFooter>
-					<AlertDialogCancel onClick={onClose} disabled={isPending}>
-						Cancel
-					</AlertDialogCancel>
-					<AlertDialogAction
-						onClick={handleSave}
-						disabled={isPending || !isAmountValid || items.length === 0}
+				<AlertDialogFooter className="sm:justify-between w-full flex-col sm:flex-row gap-2 sm:gap-0">
+					<Button
+						type="button"
+						variant="destructive"
+						onClick={handleDelete}
+						disabled={isPending}
 					>
-						{isPending ? "Saving..." : "Save Changes"}
-					</AlertDialogAction>
+						Delete Order
+					</Button>
+					<div className="flex gap-2 sm:justify-end">
+						<AlertDialogCancel onClick={onClose} disabled={isPending}>
+							Cancel
+						</AlertDialogCancel>
+						<AlertDialogAction
+							onClick={handleSave}
+							disabled={isPending || !isAmountValid || items.length === 0}
+						>
+							{isPending ? "Processing..." : "Save Changes"}
+						</AlertDialogAction>
+					</div>
 				</AlertDialogFooter>
 			</AlertDialogContent>
 		</AlertDialog>
