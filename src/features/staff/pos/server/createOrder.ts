@@ -8,6 +8,10 @@ import type {
 } from "@/generated/prisma/enums.js";
 import { applyInventoryMovement } from "@/features/admin/inventory/server/inventoryMovement";
 import { prisma } from "@/integrations/prisma/db";
+import {
+	PUSHER_NEW_ORDER_EVENT,
+	PUSHER_ORDERS_CHANNEL,
+} from "@/integrations/pusher/constants";
 import { getPusher } from "@/integrations/pusher/server";
 import { seniorPwdDiscountAmount } from "../utils/order-discount";
 
@@ -82,6 +86,20 @@ const createOrderInput = z
         });
       }
     }
+
+    data.items.forEach((item, index) => {
+      if (
+        item.is_free_drink === true &&
+        item.addon_items &&
+        item.addon_items.length > 0
+      ) {
+        ctx.addIssue({
+          code: "custom",
+          message: "Free drinks cannot include add-ons.",
+          path: ["items", index, "addon_items"],
+        });
+      }
+    });
   });
 
 function isOrderIdUniqueViolation(
@@ -308,7 +326,7 @@ export const createOrder = createServerFn({ method: "POST" })
     try {
       const pusher = getPusher();
       if (pusher) {
-        await pusher.trigger("orders", "new-order", order);
+        await pusher.trigger(PUSHER_ORDERS_CHANNEL, PUSHER_NEW_ORDER_EVENT, order);
         pusherPublished = true;
       }
     } catch (err) {

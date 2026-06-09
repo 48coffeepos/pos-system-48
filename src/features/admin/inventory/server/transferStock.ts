@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
-import { authMiddleware } from "@/features/auth/middlewares";
+import { adminAuthMiddleware } from "@/features/auth/middlewares";
 import { prisma } from "@/integrations/prisma/db";
 import { applyInventoryMovement } from "./inventoryMovement";
 import { mapInventoryItem } from "./mapInventoryItem";
@@ -13,7 +13,7 @@ export const transferStockInput = z.object({
 });
 
 export const transferStock = createServerFn({ method: "POST" })
-  .middleware([authMiddleware])
+  .middleware([adminAuthMiddleware()])
   .inputValidator(transferStockInput)
   .handler(async ({ data, context }) => {
     const logBy = context.session.user.name;

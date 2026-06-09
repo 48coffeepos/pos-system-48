@@ -78,14 +78,16 @@ export function usePosItemCustomizeDialog({
 		onSubmit: ({ value }) => {
 			if (!item) return;
 
-			const addonItems = Object.entries(selectedAddons)
-				.filter(([, v]) => v.quantity > 0)
-				.map(([id, v]) => ({
-					addon_id: id,
-					name: v.name,
-					price: v.price,
-					quantity: v.quantity,
-				}));
+			const addonItems = value.isFreeDrink
+				? []
+				: Object.entries(selectedAddons)
+						.filter(([, v]) => v.quantity > 0)
+						.map(([id, v]) => ({
+							addon_id: id,
+							name: v.name,
+							price: v.price,
+							quantity: v.quantity,
+						}));
 
 			const addonsTotal = addonItems.reduce(
 				(sum, a) => sum + a.price * a.quantity,
@@ -134,14 +136,21 @@ export function usePosItemCustomizeDialog({
 				unit_price: finalUnitPrice,
 				total_price: finalUnitPrice * qty,
 				discount:
-					value.discountType !== "NONE" ? value.discountType : undefined,
+					!value.isFreeDrink && value.discountType !== "NONE"
+						? value.discountType
+						: undefined,
 				discount_name:
-					value.discountType !== "NONE" ? value.discountName : undefined,
+					!value.isFreeDrink && value.discountType !== "NONE"
+						? value.discountName
+						: undefined,
 				discount_id:
-					value.discountType !== "NONE" ? value.discountId : undefined,
+					!value.isFreeDrink && value.discountType !== "NONE"
+						? value.discountId
+						: undefined,
 				is_free_drink: value.isFreeDrink || undefined,
 				selected_inventory_id: selectedInvItem || undefined,
-				addon_items: addonItems.length > 0 ? addonItems : undefined,
+				addon_items:
+					!value.isFreeDrink && addonItems.length > 0 ? addonItems : undefined,
 			});
 
 			onClose();

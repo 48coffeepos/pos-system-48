@@ -2,15 +2,17 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useMemo } from "react";
 import { toast } from "sonner";
 import { sessionQueryOptions } from "@/features/auth/queryOptions";
+import {
+	PUSHER_ORDERS_CHANNEL,
+	PUSHER_RECEIPT_DISMISSED_EVENT,
+} from "@/integrations/pusher/constants";
+import { usePusherChannel } from "@/integrations/pusher/hooks/usePusherChannel";
 import { usePosForm } from "../hooks/usePosForm";
 import { createOrderMutationOptions } from "../mutationOptions";
 import { posPageDataQueryOptions } from "../queryOptions";
 import { usePosStore } from "../stores/usePosStore";
 import type { CartItem, MenuItem, PosOrder } from "../types";
-import {
-	cartItemToCreateOrderItem,
-	cartItemToPosOrderItem,
-} from "../utils";
+import { cartItemToCreateOrderItem } from "../utils";
 import { PosCartPanel } from "./PosCartPanel";
 import { PosItemCustomizeDialog } from "./PosItemCustomizeDialog";
 import { PosOrderConfirmDialog } from "./PosOrderConfirmDialog";
@@ -44,6 +46,18 @@ export function PosScreen() {
 		createOrderMutationOptions(queryClient),
 	);
 
+	usePusherChannel(
+		PUSHER_ORDERS_CHANNEL,
+		PUSHER_RECEIPT_DISMISSED_EVENT,
+		(data: unknown) => {
+			const { order_id } = data as { order_id: string };
+			const { lastOrder, showReceipt, setShowReceipt } = usePosStore.getState();
+			if (showReceipt && lastOrder?.order_id === order_id) {
+				setShowReceipt(false);
+			}
+		},
+	);
+
 	const cartTotal = cart.reduce((s, c) => s + c.total_price, 0);
 
 	const form = usePosForm();
@@ -60,7 +74,6 @@ export function PosScreen() {
 	const addOns = data?.addOns ?? [];
 
 	const hasDiscountInCart = cart.some((c) => c.discount);
-	const hasFreeDrinkInCart = cart.some((c) => c.is_free_drink);
 
 	const menuItems = useMemo(
 		() =>
@@ -114,7 +127,9 @@ export function PosScreen() {
 					cup_size: "NONE",
 					unit_price: price,
 					total_price: price,
-					selected_inventory_id: hasInventory ? item.inventory_items[0].inventory.inventory_id : undefined,
+					selected_inventory_id: hasInventory
+						? item.inventory_items[0].inventory.inventory_id
+						: undefined,
 				};
 				addToCart(newItem);
 			} else {
@@ -165,7 +180,25 @@ export function PosScreen() {
 						: undefined,
 				grand_total: Number(placedOrder.grand_total),
 				note: values.note || undefined,
-				items: cart.map(cartItemToPosOrderItem),
+				items: placedOrder.order_items.map((item) => ({
+					order_item_id: item.order_item_id,
+					snapshot_menu_name: item.snapshot_menu_name,
+					quantity: item.quantity,
+					unit_price: Number(item.unit_price),
+					discount_type: item.discount_type ?? undefined,
+					discount_contact: item.discount_contact ?? undefined,
+					discount_id_number: item.discount_id_number ?? undefined,
+					loyalty: item.loyalty,
+					line_total: Number(item.line_total),
+					snapshot_inventory: item.snapshot_inventory,
+					addon_items: item.addon_items.map((ai) => ({
+						order_item_addon_id: ai.order_item_addon_id,
+						addon_id: ai.addon_id,
+						addon_name_snapshot: ai.addon_name_snapshot,
+						addon_price_snapshot: Number(ai.addon_price_snapshot),
+						quantity: ai.quantity,
+					})),
+				})),
 			};
 
 			setLastOrder(order);
@@ -226,7 +259,6 @@ export function PosScreen() {
 				onClose={() => setCustomizeItem(null)}
 				onConfirm={handleCustomizeConfirm}
 				hasDiscountInCart={hasDiscountInCart}
-				hasFreeDrinkInCart={hasFreeDrinkInCart}
 			/>
 
 			<PosOrderConfirmDialog

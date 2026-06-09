@@ -1,4 +1,8 @@
-import { CreditCardIcon, PencilSimpleLine, ReceiptIcon } from "@phosphor-icons/react";
+import {
+	CreditCardIcon,
+	PencilSimpleLine,
+	ReceiptIcon,
+} from "@phosphor-icons/react";
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { PosReceiptDialog } from "@/features/staff/pos/components/PosReceiptDialog";
@@ -44,7 +48,9 @@ export function TodayOrdersTable({ data, limit }: TodayOrdersTableProps) {
 						{limit ? "All Orders Today" : "Orders"}
 					</h3>
 					<p className="mt-0.5 text-xs text-(--medium-gray)">
-						{limit ? "A summary of today's transactions" : "A list of all transactions"}
+						{limit
+							? "A summary of today's transactions"
+							: "A list of all transactions"}
 					</p>
 				</div>
 				{limit && (
@@ -118,7 +124,9 @@ export function TodayOrdersTable({ data, limit }: TodayOrdersTableProps) {
 										</td>
 
 										<td className="p-4 font-black text-sm text-(--near-black) text-center">
-											{order.method === "GRAB" ? "--" : formatPeso(order.grand_total)}
+											{order.method === "GRAB"
+												? "--"
+												: formatPeso(order.grand_total)}
 										</td>
 
 										<td className="p-4 pr-6 no-print text-center">
@@ -190,7 +198,9 @@ export function TodayOrdersTable({ data, limit }: TodayOrdersTableProps) {
 											Total
 										</span>
 										<span className="font-black text-sm text-(--near-black)">
-											{order.method === "GRAB" ? "--" : formatPeso(order.grand_total)}
+											{order.method === "GRAB"
+												? "--"
+												: formatPeso(order.grand_total)}
 										</span>
 									</div>
 

@@ -4,16 +4,18 @@ import type { z } from "zod";
 
 import inventoryKeys from "@/features/admin/inventory/keys";
 import menuKeys, { addonKeys } from "./keys";
-import { deleteMenu, deleteMenuInput } from "./server/deleteMenu";
-import { saveMenu, saveMenuInput } from "./server/saveMenu";
-import { deleteAddOn, deleteAddOnInput } from "./server/deleteAddOn";
-import { updateAddOn, UpdateAddOnSchema } from "./server/updateAddOn";
-import { createAddOn, CreateAddOnSchema } from "./server/createAddOn";
+import { type CreateAddOnSchema, createAddOn } from "./server/createAddOn";
+import { deleteAddOn, type deleteAddOnInput } from "./server/deleteAddOn";
+import { deleteMenu, type deleteMenuInput } from "./server/deleteMenu";
+import { saveMenu, type saveMenuInput } from "./server/saveMenu";
+import { type UpdateAddOnSchema, updateAddOn } from "./server/updateAddOn";
 
 export const saveMenuMutationOptions = mutationOptions({
   mutationFn: async (data: z.infer<typeof saveMenuInput>) => saveMenu({ data }),
   onSuccess: async (data, variables, _onMutateResult, mutationContext) => {
-    await mutationContext?.client?.invalidateQueries({ queryKey: menuKeys.all });
+    await mutationContext?.client?.invalidateQueries({
+      queryKey: menuKeys.all,
+    });
     if (variables.trackInventory) {
       await mutationContext?.client?.invalidateQueries({
         queryKey: inventoryKeys.inventory,
@@ -32,9 +34,12 @@ export const saveMenuMutationOptions = mutationOptions({
 });
 
 export const deleteMenuMutationOptions = mutationOptions({
-  mutationFn: async (data: z.infer<typeof deleteMenuInput>) => deleteMenu({ data }),
+  mutationFn: async (data: z.infer<typeof deleteMenuInput>) =>
+    deleteMenu({ data }),
   onSuccess: async (_data, _variables, _onMutateResult, mutationContext) => {
-    await mutationContext?.client?.invalidateQueries({ queryKey: menuKeys.all });
+    await mutationContext?.client?.invalidateQueries({
+      queryKey: menuKeys.all,
+    });
     toast.success("Menu item deleted");
   },
   onError: (error) => {
@@ -45,7 +50,8 @@ export const deleteMenuMutationOptions = mutationOptions({
 });
 
 export const createAddOnMutationOptions = mutationOptions({
-  mutationFn: async (data: z.infer<typeof CreateAddOnSchema>) => createAddOn({ data }),
+  mutationFn: async (data: z.infer<typeof CreateAddOnSchema>) =>
+    createAddOn({ data }),
   onSuccess: (_data, variables, _onMutateResult, mutationContext) => {
     mutationContext?.client?.invalidateQueries({ queryKey: addonKeys.all });
     toast.success("Add-on created", {
@@ -60,9 +66,12 @@ export const createAddOnMutationOptions = mutationOptions({
 });
 
 export const deleteAddOnMutationOptions = mutationOptions({
-  mutationFn: async (data: z.infer<typeof deleteAddOnInput>) => deleteAddOn({ data }),
+  mutationFn: async (data: z.infer<typeof deleteAddOnInput>) =>
+    deleteAddOn({ data }),
   onSuccess: async (_data, _variables, _onMutateResult, mutationContext) => {
-    await mutationContext?.client?.invalidateQueries({ queryKey: addonKeys.all });
+    await mutationContext?.client?.invalidateQueries({
+      queryKey: addonKeys.all,
+    });
     toast.success("Add-on deleted");
   },
   onError: (error) => {
@@ -73,7 +82,8 @@ export const deleteAddOnMutationOptions = mutationOptions({
 });
 
 export const updateAddOnMutationOptions = mutationOptions({
-  mutationFn: async (data: z.infer<typeof UpdateAddOnSchema>) => updateAddOn({ data }),
+  mutationFn: async (data: z.infer<typeof UpdateAddOnSchema>) =>
+    updateAddOn({ data }),
   onSuccess: (_data, variables, _onMutateResult, mutationContext) => {
     mutationContext?.client?.invalidateQueries({ queryKey: addonKeys.all });
     toast.success("Add-on updated", {

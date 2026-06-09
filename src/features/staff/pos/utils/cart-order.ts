@@ -62,6 +62,7 @@ export function cartItemToPosOrderItem(c: CartItem) {
 		discount_type: discount,
 		discount_contact: discount_name,
 		discount_id_number: discount_id,
+		loyalty: c.is_free_drink === true,
 		line_total: total_price,
 		snapshot_inventory: snapshotInventoryLabel(c),
 		addon_items: mapAddonSnapshots(addon_items),

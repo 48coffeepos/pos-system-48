@@ -8,7 +8,7 @@ import {
 	THERMAL_PAGE_STYLE,
 } from "@/integrations/bixolon";
 import { cn } from "@/lib/utils";
-import { posBtnGhost, posBtnOutline, posBtnPrimary } from "../pos-ui";
+import { posBadgeFree, posBtnGhost, posBtnOutline, posBtnPrimary } from "../pos-ui";
 import type { PosOrder } from "../types";
 
 interface PosReceiptDialogProps {
@@ -112,6 +112,11 @@ export function PosReceiptDialog({
 											<span>{Math.round(item.quantity)}x</span>
 											<span className="uppercase break-words">
 												{item.snapshot_menu_name}
+												{item.loyalty ? (
+													<span className={cn(posBadgeFree, "ml-1 normal-case")}>
+														Free
+													</span>
+												) : null}
 												{item.snapshot_inventory && item.snapshot_inventory !== item.snapshot_menu_name
 													? <span className="font-semibold opacity-80"> {item.snapshot_inventory}</span>
 													: null}

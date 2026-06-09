@@ -13,7 +13,11 @@ export const saveMenuInput = z
     trackInventory: z.boolean(),
     price: z.number().positive().optional(),
     itemType: z
-      .enum([Inventory_Type.CUP, Inventory_Type.STANDALONE])
+      .enum([
+        Inventory_Type.CUP,
+        Inventory_Type.STANDALONE,
+        Inventory_Type.SUPPLIES,
+      ])
       .optional(),
     selectedCupIds: z.array(z.string()),
     cupPrices: z.record(z.string(), z.number()),
@@ -151,7 +155,14 @@ export const saveMenu = createServerFn({ method: "POST" })
             const createdInventory = await tx.inventory.create({
               data: {
                 name: inventoryName,
-                stock: 0,
+                beginning_admin: 0,
+                in_admin: 0,
+                out_admin: 0,
+                ending_admin: 0,
+                beginning_store: 0,
+                in_store: 0,
+                out_store: 0,
+                ending_store: 0,
                 type: Inventory_Type.STANDALONE,
               },
             });
