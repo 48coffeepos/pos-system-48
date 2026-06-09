@@ -22,12 +22,14 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
   pageSize?: number
+  empty?: React.ReactNode
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
   pageSize,
+  empty,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([])
 
@@ -96,7 +98,7 @@ export function DataTable<TData, TValue>({
             ) : (
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
-                  No results.
+                  {empty ?? "No results."}
                 </TableCell>
               </TableRow>
             )}

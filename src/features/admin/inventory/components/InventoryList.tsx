@@ -10,6 +10,7 @@ import {
   WarningCircleIcon,
 } from "@phosphor-icons/react";
 import { useMutation } from "@tanstack/react-query";
+import { type ColumnDef, createColumnHelper } from "@tanstack/react-table";
 import Fuse from "fuse.js";
 import { useMemo, useState } from "react";
 import {
@@ -23,6 +24,7 @@ import {
   AlertDialogMedia,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { DataTable } from "@/components/ui/data-table";
 import { deleteInventoryItemMutationOptions } from "../mutationOptions";
 import type { InventoryItem } from "../types";
 import { StockroomAdd } from "./stockroom/StockroomAdd";
@@ -135,7 +137,9 @@ function InventoryList({
 
   const filteredLogs = useMemo(
     () =>
-      search ? logsFuse.search(search).map((r) => r.item) : locationFilteredLogs,
+      search
+        ? logsFuse.search(search).map((r) => r.item)
+        : locationFilteredLogs,
     [search, logsFuse, locationFilteredLogs],
   );
 
@@ -172,14 +176,6 @@ function InventoryList({
   const showLegacyEmptyState =
     !hasTabShell &&
     (isLogsTab ? inventoryLogs.length === 0 : items.length === 0);
-
-  const inventoryColCount =
-    1 +
-    4 +
-    (showStockroomFinancialColumns ? 1 : 0) +
-    (effectiveActions !== "none" ? 1 : 0);
-  const logsColCount = 6 + (showFinancialColumns ? 1 : 0);
-  const tableColSpan = isLogsTab ? logsColCount : inventoryColCount;
 
   const getEmptyMessage = () => {
     if (isLogsTab) {
@@ -218,6 +214,309 @@ function InventoryList({
     };
     return styles[location] ?? "bg-gray-100 text-gray-700";
   };
+
+  const inventoryColumns = useMemo<ColumnDef<InventoryItem, any>[]>(() => {
+    const cols: ColumnDef<InventoryItem, any>[] = [
+      {
+        accessorKey: "name",
+        header: "Item",
+        meta: { className: "min-w-[200px]" },
+        cell: ({ row }) => (
+          <span className="font-semibold text-sm text-(--deep-forest)">
+            {row.original.name}
+          </span>
+        ),
+      },
+      {
+        accessorKey: "type",
+        header: "Item Type",
+        meta: { className: "text-center min-w-[100px]" },
+        cell: ({ row }) => {
+          const type = row.original.type;
+          return (
+            <span className="text-center text-sm text-(--deep-forest)">
+              {type === "CUP"
+                ? "Cup Size"
+                : type === "SUPPLIES"
+                  ? "Supplies"
+                  : "Standalone"}
+            </span>
+          );
+        },
+      },
+      {
+        id: "beginning",
+        header: "Beginning",
+        meta: { className: "text-center min-w-[80px]" },
+        cell: ({ row }) => {
+          const ledger = getLedgerForItem(row.original, ledgerTab);
+          return (
+            <span className="text-center text-sm text-(--deep-forest)">
+              {ledger.beginning}
+            </span>
+          );
+        },
+      },
+      {
+        id: "in",
+        header: "In",
+        meta: { className: "text-center min-w-[80px]" },
+        cell: ({ row }) => {
+          const ledger = getLedgerForItem(row.original, ledgerTab);
+          return (
+            <span className="text-center text-sm text-(--deep-forest)">
+              {ledger.in}
+            </span>
+          );
+        },
+      },
+      {
+        id: "out",
+        header: "Out",
+        meta: { className: "text-center min-w-[80px]" },
+        cell: ({ row }) => {
+          const ledger = getLedgerForItem(row.original, ledgerTab);
+          return (
+            <span className="text-center text-sm text-(--deep-forest)">
+              {ledger.out}
+            </span>
+          );
+        },
+      },
+      {
+        id: "ending",
+        header: "Ending",
+        meta: { className: "text-center min-w-[80px]" },
+        cell: ({ row }) => {
+          const ledger = getLedgerForItem(row.original, ledgerTab);
+          return (
+            <span className="text-center font-bold text-sm text-(--deep-forest)">
+              {ledger.ending}
+            </span>
+          );
+        },
+      },
+    ];
+
+    if (showStockroomFinancialColumns) {
+      cols.push({
+        accessorKey: "costPrice",
+        header: "Unit Price",
+        meta: { className: "text-center min-w-[120px]" },
+        cell: ({ row }) => (
+          <span className="text-center text-sm text-(--dark-gray)">
+            ₱{row.original.costPrice.toFixed(2)}
+          </span>
+        ),
+      });
+    }
+
+    if (effectiveActions !== "none") {
+      cols.push({
+        id: "actions",
+        header: () => <div className="text-right">Actions</div>,
+        meta: { className: "text-right min-w-[200px]" },
+        cell: ({ row }) => {
+          const item = row.original;
+          return (
+            <div className="flex items-center justify-end gap-3 text-(--medium-gray)">
+              {activeTab === "storefront" && (
+                <>
+                  {item.type === "SUPPLIES" ? (
+                    <button
+                      type="button"
+                      onClick={() => setSuppliesEodItem(item)}
+                      className="p-1 hover:text-(--deep-forest) transition-colors"
+                      aria-label="Record daily usage"
+                    >
+                      <MinusCircleIcon size={22} weight="bold" />
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setDeductingItem(item)}
+                      className="p-1 hover:text-red-600 transition-colors"
+                      aria-label="Deduct stock from storefront"
+                    >
+                      <MinusCircleIcon size={22} weight="bold" />
+                    </button>
+                  )}
+                  <span className="text-(--light-gray)">|</span>
+                </>
+              )}
+              {showAdminFeatures && activeTab === "admin" && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => setStockroomingItem(item)}
+                    className="p-1 hover:text-(--deep-forest) transition-colors"
+                    aria-label="Add stock to stockroom"
+                  >
+                    <PlusCircleIcon size={22} weight="bold" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setTransferringItem(item)}
+                    className="p-1 hover:text-(--deep-forest) transition-colors"
+                    aria-label="Transfer stock to storefront"
+                  >
+                    <ArrowsLeftRightIcon size={22} weight="bold" />
+                  </button>
+                  <span className="text-(--light-gray)">|</span>
+                </>
+              )}
+              {effectiveActions === "all" && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => onEdit?.(item)}
+                    className="p-1 hover:text-(--deep-forest) transition-colors"
+                    aria-label="Edit item"
+                  >
+                    <NotePencilIcon size={18} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setDeletingItem(item)}
+                    className="p-1 hover:text-red-600 transition-colors"
+                    aria-label="Delete item record"
+                  >
+                    <TrashIcon size={18} />
+                  </button>
+                </>
+              )}
+            </div>
+          );
+        },
+      });
+    }
+
+    return cols;
+  }, [
+    ledgerTab,
+    showStockroomFinancialColumns,
+    effectiveActions,
+    activeTab,
+    showAdminFeatures,
+    onEdit,
+  ]);
+
+  const logsColumnHelper = createColumnHelper<InventoryLogEntry>();
+  const logsColumns = useMemo<ColumnDef<InventoryLogEntry, any>[]>(() => {
+    const cols: ColumnDef<InventoryLogEntry, any>[] = [
+      logsColumnHelper.accessor("dateTime", {
+        header: "Date",
+        meta: { className: "min-w-[150px] whitespace-nowrap" },
+        cell: ({ row }) => {
+          const date = row.original.dateTime;
+          return (
+            <span className="text-sm text-(--dark-gray) whitespace-nowrap">
+              {date
+                ? new Date(date).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })
+                : "—"}
+            </span>
+          );
+        },
+      }),
+      logsColumnHelper.accessor("inventoryItem", {
+        header: "Item",
+        meta: { className: "min-w-[200px]" },
+        cell: ({ row }) => (
+          <span className="font-semibold text-sm text-(--deep-forest)">
+            {row.original.inventoryItem}
+          </span>
+        ),
+      }),
+      logsColumnHelper.accessor("type", {
+        header: "Type",
+        meta: { className: "min-w-[100px]" },
+        cell: ({ row }) => {
+          const type = row.original.type;
+          return (
+            <div className="flex items-center gap-1">
+              <span
+                className={`inline-block rounded px-2 py-0.5 text-[11px] font-semibold ${typeBadge(type)}`}
+              >
+                {typeLabel(type)}
+              </span>
+              {row.original.columnName && (
+                <span className="inline-block rounded bg-(--medium-gray)/10 px-1.5 py-0.5 text-[12px] font-medium text-(--medium-gray)">
+                  {row.original.columnName.split("_")[0].toUpperCase()}
+                </span>
+              )}
+            </div>
+          );
+        },
+      }),
+      logsColumnHelper.accessor("location", {
+        header: "Location",
+        meta: { className: "min-w-[120px]" },
+        cell: ({ row }) => (
+          <span
+            className={`inline-block rounded px-2 py-0.5 text-[11px] font-semibold ${locationBadge(row.original.location)}`}
+          >
+            {row.original.location === "STOCKROOM"
+              ? "Stockroom"
+              : "Storefront"}
+          </span>
+        ),
+      }),
+      logsColumnHelper.accessor("quantity", {
+        header: "Quantity",
+        meta: { className: "min-w-[100px]" },
+        cell: ({ row }) => (
+          <span className="font-bold text-sm text-(--deep-forest)">
+            {row.original.quantity ?? "—"}
+          </span>
+        ),
+      }),
+      logsColumnHelper.accessor("logBy", {
+        header: "Logged By",
+        meta: { className: "min-w-[150px]" },
+        cell: ({ row }) => (
+          <span className="text-sm text-(--dark-gray)">
+            {row.original.logBy}
+          </span>
+        ),
+      }),
+    ];
+
+    if (showFinancialColumns) {
+      cols.push(
+        logsColumnHelper.accessor("expense", {
+          header: "Expense",
+          meta: { className: "min-w-[120px] pr-4" },
+          cell: ({ row }) => {
+            const expense = row.original.expense;
+            if (expense == null)
+              return (
+                <span className="pr-4 text-sm text-(--dark-gray)">—</span>
+              );
+            const num = Number(expense);
+            return (
+              <span className="pr-4 text-sm text-(--dark-gray)">
+                {num < 0 ? `-₱${Math.abs(num).toFixed(2)}` : `₱${num.toFixed(2)}`}
+              </span>
+            );
+          },
+        }),
+      );
+    }
+
+    return cols;
+  }, [showFinancialColumns, logsColumnHelper, typeBadge, typeLabel, locationBadge]);
+
+  const emptyMessage = getEmptyMessage();
+  const emptyState = (
+    <div className="flex flex-col items-center gap-2 py-4 text-sm text-(--medium-gray)">
+      <PackageIcon className="size-10 text-(--medium-gray)/40" />
+      <span>{emptyMessage}</span>
+    </div>
+  );
 
   const tableContent = (
     <div className="rounded-2xl border border-(--light-gray) bg-(--pure-white) p-6">
@@ -352,252 +651,12 @@ function InventoryList({
         </div>
       )}
 
-      <div className="w-full overflow-x-auto">
-        <table className="w-full border-collapse text-left">
-          <thead>
-            <tr className="border-b border-(--light-gray)/40 bg-(--soft-peach)/20 text-[11px] font-bold tracking-wider text-(--medium-gray)/80 uppercase">
-              {isLogsTab ? (
-                <>
-                  <th className="rounded-l-lg p-3 pl-4">Date</th>
-                  <th className="p-3">Item</th>
-                  <th className="p-3">Type</th>
-                  <th className="p-3">Location</th>
-                  <th className="p-3">Quantity</th>
-                  <th
-                    className={`p-3 ${showFinancialColumns ? "" : "rounded-r-lg pr-4"}`}
-                  >
-                    Logged By
-                  </th>
-                  {showFinancialColumns && (
-                    <th className="rounded-r-lg p-3 pr-4">Expense</th>
-                  )}
-                </>
-              ) : (
-                <>
-                  <th className="rounded-l-lg p-3 pl-4">Item</th>
-                  <th className="p-3 text-center">Beginning</th>
-                  <th className="p-3 text-center">In</th>
-                  <th className="p-3 text-center">Out</th>
-                  <th className="p-3 text-center">Ending</th>
-                  {showStockroomFinancialColumns && (
-                    <th
-                      className={`p-3 text-center ${effectiveActions === "none" ? "rounded-r-lg pr-4" : ""}`}
-                    >
-                      Unit Price
-                    </th>
-                  )}
-                  {effectiveActions !== "none" && (
-                    <th className="rounded-r-lg p-3 pr-4 text-right">
-                      Actions
-                    </th>
-                  )}
-                </>
-              )}
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-(--light-gray)/40">
-            {currentItems.length > 0 ? (
-              isLogsTab ? (
-                (dateFilteredLogs as InventoryLogEntry[]).map((log) => (
-                  <tr key={log.id} className="group hover:bg-(--light-gray)/10">
-                    <td className="p-4 pl-4 text-sm text-(--dark-gray) whitespace-nowrap">
-                      {log.dateTime
-                        ? new Date(log.dateTime).toLocaleDateString("en-US", {
-                            year: "numeric",
-                            month: "long",
-                            day: "numeric",
-                          })
-                        : "—"}
-                    </td>
-                    <td className="p-4 text-sm font-semibold text-(--deep-forest)">
-                      {log.inventoryItem}
-                    </td>
-                    <td className="p-4">
-                      <span
-                        className={`inline-block rounded px-2 py-0.5 text-[11px] font-semibold ${typeBadge(log.type)}`}
-                      >
-                        {typeLabel(log.type)}
-                      </span>
-                      {log.columnName && (
-                        <span className="ml-1.5 inline-block rounded bg-(--medium-gray)/10 px-1.5 py-0.5 text-[12px] font-medium text-(--medium-gray)">
-                          {log.columnName.split("_")[0].toUpperCase()}
-                        </span>
-                      )}
-                    </td>
-                    <td className="p-4">
-                      <span
-                        className={`inline-block rounded px-2 py-0.5 text-[11px] font-semibold ${locationBadge(log.location)}`}
-                      >
-                        {log.location === "STOCKROOM"
-                          ? "Stockroom"
-                          : "Storefront"}
-                      </span>
-                    </td>
-                    <td className="p-4 text-sm font-bold text-(--deep-forest)">
-                      {log.quantity ?? "—"}
-                    </td>
-                    <td
-                      className={`p-4 text-sm text-(--dark-gray) ${!showFinancialColumns ? "pr-4" : ""}`}
-                    >
-                      {log.logBy}
-                    </td>
-                    {showFinancialColumns && (
-                      <td className="p-4 pr-4 text-sm text-(--dark-gray)">
-                        {log.expense != null
-                          ? (() => {
-                              const expense = Number(log.expense);
-                              return expense < 0
-                                ? `-₱${Math.abs(expense).toFixed(2)}`
-                                : `₱${expense.toFixed(2)}`;
-                            })()
-                          : "—"}
-                      </td>
-                    )}
-                  </tr>
-                ))
-              ) : (
-                (filtered as InventoryItem[]).map((item) => {
-                  const ledger = getLedgerForItem(item, ledgerTab);
-                  return (
-                    <tr
-                      key={item.id}
-                      className="group hover:bg-(--light-gray)/10"
-                    >
-                      <td className="p-4 pl-4">
-                        <div className="flex items-center gap-3">
-                          <div>
-                            <p className="font-semibold text-sm text-(--deep-forest)">
-                              {item.name}
-                            </p>
-                            <span className="inline-block rounded px-1.5 py-0.5 text-[10px] font-medium mt-0.5 bg-amber-100 text-amber-800">
-                              {item.type === "CUP"
-                                ? "Cup Size"
-                                : item.type === "SUPPLIES"
-                                  ? "Supplies"
-                                  : "Standalone"}
-                            </span>
-                          </div>
-                        </div>
-                      </td>
-
-                      <td className="p-4 text-center text-sm text-(--deep-forest)">
-                        {ledger.beginning}
-                      </td>
-                      <td className="p-4 text-center text-sm text-(--deep-forest)">
-                        {ledger.in}
-                      </td>
-                      <td className="p-4 text-center text-sm text-(--deep-forest)">
-                        {ledger.out}
-                      </td>
-                      <td className="p-4 text-center font-bold text-sm text-(--deep-forest)">
-                        {ledger.ending}
-                      </td>
-
-                      {showStockroomFinancialColumns && (
-                        <td className="p-4 text-center text-sm text-(--dark-gray)">
-                          ₱{item.costPrice.toFixed(2)}
-                        </td>
-                      )}
-
-                      {effectiveActions !== "none" && (
-                        <td className="p-4 pr-4 text-right">
-                          <div className="flex items-center justify-end gap-3 text-(--medium-gray)">
-                            {activeTab === "storefront" && (
-                              <>
-                                {item.type === "SUPPLIES" ? (
-                                  <button
-                                    type="button"
-                                    onClick={() => setSuppliesEodItem(item)}
-                                    className="p-1 hover:text-(--deep-forest) transition-colors"
-                                    aria-label="Record daily usage"
-                                  >
-                                    <MinusCircleIcon size={22} weight="bold" />
-                                  </button>
-                                ) : (
-                                  <button
-                                    type="button"
-                                    onClick={() => setDeductingItem(item)}
-                                    className="p-1 hover:text-red-600 transition-colors"
-                                    aria-label="Deduct stock from storefront"
-                                  >
-                                    <MinusCircleIcon size={22} weight="bold" />
-                                  </button>
-                                )}
-                                <span className="text-(--light-gray)">|</span>
-                              </>
-                            )}
-                            {showAdminFeatures && activeTab === "admin" && (
-                              <>
-                                <button
-                                  type="button"
-                                  onClick={() => setStockroomingItem(item)}
-                                  className="p-1 hover:text-(--deep-forest) transition-colors"
-                                  aria-label="Add stock to stockroom"
-                                >
-                                  <PlusCircleIcon size={22} weight="bold" />
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => setTransferringItem(item)}
-                                  className="p-1 hover:text-(--deep-forest) transition-colors"
-                                  aria-label="Transfer stock to storefront"
-                                >
-                                  <ArrowsLeftRightIcon
-                                    size={22}
-                                    weight="bold"
-                                  />
-                                </button>
-                                <span className="text-(--light-gray)">|</span>
-                              </>
-                            )}
-                            {effectiveActions === "all" && (
-                              <>
-                                <button
-                                  type="button"
-                                  onClick={() => onEdit?.(item)}
-                                  className="p-1 hover:text-(--deep-forest) transition-colors"
-                                  aria-label="Edit item"
-                                >
-                                  <NotePencilIcon size={18} />
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => setDeletingItem(item)}
-                                  className="p-1 hover:text-red-600 transition-colors"
-                                  aria-label="Delete item record"
-                                >
-                                  <TrashIcon size={18} />
-                                </button>
-                              </>
-                            )}
-                          </div>
-                        </td>
-                      )}
-                    </tr>
-                  );
-                })
-              )
-            ) : (
-              <tr>
-                <td
-                  colSpan={tableColSpan}
-                  className="h-24 text-center text-sm text-(--medium-gray)"
-                >
-                  {getEmptyMessage() === "No inventory items yet" ||
-                  getEmptyMessage() === "No inventory logs yet" ? (
-                    <div className="flex flex-col items-center gap-2 py-4">
-                      <PackageIcon className="size-10 text-(--medium-gray)/40" />
-                      <span>{getEmptyMessage()}</span>
-                    </div>
-                  ) : (
-                    getEmptyMessage()
-                  )}
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+      <DataTable
+        columns={(isLogsTab ? logsColumns : inventoryColumns) as ColumnDef<any, any>[]}
+        data={currentItems as any[]}
+        pageSize={9999}
+        empty={emptyState}
+      />
     </div>
   );
 
