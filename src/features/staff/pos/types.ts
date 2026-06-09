@@ -53,6 +53,7 @@ export interface PosOrder {
 	cashier_name?: string;
 	items: Array<{
 		order_item_id: string;
+		menu_id?: string;
 		snapshot_menu_name: string;
 		quantity: number;
 		unit_price: number;
