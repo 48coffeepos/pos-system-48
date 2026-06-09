@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { NotePencilIcon, PlusIcon } from "@phosphor-icons/react";
 import { useMutation } from "@tanstack/react-query";
-import { PlusIcon, NotePencilIcon } from "@phosphor-icons/react";
-
-import { cn } from "@/lib/utils";
+import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
 import {
   createInventoryItemMutationOptions,
   updateInventoryItemMutationOptions,
@@ -35,7 +35,13 @@ const itemTypeOptions: Array<{ value: InventoryItemType; label: string }> = [
   },
 ];
 
-function AddInventoryItem({ editingItem, onCancelEdit, activeTab = "storefront" }: AddInventoryItemProps) {
+const MAX_ITEM_NAME_LENGTH = 100;
+
+function AddInventoryItem({
+  editingItem,
+  onCancelEdit,
+  activeTab = "storefront",
+}: AddInventoryItemProps) {
   const isEditing = !!editingItem;
 
   const [itemName, setItemName] = useState("");
@@ -67,14 +73,17 @@ function AddInventoryItem({ editingItem, onCancelEdit, activeTab = "storefront" 
 
   const isPending = createMutation.isPending || updateMutation.isPending;
 
-  const newEndingAdmin = isEditing && editingItem && activeTab === "admin"
-    ? editingItem.beginningAdmin + inAdmin - outAdmin
-    : 0;
-  const hasPositiveDelta = isEditing && activeTab === "admin" && inAdmin > (editingItem?.inAdmin ?? 0);
+  const newEndingAdmin =
+    isEditing && editingItem && activeTab === "admin"
+      ? editingItem.beginningAdmin + inAdmin - outAdmin
+      : 0;
+  const hasPositiveDelta =
+    isEditing && activeTab === "admin" && inAdmin > (editingItem?.inAdmin ?? 0);
 
-  const newEndingStore = isEditing && editingItem && activeTab === "storefront"
-    ? editingItem.beginningStore + inStore - outStore
-    : 0;
+  const newEndingStore =
+    isEditing && editingItem && activeTab === "storefront"
+      ? editingItem.beginningStore + inStore - outStore
+      : 0;
   useEffect(() => {
     if (editingItem) {
       const ia = activeTab === "admin" ? editingItem.inAdmin : 0;
@@ -122,9 +131,9 @@ function AddInventoryItem({ editingItem, onCancelEdit, activeTab = "storefront" 
         id: editingItem.id,
         name: itemName.trim(),
         type: itemType,
-          ...(activeTab === "admin"
-            ? { inAdmin, outAdmin }
-            : { inStore, outStore }),
+        ...(activeTab === "admin"
+          ? { inAdmin, outAdmin }
+          : { inStore, outStore }),
         costPrice,
       });
     } else {
@@ -137,11 +146,17 @@ function AddInventoryItem({ editingItem, onCancelEdit, activeTab = "storefront" 
   }
 
   return (
-    <div className="rounded-2xl border border-(--light-gray) bg-(--pure-white) shadow-sm" style={{ overflow: "clip" }}>
+    <div
+      className="rounded-2xl border border-(--light-gray) bg-(--pure-white) shadow-sm"
+      style={{ overflow: "clip" }}
+    >
       <div className="flex items-center gap-3 border-b border-(--light-gray) px-6 py-5">
         <div className="flex size-10 items-center justify-center rounded-xl bg-(--pale-yellow)">
           {isEditing ? (
-            <NotePencilIcon weight="bold" className="size-5 text-(--deep-forest)" />
+            <NotePencilIcon
+              weight="bold"
+              className="size-5 text-(--deep-forest)"
+            />
           ) : (
             <PlusIcon weight="bold" className="size-5 text-(--deep-forest)" />
           )}
@@ -159,21 +174,31 @@ function AddInventoryItem({ editingItem, onCancelEdit, activeTab = "storefront" 
       <div className="space-y-5 px-6 py-5">
         <div className="space-y-1.5">
           <div className="flex items-center justify-between gap-3">
-            <label className="text-sm font-medium text-(--dark-gray)">Item Name</label>
-            <p className="text-xs text-(--medium-gray)">{itemName.length} / 20</p>
+            <Label htmlFor="itemName">Item Name</Label>
+            <p className="text-xs text-(--medium-gray)">
+              {itemName.length} / {MAX_ITEM_NAME_LENGTH}
+            </p>
           </div>
           <Input
             value={itemName}
-            onChange={(e) => setItemName(e.target.value.slice(0, 20))}
-            maxLength={20}
+            onChange={(e) =>
+              setItemName(e.target.value.slice(0, MAX_ITEM_NAME_LENGTH))
+            }
+            maxLength={MAX_ITEM_NAME_LENGTH}
             placeholder="e.g. 12oz (Hot), Coke"
             className="h-10 w-full rounded-xl border-(--light-gray) px-3 text-sm"
           />
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-sm font-medium text-(--dark-gray)">Item Type</label>
+          <Label
+            htmlFor="itemType"
+            className="text-sm font-medium text-(--dark-gray)"
+          >
+            Item Type
+          </Label>
           <select
+            id="itemType"
             value={itemType}
             onChange={(e) => setItemType(e.target.value as InventoryItemType)}
             className="h-10 w-full rounded-xl border border-(--light-gray) bg-(--pure-white) px-3 text-sm text-(--dark-gray) outline-none transition-[color,box-shadow] focus-visible:border-(--deep-forest) focus-visible:ring-2 focus-visible:ring-(--deep-forest)/20"
@@ -189,15 +214,21 @@ function AddInventoryItem({ editingItem, onCancelEdit, activeTab = "storefront" 
         {isEditing && activeTab === "admin" ? (
           <>
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-(--dark-gray)">Admin Stock (auto)</label>
+              <Label className="text-sm font-medium text-(--dark-gray)">
+                Admin Stock (auto)
+              </Label>
               <div className="flex h-10 items-center rounded-xl border border-(--light-gray) bg-(--light-gray)/20 px-3 text-sm text-(--medium-gray)">
                 {newEndingAdmin}
               </div>
             </div>
             <div className="space-y-1.5">
               <div className="flex items-center justify-between gap-3">
-                <label className="text-sm font-medium text-(--dark-gray)">In Admin</label>
-                <p className="text-xs text-(--medium-gray)">{String(inAdmin).length} / 5</p>
+                <Label className="text-sm font-medium text-(--dark-gray)">
+                  In Admin
+                </Label>
+                <p className="text-xs text-(--medium-gray)">
+                  {String(inAdmin).length} / 5
+                </p>
               </div>
               <Input
                 type="number"
@@ -224,15 +255,19 @@ function AddInventoryItem({ editingItem, onCancelEdit, activeTab = "storefront" 
                 className="h-10 w-full rounded-xl border-(--light-gray) px-3 text-sm"
               />
               {hasPositiveDelta && (
-              <p className="text-xs font-medium text-red-600">
-                Use "Add Stock" to increase stock.
-              </p>
-            )}
+                <p className="text-xs font-medium text-red-600">
+                  Use "Add Stock" to increase stock.
+                </p>
+              )}
             </div>
             <div className="space-y-1.5">
               <div className="flex items-center justify-between gap-3">
-                <label className="text-sm font-medium text-(--dark-gray)">Out Admin</label>
-                <p className="text-xs text-(--medium-gray)">{String(outAdmin).length} / 5</p>
+                <Label className="text-sm font-medium text-(--dark-gray)">
+                  Out Admin
+                </Label>
+                <p className="text-xs text-(--medium-gray)">
+                  {String(outAdmin).length} / 5
+                </p>
               </div>
               <Input
                 type="number"
@@ -259,20 +294,25 @@ function AddInventoryItem({ editingItem, onCancelEdit, activeTab = "storefront" 
                 className="h-10 w-full rounded-xl border-(--light-gray) px-3 text-sm"
               />
             </div>
-
           </>
         ) : isEditing ? (
           <>
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-(--dark-gray)">Store Stock (auto)</label>
+              <Label className="text-sm font-medium text-(--dark-gray)">
+                Store Stock (auto)
+              </Label>
               <div className="flex h-10 items-center rounded-xl border border-(--light-gray) bg-(--light-gray)/20 px-3 text-sm text-(--medium-gray)">
                 {newEndingStore}
               </div>
             </div>
             <div className="space-y-1.5">
               <div className="flex items-center justify-between gap-3">
-                <label className="text-sm font-medium text-(--dark-gray)">In Store</label>
-                <p className="text-xs text-(--medium-gray)">{String(inStore).length} / 5</p>
+                <Label className="text-sm font-medium text-(--dark-gray)">
+                  In Store
+                </Label>
+                <p className="text-xs text-(--medium-gray)">
+                  {String(inStore).length} / 5
+                </p>
               </div>
               <Input
                 type="number"
@@ -301,8 +341,12 @@ function AddInventoryItem({ editingItem, onCancelEdit, activeTab = "storefront" 
             </div>
             <div className="space-y-1.5">
               <div className="flex items-center justify-between gap-3">
-                <label className="text-sm font-medium text-(--dark-gray)">Out Store</label>
-                <p className="text-xs text-(--medium-gray)">{String(outStore).length} / 5</p>
+                <Label className="text-sm font-medium text-(--dark-gray)">
+                  Out Store
+                </Label>
+                <p className="text-xs text-(--medium-gray)">
+                  {String(outStore).length} / 5
+                </p>
               </div>
               <Input
                 type="number"
@@ -333,17 +377,21 @@ function AddInventoryItem({ editingItem, onCancelEdit, activeTab = "storefront" 
         ) : null}
 
         <div className="space-y-1.5">
-          <label className="text-sm font-medium text-(--dark-gray)">Cost Price (₱)</label>
+          <Label className="text-sm font-medium text-(--dark-gray)">
+            Cost Price (₱)
+          </Label>
           <Input
             type="text"
             inputMode="decimal"
             value={costPriceRaw}
             onChange={(e) => {
-              let raw = e.target.value;
+              const raw = e.target.value;
               let clean = raw.replace(/[^0-9.]/g, "");
               const parts = clean.split(".");
-              if (parts.length > 2) clean = parts[0] + "." + parts.slice(1).join("");
-              if (parts[1]?.length > 2) clean = parts[0] + "." + parts[1].slice(0, 2);
+              if (parts.length > 2)
+                clean = `${parts[0]}.${parts.slice(1).join("")}`;
+              if (parts[1]?.length > 2)
+                clean = `${parts[0]}.${parts[1].slice(0, 2)}`;
               setCostPriceRaw(clean);
               if (clean === "") return;
               const num = Number(clean);
@@ -390,7 +438,6 @@ function AddInventoryItem({ editingItem, onCancelEdit, activeTab = "storefront" 
             >
               <NotePencilIcon weight="bold" className="size-4" />
               {isPending ? "Saving..." : "Save Changes"}
-
             </button>
           </div>
         ) : (
@@ -414,5 +461,5 @@ function AddInventoryItem({ editingItem, onCancelEdit, activeTab = "storefront" 
   );
 }
 
-export { AddInventoryItem };
 export type { AddInventoryItemProps };
+export { AddInventoryItem };

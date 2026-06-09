@@ -1,21 +1,20 @@
-import { useQuery } from "@tanstack/react-query";
 import { WarningCircleIcon } from "@phosphor-icons/react";
+import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-
-import type { InventoryItem } from "@/features/admin/inventory/components/AddInventoryItem";
-import { AddInventoryItem } from "@/features/admin/inventory/components/AddInventoryItem";
-import { InventoryList } from "@/features/admin/inventory/components/InventoryList";
-import type { Tab } from "@/features/admin/inventory/components/InventoryList";
-import {
-  getAllInventoryQueryOptions,
-  getInventoryLogsQueryOptions,
-} from "@/features/admin/inventory/queryOptions";
 import {
   RouteErrorBoundary,
   RoutePendingBoundary,
 } from "@/components/route-boundaries";
+import { Button } from "@/components/ui/button";
+import type { InventoryItem } from "@/features/admin/inventory/components/AddInventoryItem";
+import { AddInventoryItem } from "@/features/admin/inventory/components/AddInventoryItem";
+import type { Tab } from "@/features/admin/inventory/components/InventoryList";
+import { InventoryList } from "@/features/admin/inventory/components/InventoryList";
+import {
+  getAllInventoryQueryOptions,
+  getInventoryLogsQueryOptions,
+} from "@/features/admin/inventory/queryOptions";
 
 export const Route = createFileRoute("/admin/inventory")({
   loader: async ({ context: { queryClient } }) => {
@@ -30,9 +29,13 @@ export const Route = createFileRoute("/admin/inventory")({
 });
 
 function AdminInventory() {
-  const { data: inventoryItems, isLoading, isError, error, refetch } = useQuery(
-    getAllInventoryQueryOptions,
-  );
+  const {
+    data: inventoryItems,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery(getAllInventoryQueryOptions);
   const { data: inventoryLogs } = useQuery(getInventoryLogsQueryOptions);
   const [activeTab, setActiveTab] = useState<Tab>("storefront");
   const [editingItem, setEditingItem] = useState<InventoryItem | null>(null);
@@ -42,7 +45,8 @@ function AdminInventory() {
     setEditingItem(null);
   };
 
-  const showAddPanel = (activeTab === "admin" || editingItem) && activeTab !== "logs";
+  const showAddPanel =
+    (activeTab === "admin" || editingItem) && activeTab !== "logs";
 
   return (
     <div className="min-h-screen">
@@ -51,9 +55,14 @@ function AdminInventory() {
           {isError ? (
             <div className="rounded-2xl border border-(--light-gray) bg-(--pure-white) p-12">
               <div className="flex flex-col items-center justify-center gap-4 text-center">
-                <WarningCircleIcon weight="fill" className="size-10 text-(--error)" />
+                <WarningCircleIcon
+                  weight="fill"
+                  className="size-10 text-(--error)"
+                />
                 <div>
-                  <p className="text-base font-semibold text-(--deep-forest)">Failed to load inventory</p>
+                  <p className="text-base font-semibold text-(--deep-forest)">
+                    Failed to load inventory
+                  </p>
                   <p className="mt-1 text-sm text-(--medium-gray)">
                     {error?.message ?? "Something went wrong"}
                   </p>

@@ -18,19 +18,20 @@ import {
   TableRow,
 } from "@/components/ui/table"
 
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[]
+interface DataTableProps<TData> {
+  // TValue is `any` because tables mix accessor value types (string, number, Date, etc.)
+  columns: ColumnDef<TData, any>[]
   data: TData[]
   pageSize?: number
   empty?: React.ReactNode
 }
 
-export function DataTable<TData, TValue>({
+export function DataTable<TData>({
   columns,
   data,
   pageSize,
   empty,
-}: DataTableProps<TData, TValue>) {
+}: DataTableProps<TData>) {
   const [sorting, setSorting] = React.useState<SortingState>([])
 
   const table = useReactTable({
