@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { authMiddleware } from "@/features/auth/middlewares";
+import { adminAuthMiddleware } from "@/features/auth/middlewares";
 import { prisma } from "@/integrations/prisma/db";
 import { parseCupInfoKey } from "@/lib/cup-utils";
 import { getTimeframeBounds } from "@/lib/day-bounds";
@@ -11,8 +11,8 @@ export interface CupSale {
   byMethod: Record<string, number>;
 }
 
-export const getCupSales = createServerFn({ method: "GET" })
-  .middleware([authMiddleware])
+export const getAdminCupSales = createServerFn({ method: "GET" })
+  .middleware([adminAuthMiddleware()])
   .inputValidator(z.object({ date: z.enum(["today", "yesterday"]) }))
   .handler(async ({ data }) => {
     const { start, end } = getTimeframeBounds(data.date);
@@ -40,7 +40,13 @@ export const getCupSales = createServerFn({ method: "GET" })
 
     const todayOrderItems = await prisma.orderItem.findMany({
       where: {
-        order: { created_at: { gte: start, lte: end } },
+        order: {
+          created_at: { gte: start, lte: end },
+          OR: [
+            { note: null },
+            { note: { not: { startsWith: "[CANCELED]" } } },
+          ],
+        },
       },
       select: {
         quantity: true,
@@ -70,7 +76,10 @@ export const getCupSales = createServerFn({ method: "GET" })
 
       if (item.menu_id) {
         const names = menuInvMap.get(item.menu_id) ?? [];
-        if (item.snapshot_inventory && names.includes(item.snapshot_inventory)) {
+        if (
+          item.snapshot_inventory &&
+          names.includes(item.snapshot_inventory)
+        ) {
           matchedInventoryName = item.snapshot_inventory;
         } else {
           for (const name of names) {

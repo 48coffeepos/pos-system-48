@@ -21,6 +21,7 @@ interface XReadingReceiptDialogProps {
   totalCashCounted: number;
   cashCount: CashCountValues;
   cupSales: CupSale[];
+  date: "today" | "yesterday";
 }
 
 const denominations: Denomination[] = [1000, 500, 200, 100, 50, 20, 10, 5, 1];
@@ -34,6 +35,7 @@ export function XReadingReceiptDialog({
   totalCashCounted,
   cashCount,
   cupSales,
+  date,
 }: XReadingReceiptDialogProps) {
   const contentRef = useRef<HTMLDivElement>(null);
 
@@ -50,7 +52,7 @@ export function XReadingReceiptDialog({
   const netSales = getExpectedCashInDrawer(totals);
   const { overShort } = getOverShort(totalCashCounted, totals);
 
-  const targetDate = new Date();
+  const targetDate = date === "yesterday" ? new Date(Date.now() - 86400000) : new Date();
 
   const displayDate = targetDate.toLocaleDateString("en-US", {
     month: "2-digit",

@@ -1,11 +1,11 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { authMiddleware } from "@/features/auth/middlewares";
+import { adminAuthMiddleware } from "@/features/auth/middlewares";
 import { prisma } from "@/integrations/prisma/db";
 import { getTimeframeBounds } from "@/lib/day-bounds";
 
-export const getDailyReconciliation = createServerFn({ method: "GET" })
-  .middleware([authMiddleware])
+export const getAdminReconciliation = createServerFn({ method: "GET" })
+  .middleware([adminAuthMiddleware()])
   .inputValidator(z.object({ date: z.enum(["today", "yesterday"]) }))
   .handler(async ({ data }) => {
     const { start, end } = getTimeframeBounds(data.date);
@@ -15,6 +15,10 @@ export const getDailyReconciliation = createServerFn({ method: "GET" })
         where: {
           created_at: { gte: start, lte: end },
           method: "CASH",
+          OR: [
+            { note: null },
+            { note: { not: { startsWith: "[CANCELED]" } } },
+          ],
         },
         select: { grand_total: true },
       }),
@@ -22,6 +26,10 @@ export const getDailyReconciliation = createServerFn({ method: "GET" })
         where: {
           created_at: { gte: start, lte: end },
           method: "GCASH",
+          OR: [
+            { note: null },
+            { note: { not: { startsWith: "[CANCELED]" } } },
+          ],
         },
         select: { grand_total: true },
       }),
@@ -29,13 +37,15 @@ export const getDailyReconciliation = createServerFn({ method: "GET" })
         where: {
           created_at: { gte: start, lte: end },
           method: "GRAB",
+          OR: [
+            { note: null },
+            { note: { not: { startsWith: "[CANCELED]" } } },
+          ],
         },
         select: { grand_total: true },
       }),
       prisma.expense.findMany({
-        where: {
-          timestamp: { gte: start, lte: end },
-        },
+        where: { timestamp: { gte: start, lte: end } },
         select: { amount: true, type: true },
       }),
     ]);
