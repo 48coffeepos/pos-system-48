@@ -40,7 +40,13 @@ export const getCupSales = createServerFn({ method: "GET" })
 
     const todayOrderItems = await prisma.orderItem.findMany({
       where: {
-        order: { created_at: { gte: start, lte: end } },
+        order: {
+          created_at: { gte: start, lte: end },
+          OR: [
+            { note: null },
+            { note: { not: { startsWith: "[CANCELED]" } } },
+          ],
+        },
       },
       select: {
         quantity: true,

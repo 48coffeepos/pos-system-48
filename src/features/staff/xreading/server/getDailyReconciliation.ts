@@ -15,6 +15,10 @@ export const getDailyReconciliation = createServerFn({ method: "GET" })
         where: {
           created_at: { gte: start, lte: end },
           method: "CASH",
+          OR: [
+            { note: null },
+            { note: { not: { startsWith: "[CANCELED]" } } },
+          ],
         },
         select: { grand_total: true },
       }),
@@ -22,6 +26,10 @@ export const getDailyReconciliation = createServerFn({ method: "GET" })
         where: {
           created_at: { gte: start, lte: end },
           method: "GCASH",
+          OR: [
+            { note: null },
+            { note: { not: { startsWith: "[CANCELED]" } } },
+          ],
         },
         select: { grand_total: true },
       }),
@@ -29,6 +37,10 @@ export const getDailyReconciliation = createServerFn({ method: "GET" })
         where: {
           created_at: { gte: start, lte: end },
           method: "GRAB",
+          OR: [
+            { note: null },
+            { note: { not: { startsWith: "[CANCELED]" } } },
+          ],
         },
         select: { grand_total: true },
       }),
