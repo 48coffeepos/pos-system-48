@@ -38,12 +38,7 @@ export const getFilteredOrders = createServerFn({ method: "GET" })
 		if (start && end) {
 			where.created_at = { gte: start, lte: end };
 		}
-		if (!data.showCanceled) {
-			where.OR = [
-				{ note: null },
-				{ note: { not: { startsWith: "[CANCELED]" } } },
-			];
-		} else {
+		if (data.showCanceled) {
 			where.note = { startsWith: "[CANCELED]" };
 		}
 		if (data.search) {
