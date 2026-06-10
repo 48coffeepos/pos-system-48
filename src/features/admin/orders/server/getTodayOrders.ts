@@ -11,7 +11,13 @@ export const getTodayOrders = createServerFn({ method: "GET" })
 		const { start, end } = getTodayBounds(tz);
 
 		const orders = await prisma.order.findMany({
-			where: { created_at: { gte: start, lte: end } },
+			where: {
+				created_at: { gte: start, lte: end },
+				OR: [
+					{ note: null },
+					{ note: { not: { startsWith: "[CANCELED]" } } },
+				],
+			},
 			include: {
 				staff: { select: { name: true } },
 				order_items: {

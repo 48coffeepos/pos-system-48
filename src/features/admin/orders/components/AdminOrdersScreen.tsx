@@ -2,10 +2,11 @@ import {
 	CalendarBlank,
 	CaretLeft,
 	CaretRight,
+	MagnifyingGlass,
 	XCircle,
 } from "@phosphor-icons/react";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { getOrdersQueryOptions } from "@/features/admin/orders/queryOptions";
 import { cn } from "@/lib/utils";
 import { TodayOrdersTable } from "./TodayOrdersTable";
@@ -19,12 +20,23 @@ export function AdminOrdersScreen() {
 	const [fromDate, setFromDate] = useState("");
 	const [toDate, setToDate] = useState("");
 	const [page, setPage] = useState(1);
+	const [showCanceled, setShowCanceled] = useState(false);
+	const [searchInput, setSearchInput] = useState("");
+	const [search, setSearch] = useState("");
+
+	useEffect(() => {
+		const timer = setTimeout(() => {
+			setSearch(searchInput);
+			setPage(1);
+		}, 300);
+		return () => clearTimeout(timer);
+	}, [searchInput]);
 
 	const hasDateRange = fromDate !== "" && toDate !== "";
 
 	const params = hasDateRange
-		? { fromDate, toDate, page }
-		: { timeframe, page };
+		? { fromDate, toDate, page, showCanceled, search }
+		: { timeframe, page, showCanceled, search };
 
 	const { data, isLoading } = useQuery(getOrdersQueryOptions(params));
 
@@ -49,28 +61,58 @@ export function AdminOrdersScreen() {
 			<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 				<h2 className="text-lg font-bold text-(--near-black)">Orders</h2>
 
-				<div className="flex flex-wrap items-center gap-3">
-					{/* Timeframe pills */}
-					<div className="flex gap-1 rounded-xl bg-(--off-white) p-1">
-						{filters.map((f) => (
-							<button
-								key={f}
-								type="button"
-								onClick={() => changeFilter(f)}
-								className={cn(
-									"px-3 py-1.5 rounded-lg text-xs font-semibold transition-all capitalize",
-									!hasDateRange && timeframe === f
-										? "bg-white text-(--near-black) shadow-sm"
-										: "text-(--medium-gray) hover:text-(--dark-gray)",
-								)}
-							>
-								{f}
-							</button>
-						))}
-					</div>
+				<div className="relative w-full sm:w-72">
+					<MagnifyingGlass className="absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-(--medium-gray)" />
+					<input
+						type="text"
+						value={searchInput}
+						onChange={(e) => setSearchInput(e.target.value)}
+						placeholder="Search by order ID..."
+						className="w-full rounded-lg border border-(--light-gray) bg-white py-1.5 pl-8 pr-2.5 text-xs font-medium text-(--near-black) outline-none focus:border-(--deep-forest)"
+					/>
+				</div>
+			</div>
 
-					{/* Date range inputs */}
-					<div className="flex items-center gap-2">
+			<div className="flex flex-wrap items-center gap-3">
+				{/* Timeframe pills */}
+				<div className="flex gap-1 rounded-xl bg-(--off-white) p-1">
+					{filters.map((f) => (
+						<button
+							key={f}
+							type="button"
+							onClick={() => changeFilter(f)}
+							className={cn(
+								"px-3 py-1.5 rounded-lg text-xs font-semibold transition-all capitalize",
+								!hasDateRange && timeframe === f
+									? "bg-white text-(--near-black) shadow-sm"
+									: "text-(--medium-gray) hover:text-(--dark-gray)",
+							)}
+						>
+							{f}
+						</button>
+					))}
+
+					<div className="w-px self-stretch mx-1 bg-(--light-gray)" />
+
+					<button
+						type="button"
+						onClick={() => {
+							setShowCanceled(!showCanceled);
+							setPage(1);
+						}}
+						className={cn(
+							"px-3 py-1.5 rounded-lg text-xs font-semibold transition-all",
+							showCanceled
+								? "bg-amber-100 text-amber-800 shadow-sm"
+								: "text-(--medium-gray) hover:text-(--dark-gray)",
+						)}
+					>
+						Canceled
+					</button>
+				</div>
+
+				{/* Date range inputs */}
+				<div className="flex items-center gap-2">
 						<div className="relative">
 							<CalendarBlank className="absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-(--medium-gray)" />
 							<input
@@ -115,7 +157,6 @@ export function AdminOrdersScreen() {
 						)}
 					</div>
 				</div>
-			</div>
 
 			{isLoading ? (
 				<div className="card-white p-8 text-center text-sm text-(--medium-gray)">

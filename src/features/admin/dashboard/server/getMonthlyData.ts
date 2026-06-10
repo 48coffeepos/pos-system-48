@@ -26,7 +26,13 @@ export const getMonthlyData = createServerFn({ method: "GET" })
 
     const [orders, expenses, inventoryLogs] = await Promise.all([
       prisma.order.findMany({
-        where: { created_at: { gte: start, lt: end } },
+        where: {
+          created_at: { gte: start, lt: end },
+          OR: [
+            { note: null },
+            { note: { not: { startsWith: "[CANCELED]" } } },
+          ],
+        },
         select: { method: true, grand_total: true },
       }),
       prisma.expense.findMany({

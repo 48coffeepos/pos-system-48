@@ -22,7 +22,7 @@ import type { PosOrder } from "@/features/staff/pos/types";
 import { getOrderEditPolicy } from "@/lib/day-bounds";
 import { formatPeso } from "@/lib/format-currency";
 import {
-	deleteOrderMutationOptions,
+	cancelOrderMutationOptions,
 	updateOrderItemsMutationOptions,
 	updateOrderPaymentMutationOptions,
 } from "../mutationOptions";
@@ -48,7 +48,7 @@ export function AdminEditOrderDialog({
 
 	const paymentMutation = useMutation(updateOrderPaymentMutationOptions);
 	const itemsMutation = useMutation(updateOrderItemsMutationOptions);
-	const deleteMutation = useMutation(deleteOrderMutationOptions);
+	const cancelMutation = useMutation(cancelOrderMutationOptions);
 
 	const { data: menuData } = useQuery({
 		...posPageDataQueryOptions,
@@ -195,23 +195,23 @@ export function AdminEditOrderDialog({
 		}
 	};
 
-	const handleDelete = async () => {
+	const handleCancel = async () => {
 		if (
 			!confirm(
-				"Are you sure you want to delete this entire order? This will restore inventory items and remove the transaction permanently.",
+				"Are you sure you want to cancel this order? Inventory will be restored and the order will be disassociated from active records.",
 			)
 		) {
 			return;
 		}
 		try {
-			await deleteMutation.mutateAsync({ orderId: order.order_id });
+			await cancelMutation.mutateAsync({ orderId: order.order_id });
 			onClose();
 		} catch (error) {
-			console.error("Failed to delete order", error);
+			console.error("Failed to cancel order", error);
 		}
 	};
 
-	const isPending = itemsMutation.isPending || paymentMutation.isPending || deleteMutation.isPending;
+	const isPending = itemsMutation.isPending || paymentMutation.isPending || cancelMutation.isPending;
 
 	return (
 		<AlertDialog
@@ -425,10 +425,10 @@ export function AdminEditOrderDialog({
 					<Button
 						type="button"
 						variant="destructive"
-						onClick={handleDelete}
+						onClick={handleCancel}
 						disabled={isPending}
 					>
-						Delete Order
+						Cancel Order
 					</Button>
 					<div className="flex gap-2 sm:justify-end">
 						<AlertDialogCancel onClick={onClose} disabled={isPending}>

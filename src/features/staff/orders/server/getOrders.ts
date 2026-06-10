@@ -6,6 +6,12 @@ export const getOrders = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
   .handler(async () => {
     const orders = await prisma.order.findMany({
+      where: {
+        OR: [
+          { note: null },
+          { note: { not: { startsWith: "[CANCELED]" } } },
+        ],
+      },
       include: {
         staff: true,
         order_items: {

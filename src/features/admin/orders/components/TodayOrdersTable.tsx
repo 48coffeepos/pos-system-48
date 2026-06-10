@@ -1,6 +1,7 @@
 import {
 	CreditCardIcon,
 	PencilSimpleLine,
+	Prohibit,
 	ReceiptIcon,
 } from "@phosphor-icons/react";
 import { Link } from "@tanstack/react-router";
@@ -97,10 +98,23 @@ export function TodayOrdersTable({ data, limit }: TodayOrdersTableProps) {
 								return (
 									<tr
 										key={order.order_id}
-										className="group hover:bg-(--off-white)/50 transition-colors"
+										className={cn(
+											"group transition-colors",
+											order.note?.startsWith("[CANCELED]")
+										? "bg-red-50/40 hover:bg-red-50/60"
+										: "hover:bg-(--off-white)/50",
+										)}
 									>
 										<td className="p-4 pl-6 font-mono font-bold text-sm text-(--near-black) text-center">
-											{order.order_id}
+											<div className="flex items-center justify-center gap-2">
+												{order.note?.startsWith("[CANCELED]") ? (
+													<span className="inline-flex items-center gap-1 rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-bold text-red-700">
+														<Prohibit className="size-3" />
+														Canceled
+													</span>
+												) : null}
+												<span>{order.order_id}</span>
+											</div>
 										</td>
 
 										<td className="p-4 text-xs font-medium text-(--near-black) text-center">
@@ -164,15 +178,28 @@ export function TodayOrdersTable({ data, limit }: TodayOrdersTableProps) {
 							return (
 								<div
 									key={order.order_id}
-									className="p-4 space-y-2 hover:bg-(--off-white)/50 transition-colors"
+									className={cn(
+										"p-4 space-y-2 transition-colors",
+										order.note?.startsWith("[CANCELED]")
+									? "bg-red-50/40"
+									: "hover:bg-(--off-white)/50",
+									)}
 								>
 									<div className="flex items-center justify-between">
 										<span className="text-[11px] font-bold uppercase tracking-wider text-(--medium-gray)">
 											Order No
 										</span>
-										<span className="font-mono font-bold text-sm text-(--near-black)">
-											{order.order_id}
-										</span>
+										<div className="flex items-center gap-2">
+											{order.note?.startsWith("[CANCELED]") ? (
+												<span className="inline-flex items-center gap-1 rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-bold text-red-700">
+													<Prohibit className="size-3" />
+													Canceled
+												</span>
+											) : null}
+											<span className="font-mono font-bold text-sm text-(--near-black)">
+												{order.order_id}
+											</span>
+										</div>
 									</div>
 
 									<div className="flex items-center justify-between">
@@ -227,7 +254,7 @@ export function TodayOrdersTable({ data, limit }: TodayOrdersTableProps) {
 				onClose={() => setSelectedOrder(null)}
 				cashierName={selectedOrder?.cashier_name || "Cashier"}
 				extraActions={
-					selectedOrder ? (
+					selectedOrder && !selectedOrder.note?.startsWith("[CANCELED]") ? (
 						<button
 							type="button"
 							onClick={() => {

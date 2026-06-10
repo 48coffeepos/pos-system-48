@@ -44,7 +44,7 @@ async function applyOrderEditInventoryMovement(
 	await applyInventoryMovement(tx, inv.inventory_id, { kind, quantity });
 }
 
-export const deleteOrder = createServerFn({ method: "POST" })
+export const cancelOrder = createServerFn({ method: "POST" })
 	.middleware([adminAuthMiddleware()])
 	.inputValidator(z.object({ orderId: z.string() }))
 	.handler(async ({ data }) => {
@@ -71,10 +71,15 @@ export const deleteOrder = createServerFn({ method: "POST" })
 				);
 			}
 
-			// Delete order. Prisma schema is set up with onDelete: Cascade
-			// for order_items and order_item_addons.
-			await tx.order.delete({
+			// Mark order as canceled instead of deleting it
+			const existingNote = order.note ?? "";
+			const canceledNote = existingNote
+				? `[CANCELED] ${existingNote}`
+				: "[CANCELED]";
+
+			await tx.order.update({
 				where: { order_id: order.order_id },
+				data: { note: canceledNote },
 			});
 
 			return { success: true };
