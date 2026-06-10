@@ -62,18 +62,18 @@ export function AdminOrdersScreen() {
 				<h2 className="text-lg font-bold text-(--near-black)">Orders</h2>
 
 				<div className="relative w-full sm:w-72">
-					<MagnifyingGlass className="absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-(--medium-gray)" />
+					<MagnifyingGlass className="absolute left-2 top-1/2 size-3 -translate-y-1/2 text-(--medium-gray) md:left-2.5 md:size-4" />
 					<input
 						type="text"
 						value={searchInput}
 						onChange={(e) => setSearchInput(e.target.value)}
 						placeholder="Search by order ID..."
-						className="w-full rounded-lg border border-(--light-gray) bg-white py-1.5 pl-8 pr-2.5 text-xs font-medium text-(--near-black) outline-none focus:border-(--deep-forest)"
+						className="w-full rounded-lg border border-(--light-gray) bg-white py-1 pl-7 pr-2 text-[8px] font-medium text-(--near-black) outline-none focus:border-(--deep-forest) md:py-1.5 md:pl-8 md:pr-2.5 md:text-xs"
 					/>
 				</div>
 			</div>
 
-			<div className="flex flex-wrap items-center gap-3">
+			<div className="flex flex-wrap items-center gap-1.5 md:gap-3">
 				{/* Timeframe pills */}
 				<div className="flex gap-1 rounded-xl bg-(--off-white) p-1">
 					{filters.map((f) => (
@@ -82,7 +82,7 @@ export function AdminOrdersScreen() {
 							type="button"
 							onClick={() => changeFilter(f)}
 							className={cn(
-								"px-3 py-1.5 rounded-lg text-xs font-semibold transition-all capitalize",
+								"px-2 py-1 md:px-3 md:py-1.5 rounded-lg text-[8px] md:text-xs font-semibold transition-all capitalize",
 								!hasDateRange && timeframe === f
 									? "bg-white text-(--near-black) shadow-sm"
 									: "text-(--medium-gray) hover:text-(--dark-gray)",
@@ -101,7 +101,7 @@ export function AdminOrdersScreen() {
 							setPage(1);
 						}}
 						className={cn(
-							"px-3 py-1.5 rounded-lg text-xs font-semibold transition-all",
+							"px-2 py-1 md:px-3 md:py-1.5 rounded-lg text-[8px] md:text-xs font-semibold transition-all",
 							showCanceled
 								? "bg-amber-100 text-amber-800 shadow-sm"
 								: "text-(--medium-gray) hover:text-(--dark-gray)",
@@ -112,9 +112,9 @@ export function AdminOrdersScreen() {
 				</div>
 
 				{/* Date range inputs */}
-				<div className="flex items-center gap-2">
+				<div className="flex items-center gap-1 md:gap-2">
 						<div className="relative">
-							<CalendarBlank className="absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-(--medium-gray)" />
+							<CalendarBlank className="absolute left-2 top-1/2 size-3 -translate-y-1/2 text-(--medium-gray) md:left-2.5 md:size-3.5" />
 							<input
 								type="date"
 								value={fromDate}
@@ -125,12 +125,12 @@ export function AdminOrdersScreen() {
 										setTimeframe("all");
 									}
 								}}
-								className="w-36 rounded-lg border border-(--light-gray) bg-white py-1.5 pl-8 pr-2.5 text-xs font-medium text-(--near-black) outline-none focus:border-(--deep-forest)"
+								className="w-32 md:w-36 rounded-lg border border-(--light-gray) bg-white py-1 pl-7 pr-2 text-[8px] font-medium text-(--near-black) outline-none focus:border-(--deep-forest) md:py-1.5 md:pl-8 md:pr-2.5 md:text-xs"
 							/>
 						</div>
-						<span className="text-xs text-(--medium-gray)">–</span>
+						<span className="text-[8px] md:text-xs text-(--medium-gray)">–</span>
 						<div className="relative">
-							<CalendarBlank className="absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-(--medium-gray)" />
+							<CalendarBlank className="absolute left-2 top-1/2 size-3 -translate-y-1/2 text-(--medium-gray) md:left-2.5 md:size-3.5" />
 							<input
 								type="date"
 								value={toDate}
@@ -142,16 +142,16 @@ export function AdminOrdersScreen() {
 										setTimeframe("all");
 									}
 								}}
-								className="w-36 rounded-lg border border-(--light-gray) bg-white py-1.5 pl-8 pr-2.5 text-xs font-medium text-(--near-black) outline-none focus:border-(--deep-forest)"
+								className="w-32 md:w-36 rounded-lg border border-(--light-gray) bg-white py-1 pl-7 pr-2 text-[8px] font-medium text-(--near-black) outline-none focus:border-(--deep-forest) md:py-1.5 md:pl-8 md:pr-2.5 md:text-xs"
 							/>
 						</div>
 						{hasDateRange && (
 							<button
 								type="button"
 								onClick={clearDateRange}
-								className="flex items-center gap-1 rounded-lg px-2 py-1.5 text-xs font-semibold text-(--medium-gray) hover:text-(--near-black) transition-colors"
+								className="flex items-center gap-1 rounded-lg px-1.5 py-1 md:px-2 md:py-1.5 text-[8px] md:text-xs font-semibold text-(--medium-gray) hover:text-(--near-black) transition-colors"
 							>
-								<XCircle className="size-3.5" />
+								<XCircle className="size-3 md:size-3.5" />
 								Clear
 							</button>
 						)}

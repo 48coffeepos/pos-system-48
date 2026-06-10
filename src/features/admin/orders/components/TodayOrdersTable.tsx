@@ -26,11 +26,11 @@ function methodBadge(method: string) {
 	return (
 		<span
 			className={cn(
-				"inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-[10px] font-bold",
+				"inline-flex items-center gap-1 rounded-full border px-2 py-0.5 md:px-2.5 text-[8px] md:text-xs font-bold",
 				styles[method] ?? "bg-gray-50 text-gray-700 border-gray-200/50",
 			)}
 		>
-			<CreditCardIcon className="size-3" />
+			<CreditCardIcon className="size-2.5 md:size-3" />
 			{method}
 		</span>
 	);
@@ -108,10 +108,10 @@ export function TodayOrdersTable({ data, limit }: TodayOrdersTableProps) {
 										<td className="p-4 pl-6 font-mono font-bold text-sm text-(--near-black) text-center">
 											<div className="flex items-center justify-center gap-2">
 												{order.note?.startsWith("[CANCELED]") ? (
-													<span className="inline-flex items-center gap-1 rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-bold text-red-700">
-														<Prohibit className="size-3" />
-														Canceled
-													</span>
+											<span className="inline-flex items-center gap-1 rounded-full bg-red-100 px-2 py-0.5 text-[8px] md:text-xs font-bold text-red-700">
+												<Prohibit className="size-2.5 md:size-3" />
+												Canceled
+											</span>
 												) : null}
 												<span>{order.order_id}</span>
 											</div>
@@ -130,7 +130,7 @@ export function TodayOrdersTable({ data, limit }: TodayOrdersTableProps) {
 											<div className="flex flex-col gap-1 items-center">
 												{methodBadge(order.method)}
 												{order.reference_number ? (
-													<span className="text-[10px] font-mono text-(--medium-gray)">
+													<span className="text-[8px] md:text-[10px] font-mono text-(--medium-gray)">
 														Ref: {order.reference_number}
 													</span>
 												) : null}
@@ -191,10 +191,10 @@ export function TodayOrdersTable({ data, limit }: TodayOrdersTableProps) {
 										</span>
 										<div className="flex items-center gap-2">
 											{order.note?.startsWith("[CANCELED]") ? (
-												<span className="inline-flex items-center gap-1 rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-bold text-red-700">
-													<Prohibit className="size-3" />
-													Canceled
-												</span>
+												<span className="inline-flex items-center gap-1 rounded-full bg-red-100 px-2 py-0.5 text-[8px] md:text-xs font-bold text-red-700">
+													<Prohibit className="size-2.5 md:size-3" />
+												Canceled
+											</span>
 											) : null}
 											<span className="font-mono font-bold text-sm text-(--near-black)">
 												{order.order_id}

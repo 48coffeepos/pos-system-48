@@ -7,15 +7,13 @@ import {
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import {
-	AlertDialog,
-	AlertDialogAction,
-	AlertDialogCancel,
-	AlertDialogContent,
-	AlertDialogDescription,
-	AlertDialogFooter,
-	AlertDialogHeader,
-	AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { posPageDataQueryOptions } from "@/features/staff/pos/queryOptions";
 import type { PosOrder } from "@/features/staff/pos/types";
@@ -214,30 +212,31 @@ export function AdminEditOrderDialog({
 	const isPending = itemsMutation.isPending || paymentMutation.isPending || cancelMutation.isPending;
 
 	return (
-		<AlertDialog
+		<Dialog
 			open={open}
 			onOpenChange={(isOpen) => {
 				if (!isOpen) onClose();
 			}}
 		>
-			<AlertDialogContent
-				size="default"
-				className="sm:max-w-md max-h-[90vh] overflow-y-auto"
-			>
-				<AlertDialogHeader>
-					<AlertDialogTitle>Edit Order</AlertDialogTitle>
-					<AlertDialogDescription>
-						Update items, quantities, and payment details.
-					</AlertDialogDescription>
-				</AlertDialogHeader>
+			<DialogContent className="bg-(--pure-white) flex flex-col max-h-[90vh]">
+				<DialogHeader className="flex-row items-start justify-between gap-4 shrink-0">
+					<div className="space-y-2">
+						<DialogTitle className="text-lg font-bold text-(--near-black)">
+							Edit Order
+						</DialogTitle>
+						<DialogDescription className="text-sm text-(--medium-gray)">
+							Update items, quantities, and payment details.
+						</DialogDescription>
+					</div>
+				</DialogHeader>
 
 				{editPolicy === "historical" ? (
-					<p className="text-xs text-amber-700 bg-amber-50 border border-amber-200/60 rounded-lg px-3 py-2">
+					<p className="text-xs text-amber-700 bg-amber-50 border border-amber-200/60 rounded-md px-2 py-1.5 shrink-0">
 						Inventory will not be adjusted for orders older than yesterday.
 					</p>
 				) : null}
 
-				<div className="space-y-4">
+				<div className="overflow-y-auto space-y-5 px-1 overflow-x-hidden min-h-0 grow">
 					<div className="rounded-lg bg-(--off-white) p-3 text-sm">
 						<div className="flex justify-between font-semibold">
 							<span>Order No.</span>
@@ -249,20 +248,20 @@ export function AdminEditOrderDialog({
 						</div>
 					</div>
 
-					<div className="space-y-2 border border-(--light-gray) rounded-lg p-2">
-						<h4 className="text-xs font-bold uppercase tracking-wider text-(--medium-gray) px-1">
+					<div className="space-y-3 border border-(--light-gray) rounded-lg p-3">
+						<h4 className="text-xs font-bold uppercase tracking-wider text-(--medium-gray)">
 							Order Items
 						</h4>
 						<div className="max-h-48 overflow-y-auto space-y-2">
 							{items.length === 0 ? (
-								<p className="text-xs text-red-500 px-1 py-2">
+								<p className="text-xs text-red-500 py-1">
 									Order must have at least 1 item.
 								</p>
 							) : (
 								items.map((item) => (
 									<div
 										key={item.order_item_id}
-										className="flex items-center justify-between bg-white rounded-md p-2 border border-(--light-gray)/40 text-xs"
+										className="flex items-center justify-between bg-white rounded-md p-2 border border-(--light-gray)/40 text-sm"
 									>
 										<div className="flex-1 pr-2 truncate">
 											<span className="font-bold text-(--near-black)">
@@ -276,33 +275,33 @@ export function AdminEditOrderDialog({
 											<div className="flex items-center gap-1 bg-(--off-white) rounded-md border border-(--light-gray)/50 p-0.5">
 												<button
 													type="button"
-													className="size-5 flex items-center justify-center rounded-sm hover:bg-gray-200"
+													className="size-6 flex items-center justify-center rounded-sm hover:bg-gray-200"
 													onClick={() =>
 														handleUpdateQuantity(item.order_item_id, -1)
 													}
 													disabled={item.quantity <= 1}
 												>
-													<MinusIcon className="size-3" />
+													<MinusIcon className="size-3.5" />
 												</button>
-												<span className="w-4 text-center font-bold text-(--near-black)">
+												<span className="w-5 text-center font-bold text-(--near-black) text-sm">
 													{item.quantity}
 												</span>
 												<button
 													type="button"
-													className="size-5 flex items-center justify-center rounded-sm hover:bg-gray-200"
+													className="size-6 flex items-center justify-center rounded-sm hover:bg-gray-200"
 													onClick={() =>
 														handleUpdateQuantity(item.order_item_id, 1)
 													}
 												>
-													<PlusIcon className="size-3" />
+													<PlusIcon className="size-3.5" />
 												</button>
 											</div>
 											<button
 												type="button"
-												className="size-6 flex items-center justify-center rounded-md bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
+												className="size-7 flex items-center justify-center rounded-md bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
 												onClick={() => handleRemoveItem(item.order_item_id)}
 											>
-												<TrashIcon className="size-3.5" />
+												<TrashIcon className="size-4" />
 											</button>
 										</div>
 									</div>
@@ -310,11 +309,10 @@ export function AdminEditOrderDialog({
 							)}
 						</div>
 
-						{/* Add New Item */}
-						<div className="mt-3 pt-3 border-t border-(--light-gray) px-1 pb-1">
+						<div className="pt-3 border-t border-(--light-gray)">
 							<label
 								htmlFor="edit-order-add-item"
-								className="text-xs font-bold text-(--medium-gray) mb-1 block"
+								className="text-xs font-bold text-(--medium-gray) mb-1.5 block"
 							>
 								Add Item
 							</label>
@@ -323,7 +321,7 @@ export function AdminEditOrderDialog({
 									id="edit-order-add-item"
 									value={selectedNewItem}
 									onChange={(e) => setSelectedNewItem(e.target.value)}
-									className="flex-1 h-8 rounded-md border border-input bg-transparent px-2 py-1 text-xs shadow-xs outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+									className="flex-1 h-9 rounded-md border border-input bg-transparent px-2 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
 								>
 									<option value="">Select an item...</option>
 									{availableItems.map((opt) => (
@@ -335,17 +333,17 @@ export function AdminEditOrderDialog({
 								<Button
 									type="button"
 									size="sm"
-									className="h-8 shrink-0 px-3 text-xs"
+									className="h-9 shrink-0 px-3 text-xs"
 									disabled={!selectedNewItem}
 									onClick={handleAddNewItem}
 								>
-									<PlusCircle className="mr-1 size-3.5" /> Add
+									<PlusCircle className="mr-1 size-4" /> Add
 								</Button>
 							</div>
 						</div>
 					</div>
 
-					<div className="space-y-1">
+					<div className="space-y-1.5">
 						<label
 							htmlFor="edit-order-payment-method"
 							className="text-xs font-bold uppercase tracking-wider text-(--medium-gray)"
@@ -367,7 +365,7 @@ export function AdminEditOrderDialog({
 					</div>
 
 					{method === "CASH" && (
-						<div className="space-y-1">
+						<div className="space-y-1.5">
 							<label
 								htmlFor="edit-order-amount-tendered"
 								className="text-xs font-bold uppercase tracking-wider text-(--medium-gray)"
@@ -402,7 +400,7 @@ export function AdminEditOrderDialog({
 					)}
 
 					{method !== "CASH" ? (
-						<div className="space-y-1">
+						<div className="space-y-1.5">
 							<label
 								htmlFor="edit-order-reference-number"
 								className="text-xs font-bold uppercase tracking-wider text-(--medium-gray)"
@@ -421,7 +419,7 @@ export function AdminEditOrderDialog({
 					) : null}
 				</div>
 
-				<AlertDialogFooter className="sm:justify-between w-full flex-col sm:flex-row gap-2 sm:gap-0">
+				<DialogFooter className="shrink-0">
 					<Button
 						type="button"
 						variant="destructive"
@@ -430,19 +428,23 @@ export function AdminEditOrderDialog({
 					>
 						Cancel Order
 					</Button>
-					<div className="flex gap-2 sm:justify-end">
-						<AlertDialogCancel onClick={onClose} disabled={isPending}>
-							Cancel
-						</AlertDialogCancel>
-						<AlertDialogAction
-							onClick={handleSave}
-							disabled={isPending || !isAmountValid || items.length === 0}
-						>
-							{isPending ? "Processing..." : "Save Changes"}
-						</AlertDialogAction>
-					</div>
-				</AlertDialogFooter>
-			</AlertDialogContent>
-		</AlertDialog>
+					<Button
+						type="button"
+						variant="outline"
+						onClick={onClose}
+						disabled={isPending}
+					>
+						Cancel
+					</Button>
+					<Button
+						type="button"
+						onClick={handleSave}
+						disabled={isPending || !isAmountValid || items.length === 0}
+					>
+						{isPending ? "Processing..." : "Save Changes"}
+					</Button>
+				</DialogFooter>
+			</DialogContent>
+		</Dialog>
 	);
 }
