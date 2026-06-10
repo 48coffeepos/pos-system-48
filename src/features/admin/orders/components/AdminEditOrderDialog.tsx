@@ -316,12 +316,12 @@ export function AdminEditOrderDialog({
 							>
 								Add Item
 							</label>
-							<div className="flex gap-2">
+							<div className="flex gap-2 min-w-0">
 								<select
 									id="edit-order-add-item"
 									value={selectedNewItem}
 									onChange={(e) => setSelectedNewItem(e.target.value)}
-									className="flex-1 h-9 rounded-md border border-input bg-transparent px-2 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+									className="flex-1 min-w-0 overflow-hidden h-9 rounded-md border border-input bg-transparent px-2 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
 								>
 									<option value="">Select an item...</option>
 									{availableItems.map((opt) => (
