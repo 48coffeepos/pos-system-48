@@ -160,10 +160,14 @@ function InventoryList({
           if (!log.dateTime) return true;
           const logDate = new Date(log.dateTime);
           logDate.setHours(0, 0, 0, 0);
-          if (fromDate && logDate < new Date(fromDate)) return false;
+          if (fromDate) {
+            const [fy, fm, fd] = fromDate.split("-").map(Number);
+            const from = new Date(fy, fm - 1, fd);
+            if (logDate < from) return false;
+          }
           if (toDate) {
-            const end = new Date(toDate);
-            end.setHours(23, 59, 59, 999);
+            const [ty, tm, td] = toDate.split("-").map(Number);
+            const end = new Date(ty, tm - 1, td, 23, 59, 59, 999);
             if (logDate > end) return false;
           }
           return true;
