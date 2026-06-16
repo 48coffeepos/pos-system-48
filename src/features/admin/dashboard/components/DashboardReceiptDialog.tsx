@@ -7,12 +7,24 @@ import {
   ReceiptThermalContent,
   THERMAL_PAGE_STYLE,
 } from "@/integrations/bixolon";
+import { formatReceiptDate, formatReceiptTime } from "@/lib/format-datetime";
+import type { CupSale } from "../server/getAdminCupSales";
+
+interface ReconciliationData {
+  totalCashSales: number;
+  totalGcashSales: number;
+  totalGrabSales: number;
+  totalCashOut: number;
+  totalCashIn: number;
+  totalExpenses: number;
+}
 
 interface DashboardReceiptDialogProps {
   open: boolean;
   onClose: () => void;
-  mode: "monthly" | "dailyRevenue" | null;
+  mode: "monthly" | "dailyRevenue" | "cups" | "xreading" | null;
   staffName: string;
+  receiptDate?: "today" | "yesterday";
   monthlyData?: {
     totalRevenue: number;
     totalCashOut: number;
@@ -31,6 +43,8 @@ interface DashboardReceiptDialogProps {
     totalGcashSales: number;
     totalRevenue: number;
   };
+  cupSales?: CupSale[];
+  reconciliation?: ReconciliationData;
 }
 
 function formatPeso(value: number) {
@@ -45,22 +59,35 @@ function formatTime(date: Date) {
   });
 }
 
+function formatDate(date: Date) {
+  return date.toLocaleDateString("en-US", {
+    month: "2-digit",
+    day: "2-digit",
+    year: "numeric",
+  });
+}
+
 export function DashboardReceiptDialog({
   open,
   onClose,
   mode,
   staffName,
+  receiptDate = "today",
   monthlyData,
   dailyData,
+  cupSales = [],
+  reconciliation,
 }: DashboardReceiptDialogProps) {
   const receiptRef = useRef<HTMLDivElement>(null);
   const [grabAmount, setGrabAmount] = useState<string>("");
   const [payrollAmount, setPayrollAmount] = useState<string>("");
   const [otherExpenses, setOtherExpenses] = useState<{ id: string; name: string; amount: string }[]>([]);
   const [step, setStep] = useState<"form" | "receipt">("form");
+  const [generatedAt, setGeneratedAt] = useState(() => new Date());
 
   useEffect(() => {
     if (open) {
+      setGeneratedAt(new Date());
       setStep("form");
       setGrabAmount("");
       setPayrollAmount("");
@@ -90,17 +117,14 @@ export function DashboardReceiptDialog({
 
   if (!mode) return null;
 
-  const targetDate = new Date();
-  const displayDate = targetDate.toLocaleDateString("en-US", {
-    month: "2-digit",
-    day: "2-digit",
-    year: "numeric",
-  });
-  const displayTime = targetDate.toLocaleString("en-US", {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: true,
-  });
+  const targetDate = receiptDate === "yesterday"
+    ? new Date(Date.now() - 86400000)
+    : new Date();
+  const displayDate = formatReceiptDate(targetDate);
+  const displayTime = formatReceiptTime(targetDate);
+  const generatedTime = formatReceiptTime(generatedAt);
+
+  const showForm = mode === "monthly" || mode === "dailyRevenue";
 
   return (
     <AlertDialog
@@ -110,7 +134,7 @@ export function DashboardReceiptDialog({
       }}
     >
       <AlertDialogContent className="max-w-[360px] p-6">
-        {step === "form" ? (
+        {showForm && step === "form" ? (
           <div className="space-y-4 max-h-[80vh] overflow-y-auto overflow-x-hidden pr-2">
             <div className="text-center mb-6">
               <h2 className="text-lg font-bold text-(--near-black)">
@@ -118,7 +142,7 @@ export function DashboardReceiptDialog({
               </h2>
               <p className="text-xs text-(--medium-gray) mt-1">Please enter manual details before generating the receipt.</p>
             </div>
-            
+
             <div className="space-y-4">
               <div className="space-y-1.5">
                 <label className="text-xs font-bold uppercase tracking-wider text-(--medium-gray)">
@@ -382,16 +406,187 @@ export function DashboardReceiptDialog({
             </div>
           )}
 
-          <div className="mt-8 border-t border-black pt-1 text-center">
-            <span className="text-xs font-bold tracking-widest uppercase">
-              Signature
-            </span>
-          </div>
+          {mode === "cups" && (
+            <div id="cups-sales-receipt">
+              <div className="mb-3 text-center">
+                <h2 className="text-2xl font-black tracking-tight">48 COFFEE</h2>
+                <div className="text-xs font-bold leading-tight my-0.5">
+                  <p>Ledesma St., Iloilo City Proper,</p>
+                  <p>Iloilo City, 5000</p>
+                </div>
+                <h3 className="mt-0.5 text-sm font-bold uppercase">CUPS SALES</h3>
+              </div>
 
-            <div className="mt-4 text-center">
-              <p className="text-xs font-black uppercase">{staffName}</p>
-              <p className="text-[9px] font-bold opacity-60">Admin&apos;s Name</p>
+              <div className="mb-3 space-y-0.5 text-xs font-bold">
+                <div className="flex justify-between">
+                  <span>Date :</span>
+                  <span>{displayDate}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Time :</span>
+                  <span>{displayTime}</span>
+                </div>
+              </div>
+
+              <div className="mb-2 border-t border-dashed border-black pt-2">
+                {cupSales
+                  .filter((cup) => cup.total > 0)
+                  .map((cup) => (
+                    <div
+                      key={cup.name}
+                      className="mb-2 text-xs leading-tight font-bold"
+                    >
+                      <div className="flex justify-between font-bold uppercase">
+                        <span>{cup.name}</span>
+                        <span>{cup.total} cups</span>
+                      </div>
+                      <div className="mt-0.5 flex gap-2 text-[10px] opacity-90">
+                        <span>CASH : {cup.byMethod.CASH ?? 0}</span>
+                        <span>GCASH : {cup.byMethod.GCASH ?? 0}</span>
+                        <span>GRAB : {cup.byMethod.GRAB ?? 0}</span>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+
+              <div className="border-t border-dashed border-black pt-2 text-xs font-bold">
+                <div className="mb-0.5 flex justify-between">
+                  <span>TOTAL CUPS SOLD :</span>
+                  <span>
+                    {cupSales.reduce((sum, c) => sum + c.total, 0)} cups
+                  </span>
+                </div>
+                <div className="flex gap-2 text-[10px]">
+                  <span>
+                    CASH :{" "}
+                    {cupSales.reduce(
+                      (sum, c) => sum + (c.byMethod.CASH ?? 0),
+                      0,
+                    )}
+                  </span>
+                  <span>
+                    GCASH :{" "}
+                    {cupSales.reduce(
+                      (sum, c) => sum + (c.byMethod.GCASH ?? 0),
+                      0,
+                    )}
+                  </span>
+                  <span>
+                    GRAB :{" "}
+                    {cupSales.reduce(
+                      (sum, c) => sum + (c.byMethod.GRAB ?? 0),
+                      0,
+                    )}
+                  </span>
+                </div>
+              </div>
+
+              <div className="mt-12 text-center text-sm font-bold">
+                <p className="border-t-2 border-dashed border-black pt-2">
+                  Signature of Cashier
+                </p>
+              </div>
             </div>
+          )}
+
+          {mode === "xreading" && reconciliation && (
+            <div id="xreading-receipt">
+              <div className="mb-4 text-center">
+                <h2 className="text-2xl font-black tracking-tight">48 COFFEE</h2>
+                <div className="text-xs font-bold leading-tight my-1">
+                  <p>Ledesma St., Iloilo City Proper,</p>
+                  <p>Iloilo City, 5000</p>
+                </div>
+                <h3 className="text-lg font-bold uppercase tracking-widest">
+                  SALES X-READING
+                </h3>
+              </div>
+
+              <div className="mb-4 text-sm font-bold">
+                <div className="flex justify-between">
+                  <span>Sales Date :</span>
+                  <span>{displayDate}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Generated :</span>
+                  <span>{generatedTime}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Cashier :</span>
+                  <span>{staffName}</span>
+                </div>
+              </div>
+
+              <div className="mb-4 border-t-2 border-dashed border-black pt-4" />
+
+              <div className="text-sm font-bold space-y-1">
+                <div className="flex justify-between">
+                  <span>TOTAL CASH IN:</span>
+                  <span>{formatPeso(reconciliation.totalCashIn)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>CASH SALES:</span>
+                  <span>{formatPeso(reconciliation.totalCashSales)}</span>
+                </div>
+              </div>
+
+              <div className="mt-4 border-t border-dashed border-black pt-4 text-sm font-bold space-y-1">
+                <div className="flex justify-between">
+                  <span>GROSS SALES:</span>
+                  <span>{formatPeso(reconciliation.totalCashSales + reconciliation.totalCashIn)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>TOTAL PICKUP / EXPENSES:</span>
+                  <span>{formatPeso(reconciliation.totalExpenses)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>TOTAL CASHOUT:</span>
+                  <span>{formatPeso(reconciliation.totalCashOut)}</span>
+                </div>
+              </div>
+
+              <div className="mt-4 border-t-2 border-dashed border-black pt-4 text-sm font-bold space-y-1">
+                <div className="flex justify-between">
+                  <span>NET SALES:</span>
+                  <span>{formatPeso(
+                    reconciliation.totalCashSales +
+                    reconciliation.totalCashIn -
+                    reconciliation.totalCashOut -
+                    reconciliation.totalExpenses
+                  )}</span>
+                </div>
+                <div className="flex justify-between mt-2">
+                  <span>GCASH SALES:</span>
+                  <span>{formatPeso(reconciliation.totalGcashSales)}</span>
+                </div>
+                <div className="flex justify-between mt-2">
+                  <span>GRAB SALES:</span>
+                  <span>{formatPeso(reconciliation.totalGrabSales)}</span>
+                </div>
+              </div>
+
+              <div className="mt-12 text-center text-sm font-bold">
+                <p className="border-t-2 border-dashed border-black pt-2">
+                  Signature of Cashier
+                </p>
+              </div>
+            </div>
+          )}
+
+          {mode !== "cups" && mode !== "xreading" && (
+            <>
+              <div className="mt-8 border-t border-black pt-1 text-center">
+                <span className="text-xs font-bold tracking-widest uppercase">
+                  Signature
+                </span>
+              </div>
+
+              <div className="mt-4 text-center">
+                <p className="text-xs font-black uppercase">{staffName}</p>
+                <p className="text-[9px] font-bold opacity-60">Admin&apos;s Name</p>
+              </div>
+            </>
+          )}
           </ReceiptThermalContent>
 
           <div className="no-print mt-6 flex flex-col gap-3">

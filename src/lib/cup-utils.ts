@@ -18,3 +18,25 @@ export function parseCupInfoKey(name: string): string {
   const { cup_type, cup_size } = parseCupInfo(name);
   return `${cup_size} ${cup_type}`;
 }
+
+const CUP_SORT_PRIORITY: Record<string, number> = {
+  "16OZ ICED": 0,
+  "12OZ ICED": 1,
+  "12OZ HOT": 2,
+};
+
+export function getCupSortPriority(name: string): number {
+  const key = parseCupInfoKey(name);
+  return CUP_SORT_PRIORITY[key] ?? 100;
+}
+
+export function sortCupInventoryItems<
+  T extends { inventory: { name: string } },
+>(items: T[]): T[] {
+  return [...items].sort((a, b) => {
+    const priorityDiff =
+      getCupSortPriority(a.inventory.name) - getCupSortPriority(b.inventory.name);
+    if (priorityDiff !== 0) return priorityDiff;
+    return a.inventory.name.localeCompare(b.inventory.name);
+  });
+}

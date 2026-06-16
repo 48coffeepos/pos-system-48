@@ -8,7 +8,7 @@ import {
 	updateOrderItems,
 	type updateOrderItemsInput,
 } from "./server/updateOrderItems";
-import { deleteOrder } from "./server/deleteOrder";
+import { cancelOrder } from "./server/cancelOrder";
 import { updateOrderPayment } from "./server/updateOrderPayment";
 
 async function invalidateOrderAndDashboard(
@@ -52,12 +52,19 @@ export const updateOrderPaymentMutationOptions = mutationOptions({
 export const updateOrderItemsMutationOptions = mutationOptions({
 	mutationFn: async (data: z.infer<typeof updateOrderItemsInput>) =>
 		updateOrderItems({ data }),
-	onSuccess: async (_data, _variables, _onMutateResult, mutationContext) => {
+	onSuccess: async (data, _variables, _onMutateResult, mutationContext) => {
 		await invalidateOrderAndDashboard(mutationContext);
 		toast.success("Order items updated", {
 			description:
 				"The order items and totals have been successfully modified.",
 		});
+		if (data.negative_stock_items?.length) {
+			toast.warning("Some items are now below zero stock", {
+				description: data.negative_stock_items
+					.map((item) => `${item.name} (${item.ending})`)
+					.join(", "),
+			});
+		}
 	},
 	onError: (error) => {
 		toast.error("Failed to update items", {
@@ -66,16 +73,17 @@ export const updateOrderItemsMutationOptions = mutationOptions({
 	},
 });
 
-export const deleteOrderMutationOptions = mutationOptions({
-	mutationFn: async (data: { orderId: string }) => deleteOrder({ data }),
+export const cancelOrderMutationOptions = mutationOptions({
+	mutationFn: async (data: { orderId: string }) => cancelOrder({ data }),
 	onSuccess: async (_data, _variables, _onMutateResult, mutationContext) => {
 		await invalidateOrderAndDashboard(mutationContext);
-		toast.success("Order deleted", {
-			description: "The order has been successfully removed.",
+		toast.success("Order canceled", {
+			description:
+				"The order has been canceled. Inventory has been restored.",
 		});
 	},
 	onError: (error) => {
-		toast.error("Failed to delete order", {
+		toast.error("Failed to cancel order", {
 			description: error?.message ?? "Unknown error",
 		});
 	},

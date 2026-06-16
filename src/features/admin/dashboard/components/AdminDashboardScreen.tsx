@@ -17,6 +17,8 @@ import {
   getDashboardDataQueryOptions,
   getMonthlyDataQueryOptions,
   getAvailableMonthsQueryOptions,
+  getAdminReconciliationQueryOptions,
+  getAdminCupSalesQueryOptions,
 } from "../queryOptions";
 import { CupSalesBreakdown } from "./CupSalesBreakdown";
 import { DashboardReceiptDialog } from "./DashboardReceiptDialog";
@@ -30,8 +32,17 @@ export function AdminDashboardScreen() {
   const [selectedPayment, setSelectedPayment] =
     useState<PaymentMethodFilter>("all");
   const [receiptMode, setReceiptMode] = useState<
-    "select" | "monthly" | "monthPicker" | "dailyRevenue" | null
+    | "select"
+    | "monthly"
+    | "monthPicker"
+    | "dailyRevenue"
+    | "cups"
+    | "cupsDatePicker"
+    | "xreading"
+    | "xreadingDatePicker"
+    | null
   >(null);
+  const [receiptDate, setReceiptDate] = useState<"today" | "yesterday">("today");
 
   const latest = availableMonths[0];
   const [selectedYear, setSelectedYear] = useState(latest?.year ?? new Date().getFullYear());
@@ -40,6 +51,16 @@ export function AdminDashboardScreen() {
   const { data: monthlyData } = useQuery(
     getMonthlyDataQueryOptions(selectedYear, selectedMonth),
   );
+
+  const { data: reconciliation } = useQuery({
+    ...getAdminReconciliationQueryOptions(receiptDate),
+    enabled: receiptMode === "xreading",
+  });
+
+  const { data: cupSalesData } = useQuery({
+    ...getAdminCupSalesQueryOptions(receiptDate),
+    enabled: receiptMode === "cups",
+  });
 
   const { revenue, cupSales, periodLabel } = data;
   const staffName = session?.user?.name ?? "Admin";
@@ -56,6 +77,31 @@ export function AdminDashboardScreen() {
   const handleConfirmMonth = () => {
     setReceiptMode("monthly");
   };
+
+  const handleSelectCupsDate = (date: "today" | "yesterday") => {
+    setReceiptDate(date);
+    setReceiptMode("cups");
+  };
+
+  const handleSelectXReadingDate = (date: "today" | "yesterday") => {
+    setReceiptDate(date);
+    setReceiptMode("xreading");
+  };
+
+  const resetReceipt = () => {
+    setReceiptMode(null);
+  };
+
+  const currentReceiptMode: "monthly" | "dailyRevenue" | "cups" | "xreading" | null =
+    receiptMode === "monthly"
+      ? "monthly"
+      : receiptMode === "dailyRevenue"
+        ? "dailyRevenue"
+        : receiptMode === "cups"
+          ? "cups"
+          : receiptMode === "xreading"
+            ? "xreading"
+            : null;
 
   return (
     <div className="space-y-5">
@@ -104,6 +150,22 @@ export function AdminDashboardScreen() {
               className="h-auto w-full rounded-xl border-(--light-gray) bg-(--off-white) px-4 py-2 text-xs font-semibold text-(--dark-gray) hover:bg-(--off-white)"
             >
               Daily Sales Receipt
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setReceiptMode("cupsDatePicker")}
+              className="h-auto w-full rounded-xl border-(--light-gray) bg-(--off-white) px-4 py-2 text-xs font-semibold text-(--dark-gray) hover:bg-(--off-white)"
+            >
+              Print Cup Sold
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setReceiptMode("xreadingDatePicker")}
+              className="h-auto w-full rounded-xl border-(--light-gray) bg-(--off-white) px-4 py-2 text-xs font-semibold text-(--dark-gray) hover:bg-(--off-white)"
+            >
+              Print X-Reading
             </Button>
           </div>
           <DialogFooter>
@@ -172,17 +234,117 @@ export function AdminDashboardScreen() {
         </DialogContent>
       </Dialog>
 
+      <Dialog
+        open={receiptMode === "cupsDatePicker"}
+        onOpenChange={(open) => {
+          if (!open) setReceiptMode(null);
+        }}
+      >
+        <DialogContent className="max-w-sm" showCloseButton={false}>
+          <DialogHeader>
+            <DialogTitle>Select Date</DialogTitle>
+            <DialogDescription>
+              Choose the date for cup sold data.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => handleSelectCupsDate("today")}
+              className="flex-1 h-auto rounded-xl border-(--light-gray) bg-(--off-white) px-4 py-3 text-xs font-semibold text-(--dark-gray) hover:bg-(--off-white)"
+            >
+              Today
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => handleSelectCupsDate("yesterday")}
+              className="flex-1 h-auto rounded-xl border-(--light-gray) bg-(--off-white) px-4 py-3 text-xs font-semibold text-(--dark-gray) hover:bg-(--off-white)"
+            >
+              Yesterday
+            </Button>
+          </div>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => setReceiptMode("select")}
+              className="text-xs font-semibold text-(--dark-gray)"
+            >
+              Back
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={receiptMode === "xreadingDatePicker"}
+        onOpenChange={(open) => {
+          if (!open) setReceiptMode(null);
+        }}
+      >
+        <DialogContent className="max-w-sm" showCloseButton={false}>
+          <DialogHeader>
+            <DialogTitle>Select Date</DialogTitle>
+            <DialogDescription>
+              Choose the date for X-Reading data.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => handleSelectXReadingDate("today")}
+              className="flex-1 h-auto rounded-xl border-(--light-gray) bg-(--off-white) px-4 py-3 text-xs font-semibold text-(--dark-gray) hover:bg-(--off-white)"
+            >
+              Today
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => handleSelectXReadingDate("yesterday")}
+              className="flex-1 h-auto rounded-xl border-(--light-gray) bg-(--off-white) px-4 py-3 text-xs font-semibold text-(--dark-gray) hover:bg-(--off-white)"
+            >
+              Yesterday
+            </Button>
+          </div>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => setReceiptMode("select")}
+              className="text-xs font-semibold text-(--dark-gray)"
+            >
+              Back
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <DashboardReceiptDialog
-        open={receiptMode === "monthly" || receiptMode === "dailyRevenue"}
-        onClose={() => setReceiptMode(null)}
-        mode={receiptMode === "monthPicker" ? null : receiptMode === "select" ? null : receiptMode}
+        open={!!currentReceiptMode}
+        onClose={resetReceipt}
+        mode={currentReceiptMode}
         staffName={staffName}
+        receiptDate={receiptDate}
         monthlyData={monthlyData}
         dailyData={{
           totalCashSales: data.revenue.byMethod.CASH ?? 0,
           totalGcashSales: data.revenue.byMethod.GCASH ?? 0,
           totalRevenue: (data.revenue.byMethod.CASH ?? 0) + (data.revenue.byMethod.GCASH ?? 0),
         }}
+        cupSales={cupSalesData ?? []}
+        reconciliation={
+          reconciliation ?? {
+            totalCashSales: 0,
+            totalGcashSales: 0,
+            totalGrabSales: 0,
+            totalCashOut: 0,
+            totalCashIn: 0,
+            totalExpenses: 0,
+          }
+        }
       />
     </div>
   );

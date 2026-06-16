@@ -22,6 +22,7 @@ import {
 } from "../stores/useXReadingStore";
 
 interface XReadingScreenProps {
+	date: "today" | "yesterday";
 	data: {
 		totalCashSales: number;
 		totalGcashSales: number;
@@ -32,7 +33,10 @@ interface XReadingScreenProps {
 	};
 }
 
-export function XReadingScreen({ data }: XReadingScreenProps) {
+import { useNavigate } from "@tanstack/react-router";
+
+export function XReadingScreen({ date, data }: XReadingScreenProps) {
+	const navigate = useNavigate({ from: "/staff/xreading" });
 	const { data: session } = authClient.useSession();
 	const staffName = session?.user?.name || "Staff";
 
@@ -44,7 +48,7 @@ export function XReadingScreen({ data }: XReadingScreenProps) {
 		"sales" | "cashcount" | "cups" | null
 	>(null);
 
-	const { data: cupSales = [] } = useQuery(getCupSalesQueryOptions());
+	const { data: cupSales = [] } = useQuery(getCupSalesQueryOptions(date));
 
 	const form = useAppForm({
 		defaultValues: cashCount,
@@ -55,7 +59,9 @@ export function XReadingScreen({ data }: XReadingScreenProps) {
 			form.reset(useXReadingStore.getState().cashCount);
 		};
 
-		syncFormFromStore();
+		if (useXReadingStore.persist.hasHydrated()) {
+			syncFormFromStore();
+		}
 
 		return useXReadingStore.persist.onFinishHydration(syncFormFromStore);
 	}, [form]);
@@ -79,6 +85,34 @@ export function XReadingScreen({ data }: XReadingScreenProps) {
 
 	return (
 		<>
+			{/* Date Toggle */}
+			<div className="mb-4 flex print:hidden">
+				<div className="inline-flex rounded-xl border border-(--light-gray) bg-(--pure-white) p-1 shadow-sm">
+					<button
+						type="button"
+						onClick={() => navigate({ search: { date: "today" } })}
+						className={`rounded-lg px-4 py-2 text-sm font-bold transition-colors ${
+							date === "today"
+								? "bg-(--forest-green) text-(--pale-yellow) shadow-sm"
+								: "text-(--medium-gray) hover:text-(--near-black)"
+						}`}
+					>
+						Today
+					</button>
+					<button
+						type="button"
+						onClick={() => navigate({ search: { date: "yesterday" } })}
+						className={`rounded-lg px-4 py-2 text-sm font-bold transition-colors ${
+							date === "yesterday"
+								? "bg-(--forest-green) text-(--pale-yellow) shadow-sm"
+								: "text-(--medium-gray) hover:text-(--near-black)"
+						}`}
+					>
+						Yesterday
+					</button>
+				</div>
+			</div>
+
 			{/* On-screen UI */}
 			<div className="grid grid-cols-1 gap-4 print:hidden lg:grid-cols-2">
 				<form.AppForm>
@@ -144,6 +178,7 @@ export function XReadingScreen({ data }: XReadingScreenProps) {
 				totalCashCounted={totalCashCounted}
 				cashCount={cashCount}
 				cupSales={cupSales}
+				date={date}
 			/>
 		</>
 	);

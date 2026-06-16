@@ -1,4 +1,5 @@
 import {
+	CurrencyDollarIcon,
 	ListIcon,
 	PackageIcon,
 	SignOutIcon,
@@ -19,15 +20,12 @@ import {
 	defaultPosFormValues,
 	usePosStore,
 } from "@/features/staff/pos/stores/usePosStore";
-import {
-	emptyCashCountValues,
-	useXReadingStore,
-} from "@/features/staff/xreading/stores/useXReadingStore";
 
 const navLinks = [
 	{ label: "Dashboard", path: "/admin", icon: SquaresFourIcon },
 	{ label: "Menu", path: "/admin/menu", icon: ListIcon },
 	{ label: "Inventory", path: "/admin/inventory", icon: PackageIcon },
+	{ label: "Cash Logs", path: "/admin/cash-logs", icon: CurrencyDollarIcon },
 	{ label: "Accounts", path: "/admin/accounts", icon: UsersIcon },
 ];
 
@@ -40,8 +38,6 @@ function AdminHeader() {
 	const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
 	const handleLogout = async () => {
-		useXReadingStore.persist.clearStorage();
-		useXReadingStore.setState({ cashCount: emptyCashCountValues });
 		usePosStore.persist.clearStorage();
 		usePosStore.setState({
 			cart: [],

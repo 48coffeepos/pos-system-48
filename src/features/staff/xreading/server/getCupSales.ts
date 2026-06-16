@@ -1,8 +1,9 @@
 import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
 import { authMiddleware } from "@/features/auth/middlewares";
 import { prisma } from "@/integrations/prisma/db";
 import { parseCupInfoKey } from "@/lib/cup-utils";
-import { getTodayBounds } from "@/lib/day-bounds";
+import { getTimeframeBounds } from "@/lib/day-bounds";
 
 export interface CupSale {
   name: string;
@@ -12,8 +13,9 @@ export interface CupSale {
 
 export const getCupSales = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
-  .handler(async () => {
-    const { start, end } = getTodayBounds();
+  .inputValidator(z.object({ date: z.enum(["today", "yesterday"]) }))
+  .handler(async ({ data }) => {
+    const { start, end } = getTimeframeBounds(data.date);
 
     const allCups = await prisma.inventory.findMany({
       where: { type: "CUP" },
@@ -38,7 +40,13 @@ export const getCupSales = createServerFn({ method: "GET" })
 
     const todayOrderItems = await prisma.orderItem.findMany({
       where: {
-        order: { created_at: { gte: start, lte: end } },
+        order: {
+          created_at: { gte: start, lte: end },
+          OR: [
+            { note: null },
+            { note: { not: { startsWith: "[CANCELED]" } } },
+          ],
+        },
       },
       select: {
         quantity: true,

@@ -22,6 +22,7 @@ import { Route as StaffExpensesRouteImport } from './routes/staff/expenses'
 import { Route as AdminOrdersRouteImport } from './routes/admin/orders'
 import { Route as AdminMenuRouteImport } from './routes/admin/menu'
 import { Route as AdminInventoryRouteImport } from './routes/admin/inventory'
+import { Route as AdminCashLogsRouteImport } from './routes/admin/cash-logs'
 import { Route as AdminAccountsRouteImport } from './routes/admin/accounts'
 import { Route as ApiCronUpdateYesterdayStockRouteImport } from './routes/api/cron/update-yesterday-stock'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
@@ -91,6 +92,11 @@ const AdminInventoryRoute = AdminInventoryRouteImport.update({
   path: '/inventory',
   getParentRoute: () => AdminRouteRoute,
 } as any)
+const AdminCashLogsRoute = AdminCashLogsRouteImport.update({
+  id: '/cash-logs',
+  path: '/cash-logs',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 const AdminAccountsRoute = AdminAccountsRouteImport.update({
   id: '/accounts',
   path: '/accounts',
@@ -113,6 +119,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteRouteWithChildren
   '/staff': typeof StaffRouteRouteWithChildren
   '/admin/accounts': typeof AdminAccountsRoute
+  '/admin/cash-logs': typeof AdminCashLogsRoute
   '/admin/inventory': typeof AdminInventoryRoute
   '/admin/menu': typeof AdminMenuRoute
   '/admin/orders': typeof AdminOrdersRoute
@@ -129,6 +136,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin/accounts': typeof AdminAccountsRoute
+  '/admin/cash-logs': typeof AdminCashLogsRoute
   '/admin/inventory': typeof AdminInventoryRoute
   '/admin/menu': typeof AdminMenuRoute
   '/admin/orders': typeof AdminOrdersRoute
@@ -148,6 +156,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteRouteWithChildren
   '/staff': typeof StaffRouteRouteWithChildren
   '/admin/accounts': typeof AdminAccountsRoute
+  '/admin/cash-logs': typeof AdminCashLogsRoute
   '/admin/inventory': typeof AdminInventoryRoute
   '/admin/menu': typeof AdminMenuRoute
   '/admin/orders': typeof AdminOrdersRoute
@@ -168,6 +177,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/staff'
     | '/admin/accounts'
+    | '/admin/cash-logs'
     | '/admin/inventory'
     | '/admin/menu'
     | '/admin/orders'
@@ -184,6 +194,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/admin/accounts'
+    | '/admin/cash-logs'
     | '/admin/inventory'
     | '/admin/menu'
     | '/admin/orders'
@@ -202,6 +213,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/staff'
     | '/admin/accounts'
+    | '/admin/cash-logs'
     | '/admin/inventory'
     | '/admin/menu'
     | '/admin/orders'
@@ -317,6 +329,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminInventoryRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    '/admin/cash-logs': {
+      id: '/admin/cash-logs'
+      path: '/cash-logs'
+      fullPath: '/admin/cash-logs'
+      preLoaderRoute: typeof AdminCashLogsRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     '/admin/accounts': {
       id: '/admin/accounts'
       path: '/accounts'
@@ -343,6 +362,7 @@ declare module '@tanstack/react-router' {
 
 interface AdminRouteRouteChildren {
   AdminAccountsRoute: typeof AdminAccountsRoute
+  AdminCashLogsRoute: typeof AdminCashLogsRoute
   AdminInventoryRoute: typeof AdminInventoryRoute
   AdminMenuRoute: typeof AdminMenuRoute
   AdminOrdersRoute: typeof AdminOrdersRoute
@@ -351,6 +371,7 @@ interface AdminRouteRouteChildren {
 
 const AdminRouteRouteChildren: AdminRouteRouteChildren = {
   AdminAccountsRoute: AdminAccountsRoute,
+  AdminCashLogsRoute: AdminCashLogsRoute,
   AdminInventoryRoute: AdminInventoryRoute,
   AdminMenuRoute: AdminMenuRoute,
   AdminOrdersRoute: AdminOrdersRoute,

@@ -10,6 +10,8 @@ const orderKeys = {
 		timeframe?: string;
 		fromDate?: string;
 		toDate?: string;
+		showCanceled?: boolean;
+		search?: string;
 	}) =>
 		[
 			...orderKeys.all,
@@ -18,6 +20,8 @@ const orderKeys = {
 			params.timeframe ?? "",
 			params.fromDate ?? "",
 			params.toDate ?? "",
+			String(!!params.showCanceled),
+			params.search ?? "",
 		] as const,
 };
 

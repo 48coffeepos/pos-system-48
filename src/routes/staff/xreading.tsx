@@ -7,9 +7,17 @@ import {
 import { XReadingScreen } from "@/features/staff/xreading/components/XReadingScreen";
 import { getDailyReconciliationQueryOptions } from "@/features/staff/xreading/queryOptions";
 
+import { z } from "zod";
+
+const searchSchema = z.object({
+	date: z.enum(["today", "yesterday"]).optional().default("today"),
+});
+
 export const Route = createFileRoute("/staff/xreading")({
-	loader: async ({ context: { queryClient } }) => {
-		await queryClient.ensureQueryData(getDailyReconciliationQueryOptions());
+	validateSearch: searchSchema,
+	loaderDeps: ({ search: { date } }) => ({ date }),
+	loader: async ({ context: { queryClient }, deps: { date } }) => {
+		await queryClient.ensureQueryData(getDailyReconciliationQueryOptions(date));
 	},
 	pendingComponent: RoutePendingBoundary,
 	errorComponent: RouteErrorBoundary,
@@ -17,14 +25,15 @@ export const Route = createFileRoute("/staff/xreading")({
 });
 
 function StaffXReading() {
+	const { date } = Route.useSearch();
 	const { data: reconciliationData } = useSuspenseQuery(
-		getDailyReconciliationQueryOptions(),
+		getDailyReconciliationQueryOptions(date),
 	);
 
 	return (
 		<div className="min-h-screen bg-(--pale-yellow)/30">
 			<main className="mx-auto max-w-screen-2xl p-2 sm:p-3 lg:p-4">
-				<XReadingScreen data={reconciliationData} />
+				<XReadingScreen date={date} data={reconciliationData} />
 			</main>
 		</div>
 	);

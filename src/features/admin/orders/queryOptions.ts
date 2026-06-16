@@ -28,11 +28,13 @@ export const getDateRangeOrdersQueryOptions = (
 
 export function getOrdersQueryOptions(
 	params:
-		| { timeframe: "all" | "today" | "yesterday"; page?: number }
-		| { fromDate: string; toDate: string; page?: number },
+		| { timeframe: "all" | "today" | "yesterday"; page?: number; showCanceled?: boolean; search?: string }
+		| { fromDate: string; toDate: string; page?: number; showCanceled?: boolean; search?: string },
 ) {
 	const hasDateRange = "fromDate" in params;
 	const page = params.page ?? 1;
+	const showCanceled = params.showCanceled ?? false;
+	const search = params.search ?? "";
 	return queryOptions({
 		queryKey: orderKeys.paginated({
 			page,
@@ -43,6 +45,8 @@ export function getOrdersQueryOptions(
 				? (params as { fromDate: string }).fromDate
 				: undefined,
 			toDate: hasDateRange ? (params as { toDate: string }).toDate : undefined,
+			showCanceled,
+			search,
 		}) as readonly string[],
 		queryFn: () =>
 			hasDateRange
@@ -51,6 +55,8 @@ export function getOrdersQueryOptions(
 							fromDate: (params as { fromDate: string }).fromDate,
 							toDate: (params as { toDate: string }).toDate,
 							page,
+							showCanceled,
+							search,
 						},
 					})
 				: getFilteredOrders({
@@ -59,6 +65,8 @@ export function getOrdersQueryOptions(
 								params as { timeframe: "all" | "today" | "yesterday" }
 							).timeframe,
 							page,
+							showCanceled,
+							search,
 						},
 					}),
 	});

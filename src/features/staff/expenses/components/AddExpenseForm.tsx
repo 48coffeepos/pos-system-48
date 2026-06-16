@@ -26,11 +26,19 @@ const TYPE_LABELS: Record<
 	EXPENSE: { heading: "Add Expense", submit: "Record Expense", button: "Expenses" },
 };
 
-export function AddExpenseForm() {
+interface AddExpenseFormProps {
+	onSuccess?: () => void;
+	embedded?: boolean;
+}
+
+export function AddExpenseForm({
+	onSuccess,
+	embedded = false,
+}: AddExpenseFormProps = {}) {
 	const mutation = useMutation(createExpenseMutationOptions);
 
 	const defaultValues: CreateExpenseInput = {
-		type: "CASH_OUT",
+		type: "CASH_IN",
 		description: "",
 		amount: 0,
 	};
@@ -43,6 +51,7 @@ export function AddExpenseForm() {
 		onSubmit: async ({ value }) => {
 			await mutation.mutateAsync(value);
 			form.reset();
+			onSuccess?.();
 		},
 	});
 
@@ -52,7 +61,11 @@ export function AddExpenseForm() {
 				e.preventDefault();
 				form.handleSubmit();
 			}}
-			className="rounded-2xl border border-(--light-gray) bg-(--pure-white) p-6 space-y-3"
+			className={cn(
+				"space-y-3",
+				!embedded &&
+					"rounded-2xl border border-(--light-gray) bg-(--pure-white) p-6",
+			)}
 		>
 			<form.AppField name="type">
 				{(field) => {
@@ -71,19 +84,6 @@ export function AddExpenseForm() {
 								<div className="grid grid-cols-3 gap-2">
 									<button
 										type="button"
-										onClick={() => field.handleChange("CASH_OUT")}
-										className={cn(
-											"flex items-center justify-center gap-1.5 rounded-lg border px-2 py-2 text-xs font-medium transition-all sm:text-sm sm:px-3",
-											field.state.value === "CASH_OUT"
-												? "border-(--deep-forest) bg-(--deep-forest) text-(--pale-yellow)"
-												: "border-(--light-gray) bg-(--pure-white) text-(--medium-gray) hover:border-(--medium-gray)",
-										)}
-									>
-										<ArrowDownRightIcon weight="bold" className="size-4 shrink-0" />
-										Cash Out
-									</button>
-									<button
-										type="button"
 										onClick={() => field.handleChange("CASH_IN")}
 										className={cn(
 											"flex items-center justify-center gap-1.5 rounded-lg border px-2 py-2 text-xs font-medium transition-all sm:text-sm sm:px-3",
@@ -94,6 +94,19 @@ export function AddExpenseForm() {
 									>
 										<ArrowUpRightIcon weight="bold" className="size-4 shrink-0" />
 										Cash In
+									</button>
+									<button
+										type="button"
+										onClick={() => field.handleChange("CASH_OUT")}
+										className={cn(
+											"flex items-center justify-center gap-1.5 rounded-lg border px-2 py-2 text-xs font-medium transition-all sm:text-sm sm:px-3",
+											field.state.value === "CASH_OUT"
+												? "border-(--deep-forest) bg-(--deep-forest) text-(--pale-yellow)"
+												: "border-(--light-gray) bg-(--pure-white) text-(--medium-gray) hover:border-(--medium-gray)",
+										)}
+									>
+										<ArrowDownRightIcon weight="bold" className="size-4 shrink-0" />
+										Cash Out
 									</button>
 									<button
 										type="button"

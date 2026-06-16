@@ -1,5 +1,22 @@
 import type { Inventory, Prisma } from "@/generated/prisma/client.js";
 
+export type NegativeStockItem = {
+	name: string;
+	ending: number;
+};
+
+export function trackNegativeStock(
+	items: Map<string, NegativeStockItem>,
+	updated: Inventory,
+) {
+	if (updated.ending_store < 0) {
+		items.set(updated.name, {
+			name: updated.name,
+			ending: updated.ending_store,
+		});
+	}
+}
+
 export type InventoryMovement =
 	| { kind: "admin_in"; quantity: number }
 	| { kind: "admin_out"; quantity: number }
@@ -91,11 +108,6 @@ export async function applyInventoryMovement(
 			if (item.type === "SUPPLIES") {
 				throw new Error("SUPPLIES inventory items are not deducted via sales.");
 			}
-			if (storeEnding < quantity) {
-				throw new Error(
-					`Cannot sell ${quantity} — only ${storeEnding} available in storefront.`,
-				);
-			}
 			data = {
 				out_store: { increment: quantity },
 				ending_store: storeEnding - quantity,
@@ -116,11 +128,6 @@ export async function applyInventoryMovement(
 			if (item.type === "SUPPLIES") {
 				throw new Error(
 					"SUPPLIES inventory items are not deducted via beginning sale.",
-				);
-			}
-			if (item.beginning_store < quantity) {
-				throw new Error(
-					`Cannot deduct ${quantity} from beginning stock — only ${item.beginning_store} available.`,
 				);
 			}
 			data = {

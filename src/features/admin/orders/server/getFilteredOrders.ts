@@ -14,6 +14,8 @@ export const getFilteredOrders = createServerFn({ method: "GET" })
 			toDate: z.string().optional(),
 			page: z.number().optional().default(1),
 			pageSize: z.number().optional().default(10),
+			showCanceled: z.boolean().optional().default(false),
+			search: z.string().optional(),
 		}),
 	)
 	.handler(async ({ data }) => {
@@ -32,7 +34,16 @@ export const getFilteredOrders = createServerFn({ method: "GET" })
 			end = bounds.end;
 		}
 
-		const where = start && end ? { created_at: { gte: start, lte: end } } : {};
+		const where: Record<string, unknown> = {};
+		if (start && end) {
+			where.created_at = { gte: start, lte: end };
+		}
+		if (data.showCanceled) {
+			where.note = { startsWith: "[CANCELED]" };
+		}
+		if (data.search) {
+			where.order_id = { contains: data.search };
+		}
 		const skip = (data.page - 1) * data.pageSize;
 
 		const [orders, total] = await Promise.all([

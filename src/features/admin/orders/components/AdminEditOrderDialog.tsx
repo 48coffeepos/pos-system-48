@@ -1,31 +1,31 @@
 import {
 	MinusIcon,
+	PencilSimpleIcon,
 	PlusCircle,
 	PlusIcon,
 	TrashIcon,
 } from "@phosphor-icons/react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import {
-	AlertDialog,
-	AlertDialogAction,
-	AlertDialogCancel,
-	AlertDialogContent,
-	AlertDialogDescription,
-	AlertDialogFooter,
-	AlertDialogHeader,
-	AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { posPageDataQueryOptions } from "@/features/staff/pos/queryOptions";
+import { posBadgeDiscount, posBadgeFree } from "@/features/staff/pos/pos-ui";
 import type { PosOrder } from "@/features/staff/pos/types";
 import { getOrderEditPolicy } from "@/lib/day-bounds";
 import { formatPeso } from "@/lib/format-currency";
 import {
-	deleteOrderMutationOptions,
+	cancelOrderMutationOptions,
 	updateOrderItemsMutationOptions,
 	updateOrderPaymentMutationOptions,
 } from "../mutationOptions";
+import { AdminOrderItemEditorDialog } from "./AdminOrderItemEditorDialog";
 
 interface AdminEditOrderDialogProps {
 	order: PosOrder | null;
@@ -44,28 +44,14 @@ export function AdminEditOrderDialog({
 	const [amountTendered, setAmountTendered] = useState<string>("0");
 	const [referenceNumber, setReferenceNumber] = useState<string>("");
 	const [items, setItems] = useState<PosOrder["items"]>([]);
-	const [selectedNewItem, setSelectedNewItem] = useState<string>("");
+	const [itemEditorOpen, setItemEditorOpen] = useState(false);
+	const [editingLine, setEditingLine] = useState<PosOrder["items"][number] | null>(
+		null,
+	);
 
 	const paymentMutation = useMutation(updateOrderPaymentMutationOptions);
 	const itemsMutation = useMutation(updateOrderItemsMutationOptions);
-	const deleteMutation = useMutation(deleteOrderMutationOptions);
-
-	const { data: menuData } = useQuery({
-		...posPageDataQueryOptions,
-		enabled: open,
-	});
-
-	// Flatten menu and inventory combinations for the dropdown
-	const availableItems = (menuData?.menuItems || []).flatMap((menuItem) =>
-		menuItem.inventory_items.map((inv) => ({
-			id: `${menuItem.menu_id}::${inv.inventory.name}`,
-			menu_id: menuItem.menu_id,
-			snapshot_menu_name: menuItem.name,
-			snapshot_inventory: inv.inventory.name,
-			unit_price: inv.price,
-			label: `${menuItem.name} (${inv.inventory.name}) - ${formatPeso(inv.price)}`,
-		})),
-	);
+	const cancelMutation = useMutation(cancelOrderMutationOptions);
 
 	useEffect(() => {
 		if (open && order) {
@@ -75,7 +61,8 @@ export function AdminEditOrderDialog({
 			);
 			setReferenceNumber(order.reference_number ?? "");
 			setItems(order.items || []);
-			setSelectedNewItem("");
+			setItemEditorOpen(false);
+			setEditingLine(null);
 		}
 	}, [open, order]);
 
@@ -86,21 +73,10 @@ export function AdminEditOrderDialog({
 	// Calculate the new grand total based on the locally edited items list
 	let computedGrandTotal = 0;
 	if (method !== "GRAB") {
-		computedGrandTotal = items.reduce((sum, item) => {
-			const discount = item.discount_type
-				? Number(item.discount_amount || 0)
-				: 0;
-			let itemTotal = 0;
-			if (!item.loyalty) {
-				itemTotal = Number(item.unit_price) * item.quantity - discount;
-			}
-			const addonsTotal = (item.addon_items || []).reduce(
-				(acc, addon) =>
-					acc + Number(addon.addon_price_snapshot) * addon.quantity,
-				0,
-			);
-			return sum + itemTotal + addonsTotal;
-		}, 0);
+		computedGrandTotal = items.reduce(
+			(sum, item) => sum + Number(item.line_total ?? 0),
+			0,
+		);
 	}
 
 	const grandTotal = computedGrandTotal;
@@ -115,7 +91,12 @@ export function AdminEditOrderDialog({
 		setItems((prev) =>
 			prev.map((item) => {
 				if (item.order_item_id === orderItemId) {
-					return { ...item, quantity: Math.max(1, item.quantity + delta) };
+					const quantity = Math.max(1, item.quantity + delta);
+					return {
+						...item,
+						quantity,
+						line_total: Number(item.unit_price) * quantity,
+					};
 				}
 				return item;
 			}),
@@ -128,37 +109,18 @@ export function AdminEditOrderDialog({
 		);
 	};
 
-	const handleAddNewItem = () => {
-		if (!selectedNewItem) return;
-		const option = availableItems.find((i) => i.id === selectedNewItem);
-		if (!option) return;
-
-		// Check if the exact same item already exists in the current list
-		const existingIndex = items.findIndex(
-			(i) =>
-				i.snapshot_menu_name === option.snapshot_menu_name &&
-				i.snapshot_inventory === option.snapshot_inventory,
-		);
-
-		if (existingIndex >= 0) {
-			handleUpdateQuantity(items[existingIndex].order_item_id, 1);
-		} else {
-			const newItem: PosOrder["items"][0] = {
-				order_item_id: `new-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-				menu_id: option.menu_id,
-				snapshot_menu_name: option.snapshot_menu_name,
-				snapshot_inventory: option.snapshot_inventory,
-				unit_price: option.unit_price,
-				quantity: 1,
-				line_total: option.unit_price,
-				loyalty: false,
-				addon_items: [],
-			};
-
-			setItems((prev) => [...prev, newItem]);
-		}
-
-		setSelectedNewItem("");
+	const handleSaveLine = (line: PosOrder["items"][number]) => {
+		setItems((prev) => {
+			const existingIndex = prev.findIndex(
+				(item) => item.order_item_id === line.order_item_id,
+			);
+			if (existingIndex >= 0) {
+				const next = [...prev];
+				next[existingIndex] = line;
+				return next;
+			}
+			return [...prev, line];
+		});
 	};
 
 	const handleSave = async () => {
@@ -177,7 +139,18 @@ export function AdminEditOrderDialog({
 					menu_id: i.menu_id,
 					snapshot_menu_name: i.snapshot_menu_name,
 					snapshot_inventory: i.snapshot_inventory,
-					unit_price: i.unit_price,
+					unit_price: Number(i.unit_price),
+					line_total: Number(i.line_total ?? 0),
+					loyalty: i.loyalty ?? false,
+					discount_type: i.discount_type ?? null,
+					discount_contact: i.discount_contact ?? null,
+					discount_id_number: i.discount_id_number ?? null,
+					addon_items: (i.addon_items ?? []).map((addon) => ({
+						addon_id: addon.addon_id,
+						addon_name_snapshot: addon.addon_name_snapshot,
+						addon_price_snapshot: Number(addon.addon_price_snapshot),
+						quantity: addon.quantity,
+					})),
 				})),
 			});
 
@@ -195,49 +168,50 @@ export function AdminEditOrderDialog({
 		}
 	};
 
-	const handleDelete = async () => {
+	const handleCancel = async () => {
 		if (
 			!confirm(
-				"Are you sure you want to delete this entire order? This will restore inventory items and remove the transaction permanently.",
+				"Are you sure you want to cancel this order? Inventory will be restored and the order will be disassociated from active records.",
 			)
 		) {
 			return;
 		}
 		try {
-			await deleteMutation.mutateAsync({ orderId: order.order_id });
+			await cancelMutation.mutateAsync({ orderId: order.order_id });
 			onClose();
 		} catch (error) {
-			console.error("Failed to delete order", error);
+			console.error("Failed to cancel order", error);
 		}
 	};
 
-	const isPending = itemsMutation.isPending || paymentMutation.isPending || deleteMutation.isPending;
+	const isPending = itemsMutation.isPending || paymentMutation.isPending || cancelMutation.isPending;
 
 	return (
-		<AlertDialog
+		<Dialog
 			open={open}
 			onOpenChange={(isOpen) => {
 				if (!isOpen) onClose();
 			}}
 		>
-			<AlertDialogContent
-				size="default"
-				className="sm:max-w-md max-h-[90vh] overflow-y-auto"
-			>
-				<AlertDialogHeader>
-					<AlertDialogTitle>Edit Order</AlertDialogTitle>
-					<AlertDialogDescription>
-						Update items, quantities, and payment details.
-					</AlertDialogDescription>
-				</AlertDialogHeader>
+			<DialogContent className="bg-(--pure-white) flex flex-col max-h-[90vh]">
+				<DialogHeader className="flex-row items-start justify-between gap-4 shrink-0">
+					<div className="space-y-2">
+						<DialogTitle className="text-lg font-bold text-(--near-black)">
+							Edit Order
+						</DialogTitle>
+						<DialogDescription className="text-sm text-(--medium-gray)">
+							Update items, quantities, and payment details.
+						</DialogDescription>
+					</div>
+				</DialogHeader>
 
 				{editPolicy === "historical" ? (
-					<p className="text-xs text-amber-700 bg-amber-50 border border-amber-200/60 rounded-lg px-3 py-2">
+					<p className="text-xs text-amber-700 bg-amber-50 border border-amber-200/60 rounded-md px-2 py-1.5 shrink-0">
 						Inventory will not be adjusted for orders older than yesterday.
 					</p>
 				) : null}
 
-				<div className="space-y-4">
+				<div className="overflow-y-auto space-y-5 px-1 overflow-x-hidden min-h-0 grow">
 					<div className="rounded-lg bg-(--off-white) p-3 text-sm">
 						<div className="flex justify-between font-semibold">
 							<span>Order No.</span>
@@ -249,60 +223,95 @@ export function AdminEditOrderDialog({
 						</div>
 					</div>
 
-					<div className="space-y-2 border border-(--light-gray) rounded-lg p-2">
-						<h4 className="text-xs font-bold uppercase tracking-wider text-(--medium-gray) px-1">
+					<div className="space-y-3 border border-(--light-gray) rounded-lg p-3">
+						<h4 className="text-xs font-bold uppercase tracking-wider text-(--medium-gray)">
 							Order Items
 						</h4>
 						<div className="max-h-48 overflow-y-auto space-y-2">
 							{items.length === 0 ? (
-								<p className="text-xs text-red-500 px-1 py-2">
+								<p className="text-xs text-red-500 py-1">
 									Order must have at least 1 item.
 								</p>
 							) : (
 								items.map((item) => (
 									<div
 										key={item.order_item_id}
-										className="flex items-center justify-between bg-white rounded-md p-2 border border-(--light-gray)/40 text-xs"
+										className="flex items-start justify-between gap-2 bg-white rounded-md p-2 border border-(--light-gray)/40 text-sm"
 									>
-										<div className="flex-1 pr-2 truncate">
-											<span className="font-bold text-(--near-black)">
+										<div className="min-w-0 flex-1">
+											<div className="font-bold text-(--near-black)">
 												{item.snapshot_menu_name}
-											</span>
-											<span className="text-(--medium-gray) ml-1">
-												({item.snapshot_inventory})
-											</span>
+											</div>
+											<div className="text-xs text-(--medium-gray)">
+												{item.snapshot_inventory}
+											</div>
+											<div className="mt-1 flex flex-wrap gap-1">
+												{item.loyalty ? (
+													<span className={posBadgeFree}>Free</span>
+												) : null}
+												{item.discount_type ? (
+													<span className={posBadgeDiscount}>
+														{item.discount_type === "SENIOR" ? "Senior" : "PWD"}
+													</span>
+												) : null}
+											</div>
+											{item.addon_items && item.addon_items.length > 0 ? (
+												<p className="mt-1 text-xs italic text-(--coral)">
+													+{" "}
+													{item.addon_items
+														.map(
+															(addon) =>
+																`${addon.addon_name_snapshot} x${addon.quantity}`,
+														)
+														.join(", ")}
+												</p>
+											) : null}
+											<p className="mt-1 text-xs font-semibold text-(--deep-forest)">
+												{formatPeso(Number(item.line_total ?? 0))}
+											</p>
 										</div>
-										<div className="flex items-center gap-2 shrink-0">
+										<div className="flex shrink-0 items-center gap-1">
 											<div className="flex items-center gap-1 bg-(--off-white) rounded-md border border-(--light-gray)/50 p-0.5">
 												<button
 													type="button"
-													className="size-5 flex items-center justify-center rounded-sm hover:bg-gray-200"
+													className="size-6 flex items-center justify-center rounded-sm hover:bg-gray-200"
 													onClick={() =>
 														handleUpdateQuantity(item.order_item_id, -1)
 													}
 													disabled={item.quantity <= 1}
 												>
-													<MinusIcon className="size-3" />
+													<MinusIcon className="size-3.5" />
 												</button>
-												<span className="w-4 text-center font-bold text-(--near-black)">
+												<span className="w-5 text-center font-bold text-(--near-black) text-sm">
 													{item.quantity}
 												</span>
 												<button
 													type="button"
-													className="size-5 flex items-center justify-center rounded-sm hover:bg-gray-200"
+													className="size-6 flex items-center justify-center rounded-sm hover:bg-gray-200"
 													onClick={() =>
 														handleUpdateQuantity(item.order_item_id, 1)
 													}
+													disabled={Boolean(item.discount_type)}
 												>
-													<PlusIcon className="size-3" />
+													<PlusIcon className="size-3.5" />
 												</button>
 											</div>
 											<button
 												type="button"
-												className="size-6 flex items-center justify-center rounded-md bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
+												className="size-7 flex items-center justify-center rounded-md bg-(--off-white) text-(--deep-forest) hover:bg-(--light-mint)"
+												onClick={() => {
+													setEditingLine(item);
+													setItemEditorOpen(true);
+												}}
+											>
+												<PencilSimpleIcon className="size-4" />
+											</button>
+											<button
+												type="button"
+												className="size-7 flex items-center justify-center rounded-md bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
 												onClick={() => handleRemoveItem(item.order_item_id)}
 											>
-												<TrashIcon className="size-3.5" />
+												<TrashIcon className="size-4" />
 											</button>
 										</div>
 									</div>
@@ -310,42 +319,22 @@ export function AdminEditOrderDialog({
 							)}
 						</div>
 
-						{/* Add New Item */}
-						<div className="mt-3 pt-3 border-t border-(--light-gray) px-1 pb-1">
-							<label
-								htmlFor="edit-order-add-item"
-								className="text-xs font-bold text-(--medium-gray) mb-1 block"
+						<div className="pt-3 border-t border-(--light-gray)">
+							<Button
+								type="button"
+								size="sm"
+								className="h-9 w-full text-xs"
+								onClick={() => {
+									setEditingLine(null);
+									setItemEditorOpen(true);
+								}}
 							>
-								Add Item
-							</label>
-							<div className="flex gap-2">
-								<select
-									id="edit-order-add-item"
-									value={selectedNewItem}
-									onChange={(e) => setSelectedNewItem(e.target.value)}
-									className="flex-1 h-8 rounded-md border border-input bg-transparent px-2 py-1 text-xs shadow-xs outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
-								>
-									<option value="">Select an item...</option>
-									{availableItems.map((opt) => (
-										<option key={opt.id} value={opt.id}>
-											{opt.label}
-										</option>
-									))}
-								</select>
-								<Button
-									type="button"
-									size="sm"
-									className="h-8 shrink-0 px-3 text-xs"
-									disabled={!selectedNewItem}
-									onClick={handleAddNewItem}
-								>
-									<PlusCircle className="mr-1 size-3.5" /> Add
-								</Button>
-							</div>
+								<PlusCircle className="mr-1 size-4" /> Add Item
+							</Button>
 						</div>
 					</div>
 
-					<div className="space-y-1">
+					<div className="space-y-1.5">
 						<label
 							htmlFor="edit-order-payment-method"
 							className="text-xs font-bold uppercase tracking-wider text-(--medium-gray)"
@@ -367,7 +356,7 @@ export function AdminEditOrderDialog({
 					</div>
 
 					{method === "CASH" && (
-						<div className="space-y-1">
+						<div className="space-y-1.5">
 							<label
 								htmlFor="edit-order-amount-tendered"
 								className="text-xs font-bold uppercase tracking-wider text-(--medium-gray)"
@@ -402,7 +391,7 @@ export function AdminEditOrderDialog({
 					)}
 
 					{method !== "CASH" ? (
-						<div className="space-y-1">
+						<div className="space-y-1.5">
 							<label
 								htmlFor="edit-order-reference-number"
 								className="text-xs font-bold uppercase tracking-wider text-(--medium-gray)"
@@ -421,28 +410,42 @@ export function AdminEditOrderDialog({
 					) : null}
 				</div>
 
-				<AlertDialogFooter className="sm:justify-between w-full flex-col sm:flex-row gap-2 sm:gap-0">
+				<DialogFooter className="shrink-0">
 					<Button
 						type="button"
 						variant="destructive"
-						onClick={handleDelete}
+						onClick={handleCancel}
 						disabled={isPending}
 					>
-						Delete Order
+						Cancel Order
 					</Button>
-					<div className="flex gap-2 sm:justify-end">
-						<AlertDialogCancel onClick={onClose} disabled={isPending}>
-							Cancel
-						</AlertDialogCancel>
-						<AlertDialogAction
-							onClick={handleSave}
-							disabled={isPending || !isAmountValid || items.length === 0}
-						>
-							{isPending ? "Processing..." : "Save Changes"}
-						</AlertDialogAction>
-					</div>
-				</AlertDialogFooter>
-			</AlertDialogContent>
-		</AlertDialog>
+					<Button
+						type="button"
+						variant="outline"
+						onClick={onClose}
+						disabled={isPending}
+					>
+						Cancel
+					</Button>
+					<Button
+						type="button"
+						onClick={handleSave}
+						disabled={isPending || !isAmountValid || items.length === 0}
+					>
+						{isPending ? "Processing..." : "Save Changes"}
+					</Button>
+				</DialogFooter>
+			</DialogContent>
+
+			<AdminOrderItemEditorDialog
+				open={itemEditorOpen}
+				editingItem={editingLine}
+				onClose={() => {
+					setItemEditorOpen(false);
+					setEditingLine(null);
+				}}
+				onSave={handleSaveLine}
+			/>
+		</Dialog>
 	);
 }

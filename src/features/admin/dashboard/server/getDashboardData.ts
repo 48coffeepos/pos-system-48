@@ -12,7 +12,13 @@ export const getDashboardData = createServerFn({ method: "GET" })
     const { start, end } = getTodayBounds(tz);
 
     const orders = await prisma.order.findMany({
-      where: { created_at: { gte: start, lte: end } },
+      where: {
+        created_at: { gte: start, lte: end },
+        OR: [
+          { note: null },
+          { note: { not: { startsWith: "[CANCELED]" } } },
+        ],
+      },
       select: { method: true, grand_total: true },
     });
 
@@ -65,7 +71,13 @@ export const getDashboardData = createServerFn({ method: "GET" })
 
     const todayOrderItems = await prisma.orderItem.findMany({
       where: {
-        order: { created_at: { gte: start, lte: end } },
+        order: {
+          created_at: { gte: start, lte: end },
+          OR: [
+            { note: null },
+            { note: { not: { startsWith: "[CANCELED]" } } },
+          ],
+        },
       },
       select: {
         quantity: true,

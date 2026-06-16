@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useStore } from "@tanstack/react-form";
 import { useCallback, useMemo } from "react";
 import { toast } from "sonner";
 import { sessionQueryOptions } from "@/features/auth/queryOptions";
@@ -61,6 +62,17 @@ export function PosScreen() {
 	const cartTotal = cart.reduce((s, c) => s + c.total_price, 0);
 
 	const form = usePosForm();
+
+	const paymentMethod = useStore(
+		form.store,
+		(state) => state.values.paymentMethod,
+	);
+	const amountPaid = useStore(form.store, (state) => state.values.amountPaid);
+	const referenceNumber = useStore(
+		form.store,
+		(state) => state.values.referenceNumber,
+	);
+	const note = useStore(form.store, (state) => state.values.note);
 
 	if (error) {
 		console.error("POS page data query failed:", error);
@@ -207,6 +219,13 @@ export function PosScreen() {
 			form.reset(usePosStore.getState().formValues);
 			setShowPlaceOrderConfirm(false);
 			toast.success(`Order #${order.order_id} placed successfully!`);
+			if (placedOrder.negative_stock_items?.length) {
+				toast.warning("Some items are now below zero stock", {
+					description: placedOrder.negative_stock_items
+						.map((item) => `${item.name} (${item.ending})`)
+						.join(", "),
+				});
+			}
 			if (placedOrder.pusherPublished === false) {
 				toast.warning(
 					"Order saved, but the orders list may not update automatically. Refresh if needed.",
@@ -263,6 +282,11 @@ export function PosScreen() {
 
 			<PosOrderConfirmDialog
 				open={showPlaceOrderConfirm}
+				cart={cart}
+				paymentMethod={paymentMethod}
+				amountPaid={amountPaid}
+				referenceNumber={referenceNumber}
+				note={note}
 				total={cartTotal}
 				isLoading={createOrderMutation.isPending}
 				onClose={() => setShowPlaceOrderConfirm(false)}

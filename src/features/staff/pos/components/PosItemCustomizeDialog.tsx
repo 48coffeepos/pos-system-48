@@ -1,5 +1,5 @@
 import { MinusIcon, PlusIcon } from "@phosphor-icons/react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
+import { sortCupInventoryItems, parseCupInfoKey } from "@/lib/cup-utils";
 import { formatPeso } from "@/lib/format-currency";
 import { usePosItemCustomizeDialog } from "../hooks/usePosItemCustomizeDialog";
 import {
@@ -62,6 +63,20 @@ interface PosItemCustomizeDialogProps {
 		}>;
 	}) => void;
 	hasDiscountInCart: boolean;
+	initialLine?: {
+		quantity: number;
+		snapshot_inventory?: string;
+		loyalty?: boolean;
+		discount_type?: string;
+		discount_contact?: string;
+		discount_id_number?: string;
+		addon_items?: Array<{
+			addon_id: string;
+			addon_name_snapshot: string;
+			addon_price_snapshot: number;
+			quantity: number;
+		}>;
+	} | null;
 }
 
 export function PosItemCustomizeDialog({
@@ -70,6 +85,7 @@ export function PosItemCustomizeDialog({
 	onClose,
 	onConfirm,
 	hasDiscountInCart,
+	initialLine = null,
 }: PosItemCustomizeDialogProps) {
 	const [selectedInvItem, setSelectedInvItem] = useState<string | null>(null);
 	const [showAddons, setShowAddons] = useState(false);
@@ -77,8 +93,13 @@ export function PosItemCustomizeDialog({
 		Record<string, { name: string; price: number; quantity: number }>
 	>({});
 
-	const cupItems =
-		item?.inventory_items?.filter((ii) => ii.inventory.type === "CUP") ?? [];
+	const cupItems = useMemo(
+		() =>
+			sortCupInventoryItems(
+				item?.inventory_items?.filter((ii) => ii.inventory.type === "CUP") ?? [],
+			),
+		[item?.inventory_items],
+	);
 
 	const canUseFreeDrink = selectedInvItem !== null;
 	const canDiscount = !hasDiscountInCart;
@@ -95,13 +116,49 @@ export function PosItemCustomizeDialog({
 	useEffect(() => {
 		if (!item) return;
 
+		const matchingCup = initialLine?.snapshot_inventory
+			? cupItems.find((c) => {
+					const key = parseCupInfoKey(c.inventory.name);
+					return (
+						c.inventory.name === initialLine.snapshot_inventory ||
+						key === initialLine.snapshot_inventory ||
+						c.inventory.name.toLowerCase() ===
+							initialLine.snapshot_inventory.toLowerCase()
+					);
+				})
+			: null;
+
 		setSelectedInvItem(
-			cupItems.length > 0 ? cupItems[0].inventory.inventory_id : null,
+			matchingCup?.inventory.inventory_id ??
+				(cupItems.length > 0 ? cupItems[0].inventory.inventory_id : null),
 		);
-		setShowAddons(false);
-		setSelectedAddons({});
-		form.reset();
-	}, [item, cupItems.length, cupItems[0]?.inventory?.inventory_id, form]);
+
+		const initialAddons: Record<
+			string,
+			{ name: string; price: number; quantity: number }
+		> = {};
+		for (const addon of initialLine?.addon_items ?? []) {
+			initialAddons[addon.addon_id] = {
+				name: addon.addon_name_snapshot,
+				price: Number(addon.addon_price_snapshot),
+				quantity: addon.quantity,
+			};
+		}
+		setShowAddons(Object.keys(initialAddons).length > 0);
+		setSelectedAddons(initialAddons);
+
+		form.reset({
+			discountType:
+				initialLine?.discount_type === "PWD" ||
+				initialLine?.discount_type === "SENIOR"
+					? initialLine.discount_type
+					: "NONE",
+			discountName: initialLine?.discount_contact ?? "",
+			discountId: initialLine?.discount_id_number ?? "",
+			isFreeDrink: initialLine?.loyalty ?? false,
+			quantity: initialLine?.quantity ?? 1,
+		});
+	}, [item, cupItems, initialLine, form]);
 
 	if (!item) return null;
 

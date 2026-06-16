@@ -9,6 +9,10 @@ import {
   type storefrontDeductStockInput,
 } from "./server/storefrontDeductStock";
 import {
+  storefrontAddStock,
+  type storefrontAddStockInput,
+} from "./server/storefrontAddStock";
+import {
   stockroomAddStock,
   type stockroomAddStockInput,
 } from "./server/stockroomAddStock";
@@ -124,6 +128,27 @@ export const storefrontDeductStockMutationOptions = mutationOptions({
   },
   onError: (error) => {
     toast.error("Failed to deduct stock", {
+      description: error?.message ?? "Unknown error",
+    });
+  },
+});
+
+export const storefrontAddStockMutationOptions = mutationOptions({
+  mutationFn: async (data: z.infer<typeof storefrontAddStockInput>) =>
+    storefrontAddStock({ data }),
+  onSuccess: (_data, variables, _onMutateResult, mutationContext) => {
+    mutationContext?.client?.invalidateQueries({
+      queryKey: inventoryKeys.inventory,
+    });
+    mutationContext?.client?.invalidateQueries({
+      queryKey: inventoryKeys.inventoryLogs,
+    });
+    toast.success("Stock added to storefront", {
+      description: `${variables.quantity}x ${variables.itemName} added to storefront stock.`,
+    });
+  },
+  onError: (error) => {
+    toast.error("Failed to add stock", {
       description: error?.message ?? "Unknown error",
     });
   },
