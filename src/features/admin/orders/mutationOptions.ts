@@ -52,12 +52,19 @@ export const updateOrderPaymentMutationOptions = mutationOptions({
 export const updateOrderItemsMutationOptions = mutationOptions({
 	mutationFn: async (data: z.infer<typeof updateOrderItemsInput>) =>
 		updateOrderItems({ data }),
-	onSuccess: async (_data, _variables, _onMutateResult, mutationContext) => {
+	onSuccess: async (data, _variables, _onMutateResult, mutationContext) => {
 		await invalidateOrderAndDashboard(mutationContext);
 		toast.success("Order items updated", {
 			description:
 				"The order items and totals have been successfully modified.",
 		});
+		if (data.negative_stock_items?.length) {
+			toast.warning("Some items are now below zero stock", {
+				description: data.negative_stock_items
+					.map((item) => `${item.name} (${item.ending})`)
+					.join(", "),
+			});
+		}
 	},
 	onError: (error) => {
 		toast.error("Failed to update items", {

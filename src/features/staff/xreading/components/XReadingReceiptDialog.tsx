@@ -1,11 +1,12 @@
 import { PrinterIcon } from "@phosphor-icons/react";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useReactToPrint } from "react-to-print";
 import { PosModal } from "@/features/staff/pos/components/ui/PosModal";
 import {
   ReceiptThermalContent,
   THERMAL_PAGE_STYLE,
 } from "@/integrations/bixolon";
+import { formatReceiptDate, formatReceiptTime } from "@/lib/format-datetime";
 import type { CashCountValues } from "../stores/useXReadingStore";
 import type { DailyReconciliationTotals } from "../utils/reconciliation";
 import { getExpectedCashInDrawer, getOverShort } from "../utils/reconciliation";
@@ -38,6 +39,13 @@ export function XReadingReceiptDialog({
   date,
 }: XReadingReceiptDialogProps) {
   const contentRef = useRef<HTMLDivElement>(null);
+  const [generatedAt, setGeneratedAt] = useState(() => new Date());
+
+  useEffect(() => {
+    if (open && mode) {
+      setGeneratedAt(new Date());
+    }
+  }, [open, mode]);
 
   const handlePrint = useReactToPrint({
     contentRef,
@@ -54,16 +62,8 @@ export function XReadingReceiptDialog({
 
   const targetDate = date === "yesterday" ? new Date(Date.now() - 86400000) : new Date();
 
-  const displayDate = targetDate.toLocaleDateString("en-US", {
-    month: "2-digit",
-    day: "2-digit",
-    year: "numeric",
-  });
-  const displayTime = targetDate.toLocaleString("en-US", {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: true,
-  });
+  const displayDate = formatReceiptDate(targetDate);
+  const generatedTime = formatReceiptTime(generatedAt);
 
   return (
     <PosModal
@@ -92,6 +92,10 @@ export function XReadingReceiptDialog({
               <div className="flex justify-between">
                 <span>Sales Date :</span>
                 <span>{displayDate}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Generated :</span>
+                <span>{generatedTime}</span>
               </div>
               <div className="flex justify-between">
                 <span>Cashier :</span>
@@ -171,6 +175,7 @@ export function XReadingReceiptDialog({
               </div>
               <h3 className="mt-0.5 text-lg font-bold uppercase">CASH COUNT</h3>
               <p className="text-sm mt-2 font-bold">Date: {displayDate}</p>
+              <p className="text-sm font-bold">Generated: {generatedTime}</p>
               <p className="text-sm font-bold">Cashier: {staffName}</p>
             </div>
 
@@ -229,7 +234,7 @@ export function XReadingReceiptDialog({
               </div>
               <div className="flex justify-between">
                 <span>Time :</span>
-                <span>{displayTime}</span>
+                <span>{generatedTime}</span>
               </div>
               <div className="flex justify-between">
                 <span>Cashier :</span>

@@ -7,6 +7,7 @@ import {
   ReceiptThermalContent,
   THERMAL_PAGE_STYLE,
 } from "@/integrations/bixolon";
+import { formatReceiptDate, formatReceiptTime } from "@/lib/format-datetime";
 import type { CupSale } from "../server/getAdminCupSales";
 
 interface ReconciliationData {
@@ -82,9 +83,11 @@ export function DashboardReceiptDialog({
   const [payrollAmount, setPayrollAmount] = useState<string>("");
   const [otherExpenses, setOtherExpenses] = useState<{ id: string; name: string; amount: string }[]>([]);
   const [step, setStep] = useState<"form" | "receipt">("form");
+  const [generatedAt, setGeneratedAt] = useState(() => new Date());
 
   useEffect(() => {
     if (open) {
+      setGeneratedAt(new Date());
       setStep("form");
       setGrabAmount("");
       setPayrollAmount("");
@@ -117,8 +120,9 @@ export function DashboardReceiptDialog({
   const targetDate = receiptDate === "yesterday"
     ? new Date(Date.now() - 86400000)
     : new Date();
-  const displayDate = formatDate(targetDate);
-  const displayTime = formatTime(targetDate);
+  const displayDate = formatReceiptDate(targetDate);
+  const displayTime = formatReceiptTime(targetDate);
+  const generatedTime = formatReceiptTime(generatedAt);
 
   const showForm = mode === "monthly" || mode === "dailyRevenue";
 
@@ -502,6 +506,10 @@ export function DashboardReceiptDialog({
                 <div className="flex justify-between">
                   <span>Sales Date :</span>
                   <span>{displayDate}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Generated :</span>
+                  <span>{generatedTime}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Cashier :</span>

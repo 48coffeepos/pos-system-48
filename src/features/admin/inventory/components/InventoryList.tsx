@@ -6,13 +6,17 @@ import {
   NotePencilIcon,
   PackageIcon,
   PlusCircleIcon,
+  PlusIcon,
+  PrinterIcon,
   TrashIcon,
   WarningCircleIcon,
 } from "@phosphor-icons/react";
 import { useMutation } from "@tanstack/react-query";
 import type { ColumnDef } from "@tanstack/react-table";
 import Fuse from "fuse.js";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { useReactToPrint } from "react-to-print";
+import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -26,6 +30,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { DataTable } from "@/components/ui/data-table";
 import { deleteInventoryItemMutationOptions } from "../mutationOptions";
+import { BOND_PAGE_STYLE } from "../utils/bond-print";
 import type {
   InventoryItem,
   InventoryItemType,
@@ -33,9 +38,10 @@ import type {
   InventoryTab,
 } from "../types";
 import { StockroomAdd } from "./stockroom/StockroomAdd";
-import { StorefrontDeduct } from "./storefront/StorefrontDeduct";
+import { StorefrontAdd, StorefrontDeduct } from "./storefront";
 import { SuppliesEodOutStore } from "./storefront/SuppliesEodOutStore";
 import { TransferStock } from "./transfer/TransferStock";
+import { InventoryPrintSheet } from "./InventoryPrintSheet";
 
 type Tab = InventoryTab;
 
@@ -95,6 +101,7 @@ export interface InventoryListProps {
   items?: InventoryItem[];
   inventoryLogs?: InventoryLogEntry[];
   onEdit?: (item: InventoryItem) => void;
+  onAddItem?: () => void;
   hideActions?: boolean;
   actions?: "none" | "stock" | "all";
   activeTab?: Tab;
@@ -108,6 +115,7 @@ function InventoryList({
   items = [],
   inventoryLogs = [],
   onEdit,
+  onAddItem,
   hideActions,
   actions = "all",
   activeTab = "admin",
@@ -125,6 +133,8 @@ function InventoryList({
   const [deductingItem, setDeductingItem] = useState<InventoryItem | null>(
     null,
   );
+  const [storefrontAddingItem, setStorefrontAddingItem] =
+    useState<InventoryItem | null>(null);
   const [stockroomingItem, setStockroomingItem] =
     useState<InventoryItem | null>(null);
   const [transferringItem, setTransferringItem] =
@@ -132,6 +142,12 @@ function InventoryList({
   const [suppliesEodItem, setSuppliesEodItem] = useState<InventoryItem | null>(
     null,
   );
+  const printRef = useRef<HTMLDivElement>(null);
+
+  const handlePrint = useReactToPrint({
+    contentRef: printRef,
+    pageStyle: BOND_PAGE_STYLE,
+  });
 
   const filtered = search
     ? new Fuse(items, { keys: ["name"], threshold: 0.3 })
@@ -289,6 +305,14 @@ function InventoryList({
           <div className="flex items-center justify-end gap-3 text-(--medium-gray)">
             {activeTab === "storefront" && (
               <>
+                <button
+                  type="button"
+                  onClick={() => setStorefrontAddingItem(item)}
+                  className="p-1 hover:text-(--deep-forest) transition-colors"
+                  aria-label="Add stock to storefront"
+                >
+                  <PlusCircleIcon size={22} weight="bold" />
+                </button>
                 {item.type === "SUPPLIES" ? (
                   <button
                     type="button"
@@ -462,6 +486,9 @@ function InventoryList({
     </div>
   );
 
+  const printTitle =
+    ledgerTab === "admin" ? "Stockroom Inventory" : "Storefront Inventory";
+
   return (
     <div>
       <div className="rounded-2xl border border-(--light-gray) bg-(--pure-white) p-6">
@@ -479,7 +506,32 @@ function InventoryList({
             </p>
           </div>
 
-          <div className="flex gap-2 self-start sm:self-auto">
+          <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
+            {!isLogsTab ? (
+              <>
+                {onAddItem ? (
+                  <Button
+                    type="button"
+                    size="sm"
+                    onClick={onAddItem}
+                    className="print:hidden"
+                  >
+                    <PlusIcon className="size-4" />
+                    Add Item
+                  </Button>
+                ) : null}
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  onClick={() => handlePrint()}
+                  className="print:hidden"
+                >
+                  <PrinterIcon className="size-4" />
+                  Print
+                </Button>
+              </>
+            ) : null}
             {onTabChange && (
               <div className="flex gap-1.5 rounded-full bg-(--light-gray)/30 p-1">
                 {allowedTabs.includes("admin") ? (
@@ -649,6 +701,19 @@ function InventoryList({
         />
       ) : null}
 
+      {storefrontAddingItem && (
+        <StorefrontAdd
+          item={{
+            id: storefrontAddingItem.id,
+            name: storefrontAddingItem.name,
+          }}
+          open={!!storefrontAddingItem}
+          onOpenChange={(open) => {
+            if (!open) setStorefrontAddingItem(null);
+          }}
+        />
+      )}
+
       {suppliesEodItem && (
         <SuppliesEodOutStore
           item={{
@@ -699,6 +764,16 @@ function InventoryList({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <div className="hidden">
+        <InventoryPrintSheet
+          ref={printRef}
+          title={printTitle}
+          items={filtered}
+          ledgerTab={ledgerTab}
+          showFinancialColumns={showFinancialColumns}
+        />
+      </div>
     </div>
   );
 }

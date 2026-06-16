@@ -1,4 +1,5 @@
 import {
+	CurrencyDollarIcon,
 	ListIcon,
 	PackageIcon,
 	SignOutIcon,
@@ -24,6 +25,7 @@ const navLinks = [
 	{ label: "Dashboard", path: "/admin", icon: SquaresFourIcon },
 	{ label: "Menu", path: "/admin/menu", icon: ListIcon },
 	{ label: "Inventory", path: "/admin/inventory", icon: PackageIcon },
+	{ label: "Cash Logs", path: "/admin/cash-logs", icon: CurrencyDollarIcon },
 	{ label: "Accounts", path: "/admin/accounts", icon: UsersIcon },
 ];
 

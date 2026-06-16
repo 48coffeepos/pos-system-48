@@ -6,7 +6,10 @@ import type {
   Discount_Type,
   Payment_Method,
 } from "@/generated/prisma/enums.js";
-import { applyInventoryMovement } from "@/features/admin/inventory/server/inventoryMovement";
+import {
+	applyInventoryMovement,
+	trackNegativeStock,
+} from "@/features/admin/inventory/server/inventoryMovement";
 import { prisma } from "@/integrations/prisma/db";
 import {
 	PUSHER_NEW_ORDER_EVENT,
@@ -236,25 +239,29 @@ async function createOrderInTransaction(
         },
       });
 
-      await Promise.all(
-        data.items.map(async (item) => {
-          const invIds = item.selected_inventory_id
-            ? [item.selected_inventory_id]
-            : (menuToInvMap.get(item.menu_id) ?? []);
+      const negativeStockByName = new Map<
+        string,
+        { name: string; ending: number }
+      >();
 
-          if (invIds.length === 0) return;
-          if (invIds.length > 1) {
-            throw new Error(
-              "Cup or size selection is required for this menu item. Please customize the item before checkout.",
-            );
-          }
+      for (const item of data.items) {
+        const invIds = item.selected_inventory_id
+          ? [item.selected_inventory_id]
+          : (menuToInvMap.get(item.menu_id) ?? []);
 
-          await applyInventoryMovement(tx, invIds[0], {
-            kind: "sale",
-            quantity: item.quantity,
-          });
-        }),
-      );
+        if (invIds.length === 0) continue;
+        if (invIds.length > 1) {
+          throw new Error(
+            "Cup or size selection is required for this menu item. Please customize the item before checkout.",
+          );
+        }
+
+        const updated = await applyInventoryMovement(tx, invIds[0], {
+          kind: "sale",
+          quantity: item.quantity,
+        });
+        trackNegativeStock(negativeStockByName, updated);
+      }
 
       const cashierName = order.staff?.name?.trim() || "Cashier";
 
@@ -267,6 +274,7 @@ async function createOrderInTransaction(
           : null,
         change_amount: order.change_amount ? Number(order.change_amount) : null,
         grand_total: Number(order.grand_total),
+        negative_stock_items: Array.from(negativeStockByName.values()),
         order_items: order.order_items.map((orderItem) => ({
           ...orderItem,
           snapshot_price: Number(orderItem.snapshot_price),

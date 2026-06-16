@@ -1,6 +1,7 @@
 import { mutationOptions } from "@tanstack/react-query";
 import { toast } from "sonner";
 import expenseKeys from "./keys";
+import adminCashLogKeys from "@/features/admin/cash-logs/keys";
 import { xreadingKeys } from "@/features/staff/xreading/keys";
 import { createExpense } from "./server/createExpense";
 import type { CreateExpenseInput } from "./schemas/expense";
@@ -19,6 +20,12 @@ export const createExpenseMutationOptions = mutationOptions({
       );
     }
     void context.client.invalidateQueries({ queryKey: xreadingKeys.all });
+    void context.client.invalidateQueries({
+      queryKey: adminCashLogKeys.all("today"),
+    });
+    void context.client.invalidateQueries({
+      queryKey: adminCashLogKeys.all("yesterday"),
+    });
     const label =
       variables.type === "CASH_IN"
         ? "Cash in"
