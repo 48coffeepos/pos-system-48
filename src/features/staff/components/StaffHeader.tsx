@@ -19,10 +19,6 @@ import {
 	defaultPosFormValues,
 	usePosStore,
 } from "@/features/staff/pos/stores/usePosStore";
-import {
-	emptyCashCountValues,
-	useXReadingStore,
-} from "@/features/staff/xreading/stores/useXReadingStore";
 
 const navLinks = [
 	{ label: "POS", path: "/staff/pos", icon: ShoppingCartIcon },
@@ -42,8 +38,6 @@ function StaffHeader() {
 	const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
 	const handleLogout = async () => {
-		useXReadingStore.persist.clearStorage();
-		useXReadingStore.setState({ cashCount: emptyCashCountValues });
 		usePosStore.persist.clearStorage();
 		usePosStore.setState({ cart: [], formValues: defaultPosFormValues, lastOrder: null, search: "" });
 		await authClient.signOut();

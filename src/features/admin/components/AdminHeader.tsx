@@ -19,10 +19,6 @@ import {
 	defaultPosFormValues,
 	usePosStore,
 } from "@/features/staff/pos/stores/usePosStore";
-import {
-	emptyCashCountValues,
-	useXReadingStore,
-} from "@/features/staff/xreading/stores/useXReadingStore";
 
 const navLinks = [
 	{ label: "Dashboard", path: "/admin", icon: SquaresFourIcon },
@@ -40,8 +36,6 @@ function AdminHeader() {
 	const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
 	const handleLogout = async () => {
-		useXReadingStore.persist.clearStorage();
-		useXReadingStore.setState({ cashCount: emptyCashCountValues });
 		usePosStore.persist.clearStorage();
 		usePosStore.setState({
 			cart: [],

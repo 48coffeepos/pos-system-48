@@ -59,7 +59,9 @@ export function XReadingScreen({ date, data }: XReadingScreenProps) {
 			form.reset(useXReadingStore.getState().cashCount);
 		};
 
-		syncFormFromStore();
+		if (useXReadingStore.persist.hasHydrated()) {
+			syncFormFromStore();
+		}
 
 		return useXReadingStore.persist.onFinishHydration(syncFormFromStore);
 	}, [form]);
