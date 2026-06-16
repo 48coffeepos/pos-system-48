@@ -35,6 +35,7 @@ export const updateOrderPaymentMutationOptions = mutationOptions({
 		method: "CASH" | "GCASH" | "GRAB";
 		amount_tendered: number;
 		reference_number?: string;
+		note?: string;
 	}) => updateOrderPayment({ data }),
 	onSuccess: async (_data, _variables, _onMutateResult, mutationContext) => {
 		await invalidateOrderAndDashboard(mutationContext);
@@ -74,7 +75,8 @@ export const updateOrderItemsMutationOptions = mutationOptions({
 });
 
 export const cancelOrderMutationOptions = mutationOptions({
-	mutationFn: async (data: { orderId: string }) => cancelOrder({ data }),
+	mutationFn: async (data: { orderId: string; reason: string }) =>
+		cancelOrder({ data }),
 	onSuccess: async (_data, _variables, _onMutateResult, mutationContext) => {
 		await invalidateOrderAndDashboard(mutationContext);
 		toast.success("Order canceled", {
