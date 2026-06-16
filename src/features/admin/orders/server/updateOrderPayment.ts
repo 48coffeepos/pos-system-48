@@ -9,6 +9,7 @@ export const updateOrderPaymentInput = z.object({
 	method: z.enum(["CASH", "GCASH", "GRAB"]),
 	amount_tendered: z.number().min(0),
 	reference_number: z.string().optional(),
+	note: z.string().optional(),
 });
 
 export const updateOrderPayment = createServerFn({ method: "POST" })
@@ -102,6 +103,7 @@ export const updateOrderPayment = createServerFn({ method: "POST" })
 					change_amount: changeAmount,
 					reference_number: data.reference_number || null,
 					grand_total: newGrandTotal,
+					note: data.note?.trim() || null,
 				},
 				select: { order_id: true },
 			}),

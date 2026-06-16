@@ -89,6 +89,7 @@ export const getFilteredOrders = createServerFn({ method: "GET" })
 				cashier_name: order.staff?.name ?? "Cashier",
 				items: order.order_items.map((item) => ({
 					order_item_id: item.order_item_id,
+					menu_id: item.menu_id ?? undefined,
 					snapshot_menu_name: item.snapshot_menu_name,
 					quantity: item.quantity,
 					unit_price: Number(item.unit_price),

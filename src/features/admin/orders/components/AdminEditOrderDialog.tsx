@@ -26,6 +26,7 @@ import {
 	updateOrderPaymentMutationOptions,
 } from "../mutationOptions";
 import { AdminOrderItemEditorDialog } from "./AdminOrderItemEditorDialog";
+import { CancelOrderModal } from "./CancelOrderModal";
 
 interface AdminEditOrderDialogProps {
 	order: PosOrder | null;
@@ -43,8 +44,10 @@ export function AdminEditOrderDialog({
 	const [method, setMethod] = useState<string>("CASH");
 	const [amountTendered, setAmountTendered] = useState<string>("0");
 	const [referenceNumber, setReferenceNumber] = useState<string>("");
+	const [note, setNote] = useState<string>("");
 	const [items, setItems] = useState<PosOrder["items"]>([]);
 	const [itemEditorOpen, setItemEditorOpen] = useState(false);
+	const [cancelModalOpen, setCancelModalOpen] = useState(false);
 	const [editingLine, setEditingLine] = useState<PosOrder["items"][number] | null>(
 		null,
 	);
@@ -60,8 +63,10 @@ export function AdminEditOrderDialog({
 				order.amount_tendered?.toString() ?? order.grand_total.toString(),
 			);
 			setReferenceNumber(order.reference_number ?? "");
+			setNote(order.note ?? "");
 			setItems(order.items || []);
 			setItemEditorOpen(false);
+			setCancelModalOpen(false);
 			setEditingLine(null);
 		}
 	}, [open, order]);
@@ -160,6 +165,7 @@ export function AdminEditOrderDialog({
 				method: method as "CASH" | "GCASH" | "GRAB",
 				amount_tendered: Math.max(validAmount, grandTotal),
 				reference_number: isNonCash ? referenceNumber : undefined,
+				note: note.trim() || undefined,
 			});
 
 			onClose();
@@ -168,16 +174,10 @@ export function AdminEditOrderDialog({
 		}
 	};
 
-	const handleCancel = async () => {
-		if (
-			!confirm(
-				"Are you sure you want to cancel this order? Inventory will be restored and the order will be disassociated from active records.",
-			)
-		) {
-			return;
-		}
+	const handleCancelConfirm = async (reason: string) => {
 		try {
-			await cancelMutation.mutateAsync({ orderId: order.order_id });
+			await cancelMutation.mutateAsync({ orderId: order.order_id, reason });
+			setCancelModalOpen(false);
 			onClose();
 		} catch (error) {
 			console.error("Failed to cancel order", error);
@@ -187,6 +187,7 @@ export function AdminEditOrderDialog({
 	const isPending = itemsMutation.isPending || paymentMutation.isPending || cancelMutation.isPending;
 
 	return (
+		<>
 		<Dialog
 			open={open}
 			onOpenChange={(isOpen) => {
@@ -408,13 +409,30 @@ export function AdminEditOrderDialog({
 							/>
 						</div>
 					) : null}
+
+					<div className="space-y-1.5">
+						<label
+							htmlFor="edit-order-note"
+							className="text-xs font-bold uppercase tracking-wider text-(--medium-gray)"
+						>
+							Note
+						</label>
+						<input
+							id="edit-order-note"
+							type="text"
+							value={note}
+							onChange={(e) => setNote(e.target.value)}
+							placeholder="Add a note..."
+							className="flex w-full h-9 rounded-md border border-input bg-transparent px-2.5 py-2 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+						/>
+					</div>
 				</div>
 
 				<DialogFooter className="shrink-0">
 					<Button
 						type="button"
 						variant="destructive"
-						onClick={handleCancel}
+						onClick={() => setCancelModalOpen(true)}
 						disabled={isPending}
 					>
 						Cancel Order
@@ -436,16 +454,24 @@ export function AdminEditOrderDialog({
 					</Button>
 				</DialogFooter>
 			</DialogContent>
-
-			<AdminOrderItemEditorDialog
-				open={itemEditorOpen}
-				editingItem={editingLine}
-				onClose={() => {
-					setItemEditorOpen(false);
-					setEditingLine(null);
-				}}
-				onSave={handleSaveLine}
-			/>
 		</Dialog>
+
+		<AdminOrderItemEditorDialog
+			open={itemEditorOpen}
+			editingItem={editingLine}
+			onClose={() => {
+				setItemEditorOpen(false);
+				setEditingLine(null);
+			}}
+			onSave={handleSaveLine}
+		/>
+
+		<CancelOrderModal
+			open={cancelModalOpen}
+			onClose={() => setCancelModalOpen(false)}
+			onConfirm={handleCancelConfirm}
+			isPending={cancelMutation.isPending}
+		/>
+		</>
 	);
 }

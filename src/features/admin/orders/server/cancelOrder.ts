@@ -46,7 +46,12 @@ async function applyOrderEditInventoryMovement(
 
 export const cancelOrder = createServerFn({ method: "POST" })
 	.middleware([adminAuthMiddleware()])
-	.inputValidator(z.object({ orderId: z.string() }))
+	.inputValidator(
+		z.object({
+			orderId: z.string(),
+			reason: z.string().trim().min(1, "Cancel reason is required"),
+		}),
+	)
 	.handler(async ({ data }) => {
 		return prisma.$transaction(async (tx) => {
 			const order = await tx.order.findUnique({
@@ -72,10 +77,11 @@ export const cancelOrder = createServerFn({ method: "POST" })
 			}
 
 			// Mark order as canceled instead of deleting it
-			const existingNote = order.note ?? "";
+			const trimmedReason = data.reason.trim();
+			const existingNote = order.note?.trim() ?? "";
 			const canceledNote = existingNote
-				? `[CANCELED] ${existingNote}`
-				: "[CANCELED]";
+				? `[CANCELED] ${trimmedReason} — ${existingNote}`
+				: `[CANCELED] ${trimmedReason}`;
 
 			await tx.order.update({
 				where: { order_id: order.order_id },

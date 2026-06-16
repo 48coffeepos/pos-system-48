@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
 	Dialog,
 	DialogContent,
@@ -27,7 +27,7 @@ export function AdminOrderItemEditorDialog({
 	onSave,
 }: AdminOrderItemEditorDialogProps) {
 	const [selectedMenuId, setSelectedMenuId] = useState<string>("");
-	const { data: menuData } = useQuery({
+	const { data: menuData, isSuccess: menuLoaded } = useQuery({
 		...posPageDataQueryOptions,
 		enabled: open,
 	});
@@ -35,11 +35,29 @@ export function AdminOrderItemEditorDialog({
 	const menuItems = (menuData?.menuItems ?? []) as MenuItem[];
 	const addOns = menuData?.addOns ?? [];
 
+	useEffect(() => {
+		if (!open) {
+			setSelectedMenuId("");
+			return;
+		}
+		if (editingItem) {
+			setSelectedMenuId("");
+		}
+	}, [open, editingItem]);
+
 	const selectedMenu = useMemo(() => {
 		if (editingItem?.menu_id) {
 			return menuItems.find((m) => m.menu_id === editingItem.menu_id) ?? null;
 		}
-		return menuItems.find((m) => m.menu_id === selectedMenuId) ?? null;
+		if (editingItem?.snapshot_menu_name) {
+			return (
+				menuItems.find((m) => m.name === editingItem.snapshot_menu_name) ?? null
+			);
+		}
+		if (selectedMenuId) {
+			return menuItems.find((m) => m.menu_id === selectedMenuId) ?? null;
+		}
+		return null;
 	}, [editingItem, menuItems, selectedMenuId]);
 
 	const hasDiscountInCart = false;
@@ -134,8 +152,25 @@ export function AdminOrderItemEditorDialog({
 		);
 	}
 
+	if (editingItem && menuLoaded && !selectedMenu) {
+		return (
+			<Dialog open onOpenChange={(isOpen) => !isOpen && onClose()}>
+				<DialogContent className="w-[calc(100vw-1rem)] max-w-md">
+					<DialogHeader>
+						<DialogTitle>Edit Order Item</DialogTitle>
+					</DialogHeader>
+					<p className="text-sm text-red-600">
+						Menu item not found. The menu may have changed since this order was
+						placed.
+					</p>
+				</DialogContent>
+			</Dialog>
+		);
+	}
+
 	return (
 		<PosItemCustomizeDialog
+			key={editingItem?.order_item_id ?? selectedMenuId ?? "new"}
 			item={selectedMenu}
 			addOns={addOns}
 			onClose={onClose}
