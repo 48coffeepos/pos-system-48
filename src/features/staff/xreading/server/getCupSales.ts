@@ -13,9 +13,10 @@ export interface CupSale {
 
 export const getCupSales = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
-  .inputValidator(z.object({ date: z.enum(["today", "yesterday"]) }))
+  .inputValidator(z.object({ date: z.enum(["today", "yesterday"]), staffId: z.string().optional() }))
   .handler(async ({ data }) => {
     const { start, end } = getTimeframeBounds(data.date);
+    const staffFilter = data.staffId ? { staff_id: data.staffId } : {};
 
     const allCups = await prisma.inventory.findMany({
       where: { type: "CUP" },
@@ -41,6 +42,7 @@ export const getCupSales = createServerFn({ method: "GET" })
     const todayOrderItems = await prisma.orderItem.findMany({
       where: {
         order: {
+          ...staffFilter,
           created_at: { gte: start, lte: end },
           OR: [
             { note: null },

@@ -31,11 +31,13 @@ interface XReadingScreenProps {
 		totalCashIn: number;
 		totalExpenses: number;
 	};
+	mode: "me" | "all";
+	staffId?: string;
 }
 
 import { useNavigate } from "@tanstack/react-router";
 
-export function XReadingScreen({ date, data }: XReadingScreenProps) {
+export function XReadingScreen({ date, data, mode, staffId }: XReadingScreenProps) {
 	const navigate = useNavigate({ from: "/staff/xreading" });
 	const { data: session } = authClient.useSession();
 	const staffName = session?.user?.name || "Staff";
@@ -48,7 +50,7 @@ export function XReadingScreen({ date, data }: XReadingScreenProps) {
 		"sales" | "cashcount" | "cups" | null
 	>(null);
 
-	const { data: cupSales = [] } = useQuery(getCupSalesQueryOptions(date));
+	const { data: cupSales = [] } = useQuery(getCupSalesQueryOptions(date, mode === "me" ? staffId : undefined));
 
 	const form = useAppForm({
 		defaultValues: cashCount,
@@ -101,7 +103,7 @@ export function XReadingScreen({ date, data }: XReadingScreenProps) {
 					</button>
 					<button
 						type="button"
-						onClick={() => navigate({ search: { date: "yesterday" } })}
+						onClick={() => navigate({ search: { date: "yesterday", mode } })}
 						className={`rounded-lg px-4 py-2 text-sm font-bold transition-colors ${
 							date === "yesterday"
 								? "bg-(--forest-green) text-(--pale-yellow) shadow-sm"
@@ -109,6 +111,30 @@ export function XReadingScreen({ date, data }: XReadingScreenProps) {
 						}`}
 					>
 						Yesterday
+					</button>
+				</div>
+				<div className="ml-4 inline-flex rounded-xl border border-(--light-gray) bg-(--pure-white) p-1 shadow-sm">
+					<button
+						type="button"
+						onClick={() => navigate({ search: { date, mode: "me" } })}
+						className={`rounded-lg px-4 py-2 text-sm font-bold transition-colors ${
+							mode === "me"
+								? "bg-(--forest-green) text-(--pale-yellow) shadow-sm"
+								: "text-(--medium-gray) hover:text-(--near-black)"
+						}`}
+					>
+						My Shift
+					</button>
+					<button
+						type="button"
+						onClick={() => navigate({ search: { date, mode: "all" } })}
+						className={`rounded-lg px-4 py-2 text-sm font-bold transition-colors ${
+							mode === "all"
+								? "bg-(--forest-green) text-(--pale-yellow) shadow-sm"
+								: "text-(--medium-gray) hover:text-(--near-black)"
+						}`}
+					>
+						All Shift
 					</button>
 				</div>
 			</div>
@@ -179,6 +205,7 @@ export function XReadingScreen({ date, data }: XReadingScreenProps) {
 				cashCount={cashCount}
 				cupSales={cupSales}
 				date={date}
+				dateMode={mode}
 			/>
 		</>
 	);

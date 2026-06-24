@@ -6,13 +6,15 @@ import { getTimeframeBounds } from "@/lib/day-bounds";
 
 export const getDailyReconciliation = createServerFn({ method: "GET" })
   .middleware([authMiddleware])
-  .inputValidator(z.object({ date: z.enum(["today", "yesterday"]) }))
+  .inputValidator(z.object({ date: z.enum(["today", "yesterday"]), staffId: z.string().optional() }))
   .handler(async ({ data }) => {
     const { start, end } = getTimeframeBounds(data.date);
+    const staffFilter = data.staffId ? { staff_id: data.staffId } : {};
 
     const [cashOrders, gcashOrders, grabOrders, expenses] = await Promise.all([
       prisma.order.findMany({
         where: {
+          ...staffFilter,
           created_at: { gte: start, lte: end },
           method: "CASH",
           OR: [
@@ -24,6 +26,7 @@ export const getDailyReconciliation = createServerFn({ method: "GET" })
       }),
       prisma.order.findMany({
         where: {
+          ...staffFilter,
           created_at: { gte: start, lte: end },
           method: "GCASH",
           OR: [
@@ -35,6 +38,7 @@ export const getDailyReconciliation = createServerFn({ method: "GET" })
       }),
       prisma.order.findMany({
         where: {
+          ...staffFilter,
           created_at: { gte: start, lte: end },
           method: "GRAB",
           OR: [
@@ -46,6 +50,7 @@ export const getDailyReconciliation = createServerFn({ method: "GET" })
       }),
       prisma.expense.findMany({
         where: {
+          ...staffFilter,
           timestamp: { gte: start, lte: end },
         },
         select: { amount: true, type: true },

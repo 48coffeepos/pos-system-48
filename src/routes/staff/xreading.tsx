@@ -6,34 +6,35 @@ import {
 } from "@/components/route-boundaries";
 import { XReadingScreen } from "@/features/staff/xreading/components/XReadingScreen";
 import { getDailyReconciliationQueryOptions } from "@/features/staff/xreading/queryOptions";
+import { authClient } from "@/integrations/better-auth/auth-client";
 
 import { z } from "zod";
 
 const searchSchema = z.object({
 	date: z.enum(["today", "yesterday"]).optional().default("today"),
+	mode: z.enum(["me", "all"]).optional().default("all"),
 });
 
 export const Route = createFileRoute("/staff/xreading")({
 	validateSearch: searchSchema,
-	loaderDeps: ({ search: { date } }) => ({ date }),
-	loader: async ({ context: { queryClient }, deps: { date } }) => {
-		await queryClient.ensureQueryData(getDailyReconciliationQueryOptions(date));
-	},
 	pendingComponent: RoutePendingBoundary,
 	errorComponent: RouteErrorBoundary,
 	component: StaffXReading,
 });
 
 function StaffXReading() {
-	const { date } = Route.useSearch();
+	const { date, mode } = Route.useSearch();
+	const { data: session } = authClient.useSession();
+	const staffId = session?.user?.id;
+
 	const { data: reconciliationData } = useSuspenseQuery(
-		getDailyReconciliationQueryOptions(date),
+		getDailyReconciliationQueryOptions(date, mode === "me" ? staffId : undefined),
 	);
 
 	return (
 		<div className="min-h-screen bg-(--pale-yellow)/30">
 			<main className="mx-auto max-w-screen-2xl p-2 sm:p-3 lg:p-4">
-				<XReadingScreen date={date} data={reconciliationData} />
+				<XReadingScreen date={date} data={reconciliationData} mode={mode} staffId={staffId} />
 			</main>
 		</div>
 	);
